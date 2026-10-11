@@ -1,6 +1,310 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="de_DE">
+<!-- expai chains: begin -->
+<context>
+    <name>extension/expai/chain</name>
+    <message>
+        <source>Chains</source>
+        <translation>Ketten</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation>Exponential Intelligence</translation>
+    </message>
+    <message>
+        <source>Chains need the job queue (extension expqueue) and the chain tables (bin/php/expaischema.php --install).</source>
+        <translation>Ketten brauchen die Auftragswarteschlange (Erweiterung expqueue) und die Ketten-Tabellen (bin/php/expaischema.php --install).</translation>
+    </message>
+    <message>
+        <source>A chain writes in steps: a model writes, another reviews and the text is revised until it passes, a third prepares the title and summary, then an editor approves before anything else happens. Every step is a queued job with its cost; the result is a draft.</source>
+        <translation>Eine Kette schreibt in Schritten: Ein Modell schreibt, ein anderes prüft, und der Text wird überarbeitet, bis er besteht; ein drittes bereitet Titel und Zusammenfassung vor, dann gibt eine Redakteurin oder ein Redakteur frei, bevor irgendetwas anderes geschieht. Jeder Schritt ist ein Auftrag in der Warteschlange mit seinen Kosten; das Ergebnis ist ein Entwurf.</translation>
+    </message>
+    <message>
+        <source>Runs of all users</source>
+        <translation>Läufe aller Benutzer</translation>
+    </message>
+    <message>
+        <source>Your runs</source>
+        <translation>Ihre Läufe</translation>
+    </message>
+    <message>
+        <source>Run</source>
+        <translation>Lauf</translation>
+    </message>
+    <message>
+        <source>State</source>
+        <translation>Status</translation>
+    </message>
+    <message>
+        <source>Step</source>
+        <translation>Schritt</translation>
+    </message>
+    <message>
+        <source>Cost</source>
+        <translation>Kosten</translation>
+    </message>
+    <message>
+        <source>Changed</source>
+        <translation>Geändert</translation>
+    </message>
+    <message>
+        <source>No runs yet. Start one from the Intelligence tab of a page ("Write with a chain") or from Start writing on the dashboard.</source>
+        <translation>Noch keine Läufe. Starten Sie einen im Intelligence-Reiter einer Seite („Mit einer Kette schreiben“) oder unter „Schreiben beginnen“ im Dashboard.</translation>
+    </message>
+    <message>
+        <source>Chain "%chain", run %id</source>
+        <translation>Kette „%chain“, Lauf %id</translation>
+    </message>
+    <message>
+        <source>Cost so far</source>
+        <translation>Bisherige Kosten</translation>
+    </message>
+    <message>
+        <source>of at most %max per run</source>
+        <translation>von höchstens %max pro Lauf</translation>
+    </message>
+    <message>
+        <source>Tokens</source>
+        <translation>Tokens</translation>
+    </message>
+    <message>
+        <source>Time</source>
+        <translation>Zeit</translation>
+    </message>
+    <message>
+        <source>%m min %s s</source>
+        <translation>%m min %s s</translation>
+    </message>
+    <message>
+        <source>%s s</source>
+        <translation>%s s</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <translation>Ort</translation>
+    </message>
+    <message>
+        <source>Draft</source>
+        <translation>Entwurf</translation>
+    </message>
+    <message>
+        <source>Version %version</source>
+        <translation>Version %version</translation>
+    </message>
+    <message>
+        <source>Edit the draft</source>
+        <translation>Entwurf bearbeiten</translation>
+    </message>
+    <message>
+        <source>written at the checkpoint</source>
+        <translation>wird am Prüfpunkt geschrieben</translation>
+    </message>
+    <message>
+        <source>Job group</source>
+        <translation>Auftragsgruppe</translation>
+    </message>
+    <message>
+        <source>%spent spent</source>
+        <translation>%spent ausgegeben</translation>
+    </message>
+    <message>
+        <source>Brief</source>
+        <translation>Auftrag</translation>
+    </message>
+    <message>
+        <source>The settings of this chain changed since the run started; the run keeps the steps and prompts it started with.</source>
+        <translation>Die Einstellungen dieser Kette haben sich seit dem Start des Laufs geändert; der Lauf behält die Schritte und Prompts, mit denen er begonnen hat.</translation>
+    </message>
+    <message>
+        <source>editor</source>
+        <translation>Redaktion</translation>
+    </message>
+    <message>
+        <source>Your decision</source>
+        <translation>Ihre Entscheidung</translation>
+    </message>
+    <message>
+        <source>Read the draft (and change it in the edit form if you like), then continue, ask for changes or stop. Continuing hands your version on to the next step.</source>
+        <translation>Lesen Sie den Entwurf (und ändern Sie ihn bei Bedarf im Bearbeitungsformular), dann fahren Sie fort, bitten um Änderungen oder stoppen. Beim Fortfahren geht Ihre Fassung an den nächsten Schritt.</translation>
+    </message>
+    <message>
+        <source>Note (required to ask for changes)</source>
+        <translation>Notiz (nötig, um Änderungen zu erbitten)</translation>
+    </message>
+    <message>
+        <source>Approve and continue</source>
+        <translation>Freigeben und fortfahren</translation>
+    </message>
+    <message>
+        <source>Ask for changes</source>
+        <translation>Änderungen erbitten</translation>
+    </message>
+    <message>
+        <source>Stop the run</source>
+        <translation>Lauf stoppen</translation>
+    </message>
+    <message>
+        <source>Continue with a higher run budget</source>
+        <translation>Mit höherem Laufbudget fortfahren</translation>
+    </message>
+    <message>
+        <source>Steps</source>
+        <translation>Schritte</translation>
+    </message>
+    <message>
+        <source>Model and lane</source>
+        <translation>Modell und Weg</translation>
+    </message>
+    <message>
+        <source>Score</source>
+        <translation>Bewertung</translation>
+    </message>
+    <message>
+        <source>round %n</source>
+        <translation>Runde %n</translation>
+    </message>
+    <message>
+        <source>%count issue(s)</source>
+        <translation>%count Punkt(e)</translation>
+    </message>
+    <message>
+        <source>Checklist</source>
+        <translation>Checkliste</translation>
+    </message>
+    <message>
+        <source>job: %state</source>
+        <translation>Auftrag: %state</translation>
+    </message>
+    <message>
+        <source>job</source>
+        <translation>Auftrag</translation>
+    </message>
+    <message>
+        <source>Search and sharing</source>
+        <translation>Suche und Teilen</translation>
+    </message>
+    <message>
+        <source>Meta title</source>
+        <translation>Meta-Titel</translation>
+    </message>
+    <message>
+        <source>Meta description</source>
+        <translation>Meta-Beschreibung</translation>
+    </message>
+    <message>
+        <source>Keywords</source>
+        <translation>Schlüsselwörter</translation>
+    </message>
+    <message>
+        <source>Links</source>
+        <translation>Links</translation>
+    </message>
+    <message>
+        <source>The text so far</source>
+        <translation>Der bisherige Text</translation>
+    </message>
+    <message>
+        <source>Translation: handed to %handler for %languages.</source>
+        <translation>Übersetzung: an %handler übergeben für %languages.</translation>
+    </message>
+    <message>
+        <source>All runs</source>
+        <translation>Alle Läufe</translation>
+    </message>
+    <message>
+        <source>Write with a chain</source>
+        <translation>Mit einer Kette schreiben</translation>
+    </message>
+    <message>
+        <source>Use chain</source>
+        <translation>Kette verwenden</translation>
+    </message>
+    <message>
+        <source>Items</source>
+        <translation>Anzahl</translation>
+    </message>
+    <message>
+        <source>For example: an article for families about our spring events, friendly, about 400 words.</source>
+        <translation>Zum Beispiel: ein Artikel für Familien über unsere Frühlingsveranstaltungen, freundlich, etwa 400 Wörter.</translation>
+    </message>
+    <message>
+        <source>Start the chain</source>
+        <translation>Kette starten</translation>
+    </message>
+    <message>
+        <source>Runs and checkpoints</source>
+        <translation>Läufe und Prüfpunkte</translation>
+    </message>
+    <message>
+        <source>Each item is one run in the background: written, reviewed and revised until it passes, then title and summary; the draft waits for you to approve it before anything else happens. Under "%name"; at most %max per run.</source>
+        <translation>Jedes Stück ist ein Lauf im Hintergrund: geschrieben, geprüft und überarbeitet, bis es besteht, dann Titel und Zusammenfassung; der Entwurf wartet auf Ihre Freigabe, bevor irgendetwas anderes geschieht. Unter „%name“; höchstens %max pro Lauf.</translation>
+    </message>
+    <message>
+        <source>Use chain: %label</source>
+        <translation>Kette verwenden: %label</translation>
+    </message>
+    <message>
+        <source>%count wait for you</source>
+        <translation>%count warten auf Sie</translation>
+    </message>
+    <message>
+        <source>Running</source>
+        <translation>Läuft</translation>
+    </message>
+    <message>
+        <source>Waiting for an editor</source>
+        <translation>Wartet auf die Redaktion</translation>
+    </message>
+    <message>
+        <source>Held by a budget</source>
+        <translation>Von einem Budget angehalten</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Fertig</translation>
+    </message>
+    <message>
+        <source>Failed</source>
+        <translation>Fehlgeschlagen</translation>
+    </message>
+    <message>
+        <source>Stopped</source>
+        <translation>Gestoppt</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>There is no chain "%chain".</source>
+        <translation>Es gibt keine Kette „%chain“.</translation>
+    </message>
+    <message>
+        <source>You may not start the chain "%chain".</source>
+        <translation>Sie dürfen die Kette „%chain“ nicht starten.</translation>
+    </message>
+    <message>
+        <source>Write a brief: what should the chain write?</source>
+        <translation>Schreiben Sie einen Auftrag: Was soll die Kette schreiben?</translation>
+    </message>
+    <message>
+        <source>Say what should change.</source>
+        <translation>Sagen Sie, was sich ändern soll.</translation>
+    </message>
+    <message>
+        <source>This run is not held.</source>
+        <translation>Dieser Lauf ist nicht angehalten.</translation>
+    </message>
+    <message>
+        <source>This run is not waiting for an editor.</source>
+        <translation>Dieser Lauf wartet nicht auf die Redaktion.</translation>
+    </message>
+    <message>
+        <source>The chain run cannot be continued.</source>
+        <translation>Der Kettenlauf kann nicht fortgesetzt werden.</translation>
+    </message>
+</context>
+<!-- expai chains: end -->
 <!-- expai lanes/budgets/packages: begin -->
 <context>
     <name>extension/expai/budget</name>

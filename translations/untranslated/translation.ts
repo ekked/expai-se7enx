@@ -1,6 +1,310 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0">
+<!-- expai chains: begin -->
+<context>
+    <name>extension/expai/chain</name>
+    <message>
+        <source>Chains</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chains need the job queue (extension expqueue) and the chain tables (bin/php/expaischema.php --install).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A chain writes in steps: a model writes, another reviews and the text is revised until it passes, a third prepares the title and summary, then an editor approves before anything else happens. Every step is a queued job with its cost; the result is a draft.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Runs of all users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your runs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>State</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Step</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cost</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No runs yet. Start one from the Intelligence tab of a page ("Write with a chain") or from Start writing on the dashboard.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chain "%chain", run %id</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cost so far</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>of at most %max per run</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tokens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%m min %s s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%s s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draft</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version %version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit the draft</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>written at the checkpoint</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%spent spent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brief</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The settings of this chain changed since the run started; the run keeps the steps and prompts it started with.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your decision</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Read the draft (and change it in the edit form if you like), then continue, ask for changes or stop. Continuing hands your version on to the next step.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Note (required to ask for changes)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Approve and continue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ask for changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop the run</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continue with a higher run budget</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Steps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model and lane</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Score</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>round %n</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count issue(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checklist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>job: %state</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>job</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search and sharing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Meta title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Meta description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keywords</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Links</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The text so far</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Translation: handed to %handler for %languages.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All runs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Write with a chain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use chain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For example: an article for families about our spring events, friendly, about 400 words.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start the chain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Runs and checkpoints</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Each item is one run in the background: written, reviewed and revised until it passes, then title and summary; the draft waits for you to approve it before anything else happens. Under "%name"; at most %max per run.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use chain: %label</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count wait for you</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Running</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting for an editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Held by a budget</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>There is no chain "%chain".</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You may not start the chain "%chain".</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Write a brief: what should the chain write?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Say what should change.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This run is not held.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This run is not waiting for an editor.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The chain run cannot be continued.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<!-- expai chains: end -->
 <!-- expai lanes/budgets/packages: begin -->
 <context>
     <name>extension/expai/budget</name>

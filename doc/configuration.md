@@ -291,6 +291,35 @@ See [budgets.md](budgets.md).
 | `Appliers[<name>]` | (none) | Classes implementing `expAiRequestApplier` that write the answer of a queued request somewhere (option `apply`). |
 | `MaxStoredAnswerBytes` | `200000` | The longest answer kept in a job's checkpoint. |
 
+## AI chains
+
+See [chains.md](chains.md). The block "AI chains" of expai.ini adds `[PanelSettings] Sections[]=chains` (with
+`[PanelSection_chains]`, "Write with a chain" in the Intelligence tab) and `[QueueSettings] Appliers[chain]=expAiChainApplier`.
+
+`[ChainSettings]`:
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `Chains[]` | `article` | The chains users may start (policy expai/chain, limitation Chain). |
+| `PromptDirectories[]` | (none) | Directories (relative to the installation) searched for prompt templates before `extension/expai/design/admin/templates`. |
+| `SystemPrompt` | (empty) | Added to the system prompt of every chain step. |
+| `MaxBriefLength` | `4000` | The longest brief, in characters. |
+| `MaxContextChars` | `12000` | The longest context the read tools of a step add to its prompt. |
+| `MaxStoredOutputBytes` | `200000` | The longest step output kept in `expai_chain_step.output`. |
+| `TranslateHandler` | `expAiChainTranslateSync` | The class whose static `chainTranslate( $run, $languages )` takes the translate step (the shipped one hands a published object to the translation sync); empty: the step is skipped. |
+
+`[Chain_<id>]` (shipped: `[Chain_article]`): `Label`, `Description`, `Class`, `Fields[]` (the fields the generate
+steps write), `Steps[]` (the steps in order), `MaxCostPerRun` (the run and job group budget, `1.00`), `MaxItems`
+(items per start, `5`).
+
+`[ChainStep_<id>.<step>]` (shipped: `[ChainStep_article.write]`, `[ChainStep_article.review]`,
+`[ChainStep_article.revise]`, `[ChainStep_article.seo]`, `[ChainStep_article.checkpoint]`,
+`[ChainStep_article.translate]`): `Type` (generate, review, transform, human, translate), `Label`, `Model` (a model
+alias), `Lane` (`auto`), `PromptTemplate` or `PromptText`, `Tools[]` (read tools run before the call), `Checklist[]`,
+`PassCriteria[]`, `MaxIterations`, `OnFail` (revise, stop, escalate), `ReviseStep`, `OnExhausted` (escalate, stop),
+`Checkpoint` (human, none), `Next`, `MaxTokens`, `OutputFields[]`, `Languages[]`. Every one is explained with an
+example in [chains.md](chains.md#defining-a-chain).
+
 ## [PackageSettings]: content packages
 
 See [packages.md](packages.md).

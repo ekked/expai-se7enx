@@ -1,6 +1,310 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="en_US">
+<!-- expai chains: begin -->
+<context>
+    <name>extension/expai/chain</name>
+    <message>
+        <source>Chains</source>
+        <translation>Chains</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation>Exponential Intelligence</translation>
+    </message>
+    <message>
+        <source>Chains need the job queue (extension expqueue) and the chain tables (bin/php/expaischema.php --install).</source>
+        <translation>Chains need the job queue (extension expqueue) and the chain tables (bin/php/expaischema.php --install).</translation>
+    </message>
+    <message>
+        <source>A chain writes in steps: a model writes, another reviews and the text is revised until it passes, a third prepares the title and summary, then an editor approves before anything else happens. Every step is a queued job with its cost; the result is a draft.</source>
+        <translation>A chain writes in steps: a model writes, another reviews and the text is revised until it passes, a third prepares the title and summary, then an editor approves before anything else happens. Every step is a queued job with its cost; the result is a draft.</translation>
+    </message>
+    <message>
+        <source>Runs of all users</source>
+        <translation>Runs of all users</translation>
+    </message>
+    <message>
+        <source>Your runs</source>
+        <translation>Your runs</translation>
+    </message>
+    <message>
+        <source>Run</source>
+        <translation>Run</translation>
+    </message>
+    <message>
+        <source>State</source>
+        <translation>State</translation>
+    </message>
+    <message>
+        <source>Step</source>
+        <translation>Step</translation>
+    </message>
+    <message>
+        <source>Cost</source>
+        <translation>Cost</translation>
+    </message>
+    <message>
+        <source>Changed</source>
+        <translation>Changed</translation>
+    </message>
+    <message>
+        <source>No runs yet. Start one from the Intelligence tab of a page ("Write with a chain") or from Start writing on the dashboard.</source>
+        <translation>No runs yet. Start one from the Intelligence tab of a page ("Write with a chain") or from Start writing on the dashboard.</translation>
+    </message>
+    <message>
+        <source>Chain "%chain", run %id</source>
+        <translation>Chain "%chain", run %id</translation>
+    </message>
+    <message>
+        <source>Cost so far</source>
+        <translation>Cost so far</translation>
+    </message>
+    <message>
+        <source>of at most %max per run</source>
+        <translation>of at most %max per run</translation>
+    </message>
+    <message>
+        <source>Tokens</source>
+        <translation>Tokens</translation>
+    </message>
+    <message>
+        <source>Time</source>
+        <translation>Time</translation>
+    </message>
+    <message>
+        <source>%m min %s s</source>
+        <translation>%m min %s s</translation>
+    </message>
+    <message>
+        <source>%s s</source>
+        <translation>%s s</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <translation>Location</translation>
+    </message>
+    <message>
+        <source>Draft</source>
+        <translation>Draft</translation>
+    </message>
+    <message>
+        <source>Version %version</source>
+        <translation>Version %version</translation>
+    </message>
+    <message>
+        <source>Edit the draft</source>
+        <translation>Edit the draft</translation>
+    </message>
+    <message>
+        <source>written at the checkpoint</source>
+        <translation>written at the checkpoint</translation>
+    </message>
+    <message>
+        <source>Job group</source>
+        <translation>Job group</translation>
+    </message>
+    <message>
+        <source>%spent spent</source>
+        <translation>%spent spent</translation>
+    </message>
+    <message>
+        <source>Brief</source>
+        <translation>Brief</translation>
+    </message>
+    <message>
+        <source>The settings of this chain changed since the run started; the run keeps the steps and prompts it started with.</source>
+        <translation>The settings of this chain changed since the run started; the run keeps the steps and prompts it started with.</translation>
+    </message>
+    <message>
+        <source>editor</source>
+        <translation>editor</translation>
+    </message>
+    <message>
+        <source>Your decision</source>
+        <translation>Your decision</translation>
+    </message>
+    <message>
+        <source>Read the draft (and change it in the edit form if you like), then continue, ask for changes or stop. Continuing hands your version on to the next step.</source>
+        <translation>Read the draft (and change it in the edit form if you like), then continue, ask for changes or stop. Continuing hands your version on to the next step.</translation>
+    </message>
+    <message>
+        <source>Note (required to ask for changes)</source>
+        <translation>Note (required to ask for changes)</translation>
+    </message>
+    <message>
+        <source>Approve and continue</source>
+        <translation>Approve and continue</translation>
+    </message>
+    <message>
+        <source>Ask for changes</source>
+        <translation>Ask for changes</translation>
+    </message>
+    <message>
+        <source>Stop the run</source>
+        <translation>Stop the run</translation>
+    </message>
+    <message>
+        <source>Continue with a higher run budget</source>
+        <translation>Continue with a higher run budget</translation>
+    </message>
+    <message>
+        <source>Steps</source>
+        <translation>Steps</translation>
+    </message>
+    <message>
+        <source>Model and lane</source>
+        <translation>Model and lane</translation>
+    </message>
+    <message>
+        <source>Score</source>
+        <translation>Score</translation>
+    </message>
+    <message>
+        <source>round %n</source>
+        <translation>round %n</translation>
+    </message>
+    <message>
+        <source>%count issue(s)</source>
+        <translation>%count issue(s)</translation>
+    </message>
+    <message>
+        <source>Checklist</source>
+        <translation>Checklist</translation>
+    </message>
+    <message>
+        <source>job: %state</source>
+        <translation>job: %state</translation>
+    </message>
+    <message>
+        <source>job</source>
+        <translation>job</translation>
+    </message>
+    <message>
+        <source>Search and sharing</source>
+        <translation>Search and sharing</translation>
+    </message>
+    <message>
+        <source>Meta title</source>
+        <translation>Meta title</translation>
+    </message>
+    <message>
+        <source>Meta description</source>
+        <translation>Meta description</translation>
+    </message>
+    <message>
+        <source>Keywords</source>
+        <translation>Keywords</translation>
+    </message>
+    <message>
+        <source>Links</source>
+        <translation>Links</translation>
+    </message>
+    <message>
+        <source>The text so far</source>
+        <translation>The text so far</translation>
+    </message>
+    <message>
+        <source>Translation: handed to %handler for %languages.</source>
+        <translation>Translation: handed to %handler for %languages.</translation>
+    </message>
+    <message>
+        <source>All runs</source>
+        <translation>All runs</translation>
+    </message>
+    <message>
+        <source>Write with a chain</source>
+        <translation>Write with a chain</translation>
+    </message>
+    <message>
+        <source>Use chain</source>
+        <translation>Use chain</translation>
+    </message>
+    <message>
+        <source>Items</source>
+        <translation>Items</translation>
+    </message>
+    <message>
+        <source>For example: an article for families about our spring events, friendly, about 400 words.</source>
+        <translation>For example: an article for families about our spring events, friendly, about 400 words.</translation>
+    </message>
+    <message>
+        <source>Start the chain</source>
+        <translation>Start the chain</translation>
+    </message>
+    <message>
+        <source>Runs and checkpoints</source>
+        <translation>Runs and checkpoints</translation>
+    </message>
+    <message>
+        <source>Each item is one run in the background: written, reviewed and revised until it passes, then title and summary; the draft waits for you to approve it before anything else happens. Under "%name"; at most %max per run.</source>
+        <translation>Each item is one run in the background: written, reviewed and revised until it passes, then title and summary; the draft waits for you to approve it before anything else happens. Under "%name"; at most %max per run.</translation>
+    </message>
+    <message>
+        <source>Use chain: %label</source>
+        <translation>Use chain: %label</translation>
+    </message>
+    <message>
+        <source>%count wait for you</source>
+        <translation>%count wait for you</translation>
+    </message>
+    <message>
+        <source>Running</source>
+        <translation>Running</translation>
+    </message>
+    <message>
+        <source>Waiting for an editor</source>
+        <translation>Waiting for an editor</translation>
+    </message>
+    <message>
+        <source>Held by a budget</source>
+        <translation>Held by a budget</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Done</translation>
+    </message>
+    <message>
+        <source>Failed</source>
+        <translation>Failed</translation>
+    </message>
+    <message>
+        <source>Stopped</source>
+        <translation>Stopped</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>There is no chain "%chain".</source>
+        <translation>There is no chain "%chain".</translation>
+    </message>
+    <message>
+        <source>You may not start the chain "%chain".</source>
+        <translation>You may not start the chain "%chain".</translation>
+    </message>
+    <message>
+        <source>Write a brief: what should the chain write?</source>
+        <translation>Write a brief: what should the chain write?</translation>
+    </message>
+    <message>
+        <source>Say what should change.</source>
+        <translation>Say what should change.</translation>
+    </message>
+    <message>
+        <source>This run is not held.</source>
+        <translation>This run is not held.</translation>
+    </message>
+    <message>
+        <source>This run is not waiting for an editor.</source>
+        <translation>This run is not waiting for an editor.</translation>
+    </message>
+    <message>
+        <source>The chain run cannot be continued.</source>
+        <translation>The chain run cannot be continued.</translation>
+    </message>
+</context>
+<!-- expai chains: end -->
 <!-- expai lanes/budgets/packages: begin -->
 <context>
     <name>extension/expai/budget</name>

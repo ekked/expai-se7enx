@@ -15,6 +15,7 @@
 | [mcp.md](mcp.md) | MCP tools: the in-process expmcp bridge and external servers |
 | [lanes.md](lanes.md) | Lanes (standard, flex, batch, fast), the lane policy, queued requests, provider batches of five APIs |
 | [budgets.md](budgets.md) | The monthly site budget and job group budgets: reservation, hold, resume, figures |
+| [chains.md](chains.md) | AI chains: write, review, revise, SEO, the human checkpoint; defining a chain (worked example), prompts, pass criteria, budgets, configuration, permissions, database |
 | [packages.md](packages.md) | Content packages: export, validate, diff, import as drafts, conflicts, expai/packages |
 | [package-format.md](package-format.md) | The package format 1.0 and its JSON Schema, attribute values per datatype, the checksum |
 | [package-authoring-for-agents.md](package-authoring-for-agents.md) | How a local CLI agent writes a package (terms, data, the validation loop) |
