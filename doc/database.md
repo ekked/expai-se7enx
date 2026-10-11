@@ -85,6 +85,22 @@ Index: (user_id, node_id).
 
 Index: (model_alias, created). Names fit Oracle's limits; no column is an Oracle reserved word.
 
+**expai_batch**: one provider batch of a batch lane ([lanes.md](lanes.md)): `provider`, `lane`, `model_alias`, `model`,
+`batch_api`, `remote_id` (the provider's id), `input_ref` / `output_ref` (input and result files or URLs), `state`
+(submitted, in_progress, canceling, ended, failed, expired, canceled, done), `remote_status`, `request_count`,
+`succeeded`, `errored`, `expired`, `canceled`, `submitted`, `ended`, `expires_at`, `results_fetched`, `deleted` (when
+it was deleted at the provider), `polls`, `submit_job_uuid`, `user_id`, `retention`, `last_error`, `created`,
+`modified`. Index (state, provider). Its requests are the expqueue jobs whose `external_ref` is `expai-batch:<id>`.
+
+**expai_package**: one stored content package ([packages.md](packages.md)): `uuid`, `name`, `checksum`,
+`format_version`, `state` (uploaded, valid, invalid, importing, imported, failed), `object_count`, `file_count`,
+`bytes`, `origin` (upload, cli), `storage` (the directory below var/<vardir>/expai/packages/), `user_id`, `group_uuid`
+(a queued import), `report` (JSON: validation, dry_run, import), `created`, `modified`. Index (uuid).
+
+Columns of lanes and packages in the other tables: `expai_usage_log.lane`, `service_tier` (what the provider reported),
+`job_uuid`, `batch_id`, `price_factor` (percent of the list price the request is billed at; costs use it; index
+on job_uuid); `expai_draft_log.job_uuid`, `package_uuid` (index).
+
 ## Installing
 
 ```

@@ -280,7 +280,7 @@ class expAiPackage
      */
     public static function canonical( $value )
     {
-        return json_encode( self::sortMembers( $value ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRESERVE_ZERO_FRACTION );
+        return json_encode( self::sortMembers( $value ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS | JSON_PRESERVE_ZERO_FRACTION );
     }
 
     /** @return mixed the value with the members of every object sorted */

@@ -1,6 +1,509 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="de_DE">
+<!-- expai lanes/budgets/packages: begin -->
+<context>
+    <name>extension/expai/budget</name>
+    <message>
+        <source>Budgets and lanes</source>
+        <translation>Budgets und Wege</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation>Exponential Intelligence</translation>
+    </message>
+    <message>
+        <source>The job queue (extension expqueue) is not active: requests run only in the panel and the edit form, and nothing is reserved.</source>
+        <translation>Die Auftragswarteschlange (Erweiterung expqueue) ist nicht aktiv: Anfragen laufen nur im Panel und im Bearbeitungsformular, und nichts wird reserviert.</translation>
+    </message>
+    <message>
+        <source>Job groups</source>
+        <translation>Auftragsgruppen</translation>
+    </message>
+    <message>
+        <source>Group</source>
+        <translation>Gruppe</translation>
+    </message>
+    <message>
+        <source>State</source>
+        <translation>Zustand</translation>
+    </message>
+    <message>
+        <source>Jobs</source>
+        <translation>Aufträge</translation>
+    </message>
+    <message>
+        <source>Budget</source>
+        <translation>Budget</translation>
+    </message>
+    <message>
+        <source>Spent</source>
+        <translation>Ausgegeben</translation>
+    </message>
+    <message>
+        <source>Reserved</source>
+        <translation>Reserviert</translation>
+    </message>
+    <message>
+        <source>Held</source>
+        <translation>Angehalten</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>keines</translation>
+    </message>
+    <message>
+        <source>Held jobs</source>
+        <translation>Angehaltene Aufträge</translation>
+    </message>
+    <message>
+        <source>Resume held jobs that fit the budget</source>
+        <translation>Angehaltene Aufträge fortsetzen, die ins Budget passen</translation>
+    </message>
+    <message>
+        <source>Lanes</source>
+        <translation>Wege</translation>
+    </message>
+    <message>
+        <source>A lane is a way of sending a request: standard, flex (slower, cheaper), batch (submitted with others, answered within hours, at half price), fast (quicker, at a premium). Queued requests reserve their estimate times %factor.</source>
+        <translation>Ein Weg ist eine Art, eine Anfrage zu senden: standard, flex (langsamer, günstiger), batch (mit anderen gesammelt, binnen Stunden beantwortet, zum halben Preis), fast (schneller, mit Aufschlag). Anfragen in der Warteschlange reservieren ihre Schätzung mal %factor.</translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>Modell</translation>
+    </message>
+    <message>
+        <source>Lane</source>
+        <translation>Weg</translation>
+    </message>
+    <message>
+        <source>Price</source>
+        <translation>Preis</translation>
+    </message>
+    <message>
+        <source>Typical wait</source>
+        <translation>Übliche Wartezeit</translation>
+    </message>
+    <message>
+        <source>Retention</source>
+        <translation>Aufbewahrung</translation>
+    </message>
+    <message>
+        <source>batch</source>
+        <translation>Batch</translation>
+    </message>
+    <message>
+        <source>not confirmed</source>
+        <translation>nicht bestätigt</translation>
+    </message>
+    <message>
+        <source>%h h</source>
+        <translation>%h Std.</translation>
+    </message>
+    <message>
+        <source>%m min</source>
+        <translation>%m Min.</translation>
+    </message>
+    <message>
+        <source>%s s</source>
+        <translation>%s s</translation>
+    </message>
+    <message>
+        <source>in use</source>
+        <translation>in Gebrauch</translation>
+    </message>
+    <message>
+        <source>disabled</source>
+        <translation>abgeschaltet</translation>
+    </message>
+    <message>
+        <source>no confirmed price</source>
+        <translation>kein bestätigter Preis</translation>
+    </message>
+    <message>
+        <source>checked %date</source>
+        <translation>geprüft am %date</translation>
+    </message>
+    <message>
+        <source>Provider batches</source>
+        <translation>Batches beim Anbieter</translation>
+    </message>
+    <message>
+        <source>Provider</source>
+        <translation>Anbieter</translation>
+    </message>
+    <message>
+        <source>Requests</source>
+        <translation>Anfragen</translation>
+    </message>
+    <message>
+        <source>Submitted</source>
+        <translation>Eingereicht</translation>
+    </message>
+    <message>
+        <source>Deleted at the provider</source>
+        <translation>Beim Anbieter gelöscht</translation>
+    </message>
+    <message>
+        <source>%ok answered, %err failed, %exp expired</source>
+        <translation>%ok beantwortet, %err fehlgeschlagen, %exp abgelaufen</translation>
+    </message>
+    <message>
+        <source>no</source>
+        <translation>nein</translation>
+    </message>
+    <message>
+        <source>Budget this month</source>
+        <translation>Budget in diesem Monat</translation>
+    </message>
+    <message>
+        <source>%spent spent + %reserved reserved of %cap (%percent %)</source>
+        <translation>%spent ausgegeben + %reserved reserviert von %cap (%percent %)</translation>
+    </message>
+    <message>
+        <source>%left left; resets %time.</source>
+        <translation>%left übrig; wird zurückgesetzt am %time.</translation>
+    </message>
+    <message>
+        <source>No monthly site budget is set ([Budgets] SiteMonthly or [Limits] MaxCostPerSitePerMonth). Spent this month: %spent; reserved by queued requests: %reserved.</source>
+        <translation>Es ist kein monatliches Budget der Website eingestellt ([Budgets] SiteMonthly oder [Limits] MaxCostPerSitePerMonth). In diesem Monat ausgegeben: %spent; von Anfragen in der Warteschlange reserviert: %reserved.</translation>
+    </message>
+    <message>
+        <source>%n queued jobs are held by a budget.</source>
+        <translation>%n Aufträge in der Warteschlange sind durch ein Budget angehalten.</translation>
+    </message>
+    <message>
+        <source>Budgets, lanes and batches</source>
+        <translation>Budgets, Wege und Batches</translation>
+    </message>
+    <message>
+        <source>Content packages</source>
+        <translation>Inhaltspakete</translation>
+    </message>
+    <message>
+        <source>%resumed held jobs resumed, %held still held by a budget.</source>
+        <translation>%resumed angehaltene Aufträge fortgesetzt, %held weiter durch ein Budget angehalten.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>The batch API of %provider reported an error.</source>
+        <translation>Die Batch-Schnittstelle von %provider hat einen Fehler gemeldet.</translation>
+    </message>
+    <message>
+        <source>No lane of the model %model may take this request.</source>
+        <translation>Kein Weg des Modells %model darf diese Anfrage nehmen.</translation>
+    </message>
+    <message>
+        <source>The job queue is not available.</source>
+        <translation>Die Auftragswarteschlange ist nicht verfügbar.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/package</name>
+    <message>
+        <source>Content packages</source>
+        <translation>Inhaltspakete</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation>Exponential Intelligence</translation>
+    </message>
+    <message>
+        <source>Package</source>
+        <translation>Paket</translation>
+    </message>
+    <message>
+        <source>State</source>
+        <translation>Zustand</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Objekte</translation>
+    </message>
+    <message>
+        <source>Files</source>
+        <translation>Dateien</translation>
+    </message>
+    <message>
+        <source>Checksum</source>
+        <translation>Prüfsumme</translation>
+    </message>
+    <message>
+        <source>Uploaded</source>
+        <translation>Hochgeladen</translation>
+    </message>
+    <message>
+        <source>Made by</source>
+        <translation>Erstellt mit</translation>
+    </message>
+    <message>
+        <source>Written by AI</source>
+        <translation>Von KI geschrieben</translation>
+    </message>
+    <message>
+        <source>yes</source>
+        <translation>ja</translation>
+    </message>
+    <message>
+        <source>no</source>
+        <translation>nein</translation>
+    </message>
+    <message>
+        <source>Validation</source>
+        <translation>Prüfung</translation>
+    </message>
+    <message>
+        <source>valid</source>
+        <translation>gültig</translation>
+    </message>
+    <message>
+        <source>not valid</source>
+        <translation>ungültig</translation>
+    </message>
+    <message>
+        <source>%errors errors, %warnings warnings, checked %time</source>
+        <translation>%errors Fehler, %warnings Warnungen, geprüft am %time</translation>
+    </message>
+    <message>
+        <source>Warnings</source>
+        <translation>Warnungen</translation>
+    </message>
+    <message>
+        <source>Import as drafts</source>
+        <translation>Als Entwürfe importieren</translation>
+    </message>
+    <message>
+        <source>An import only writes drafts, as you, with your permissions. Publishing them is a separate step (approval workflows apply). Make a dry run first.</source>
+        <translation>Ein Import schreibt nur Entwürfe, als Sie, mit Ihren Rechten. Sie zu veröffentlichen ist ein eigener Schritt (Freigabe-Workflows gelten). Machen Sie zuerst einen Probelauf.</translation>
+    </message>
+    <message>
+        <source>This package is imported in the job queue.</source>
+        <translation>Dieses Paket wird in der Auftragswarteschlange importiert.</translation>
+    </message>
+    <message>
+        <source>On conflict</source>
+        <translation>Bei einem Konflikt</translation>
+    </message>
+    <message>
+        <source>skip the object</source>
+        <translation>das Objekt überspringen</translation>
+    </message>
+    <message>
+        <source>make a draft anyway (marked as a conflict)</source>
+        <translation>trotzdem einen Entwurf anlegen (als Konflikt markiert)</translation>
+    </message>
+    <message>
+        <source>import nothing</source>
+        <translation>nichts importieren</translation>
+    </message>
+    <message>
+        <source>Parent (node id, node remote id or path; for objects whose parent is not in the package)</source>
+        <translation>Übergeordneter Knoten (Knoten-ID, Remote-ID des Knotens oder Pfad; für Objekte, deren übergeordnetes Objekt nicht im Paket ist)</translation>
+    </message>
+    <message>
+        <source>Import as copies (remap the remote ids with this prefix)</source>
+        <translation>Als Kopien importieren (Remote-IDs mit diesem Präfix umschreiben)</translation>
+    </message>
+    <message>
+        <source>Validate again</source>
+        <translation>Erneut prüfen</translation>
+    </message>
+    <message>
+        <source>Dry run</source>
+        <translation>Probelauf</translation>
+    </message>
+    <message>
+        <source>differences: %n</source>
+        <translation>Unterschiede: %n</translation>
+    </message>
+    <message>
+        <source>Object</source>
+        <translation>Objekt</translation>
+    </message>
+    <message>
+        <source>Class</source>
+        <translation>Klasse</translation>
+    </message>
+    <message>
+        <source>Action</source>
+        <translation>Aktion</translation>
+    </message>
+    <message>
+        <source>Differences</source>
+        <translation>Unterschiede</translation>
+    </message>
+    <message>
+        <source>Import</source>
+        <translation>Import</translation>
+    </message>
+    <message>
+        <source>Job group</source>
+        <translation>Auftragsgruppe</translation>
+    </message>
+    <message>
+        <source>%done of %total jobs ended (%percent %)</source>
+        <translation>%done von %total Aufträgen beendet (%percent %)</translation>
+    </message>
+    <message>
+        <source>Drafts</source>
+        <translation>Entwürfe</translation>
+    </message>
+    <message>
+        <source>Messages</source>
+        <translation>Meldungen</translation>
+    </message>
+    <message>
+        <source>All packages</source>
+        <translation>Alle Pakete</translation>
+    </message>
+    <message>
+        <source>Upload a package</source>
+        <translation>Ein Paket hochladen</translation>
+    </message>
+    <message>
+        <source>A package is a .exppkg or .zip file (package.json and its files) or a package.json alone, up to %max. It is validated at once; nothing is imported until you ask for it.</source>
+        <translation>Ein Paket ist eine .exppkg- oder .zip-Datei (package.json und ihre Dateien) oder eine einzelne package.json, bis %max. Es wird sofort geprüft; importiert wird erst, wenn Sie es verlangen.</translation>
+    </message>
+    <message>
+        <source>How packages work</source>
+        <translation>Wie Pakete funktionieren</translation>
+    </message>
+    <message>
+        <source>Upload and validate</source>
+        <translation>Hochladen und prüfen</translation>
+    </message>
+    <message>
+        <source>Packages</source>
+        <translation>Pakete</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <source>Origin</source>
+        <translation>Herkunft</translation>
+    </message>
+    <message>
+        <source>No package was uploaded yet.</source>
+        <translation>Es wurde noch kein Paket hochgeladen.</translation>
+    </message>
+    <message>
+        <source>The package %path does not exist.</source>
+        <translation>Das Paket %path gibt es nicht.</translation>
+    </message>
+    <message>
+        <source>The package has no package.json.</source>
+        <translation>Das Paket hat keine package.json.</translation>
+    </message>
+    <message>
+        <source>package.json is larger than %max bytes.</source>
+        <translation>package.json ist größer als %max Bytes.</translation>
+    </message>
+    <message>
+        <source>package.json is not valid JSON: %error</source>
+        <translation>package.json ist kein gültiges JSON: %error</translation>
+    </message>
+    <message>
+        <source>Zip packages need the PHP zip extension; upload a directory or package.json instead.</source>
+        <translation>Zip-Pakete brauchen die PHP-Erweiterung zip; laden Sie stattdessen ein Verzeichnis oder eine package.json hoch.</translation>
+    </message>
+    <message>
+        <source>The zip file could not be opened.</source>
+        <translation>Die Zip-Datei konnte nicht geöffnet werden.</translation>
+    </message>
+    <message>
+        <source>The package has more than %max entries.</source>
+        <translation>Das Paket hat mehr als %max Einträge.</translation>
+    </message>
+    <message>
+        <source>The package contains the directory %name, which is not allowed.</source>
+        <translation>Das Paket enthält das Verzeichnis %name, das nicht erlaubt ist.</translation>
+    </message>
+    <message>
+        <source>The package contains %name; only package.json and files/&lt;sha256&gt;.&lt;ext&gt; are allowed.</source>
+        <translation>Das Paket enthält %name; erlaubt sind nur package.json und files/&lt;sha256&gt;.&lt;ext&gt;.</translation>
+    </message>
+    <message>
+        <source>The package contains a symbolic link.</source>
+        <translation>Das Paket enthält einen symbolischen Link.</translation>
+    </message>
+    <message>
+        <source>%name is larger than %max bytes.</source>
+        <translation>%name ist größer als %max Bytes.</translation>
+    </message>
+    <message>
+        <source>%name is compressed suspiciously well (a zip bomb?).</source>
+        <translation>%name ist verdächtig stark komprimiert (eine Zip-Bombe?).</translation>
+    </message>
+    <message>
+        <source>The package is larger than %max bytes.</source>
+        <translation>Das Paket ist größer als %max Bytes.</translation>
+    </message>
+    <message>
+        <source>%name could not be read from the zip file.</source>
+        <translation>%name konnte nicht aus der Zip-Datei gelesen werden.</translation>
+    </message>
+    <message>
+        <source>Zip packages need the PHP zip extension; write a directory instead.</source>
+        <translation>Zip-Pakete brauchen die PHP-Erweiterung zip; schreiben Sie stattdessen ein Verzeichnis.</translation>
+    </message>
+    <message>
+        <source>The zip file could not be written.</source>
+        <translation>Die Zip-Datei konnte nicht geschrieben werden.</translation>
+    </message>
+    <message>
+        <source>Node %id does not exist or you may not read it.</source>
+        <translation>Den Knoten %id gibt es nicht, oder Sie dürfen ihn nicht lesen.</translation>
+    </message>
+    <message>
+        <source>The subtree has more than %max objects ([PackageSettings] MaxObjects).</source>
+        <translation>Der Teilbaum hat mehr als %max Objekte ([PackageSettings] MaxObjects).</translation>
+    </message>
+    <message>
+        <source>The data policy restricts %count object(s) of this export (%ids); export them only with --allow-restricted.</source>
+        <translation>Die Datenrichtlinie beschränkt %count Objekt(e) dieses Exports (%ids); exportieren Sie sie nur mit --allow-restricted.</translation>
+    </message>
+    <message>
+        <source>The package is not valid: %errors</source>
+        <translation>Das Paket ist ungültig: %errors</translation>
+    </message>
+    <message>
+        <source>The package is valid.</source>
+        <translation>Das Paket ist gültig.</translation>
+    </message>
+    <message>
+        <source>The package is not valid.</source>
+        <translation>Das Paket ist ungültig.</translation>
+    </message>
+    <message>
+        <source>Dry run done: nothing was written.</source>
+        <translation>Probelauf fertig: nichts wurde geschrieben.</translation>
+    </message>
+    <message>
+        <source>The import runs in the job queue (%jobs jobs). This page shows its progress.</source>
+        <translation>Der Import läuft in der Auftragswarteschlange (%jobs Aufträge). Diese Seite zeigt den Fortschritt.</translation>
+    </message>
+    <message>
+        <source>Imported as drafts: review them below and send them for publishing.</source>
+        <translation>Als Entwürfe importiert: prüfen Sie sie unten und senden Sie sie zur Veröffentlichung.</translation>
+    </message>
+    <message>
+        <source>Nothing was imported: the package has conflicts or errors and "on conflict" is "fail".</source>
+        <translation>Nichts wurde importiert: das Paket hat Konflikte oder Fehler, und „Bei einem Konflikt“ steht auf „nichts importieren“.</translation>
+    </message>
+    <message>
+        <source>Choose a package file to upload.</source>
+        <translation>Wählen Sie eine Paketdatei zum Hochladen.</translation>
+    </message>
+    <message>
+        <source>The file is larger than %max bytes; import larger packages with ./console ext:expai:package import.</source>
+        <translation>Die Datei ist größer als %max Bytes; importieren Sie größere Pakete mit ./console ext:expai:package import.</translation>
+    </message>
+</context>
+<!-- expai lanes/budgets/packages: end -->
 <context>
     <name>design/admin/parts/my/menu</name>
     <message>

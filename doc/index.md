@@ -13,6 +13,11 @@
 | [probe.md](probe.md) | The tool-calling probe and the write gate |
 | [local-models.md](local-models.md) | A local open-weight model: install, limits, the helper, expai/models |
 | [mcp.md](mcp.md) | MCP tools: the in-process expmcp bridge and external servers |
+| [lanes.md](lanes.md) | Lanes (standard, flex, batch, fast), the lane policy, queued requests, provider batches of five APIs |
+| [budgets.md](budgets.md) | The monthly site budget and job group budgets: reservation, hold, resume, figures |
+| [packages.md](packages.md) | Content packages: export, validate, diff, import as drafts, conflicts, expai/packages |
+| [package-format.md](package-format.md) | The package format 1.0 and its JSON Schema, attribute values per datatype, the checksum |
+| [package-authoring-for-agents.md](package-authoring-for-agents.md) | How a local CLI agent writes a package (terms, data, the validation loop) |
 | [permissions.md](permissions.md) | Policies, and how the editor's own permissions limit everything the assistant does |
 | [full-view-panel.md](full-view-panel.md) | The Intelligence tab: sections, conversation, history, context window, drafts |
 | [edit-view-integration.md](edit-view-integration.md) | The edit form hook, field actions, how values reach Tiptap / the Online Editor |

@@ -229,6 +229,83 @@ See [data-policy.md](data-policy.md). Without any rule every active provider may
 | `StatusFile` | `/var/lib/expai-llm/status.json` | The status the helper writes (read by expai/models). |
 | `Models[]` | `qwen3.5:4b` | The models the view offers to pull and remove (the helper has its own allowlist). |
 
+## Lanes
+
+### [Lane_<provider>.<lane>]: one lane
+
+A way of sending requests to a provider ([lanes.md](lanes.md)). Every provider has the lane `standard`, with or without
+a group. Shipped: `anthropic.standard`, `anthropic.batch`, `anthropic.fast` (disabled), `openai.flex`, `openai.batch`,
+`gemini.batch`, `gemini.flex` (disabled), `mistral.batch`, `openrouter.batch` and `openrouter.flex` (disabled).
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `Type` | `sync` (`batch` for a lane named batch) | `sync`: one call answered in the request; `batch`: submitted with others, polled, results fetched later. |
+| `Enabled` | `true` with a group (standard always) | `false` keeps the lane out of every choice. |
+| `PriceMultiplier` | `1` for standard, else empty | The factor on the list price (batch `0.5`, fast `2.0`). Empty: the price is not confirmed and the lane is never used. |
+| `ExpectedLatency`, `MaxLatency` | 60 / 3600 s (batch), MaxLatency 86400 for batch | Typical and longest seconds until the answer, for deadlines. |
+| `Retention` | `inherit` | What the provider keeps of a request on this lane: `inherit` (the provider's), `none`, `zdr`, `30d`, `29d`, `6w`, `unknown`. Only `none` and `zdr` meet a zero-retention rule. |
+| `RequestParams[<name>]` | (none) | Values merged into the request body (`speed=fast`, `service_tier=flex`). |
+| `Headers[]` | (none) | Extra request headers (`anthropic-beta: fast-mode-2026-02-01`); key headers are refused. |
+| `FallbackLane` | (none) | The lane a request moves to when this one answers 429, 503 or 529. |
+| `OnUnavailable` | `retry` | `escalate`: a flex lane's "resource unavailable" moves the request to `FallbackLane` at once. |
+| `Timeout` | the provider's | Seconds of one call on a sync lane (flex: 900). |
+| `Models[]` | (all) | Only these model aliases (or ids) use the lane. |
+| `BatchApi` | the provider type | `anthropic`, `openai`, `gemini`, `mistral` or `openrouter`. |
+| `BatchURL` | derived from the provider | The batch API base where it is not the provider's URL (Gemini: its native API). |
+| `MaxRequestsPerBatch` | `2000` | Requests per provider batch (Mistral at most 9999 inline). |
+| `BatchCollectSeconds` | `300` | How long waiting requests are collected before a batch is submitted. |
+| `PollSeconds` | `300` | Seconds between two polls of a batch. |
+| `DeleteAfterFetch` | `enabled` | Delete the batch (and its files) at the provider after its results were fetched. |
+| `ExpiredLane` | `standard` | Where an expired or cancelled batch request goes. |
+| `Verified`, `Source`, `Label` | | When and where the offer was read; a label. |
+
+`[Provider_<id>] Lanes[]` and `[Model_<alias>] Lanes[]`, when set, restrict the lanes of a provider and a model. The
+concurrency of a lane is `expqueue.ini [QueueResource_<provider>:<lane>] MaxConcurrent`.
+
+### [LanePolicy]: which lane a queued request takes
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `Order[<purpose>]` | `default` standard, `bulk` batch;flex;standard, `translate` flex;batch;standard, `translate_full` batch;flex;standard | The lanes a request of that purpose tries, in order (`;` separated). |
+| `ClassOrder[<queue class>]` | per class of expqueue | The order for a request whose purpose has none. |
+| `PurposeClass[<purpose>]` | `default` editorial, `bulk` bulk, `translate` translation_patch, `translate_full` translation_full | The queue class of a request of that purpose. |
+| `UrgentPriority` | `80` | From this priority on, flex and batch are skipped (0: never). |
+| `StrictDeadline` | `disabled` | `enabled`: a deadline is checked against a batch lane's `MaxLatency`. |
+
+## [Budgets]: budgets of queued requests
+
+See [budgets.md](budgets.md).
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `SiteMonthly` | (empty: `[Limits] MaxCostPerSitePerMonth`) | The monthly budget of the site; requests of the month plus reservations must stay below it, else queued requests are held. |
+| `DefaultGroupBudget` | (none) | The budget of a new job group whose producer names none. |
+| `ReserveFactor` | `1.25` | A queued request reserves its estimate times this. |
+| `CharsPerToken` | `3.5` | Characters per token for the estimate of the input. |
+| `OutputShareOfMax` | `0.5` | The share of `max_tokens` estimated as output (unless the producer gives `est_output`). |
+
+## [QueueSettings]: queued requests
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `Appliers[<name>]` | (none) | Classes implementing `expAiRequestApplier` that write the answer of a queued request somewhere (option `apply`). |
+| `MaxStoredAnswerBytes` | `200000` | The longest answer kept in a job's checkpoint. |
+
+## [PackageSettings]: content packages
+
+See [packages.md](packages.md).
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `MaxObjects` | `2000` | Objects in one package (and in one subtree export). |
+| `MaxFiles`, `MaxBytes`, `MaxFileBytes`, `MaxJsonBytes` | 5000, 500 MB, 50 MB, 50 MB | Files, total size, size of one file, size of package.json. |
+| `MaxCompressionRatio` | `200` | A zip entry above 1 MB compressed better than this is refused. |
+| `MaxUploadBytes` | 50 MB | The largest upload on expai/packages. |
+| `QueueAbove`, `ChunkSize` | `20`, `5` | A package with more objects is imported as a job group, `ChunkSize` objects per job. |
+| `RequireChecksum` | `enabled` | A package without a manifest checksum is refused. |
+| `AllowedMimeTypes[]` | images, PDF, text, CSV, zip, Office, mp3, mp4 | File types a package may carry (SVG never). |
+| `StringDatatypes[]` | `ezisbn`, `ezselection`, `ezcountry` | Datatypes beyond the built-in ones carried as their toString() text. |
+
 ## [McpBridge], [McpSettings], [McpServer_<id>]: MCP tools
 
 See [mcp.md](mcp.md).

@@ -10,6 +10,12 @@
 | `expai/model_use` | choosing models of providers outside `[ProviderSettings] ProvidersWithoutPolicy[]` (default: every provider but anthropic). Limitation **Provider**: only the models of those providers. Without it a user has the site default and the open providers' models; a model posted that is not allowed is refused ("This model is not available.") |
 | `expai/model_manage` | the view expai/models: providers, key presence, probe results, the local model server (start, stop, pull, remove, test prompt) |
 | `expai/mcp` | MCP tools in the panel ([mcp.md](mcp.md)). Limitation **Server**: `exp` (the in-process expmcp bridge) or the id of an external server |
+| `expai/package_import` | Setup > Content packages (`expai/packages`): upload, validate, dry run, import as drafts; `./console ext:expai:package import`. Imports write drafts with the user's own content permissions ([packages.md](packages.md)) |
+| `expai/package_export` | `./console ext:expai:package export` (only what the user may read) |
+| `expai/lane_fast` | a queued request may ask for a fast lane (a price premium; [lanes.md](lanes.md)) |
+
+`expai/log` also opens `expai/budgets` (the site budget, job groups, lanes, batches); with `expai/settings` its
+"Resume held jobs" button ([budgets.md](budgets.md)).
 
 `expai/model_use` and `expai/mcp` have one limitation each; the others none. What the assistant may do in the content
 tree is decided by the editor's content policies (below). The tab, the menu entry and the dashboard block are not shown at all without `expai/write`.
