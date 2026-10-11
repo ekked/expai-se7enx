@@ -1,0 +1,11 @@
+# Every 5 minutes: stop Ollama after 30 minutes without a loaded model.
+[Unit]
+Description=Exponential Intelligence local model idle check (every 5 minutes)
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=5min
+AccuracySec=1min
+
+[Install]
+WantedBy=timers.target

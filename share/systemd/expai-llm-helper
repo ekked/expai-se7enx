@@ -1,0 +1,228 @@
+#!/usr/bin/env python3
+"""The local model helper of Exponential Intelligence (expai), installed as /usr/local/libexec/expai-llm-helper
+(root:root 0755). The web process never runs commands: expai/models writes a request (<id>.json) into the spool
+/var/lib/expai-llm/spool, and expai-llm-helper.path starts this helper, which carries the requests out one at a time.
+
+  expai-llm-helper run    handle every waiting request (oldest first), then write the status file
+  expai-llm-helper idle   stop Ollama when no model has been loaded for IDLE_MINUTES (default 30)
+  expai-llm-helper status write the status file
+
+A request is {"id", "action", "model", "requested_by_user_id", "ts"}. Fixed actions only: start, stop, pull, remove,
+refresh_status. A model must be listed in /etc/expai-llm/models.allow (root-owned; "<model> [<name to create>]").
+Requests older than 10 minutes, larger than 4 KB, malformed or not allowed are dropped and logged. No shell, no
+arguments from the request reach a command line except an allowlisted model name. Every action is logged to the
+journal (stdout). The status file /var/lib/expai-llm/status.json is readable by the web user's group.
+"""
+import fcntl
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import time
+import urllib.request
+
+SPOOL = '/var/lib/expai-llm/spool'
+STATUS = '/var/lib/expai-llm/status.json'
+STATE = '/var/lib/expai-llm/idle-state.json'
+ALLOW = '/etc/expai-llm/models.allow'
+MODELFILES = '/etc/expai-llm/modelfiles'
+LOCK = '/run/expai-llm-helper.lock'
+API = 'http://127.0.0.1:11434'
+UNIT = 'ollama.service'
+MAX_AGE = 600
+MIN_FREE_GB = 20
+IDLE_MINUTES = int(os.environ.get('IDLE_MINUTES', '30'))
+ACTIONS = ('start', 'stop', 'pull', 'remove', 'refresh_status')
+NAME = re.compile(r'^[a-z0-9][a-z0-9._-]{0,59}(:[a-z0-9._-]{1,40})?$')
+
+
+def log(text):
+    print('expai-llm-helper: ' + text, flush=True)
+
+
+def allowlist():
+    out = {}
+    try:
+        st = os.stat(ALLOW)
+        if st.st_uid != 0 or st.st_mode & 0o022:
+            log('refusing %s: not root-owned or writable by others' % ALLOW)
+            return {}
+        with open(ALLOW, encoding='utf-8') as handle:
+            for line in handle:
+                parts = line.split('#', 1)[0].split()
+                if parts and NAME.match(parts[0]):
+                    out[parts[0]] = parts[1] if len(parts) > 1 and NAME.match(parts[1]) else ''
+    except OSError:
+        pass
+    return out
+
+
+def api(path, body=None, method=None, timeout=10):
+    data = json.dumps(body).encode() if body is not None else None
+    req = urllib.request.Request(API + path, data=data, method=method or ('POST' if data else 'GET'),
+                                 headers={'Content-Type': 'application/json'})
+    with urllib.request.urlopen(req, timeout=timeout) as response:
+        text = response.read().decode('utf-8', 'replace')
+    return json.loads(text) if text.strip().startswith('{') else {}
+
+
+def running():
+    try:
+        api('/api/version', timeout=2)
+        return True
+    except Exception:
+        return False
+
+
+def systemctl(verb):
+    result = subprocess.run(['systemctl', verb, UNIT], capture_output=True, text=True, timeout=120)
+    return result.returncode == 0, (result.stderr or result.stdout).strip()[:200]
+
+
+def wait_running(seconds=60):
+    for _ in range(seconds):
+        if running():
+            return True
+        time.sleep(1)
+    return False
+
+
+def write_status(last=''):
+    status = {'time': time.strftime('%Y-%m-%d %H:%M:%S'), 'last': last, 'running': running(), 'version': '', 'models': [], 'loaded': []}
+    if status['running']:
+        try:
+            status['version'] = api('/api/version').get('version', '')
+            status['models'] = [m.get('name', '') for m in api('/api/tags').get('models', [])]
+            status['loaded'] = [m.get('name', '') for m in api('/api/ps').get('models', [])]
+        except Exception as error:
+            status['error'] = str(error)[:200]
+    tmp = STATUS + '.tmp'
+    with open(tmp, 'w', encoding='utf-8') as handle:
+        json.dump(status, handle)
+    os.chmod(tmp, 0o640)
+    shutil.chown(tmp, group=os.stat(SPOOL).st_gid)
+    os.replace(tmp, STATUS)
+
+
+def handle(request, allowed):
+    action = request.get('action')
+    model = request.get('model') or ''
+    if action not in ACTIONS:
+        return 'refused: unknown action'
+    if model and (not isinstance(model, str) or model not in allowed):
+        return 'refused: model not in %s' % ALLOW
+    if action == 'start':
+        ok, detail = systemctl('start')
+        return 'started' if ok and wait_running() else 'start failed: ' + detail
+    if action == 'stop':
+        ok, detail = systemctl('stop')
+        return 'stopped' if ok else 'stop failed: ' + detail
+    if action == 'refresh_status':
+        return 'status refreshed'
+    if not model:
+        return 'refused: no model'
+    if not running():
+        ok, detail = systemctl('start')
+        if not ok or not wait_running():
+            return 'refused: Ollama does not start: ' + detail
+    if action == 'pull':
+        free = shutil.disk_usage('/var/lib/ollama').free / 1024 ** 3
+        if free < MIN_FREE_GB:
+            return 'refused: only %.1f GB free' % free
+        result = api('/api/pull', {'model': model, 'stream': False}, timeout=3000)
+        if result.get('status') != 'success':
+            return 'pull failed: ' + json.dumps(result)[:200]
+        target = allowed.get(model)
+        if target:
+            modelfile = os.path.join(MODELFILES, target.replace(':', '-') + '.Modelfile')
+            if os.path.isfile(modelfile) and os.stat(modelfile).st_uid == 0:
+                created = subprocess.run(['runuser', '-u', 'ollama', '--', '/usr/local/bin/ollama', 'create', target, '-f', modelfile],
+                                         capture_output=True, text=True, timeout=600, env={'OLLAMA_HOST': '127.0.0.1:11434', 'HOME': '/var/lib/ollama', 'PATH': '/usr/bin:/bin'})
+                if created.returncode != 0:
+                    return 'pulled %s, create %s failed: %s' % (model, target, (created.stderr or created.stdout)[-200:])
+                return 'pulled %s, created %s' % (model, target)
+        return 'pulled ' + model
+    if action == 'remove':
+        names = [model] + ([allowed[model]] if allowed.get(model) else [])
+        for name in names:
+            try:
+                api('/api/delete', {'model': name}, method='DELETE')
+            except Exception as error:
+                log('remove %s: %s' % (name, str(error)[:120]))
+        return 'removed ' + ', '.join(names)
+    return 'refused'
+
+
+def run():
+    allowed = allowlist()
+    last = ''
+    files = sorted((os.path.join(SPOOL, f) for f in os.listdir(SPOOL) if f.endswith('.json')), key=os.path.getmtime)
+    for path in files:
+        try:
+            if os.path.getsize(path) > 4096 or os.path.islink(path):
+                raise ValueError('too large or a link')
+            with open(path, encoding='utf-8') as handle:
+                request = json.load(handle)
+            if not isinstance(request, dict) or time.time() - float(request.get('ts', 0)) > MAX_AGE:
+                raise ValueError('malformed or older than %d s' % MAX_AGE)
+            result = handle(request, allowed)
+            log('request %s by user %s: %s %s -> %s' % (str(request.get('id', ''))[:32], int(request.get('requested_by_user_id', 0)),
+                                                         request.get('action'), request.get('model', ''), result))
+            last = '%s %s: %s' % (request.get('action'), request.get('model', ''), result)
+        except Exception as error:
+            log('dropped %s: %s' % (os.path.basename(path), str(error)[:200]))
+            last = 'dropped a request: ' + str(error)[:120]
+        finally:
+            try:
+                os.unlink(path)
+            except OSError:
+                pass
+    write_status(last)
+
+
+def idle():
+    state = {}
+    try:
+        with open(STATE, encoding='utf-8') as handle:
+            state = json.load(handle)
+    except Exception:
+        pass
+    now = time.time()
+    if not running():
+        state['busy'] = now
+    else:
+        try:
+            loaded = api('/api/ps', timeout=3).get('models', [])
+        except Exception:
+            loaded = []
+        if loaded or 'busy' not in state:
+            state['busy'] = now
+        elif now - state['busy'] > IDLE_MINUTES * 60:
+            ok, detail = systemctl('stop')
+            log('idle for %d minutes: stopped Ollama (%s)' % (IDLE_MINUTES, 'ok' if ok else detail))
+            state['busy'] = now
+            write_status('stopped after %d idle minutes' % IDLE_MINUTES)
+    with open(STATE, 'w', encoding='utf-8') as handle:
+        json.dump(state, handle)
+
+
+def main():
+    command = sys.argv[1] if len(sys.argv) > 1 else 'run'
+    with open(LOCK, 'w') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        if command == 'run':
+            run()
+        elif command == 'idle':
+            idle()
+        elif command == 'status':
+            write_status('status')
+        else:
+            log('unknown command ' + command)
+            return 2
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

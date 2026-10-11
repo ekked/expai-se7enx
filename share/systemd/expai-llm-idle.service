@@ -1,0 +1,10 @@
+# Stops Ollama when no model has been loaded for IdleMinutes (default 30), see expai-llm-idle.timer.
+[Unit]
+Description=Exponential Intelligence local model idle check
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/libexec/expai-llm-helper idle
+PrivateTmp=yes
+ProtectHome=yes
+NoNewPrivileges=yes

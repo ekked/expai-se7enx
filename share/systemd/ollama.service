@@ -1,0 +1,47 @@
+# A local Ollama for Exponential Intelligence (expai), capped so it cannot crowd out the web sites on the same host.
+# Install: see doc/local-models.md. This unit has no [Install] section on purpose: it is never started at boot,
+# only on demand (expai/models -> the spool helper, or "systemctl start ollama" by an operator), and the idle timer
+# (expai-llm-idle.timer) stops it again.
+[Unit]
+Description=Ollama for Exponential Intelligence (local model, loopback only)
+After=network-online.target
+
+[Service]
+Type=simple
+User=ollama
+Group=ollama
+ExecStart=/usr/local/bin/ollama serve
+Restart=on-failure
+RestartSec=5
+# loopback only: nothing but this host can reach it
+Environment=OLLAMA_HOST=127.0.0.1:11434
+Environment=OLLAMA_MODELS=/var/lib/ollama/models
+Environment=HOME=/var/lib/ollama
+Environment=OLLAMA_KEEP_ALIVE=5m
+Environment=OLLAMA_NUM_PARALLEL=1
+Environment=OLLAMA_MAX_LOADED_MODELS=1
+Environment=OLLAMA_CONTEXT_LENGTH=16384
+Environment=OLLAMA_MAX_QUEUE=4
+Environment=OLLAMA_NOPRUNE=1
+# limits: at most 4 cores and a low share when the sites are busy; 8-10 GB memory, never swap
+CPUQuota=400%
+CPUWeight=20
+Nice=15
+IOWeight=20
+MemoryHigh=8G
+MemoryMax=10G
+MemorySwapMax=0
+TasksMax=256
+# hardening
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/ollama
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictSUIDSGID=yes
+LockPersonality=yes

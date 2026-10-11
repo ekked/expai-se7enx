@@ -1,0 +1,11 @@
+# Starts the helper when expai/models writes a request (<id>.json) into the spool.
+[Unit]
+Description=Exponential Intelligence local model helper (watches the spool)
+
+[Path]
+PathExistsGlob=/var/lib/expai-llm/spool/*.json
+Unit=expai-llm-helper.service
+MakeDirectory=no
+
+[Install]
+WantedBy=paths.target

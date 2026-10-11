@@ -1,0 +1,13 @@
+# Carries out the requests expai/models writes into the spool (start, stop, pull, remove, refresh_status).
+# Started by expai-llm-helper.path; one run handles every waiting request, one at a time.
+[Unit]
+Description=Exponential Intelligence local model helper (spool requests)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/libexec/expai-llm-helper run
+TimeoutStartSec=3600
+Nice=10
+PrivateTmp=yes
+ProtectHome=yes
+NoNewPrivileges=yes
