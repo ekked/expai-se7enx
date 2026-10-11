@@ -59,6 +59,12 @@ expai.js reads and writes a field through an adapter per datatype (`ExpAi.fieldA
 The `input`/`change` events are what ezautosave watches, so a filled field is autosaved like a typed one. Rich text
 is the HTML subset `p, h2, h3, h4, strong, em, ul, ol, li, a href` (cleaned on the server).
 
+## Presets and the Improve menu
+
+Next to the field actions, `expai_presets.js` adds the presets of the object's class ("Suggest title", "Write summary",
+"Meta description", "Keywords", also on the parts of an xrowmetadata field) and one "Improve" menu per text field, and
+the line "Defaults in use" above the fields. They fill the form the same way, with Undo. See [presets.md](presets.md).
+
 ## "Fill the fields"
 
 `expai::fill` sends the brief and the form's current values; the model gets the writable fields of the class (with

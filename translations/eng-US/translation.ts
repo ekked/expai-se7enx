@@ -323,6 +323,14 @@
         <source>Exponential Intelligence is switched off on this site.</source>
         <translation>Exponential Intelligence is switched off on this site.</translation>
     </message>
+    <message>
+        <source>Presets are switched off.</source>
+        <translation>Presets are switched off.</translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to improve.</source>
+        <translation>The field is empty: there is nothing to improve.</translation>
+    </message>
 </context>
 <!-- expai chains: end -->
 <!-- expai lanes/budgets/packages: begin -->
@@ -4318,4 +4326,534 @@
 </context>
 <!-- /#370 M5 alt text -->
 
+<context>
+    <name>extension/expai/preset</name>
+    <message>
+        <source>Suggest title</source>
+        <translation>Suggest title</translation>
+    </message>
+    <message>
+        <source>Write summary</source>
+        <translation>Write summary</translation>
+    </message>
+    <message>
+        <source>Meta description</source>
+        <translation>Meta description</translation>
+    </message>
+    <message>
+        <source>Keywords</source>
+        <translation>Keywords</translation>
+    </message>
+    <message>
+        <source>Shorten</source>
+        <translation>Shorten</translation>
+    </message>
+    <message>
+        <source>Expand</source>
+        <translation>Expand</translation>
+    </message>
+    <message>
+        <source>Clarify</source>
+        <translation>Clarify</translation>
+    </message>
+    <message>
+        <source>Fix grammar</source>
+        <translation>Fix grammar</translation>
+    </message>
+    <message>
+        <source>Simplify for new readers</source>
+        <translation>Simplify for new readers</translation>
+    </message>
+    <message>
+        <source>More formal</source>
+        <translation>More formal</translation>
+    </message>
+    <message>
+        <source>More casual</source>
+        <translation>More casual</translation>
+    </message>
+    <message>
+        <source>Defaults in use</source>
+        <translation>Defaults in use</translation>
+    </message>
+    <message>
+        <source>region US</source>
+        <translation>region US</translation>
+    </message>
+    <message>
+        <source>region EU</source>
+        <translation>region EU</translation>
+    </message>
+    <message>
+        <source>on this server</source>
+        <translation>on this server</translation>
+    </message>
+    <message>
+        <source>region unknown</source>
+        <translation>region unknown</translation>
+    </message>
+    <message>
+        <source>standard lane</source>
+        <translation>standard lane</translation>
+    </message>
+    <message>
+        <source>about %cost per click</source>
+        <translation>about %cost per click</translation>
+    </message>
+    <message>
+        <source>cost per click unknown</source>
+        <translation>cost per click unknown</translation>
+    </message>
+    <message>
+        <source>no cost per click</source>
+        <translation>no cost per click</translation>
+    </message>
+    <message>
+        <source>nothing is stored until you store the draft</source>
+        <translation>nothing is stored until you store the draft</translation>
+    </message>
+    <message>
+        <source>Presets</source>
+        <translation>Presets</translation>
+    </message>
+    <message>
+        <source>Improve</source>
+        <translation>Improve</translation>
+    </message>
+    <message>
+        <source>Improve this field</source>
+        <translation>Improve this field</translation>
+    </message>
+    <message>
+        <source>%action: %field</source>
+        <translation>%action: %field</translation>
+    </message>
+    <message>
+        <source>Improve: %field</source>
+        <translation>Improve: %field</translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to improve.</source>
+        <translation>The field is empty: there is nothing to improve.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/facts</name>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation>Exponential Intelligence</translation>
+    </message>
+    <message>
+        <source>AI facts</source>
+        <translation>AI facts</translation>
+    </message>
+    <message>
+        <source>What goes where, kept how long, used by whom, at what cost (printable)</source>
+        <translation>What goes where, kept how long, used by whom, at what cost (printable)</translation>
+    </message>
+    <message>
+        <source>US</source>
+        <translation>US</translation>
+    </message>
+    <message>
+        <source>EU</source>
+        <translation>EU</translation>
+    </message>
+    <message>
+        <source>this server</source>
+        <translation>this server</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>unknown</translation>
+    </message>
+    <message>
+        <source>on</source>
+        <translation>on</translation>
+    </message>
+    <message>
+        <source>off</source>
+        <translation>off</translation>
+    </message>
+    <message>
+        <source>What Exponential Intelligence sends where, how long it is kept, who may use it and what it costs. As of %date, %site, expai %version.</source>
+        <translation>What Exponential Intelligence sends where, how long it is kept, who may use it and what it costs. As of %date, %site, expai %version.</translation>
+    </message>
+    <message>
+        <source>Contact for questions about this processing: %contact</source>
+        <translation>Contact for questions about this processing: %contact</translation>
+    </message>
+    <message>
+        <source>Print or save as PDF</source>
+        <translation>Print or save as PDF</translation>
+    </message>
+    <message>
+        <source>Master switch and surfaces</source>
+        <translation>Master switch and surfaces</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence ([AISettings] Enabled)</source>
+        <translation>Exponential Intelligence ([AISettings] Enabled)</translation>
+    </message>
+    <message>
+        <source>not configured</source>
+        <translation>not configured</translation>
+    </message>
+    <message>
+        <source>Edit form controls</source>
+        <translation>Edit form controls</translation>
+    </message>
+    <message>
+        <source>Editor presets and Improve menu</source>
+        <translation>Editor presets and Improve menu</translation>
+    </message>
+    <message>
+        <source>Vector workspace</source>
+        <translation>Vector workspace</translation>
+    </message>
+    <message>
+        <source>Translation sync</source>
+        <translation>Translation sync</translation>
+    </message>
+    <message>
+        <source>Users may choose a model</source>
+        <translation>Users may choose a model</translation>
+    </message>
+    <message>
+        <source>Service tools</source>
+        <translation>Service tools</translation>
+    </message>
+    <message>
+        <source>Every request runs as the editor, within the editor's own permissions, and writes drafts only; nothing is published without the usual publish or approval.</source>
+        <translation>Every request runs as the editor, within the editor's own permissions, and writes drafts only; nothing is published without the usual publish or approval.</translation>
+    </message>
+    <message>
+        <source>Providers</source>
+        <translation>Providers</translation>
+    </message>
+    <message>
+        <source>Region</source>
+        <translation>Region</translation>
+    </message>
+    <message>
+        <source>Retention</source>
+        <translation>Retention</translation>
+    </message>
+    <message>
+        <source>Terms checked</source>
+        <translation>Terms checked</translation>
+    </message>
+    <message>
+        <source>not checked</source>
+        <translation>not checked</translation>
+    </message>
+    <message>
+        <source>Key</source>
+        <translation>Key</translation>
+    </message>
+    <message>
+        <source>From %file (%placement)</source>
+        <translation>From %file (%placement)</translation>
+    </message>
+    <message>
+        <source>No key needed</source>
+        <translation>No key needed</translation>
+    </message>
+    <message>
+        <source>No key</source>
+        <translation>No key</translation>
+    </message>
+    <message>
+        <source>Who may use it</source>
+        <translation>Who may use it</translation>
+    </message>
+    <message>
+        <source>every user with expai/write</source>
+        <translation>every user with expai/write</translation>
+    </message>
+    <message>
+        <source>users with expai/model_use for this provider</source>
+        <translation>users with expai/model_use for this provider</translation>
+    </message>
+    <message>
+        <source>This month</source>
+        <translation>This month</translation>
+    </message>
+    <message>
+        <source>%requests requests, %tokens tokens, %cost</source>
+        <translation>%requests requests, %tokens tokens, %cost</translation>
+    </message>
+    <message>
+        <source>limit %max per month</source>
+        <translation>limit %max per month</translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>Model</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation>Tools</translation>
+    </message>
+    <message>
+        <source>Write gate</source>
+        <translation>Write gate</translation>
+    </message>
+    <message>
+        <source>Probe</source>
+        <translation>Probe</translation>
+    </message>
+    <message>
+        <source>Cost</source>
+        <translation>Cost</translation>
+    </message>
+    <message>
+        <source>(site default)</source>
+        <translation>(site default)</translation>
+    </message>
+    <message>
+        <source>may write drafts</source>
+        <translation>may write drafts</translation>
+    </message>
+    <message>
+        <source>trusted</source>
+        <translation>trusted</translation>
+    </message>
+    <message>
+        <source>read only</source>
+        <translation>read only</translation>
+    </message>
+    <message>
+        <source>%rate% on %date</source>
+        <translation>%rate% on %date</translation>
+    </message>
+    <message>
+        <source>no live probe</source>
+        <translation>no live probe</translation>
+    </message>
+    <message>
+        <source>A model writes drafts only with native tool calling and a live probe pass rate of at least %threshold%, unless it is marked trusted.</source>
+        <translation>A model writes drafts only with native tool calling and a live probe pass rate of at least %threshold%, unless it is marked trusted.</translation>
+    </message>
+    <message>
+        <source>Lanes and their retention</source>
+        <translation>Lanes and their retention</translation>
+    </message>
+    <message>
+        <source>Provider</source>
+        <translation>Provider</translation>
+    </message>
+    <message>
+        <source>Lane</source>
+        <translation>Lane</translation>
+    </message>
+    <message>
+        <source>Kind</source>
+        <translation>Kind</translation>
+    </message>
+    <message>
+        <source>Price</source>
+        <translation>Price</translation>
+    </message>
+    <message>
+        <source>In use</source>
+        <translation>In use</translation>
+    </message>
+    <message>
+        <source>batch</source>
+        <translation>batch</translation>
+    </message>
+    <message>
+        <source>direct</source>
+        <translation>direct</translation>
+    </message>
+    <message>
+        <source>nothing kept</source>
+        <translation>nothing kept</translation>
+    </message>
+    <message>
+        <source>deleted by expai after the results are fetched</source>
+        <translation>deleted by expai after the results are fetched</translation>
+    </message>
+    <message>
+        <source>Data policy</source>
+        <translation>Data policy</translation>
+    </message>
+    <message>
+        <source>No data policy rule is set: content may go to every active provider above.</source>
+        <translation>No data policy rule is set: content may go to every active provider above.</translation>
+    </message>
+    <message>
+        <source>All content</source>
+        <translation>All content</translation>
+    </message>
+    <message>
+        <source>every region</source>
+        <translation>every region</translation>
+    </message>
+    <message>
+        <source>Zero retention for all content</source>
+        <translation>Zero retention for all content</translation>
+    </message>
+    <message>
+        <source>Content</source>
+        <translation>Content</translation>
+    </message>
+    <message>
+        <source>May go to the regions</source>
+        <translation>May go to the regions</translation>
+    </message>
+    <message>
+        <source>Section %name</source>
+        <translation>Section %name</translation>
+    </message>
+    <message>
+        <source>Class %name</source>
+        <translation>Class %name</translation>
+    </message>
+    <message>
+        <source>Zero retention is required for: %list</source>
+        <translation>Zero retention is required for: %list</translation>
+    </message>
+    <message>
+        <source>Images, files and relations are never sent; only the text fields the editor works on and their context.</source>
+        <translation>Images, files and relations are never sent; only the text fields the editor works on and their context.</translation>
+    </message>
+    <message>
+        <source>Limits, budget and usage this month</source>
+        <translation>Limits, budget and usage this month</translation>
+    </message>
+    <message>
+        <source>All users this month: %requests requests, %tokens tokens, %cost (estimated from list prices; the provider's invoice is authoritative).</source>
+        <translation>All users this month: %requests requests, %tokens tokens, %cost (estimated from list prices; the provider's invoice is authoritative).</translation>
+    </message>
+    <message>
+        <source>Monthly budget of queued requests: %budget, spent %spent.</source>
+        <translation>Monthly budget of queued requests: %budget, spent %spent.</translation>
+    </message>
+    <message>
+        <source>Limit</source>
+        <translation>Limit</translation>
+    </message>
+    <message>
+        <source>For</source>
+        <translation>For</translation>
+    </message>
+    <message>
+        <source>Maximum</source>
+        <translation>Maximum</translation>
+    </message>
+    <message>
+        <source>Used</source>
+        <translation>Used</translation>
+    </message>
+    <message>
+        <source>the whole site</source>
+        <translation>the whole site</translation>
+    </message>
+    <message>
+        <source>each user</source>
+        <translation>each user</translation>
+    </message>
+    <message>
+        <source>No limit is set ([Limits] in expai.ini).</source>
+        <translation>No limit is set ([Limits] in expai.ini).</translation>
+    </message>
+    <message>
+        <source>Tools that reach outside the site</source>
+        <translation>Tools that reach outside the site</translation>
+    </message>
+    <message>
+        <source>on, for: %domains</source>
+        <translation>on, for: %domains</translation>
+    </message>
+    <message>
+        <source>respects robots.txt</source>
+        <translation>respects robots.txt</translation>
+    </message>
+    <message>
+        <source>on: %provider, region %region, retention %retention</source>
+        <translation>on: %provider, region %region, retention %retention</translation>
+    </message>
+    <message>
+        <source>key from %file</source>
+        <translation>key from %file</translation>
+    </message>
+    <message>
+        <source>on, %count repositories</source>
+        <translation>on, %count repositories</translation>
+    </message>
+    <message>
+        <source>MCP bridge (site tools in process)</source>
+        <translation>MCP bridge (site tools in process)</translation>
+    </message>
+    <message>
+        <source>on: %tools</source>
+        <translation>on: %tools</translation>
+    </message>
+    <message>
+        <source>External MCP servers</source>
+        <translation>External MCP servers</translation>
+    </message>
+    <message>
+        <source>token from %file</source>
+        <translation>token from %file</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>none</translation>
+    </message>
+    <message>
+        <source>What this site keeps</source>
+        <translation>What this site keeps</translation>
+    </message>
+    <message>
+        <source>Usage log (tokens, cost, model; user ids, no names)</source>
+        <translation>Usage log (tokens, cost, model; user ids, no names)</translation>
+    </message>
+    <message>
+        <source>%days days</source>
+        <translation>%days days</translation>
+    </message>
+    <message>
+        <source>kept</source>
+        <translation>kept</translation>
+    </message>
+    <message>
+        <source>Full requests in the log</source>
+        <translation>Full requests in the log</translation>
+    </message>
+    <message>
+        <source>Summary of the editor's request in the draft log</source>
+        <translation>Summary of the editor's request in the draft log</translation>
+    </message>
+    <message>
+        <source>at most %chars characters</source>
+        <translation>at most %chars characters</translation>
+    </message>
+    <message>
+        <source>Thread events, proposals, checkpoints</source>
+        <translation>Thread events, proposals, checkpoints</translation>
+    </message>
+    <message>
+        <source>%events / %proposals / %checkpoints days</source>
+        <translation>%events / %proposals / %checkpoints days</translation>
+    </message>
+    <message>
+        <source>Roles with Exponential Intelligence policies</source>
+        <translation>Roles with Exponential Intelligence policies</translation>
+    </message>
+    <message>
+        <source>Role</source>
+        <translation>Role</translation>
+    </message>
+    <message>
+        <source>Policies</source>
+        <translation>Policies</translation>
+    </message>
+    <message>
+        <source>No role has a policy of Exponential Intelligence.</source>
+        <translation>No role has a policy of Exponential Intelligence.</translation>
+    </message>
+</context>
 </TS>

@@ -323,6 +323,14 @@
         <source>Exponential Intelligence is switched off on this site.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Presets are switched off.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to improve.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <!-- expai chains: end -->
 <!-- expai lanes/budgets/packages: begin -->
@@ -4318,4 +4326,534 @@
 </context>
 <!-- /#370 M5 alt text -->
 
+<context>
+    <name>extension/expai/preset</name>
+    <message>
+        <source>Suggest title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Write summary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Meta description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keywords</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shorten</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clarify</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fix grammar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Simplify for new readers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>More formal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>More casual</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Defaults in use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>region US</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>region EU</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>on this server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>region unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>standard lane</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>about %cost per click</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cost per click unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>no cost per click</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>nothing is stored until you store the draft</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Presets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Improve</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Improve this field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%action: %field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Improve: %field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to improve.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/facts</name>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AI facts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What goes where, kept how long, used by whom, at what cost (printable)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>US</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>EU</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What Exponential Intelligence sends where, how long it is kept, who may use it and what it costs. As of %date, %site, expai %version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contact for questions about this processing: %contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Print or save as PDF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Master switch and surfaces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence ([AISettings] Enabled)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>not configured</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit form controls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Editor presets and Improve menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vector workspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Translation sync</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Users may choose a model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Service tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Every request runs as the editor, within the editor's own permissions, and writes drafts only; nothing is published without the usual publish or approval.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Providers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Region</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Retention</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Terms checked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>not checked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>From %file (%placement)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No key needed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Who may use it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>every user with expai/write</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>users with expai/model_use for this provider</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This month</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%requests requests, %tokens tokens, %cost</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>limit %max per month</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Write gate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Probe</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cost</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(site default)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>may write drafts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>trusted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>read only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%rate% on %date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>no live probe</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A model writes drafts only with native tool calling and a live probe pass rate of at least %threshold%, unless it is marked trusted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lanes and their retention</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Provider</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lane</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Kind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Price</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>batch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>direct</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>nothing kept</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>deleted by expai after the results are fetched</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Data policy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No data policy rule is set: content may go to every active provider above.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All content</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>every region</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zero retention for all content</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Content</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>May go to the regions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Section %name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Class %name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zero retention is required for: %list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Images, files and relations are never sent; only the text fields the editor works on and their context.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Limits, budget and usage this month</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All users this month: %requests requests, %tokens tokens, %cost (estimated from list prices; the provider's invoice is authoritative).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monthly budget of queued requests: %budget, spent %spent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Limit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Used</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>the whole site</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>each user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No limit is set ([Limits] in expai.ini).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tools that reach outside the site</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>on, for: %domains</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>respects robots.txt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>on: %provider, region %region, retention %retention</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>key from %file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>on, %count repositories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MCP bridge (site tools in process)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>on: %tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>External MCP servers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>token from %file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What this site keeps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Usage log (tokens, cost, model; user ids, no names)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%days days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>kept</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Full requests in the log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Summary of the editor's request in the draft log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>at most %chars characters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Thread events, proposals, checkpoints</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%events / %proposals / %checkpoints days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Roles with Exponential Intelligence policies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Role</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Policies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No role has a policy of Exponential Intelligence.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>

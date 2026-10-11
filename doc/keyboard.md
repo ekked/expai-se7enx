@@ -19,6 +19,7 @@ What it lists, as you type:
 | --- | --- |
 | Commands | Open Vector; New thread here (on a content page); Switch model; Keyboard shortcuts; in Vector also New thread, Run, Stop, Plan/Write, Scope, Lane, Next/Previous thread, Plan/Changes/Cost |
 | Field actions | in an edit form: every field action of every field ("Shorten: Intro"), run by Enter |
+| Commands (edit form) | every preset button ("Suggest title: Title") and every Improve menu ("Improve: Body text"), registered by expai_presets.js ([presets.md](presets.md)) |
 | Threads | the latest threads, or those whose title matches |
 | Nodes | readable nodes whose name contains the text (2 characters or more) or with that node id: Enter opens the node |
 | Models | with "Switch model": the models the editor may use; in Vector it changes the thread's model, elsewhere the editor's model |

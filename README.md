@@ -24,6 +24,14 @@ Licensed under the GNU General Public License v2.0 (or any later version), see [
   fields from a brief, and per-field actions (Write, Rewrite, Shorten, Translate, Suggest) next to text fields. The
   values go into the form for the editor to review; nothing is stored until the draft is stored or published as
   usual, so autosave, the Online Editor and Tiptap keep working.
+- **Editor presets and the Improve menu**: one-click "Suggest title", "Write summary", "Meta description" and
+  "Keywords" next to the fields each class maps them to (xrowmetadata parts included), an "Improve" menu on every
+  text field, and a visible "Defaults in use" line with the model, region, lane and cost per click
+  ([doc/presets.md](doc/presets.md)).
+- **"AI facts" page** (`expai/facts`, Setup > AI facts): one printable page for a data protection officer with every
+  provider's region, retention, terms date and key source (never the key), who may use it, models and write gate,
+  lanes, data policy, limits against this month's usage and the tools that reach outside the site
+  ([doc/ai-facts.md](doc/ai-facts.md)).
 - **The "Exponential Intelligence" label** on every version it wrote: in "My drafts", the drafts page, version views,
   edit forms and the approval (collaboration) views, with the model in the tooltip.
 - **Dashboard page** (`expai/dashboard`, in the Dashboard tab's left menu): estimated cost, tokens, requests and

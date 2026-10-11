@@ -572,3 +572,29 @@ See [alt-text.md](alt-text.md). The button is the field action `[FieldAction_alt
 Other files: `ezjscore.ini [ezjscServer_expaialttext]` (the function `expaialttext::suggest`), `expqueue.ini
 [JobType_expai.alttext]` (the job type of the report), and `Capabilities[]=vision` in `[Model_<alias>]` (the models
 that can look at images; the Anthropic models of `[AISettings]` have it).
+
+## [EditPresets], [Presets]: editor presets and the Improve menu
+
+See [presets.md](presets.md).
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `[EditPresets] Enabled` | `true` | The preset buttons, the Improve menu and the defaults line in the edit form (with `[EditViewSettings] Enabled` and the master switch). |
+| `DefaultsLine` | `enabled` | The line above the fields with the model, its region, the lane and the estimated cost of one click. |
+| `EstimateInputTokens`, `EstimateOutputTokens` | `2500`, `300` | The tokens one click is estimated at, for the defaults line. |
+| `Presets[]` | title, summary, meta_description, keywords | The presets, in this order; each is `[FieldAction_preset_<name>]` (Label, Handler, Datatypes[], Input, Instruction, as any field action). |
+| `Improve[]` | shorten, expand, clarify, grammar, simplify, formal, casual | The entries of the Improve menu; each is `[FieldAction_improve_<name>]`. |
+| `ImproveDatatypes[]` | ezstring, eztext, ezxmltext | The datatypes that get the Improve menu (also needed in `[ToolSettings] WritableDatatypes[]`). |
+| `[Presets] Class_<class identifier>[<preset>]` | article, blog_post, folder, ng_article, ng_blog_post, ng_news, ng_landing_page, ng_category | The fields a preset fills in a class: attribute identifiers, or `<attribute>.<part>` for an xrowmetadata part (title, description, keywords), separated by commas. A class without a line gets no presets. |
+
+## [FactsSettings]: the "AI facts" page
+
+See [ai-facts.md](ai-facts.md).
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `Contact` | (empty) | The contact for questions about the processing, printed under the title of `expai/facts`. |
+| `Note` | (empty) | A note printed under the title (e.g. the reference of the record of processing activities). |
+
+Other files: `ezjscore.ini [ezjscServer_expaipreset]` (the function `expaipreset::preset`), `menu.ini
+[Leftmenu_setup]` (the entry Setup > AI facts, policy `expai/facts`).

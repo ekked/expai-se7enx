@@ -65,6 +65,13 @@ The new value goes into the field (into the editor for rich text) with a short n
 
 Nothing is saved until you store or publish the draft as usual. Your site may add more actions (doc/extending.md).
 
+**Presets and Improve.** One-click buttons with nothing to type: **Suggest title**, **Write summary**, **Meta
+description** and **Keywords** sit next to the fields your site set them up for (also next to the title, description
+and keywords of the page metadata). Every text field has an **Improve** menu: Shorten, Expand, Clarify, Fix grammar,
+Simplify for new readers, More formal, More casual. They fill the field the same way, with **Undo**. The line
+**Defaults in use** above the fields says which model a click uses, where it runs and about what one click costs.
+In the command palette (Ctrl/Cmd+K) you find them as "Suggest title: Title" or "Improve: Body text" (doc/presets.md).
+
 ## 3. The label
 
 Every version written with Exponential Intelligence carries the label **Exponential Intelligence** (the tooltip says

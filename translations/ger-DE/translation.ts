@@ -323,6 +323,14 @@
         <source>Exponential Intelligence is switched off on this site.</source>
         <translation>Exponential Intelligence ist auf dieser Website ausgeschaltet.</translation>
     </message>
+    <message>
+        <source>Presets are switched off.</source>
+        <translation>Die Vorlagen sind ausgeschaltet.</translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to improve.</source>
+        <translation>Das Feld ist leer: Es gibt nichts zu verbessern.</translation>
+    </message>
 </context>
 <!-- expai chains: end -->
 <!-- expai lanes/budgets/packages: begin -->
@@ -4318,4 +4326,534 @@
 </context>
 <!-- /#370 M5 alt text -->
 
+<context>
+    <name>extension/expai/preset</name>
+    <message>
+        <source>Suggest title</source>
+        <translation>Titel vorschlagen</translation>
+    </message>
+    <message>
+        <source>Write summary</source>
+        <translation>Zusammenfassung schreiben</translation>
+    </message>
+    <message>
+        <source>Meta description</source>
+        <translation>Meta-Beschreibung</translation>
+    </message>
+    <message>
+        <source>Keywords</source>
+        <translation>Schlagwörter</translation>
+    </message>
+    <message>
+        <source>Shorten</source>
+        <translation>Kürzen</translation>
+    </message>
+    <message>
+        <source>Expand</source>
+        <translation>Ausbauen</translation>
+    </message>
+    <message>
+        <source>Clarify</source>
+        <translation>Klarer formulieren</translation>
+    </message>
+    <message>
+        <source>Fix grammar</source>
+        <translation>Grammatik korrigieren</translation>
+    </message>
+    <message>
+        <source>Simplify for new readers</source>
+        <translation>Für Einsteiger vereinfachen</translation>
+    </message>
+    <message>
+        <source>More formal</source>
+        <translation>Förmlicher</translation>
+    </message>
+    <message>
+        <source>More casual</source>
+        <translation>Lockerer</translation>
+    </message>
+    <message>
+        <source>Defaults in use</source>
+        <translation>Aktuelle Voreinstellungen</translation>
+    </message>
+    <message>
+        <source>region US</source>
+        <translation>Region USA</translation>
+    </message>
+    <message>
+        <source>region EU</source>
+        <translation>Region EU</translation>
+    </message>
+    <message>
+        <source>on this server</source>
+        <translation>auf diesem Server</translation>
+    </message>
+    <message>
+        <source>region unknown</source>
+        <translation>Region unbekannt</translation>
+    </message>
+    <message>
+        <source>standard lane</source>
+        <translation>Standard-Spur</translation>
+    </message>
+    <message>
+        <source>about %cost per click</source>
+        <translation>etwa %cost pro Klick</translation>
+    </message>
+    <message>
+        <source>cost per click unknown</source>
+        <translation>Kosten pro Klick unbekannt</translation>
+    </message>
+    <message>
+        <source>no cost per click</source>
+        <translation>keine Kosten pro Klick</translation>
+    </message>
+    <message>
+        <source>nothing is stored until you store the draft</source>
+        <translation>nichts wird gespeichert, bevor Sie den Entwurf speichern</translation>
+    </message>
+    <message>
+        <source>Presets</source>
+        <translation>Vorlagen</translation>
+    </message>
+    <message>
+        <source>Improve</source>
+        <translation>Verbessern</translation>
+    </message>
+    <message>
+        <source>Improve this field</source>
+        <translation>Dieses Feld verbessern</translation>
+    </message>
+    <message>
+        <source>%action: %field</source>
+        <translation>%action: %field</translation>
+    </message>
+    <message>
+        <source>Improve: %field</source>
+        <translation>Verbessern: %field</translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to improve.</source>
+        <translation>Das Feld ist leer: Es gibt nichts zu verbessern.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/facts</name>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation>Exponential Intelligence</translation>
+    </message>
+    <message>
+        <source>AI facts</source>
+        <translation>KI-Fakten</translation>
+    </message>
+    <message>
+        <source>What goes where, kept how long, used by whom, at what cost (printable)</source>
+        <translation>Was wohin geht, wie lange es bleibt, wer es nutzt, was es kostet (druckbar)</translation>
+    </message>
+    <message>
+        <source>US</source>
+        <translation>USA</translation>
+    </message>
+    <message>
+        <source>EU</source>
+        <translation>EU</translation>
+    </message>
+    <message>
+        <source>this server</source>
+        <translation>dieser Server</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>unbekannt</translation>
+    </message>
+    <message>
+        <source>on</source>
+        <translation>an</translation>
+    </message>
+    <message>
+        <source>off</source>
+        <translation>aus</translation>
+    </message>
+    <message>
+        <source>What Exponential Intelligence sends where, how long it is kept, who may use it and what it costs. As of %date, %site, expai %version.</source>
+        <translation>Was Exponential Intelligence wohin sendet, wie lange es aufbewahrt wird, wer es nutzen darf und was es kostet. Stand %date, %site, expai %version.</translation>
+    </message>
+    <message>
+        <source>Contact for questions about this processing: %contact</source>
+        <translation>Ansprechpartner für Fragen zu dieser Verarbeitung: %contact</translation>
+    </message>
+    <message>
+        <source>Print or save as PDF</source>
+        <translation>Drucken oder als PDF speichern</translation>
+    </message>
+    <message>
+        <source>Master switch and surfaces</source>
+        <translation>Hauptschalter und Oberflächen</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence ([AISettings] Enabled)</source>
+        <translation>Exponential Intelligence ([AISettings] Enabled)</translation>
+    </message>
+    <message>
+        <source>not configured</source>
+        <translation>nicht konfiguriert</translation>
+    </message>
+    <message>
+        <source>Edit form controls</source>
+        <translation>Bedienelemente im Bearbeitungsformular</translation>
+    </message>
+    <message>
+        <source>Editor presets and Improve menu</source>
+        <translation>Vorlagen und Verbessern-Menü im Editor</translation>
+    </message>
+    <message>
+        <source>Vector workspace</source>
+        <translation>Vector-Arbeitsbereich</translation>
+    </message>
+    <message>
+        <source>Translation sync</source>
+        <translation>Übersetzungsabgleich</translation>
+    </message>
+    <message>
+        <source>Users may choose a model</source>
+        <translation>Benutzer dürfen ein Modell wählen</translation>
+    </message>
+    <message>
+        <source>Service tools</source>
+        <translation>Service-Werkzeuge</translation>
+    </message>
+    <message>
+        <source>Every request runs as the editor, within the editor's own permissions, and writes drafts only; nothing is published without the usual publish or approval.</source>
+        <translation>Jede Anfrage läuft als der Redakteur, mit dessen eigenen Rechten, und schreibt nur Entwürfe; nichts wird ohne die übliche Veröffentlichung oder Freigabe veröffentlicht.</translation>
+    </message>
+    <message>
+        <source>Providers</source>
+        <translation>Anbieter</translation>
+    </message>
+    <message>
+        <source>Region</source>
+        <translation>Region</translation>
+    </message>
+    <message>
+        <source>Retention</source>
+        <translation>Aufbewahrung</translation>
+    </message>
+    <message>
+        <source>Terms checked</source>
+        <translation>Bedingungen geprüft</translation>
+    </message>
+    <message>
+        <source>not checked</source>
+        <translation>nicht geprüft</translation>
+    </message>
+    <message>
+        <source>Key</source>
+        <translation>Schlüssel</translation>
+    </message>
+    <message>
+        <source>From %file (%placement)</source>
+        <translation>Aus %file (%placement)</translation>
+    </message>
+    <message>
+        <source>No key needed</source>
+        <translation>Kein Schlüssel nötig</translation>
+    </message>
+    <message>
+        <source>No key</source>
+        <translation>Kein Schlüssel</translation>
+    </message>
+    <message>
+        <source>Who may use it</source>
+        <translation>Wer darf ihn nutzen</translation>
+    </message>
+    <message>
+        <source>every user with expai/write</source>
+        <translation>jeder Benutzer mit expai/write</translation>
+    </message>
+    <message>
+        <source>users with expai/model_use for this provider</source>
+        <translation>Benutzer mit expai/model_use für diesen Anbieter</translation>
+    </message>
+    <message>
+        <source>This month</source>
+        <translation>Dieser Monat</translation>
+    </message>
+    <message>
+        <source>%requests requests, %tokens tokens, %cost</source>
+        <translation>%requests Anfragen, %tokens Token, %cost</translation>
+    </message>
+    <message>
+        <source>limit %max per month</source>
+        <translation>Grenze %max pro Monat</translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>Modell</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation>Werkzeuge</translation>
+    </message>
+    <message>
+        <source>Write gate</source>
+        <translation>Schreibfreigabe</translation>
+    </message>
+    <message>
+        <source>Probe</source>
+        <translation>Probe</translation>
+    </message>
+    <message>
+        <source>Cost</source>
+        <translation>Kosten</translation>
+    </message>
+    <message>
+        <source>(site default)</source>
+        <translation>(Standard der Website)</translation>
+    </message>
+    <message>
+        <source>may write drafts</source>
+        <translation>darf Entwürfe schreiben</translation>
+    </message>
+    <message>
+        <source>trusted</source>
+        <translation>vertrauenswürdig</translation>
+    </message>
+    <message>
+        <source>read only</source>
+        <translation>nur lesen</translation>
+    </message>
+    <message>
+        <source>%rate% on %date</source>
+        <translation>%rate% am %date</translation>
+    </message>
+    <message>
+        <source>no live probe</source>
+        <translation>keine Live-Probe</translation>
+    </message>
+    <message>
+        <source>A model writes drafts only with native tool calling and a live probe pass rate of at least %threshold%, unless it is marked trusted.</source>
+        <translation>Ein Modell schreibt Entwürfe nur mit nativen Werkzeugaufrufen und einer Live-Probe mit mindestens %threshold% bestandenen Aufgaben, es sei denn, es ist als vertrauenswürdig markiert.</translation>
+    </message>
+    <message>
+        <source>Lanes and their retention</source>
+        <translation>Spuren und ihre Aufbewahrung</translation>
+    </message>
+    <message>
+        <source>Provider</source>
+        <translation>Anbieter</translation>
+    </message>
+    <message>
+        <source>Lane</source>
+        <translation>Spur</translation>
+    </message>
+    <message>
+        <source>Kind</source>
+        <translation>Art</translation>
+    </message>
+    <message>
+        <source>Price</source>
+        <translation>Preis</translation>
+    </message>
+    <message>
+        <source>In use</source>
+        <translation>In Gebrauch</translation>
+    </message>
+    <message>
+        <source>batch</source>
+        <translation>Stapel</translation>
+    </message>
+    <message>
+        <source>direct</source>
+        <translation>direkt</translation>
+    </message>
+    <message>
+        <source>nothing kept</source>
+        <translation>nichts aufbewahrt</translation>
+    </message>
+    <message>
+        <source>deleted by expai after the results are fetched</source>
+        <translation>von expai gelöscht, sobald die Ergebnisse abgeholt sind</translation>
+    </message>
+    <message>
+        <source>Data policy</source>
+        <translation>Datenrichtlinie</translation>
+    </message>
+    <message>
+        <source>No data policy rule is set: content may go to every active provider above.</source>
+        <translation>Keine Regel der Datenrichtlinie ist gesetzt: Inhalte dürfen an jeden oben genannten aktiven Anbieter gehen.</translation>
+    </message>
+    <message>
+        <source>All content</source>
+        <translation>Alle Inhalte</translation>
+    </message>
+    <message>
+        <source>every region</source>
+        <translation>jede Region</translation>
+    </message>
+    <message>
+        <source>Zero retention for all content</source>
+        <translation>Keine Aufbewahrung für alle Inhalte</translation>
+    </message>
+    <message>
+        <source>Content</source>
+        <translation>Inhalt</translation>
+    </message>
+    <message>
+        <source>May go to the regions</source>
+        <translation>Darf in die Regionen</translation>
+    </message>
+    <message>
+        <source>Section %name</source>
+        <translation>Bereich %name</translation>
+    </message>
+    <message>
+        <source>Class %name</source>
+        <translation>Klasse %name</translation>
+    </message>
+    <message>
+        <source>Zero retention is required for: %list</source>
+        <translation>Keine Aufbewahrung ist vorgeschrieben für: %list</translation>
+    </message>
+    <message>
+        <source>Images, files and relations are never sent; only the text fields the editor works on and their context.</source>
+        <translation>Bilder, Dateien und Beziehungen werden nie gesendet; nur die Textfelder, an denen der Redakteur arbeitet, und ihr Kontext.</translation>
+    </message>
+    <message>
+        <source>Limits, budget and usage this month</source>
+        <translation>Grenzen, Budget und Verbrauch in diesem Monat</translation>
+    </message>
+    <message>
+        <source>All users this month: %requests requests, %tokens tokens, %cost (estimated from list prices; the provider's invoice is authoritative).</source>
+        <translation>Alle Benutzer in diesem Monat: %requests Anfragen, %tokens Token, %cost (geschätzt nach Listenpreisen; maßgeblich ist die Rechnung des Anbieters).</translation>
+    </message>
+    <message>
+        <source>Monthly budget of queued requests: %budget, spent %spent.</source>
+        <translation>Monatsbudget der Anfragen in der Warteschlange: %budget, verbraucht %spent.</translation>
+    </message>
+    <message>
+        <source>Limit</source>
+        <translation>Grenze</translation>
+    </message>
+    <message>
+        <source>For</source>
+        <translation>Für</translation>
+    </message>
+    <message>
+        <source>Maximum</source>
+        <translation>Höchstwert</translation>
+    </message>
+    <message>
+        <source>Used</source>
+        <translation>Verbraucht</translation>
+    </message>
+    <message>
+        <source>the whole site</source>
+        <translation>die ganze Website</translation>
+    </message>
+    <message>
+        <source>each user</source>
+        <translation>jeden Benutzer</translation>
+    </message>
+    <message>
+        <source>No limit is set ([Limits] in expai.ini).</source>
+        <translation>Keine Grenze ist gesetzt ([Limits] in expai.ini).</translation>
+    </message>
+    <message>
+        <source>Tools that reach outside the site</source>
+        <translation>Werkzeuge, die über die Website hinausreichen</translation>
+    </message>
+    <message>
+        <source>on, for: %domains</source>
+        <translation>an, für: %domains</translation>
+    </message>
+    <message>
+        <source>respects robots.txt</source>
+        <translation>beachtet robots.txt</translation>
+    </message>
+    <message>
+        <source>on: %provider, region %region, retention %retention</source>
+        <translation>an: %provider, Region %region, Aufbewahrung %retention</translation>
+    </message>
+    <message>
+        <source>key from %file</source>
+        <translation>Schlüssel aus %file</translation>
+    </message>
+    <message>
+        <source>on, %count repositories</source>
+        <translation>an, %count Repositories</translation>
+    </message>
+    <message>
+        <source>MCP bridge (site tools in process)</source>
+        <translation>MCP-Brücke (Website-Werkzeuge im Prozess)</translation>
+    </message>
+    <message>
+        <source>on: %tools</source>
+        <translation>an: %tools</translation>
+    </message>
+    <message>
+        <source>External MCP servers</source>
+        <translation>Externe MCP-Server</translation>
+    </message>
+    <message>
+        <source>token from %file</source>
+        <translation>Token aus %file</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>keine</translation>
+    </message>
+    <message>
+        <source>What this site keeps</source>
+        <translation>Was diese Website aufbewahrt</translation>
+    </message>
+    <message>
+        <source>Usage log (tokens, cost, model; user ids, no names)</source>
+        <translation>Verbrauchsprotokoll (Token, Kosten, Modell; Benutzer-IDs, keine Namen)</translation>
+    </message>
+    <message>
+        <source>%days days</source>
+        <translation>%days Tage</translation>
+    </message>
+    <message>
+        <source>kept</source>
+        <translation>aufbewahrt</translation>
+    </message>
+    <message>
+        <source>Full requests in the log</source>
+        <translation>Vollständige Anfragen im Protokoll</translation>
+    </message>
+    <message>
+        <source>Summary of the editor's request in the draft log</source>
+        <translation>Zusammenfassung der Anfrage im Entwurfsprotokoll</translation>
+    </message>
+    <message>
+        <source>at most %chars characters</source>
+        <translation>höchstens %chars Zeichen</translation>
+    </message>
+    <message>
+        <source>Thread events, proposals, checkpoints</source>
+        <translation>Thread-Ereignisse, Vorschläge, Kontrollpunkte</translation>
+    </message>
+    <message>
+        <source>%events / %proposals / %checkpoints days</source>
+        <translation>%events / %proposals / %checkpoints Tage</translation>
+    </message>
+    <message>
+        <source>Roles with Exponential Intelligence policies</source>
+        <translation>Rollen mit Richtlinien für Exponential Intelligence</translation>
+    </message>
+    <message>
+        <source>Role</source>
+        <translation>Rolle</translation>
+    </message>
+    <message>
+        <source>Policies</source>
+        <translation>Richtlinien</translation>
+    </message>
+    <message>
+        <source>No role has a policy of Exponential Intelligence.</source>
+        <translation>Keine Rolle hat eine Richtlinie für Exponential Intelligence.</translation>
+    </message>
+</context>
 </TS>
