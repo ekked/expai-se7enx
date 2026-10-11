@@ -2393,4 +2393,913 @@
         <translation>Im Vergleich zum Zeitraum davor</translation>
     </message>
 </context>
+<!-- expai threads/vector/keyboard: begin -->
+<context>
+    <name>design/admin/parts/my/menu</name>
+    <message>
+        <source>Vector</source>
+        <translation>Vector</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>Changing the shortcuts is switched off on this site.</source>
+        <translation>Das Ändern der Tastenkürzel ist auf dieser Website abgeschaltet.</translation>
+    </message>
+    <message>
+        <source>Unknown command: %command</source>
+        <translation>Unbekannter Befehl: %command</translation>
+    </message>
+    <message>
+        <source>This shortcut cannot be used: %keys</source>
+        <translation>Dieses Tastenkürzel kann nicht verwendet werden: %keys</translation>
+    </message>
+    <message>
+        <source>You do not have access to Vector.</source>
+        <translation>Sie haben keinen Zugriff auf Vector.</translation>
+    </message>
+    <message>
+        <source>The thread tables are missing. Please ask an administrator to update the database of Exponential Intelligence.</source>
+        <translation>Die Tabellen der Threads fehlen. Bitten Sie einen Administrator, die Datenbank von Exponential Intelligence zu aktualisieren.</translation>
+    </message>
+    <message>
+        <source>This thread does not exist or you may not open it.</source>
+        <translation>Diesen Thread gibt es nicht, oder Sie dürfen ihn nicht öffnen.</translation>
+    </message>
+    <message>
+        <source>This lane is not available for the model.</source>
+        <translation>Diese Spur ist für das Modell nicht verfügbar.</translation>
+    </message>
+    <message>
+        <source>Choose the scope first: a node or a subtree.</source>
+        <translation>Wählen Sie zuerst den Bereich: einen Knoten oder einen Teilbaum.</translation>
+    </message>
+    <message>
+        <source>The model of this thread is no longer available to you. Choose another model.</source>
+        <translation>Das Modell dieses Threads steht Ihnen nicht mehr zur Verfügung. Wählen Sie ein anderes Modell.</translation>
+    </message>
+    <message>
+        <source>This thread has no conversation any more.</source>
+        <translation>Dieser Thread hat keine Unterhaltung mehr.</translation>
+    </message>
+    <message>
+        <source>At most 20 messages can wait.</source>
+        <translation>Es können höchstens 20 Nachrichten warten.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/keyboard</name>
+    <message>
+        <source>Command palette</source>
+        <translation>Befehlspalette</translation>
+    </message>
+    <message>
+        <source>Type a command, a thread or a node...</source>
+        <translation>Befehl, Thread oder Knoten eingeben ...</translation>
+    </message>
+    <message>
+        <source>Nothing found.</source>
+        <translation>Nichts gefunden.</translation>
+    </message>
+    <message>
+        <source>Searching...</source>
+        <translation>Suche läuft ...</translation>
+    </message>
+    <message>
+        <source>Commands</source>
+        <translation>Befehle</translation>
+    </message>
+    <message>
+        <source>Threads</source>
+        <translation>Threads</translation>
+    </message>
+    <message>
+        <source>Nodes</source>
+        <translation>Knoten</translation>
+    </message>
+    <message>
+        <source>Models</source>
+        <translation>Modelle</translation>
+    </message>
+    <message>
+        <source>Field actions</source>
+        <translation>Feldaktionen</translation>
+    </message>
+    <message>
+        <source>Open Vector</source>
+        <translation>Vector öffnen</translation>
+    </message>
+    <message>
+        <source>New thread</source>
+        <translation>Neuer Thread</translation>
+    </message>
+    <message>
+        <source>New thread here (%name)</source>
+        <translation>Neuer Thread hier (%name)</translation>
+    </message>
+    <message>
+        <source>Open thread</source>
+        <translation>Thread öffnen</translation>
+    </message>
+    <message>
+        <source>Jump to node</source>
+        <translation>Zum Knoten springen</translation>
+    </message>
+    <message>
+        <source>Switch model</source>
+        <translation>Modell wechseln</translation>
+    </message>
+    <message>
+        <source>current</source>
+        <translation>aktuell</translation>
+    </message>
+    <message>
+        <source>Model switched to %model.</source>
+        <translation>Modell gewechselt zu %model.</translation>
+    </message>
+    <message>
+        <source>Keyboard shortcuts</source>
+        <translation>Tastenkürzel</translation>
+    </message>
+    <message>
+        <source>Up and down to choose, Enter to run, Esc to close</source>
+        <translation>Pfeil hoch und runter zum Wählen, Enter zum Ausführen, Esc zum Schließen</translation>
+    </message>
+    <message>
+        <source>%action: %field</source>
+        <translation>%action: %field</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Schließen</translation>
+    </message>
+    <message>
+        <source>changed</source>
+        <translation>geändert</translation>
+    </message>
+    <message>
+        <source>Change</source>
+        <translation>Ändern</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation>Zurücksetzen</translation>
+    </message>
+    <message>
+        <source>Reset all shortcuts</source>
+        <translation>Alle Tastenkürzel zurücksetzen</translation>
+    </message>
+    <message>
+        <source>Press the new keys for "%command" (Esc cancels)</source>
+        <translation>Drücken Sie die neuen Tasten für „%command“ (Esc bricht ab)</translation>
+    </message>
+    <message>
+        <source>Something went wrong:</source>
+        <translation>Etwas ist schiefgegangen:</translation>
+    </message>
+    <message>
+        <source>Open the command palette</source>
+        <translation>Befehlspalette öffnen</translation>
+    </message>
+    <message>
+        <source>Run / send the message</source>
+        <translation>Ausführen / Nachricht senden</translation>
+    </message>
+    <message>
+        <source>Queue the message while a turn runs</source>
+        <translation>Nachricht einreihen, während ein Durchgang läuft</translation>
+    </message>
+    <message>
+        <source>Stop the thread (press twice)</source>
+        <translation>Thread anhalten (zweimal drücken)</translation>
+    </message>
+    <message>
+        <source>Next item</source>
+        <translation>Nächster Eintrag</translation>
+    </message>
+    <message>
+        <source>Previous item</source>
+        <translation>Vorheriger Eintrag</translation>
+    </message>
+    <message>
+        <source>Accept the change</source>
+        <translation>Änderung annehmen</translation>
+    </message>
+    <message>
+        <source>Reject the change</source>
+        <translation>Änderung ablehnen</translation>
+    </message>
+    <message>
+        <source>Next thread</source>
+        <translation>Nächster Thread</translation>
+    </message>
+    <message>
+        <source>Previous thread</source>
+        <translation>Vorheriger Thread</translation>
+    </message>
+    <message>
+        <source>Switch between plan and write</source>
+        <translation>Zwischen Planen und Schreiben wechseln</translation>
+    </message>
+    <message>
+        <source>Choose the model</source>
+        <translation>Modell wählen</translation>
+    </message>
+    <message>
+        <source>Choose the lane</source>
+        <translation>Spur wählen</translation>
+    </message>
+    <message>
+        <source>Change the scope</source>
+        <translation>Bereich ändern</translation>
+    </message>
+    <message>
+        <source>Show the plan</source>
+        <translation>Plan zeigen</translation>
+    </message>
+    <message>
+        <source>Show the changes</source>
+        <translation>Änderungen zeigen</translation>
+    </message>
+    <message>
+        <source>Show the cost</source>
+        <translation>Kosten zeigen</translation>
+    </message>
+    <message>
+        <source>Show the shortcuts</source>
+        <translation>Tastenkürzel zeigen</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/threads</name>
+    <message>
+        <source>New thread</source>
+        <translation>Neuer Thread</translation>
+    </message>
+    <message>
+        <source>Working</source>
+        <translation>In Arbeit</translation>
+    </message>
+    <message>
+        <source>Needs you</source>
+        <translation>Braucht Sie</translation>
+    </message>
+    <message>
+        <source>Pinned</source>
+        <translation>Angeheftet</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Zuletzt</translation>
+    </message>
+    <message>
+        <source>Waiting for your approval</source>
+        <translation>Wartet auf Ihre Freigabe</translation>
+    </message>
+    <message>
+        <source>Settled</source>
+        <translation>Erledigt</translation>
+    </message>
+    <message>
+        <source>Archived</source>
+        <translation>Archiviert</translation>
+    </message>
+    <message>
+        <source>No threads yet.</source>
+        <translation>Noch keine Threads.</translation>
+    </message>
+    <message>
+        <source>No thread matches.</source>
+        <translation>Kein Thread passt.</translation>
+    </message>
+    <message>
+        <source>Idle</source>
+        <translation>Bereit</translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation>Eingereiht</translation>
+    </message>
+    <message>
+        <source>Waits for you</source>
+        <translation>Wartet auf Sie</translation>
+    </message>
+    <message>
+        <source>To review</source>
+        <translation>Zu prüfen</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Fertig</translation>
+    </message>
+    <message>
+        <source>Failed</source>
+        <translation>Fehlgeschlagen</translation>
+    </message>
+    <message>
+        <source>Stopped</source>
+        <translation>Angehalten</translation>
+    </message>
+    <message>
+        <source>Intelligence tab</source>
+        <translation>Reiter Intelligence</translation>
+    </message>
+    <message>
+        <source>Vector</source>
+        <translation>Vector</translation>
+    </message>
+    <message>
+        <source>New activity</source>
+        <translation>Neue Aktivität</translation>
+    </message>
+    <message>
+        <source>Threads on this page</source>
+        <translation>Threads auf dieser Seite</translation>
+    </message>
+    <message>
+        <source>Your conversations here are threads too; they appear in Vector.</source>
+        <translation>Ihre Unterhaltungen hier sind ebenfalls Threads; sie erscheinen in Vector.</translation>
+    </message>
+    <message>
+        <source>New thread in Vector for this page</source>
+        <translation>Neuer Thread in Vector für diese Seite</translation>
+    </message>
+    <message>
+        <source>All threads</source>
+        <translation>Alle Threads</translation>
+    </message>
+    <message>
+        <source>Open in Vector</source>
+        <translation>In Vector öffnen</translation>
+    </message>
+    <message>
+        <source>This conversation</source>
+        <translation>Diese Unterhaltung</translation>
+    </message>
+    <message>
+        <source>Threads</source>
+        <translation>Threads</translation>
+    </message>
+    <message>
+        <source>%count need you</source>
+        <translation>%count brauchen Sie</translation>
+    </message>
+    <message>
+        <source>Open Vector</source>
+        <translation>Vector öffnen</translation>
+    </message>
+    <message>
+        <source>No threads yet. A conversation in the Intelligence tab of a page becomes a thread; Vector starts threads of its own.</source>
+        <translation>Noch keine Threads. Eine Unterhaltung im Reiter Intelligence einer Seite wird zum Thread; Vector beginnt eigene Threads.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/vector</name>
+    <message>
+        <source>Vector</source>
+        <translation>Vector</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation>Exponential Intelligence</translation>
+    </message>
+    <message>
+        <source>Search threads, commands, nodes...</source>
+        <translation>Threads, Befehle, Knoten suchen ...</translation>
+    </message>
+    <message>
+        <source>Threads</source>
+        <translation>Threads</translation>
+    </message>
+    <message>
+        <source>Plan, changes and cost</source>
+        <translation>Plan, Änderungen und Kosten</translation>
+    </message>
+    <message>
+        <source>Keyboard shortcuts</source>
+        <translation>Tastenkürzel</translation>
+    </message>
+    <message>
+        <source>Vector is switched off on this site.</source>
+        <translation>Vector ist auf dieser Website abgeschaltet.</translation>
+    </message>
+    <message>
+        <source>The database of Exponential Intelligence needs an update before Vector can be used. Please ask an administrator.</source>
+        <translation>Die Datenbank von Exponential Intelligence muss aktualisiert werden, bevor Vector genutzt werden kann. Bitte wenden Sie sich an einen Administrator.</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence is switched off or not configured: threads can be read, but not run.</source>
+        <translation>Exponential Intelligence ist abgeschaltet oder nicht eingerichtet: Threads können gelesen, aber nicht ausgeführt werden.</translation>
+    </message>
+    <message>
+        <source>New thread</source>
+        <translation>Neuer Thread</translation>
+    </message>
+    <message>
+        <source>Filter threads</source>
+        <translation>Threads filtern</translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation>Aktiv</translation>
+    </message>
+    <message>
+        <source>Settled</source>
+        <translation>Erledigt</translation>
+    </message>
+    <message>
+        <source>Archived</source>
+        <translation>Archiviert</translation>
+    </message>
+    <message>
+        <source>Thread</source>
+        <translation>Thread</translation>
+    </message>
+    <message>
+        <source>Start a thread</source>
+        <translation>Einen Thread beginnen</translation>
+    </message>
+    <message>
+        <source>Choose what it may touch (nodes, subtrees, classes, languages), then say what to do. Bulk work starts with a plan.</source>
+        <translation>Wählen Sie, was er berühren darf (Knoten, Teilbäume, Klassen, Sprachen), und sagen Sie dann, was zu tun ist. Massenarbeit beginnt mit einem Plan.</translation>
+    </message>
+    <message>
+        <source>New thread on "%name"</source>
+        <translation>Neuer Thread zu „%name“</translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation>Titel</translation>
+    </message>
+    <message>
+        <source>Pin</source>
+        <translation>Anheften</translation>
+    </message>
+    <message>
+        <source>Settle</source>
+        <translation>Erledigen</translation>
+    </message>
+    <message>
+        <source>Archive</source>
+        <translation>Archivieren</translation>
+    </message>
+    <message>
+        <source>You see this thread because a version it wrote waits for your approval. Only its owner can change it.</source>
+        <translation>Sie sehen diesen Thread, weil eine von ihm geschriebene Version auf Ihre Freigabe wartet. Nur sein Eigentümer kann ihn ändern.</translation>
+    </message>
+    <message>
+        <source>Scope</source>
+        <translation>Bereich</translation>
+    </message>
+    <message>
+        <source>Change</source>
+        <translation>Ändern</translation>
+    </message>
+    <message>
+        <source>Mode</source>
+        <translation>Modus</translation>
+    </message>
+    <message>
+        <source>Plan</source>
+        <translation>Planen</translation>
+    </message>
+    <message>
+        <source>Write</source>
+        <translation>Schreiben</translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>Modell</translation>
+    </message>
+    <message>
+        <source>Lane</source>
+        <translation>Spur</translation>
+    </message>
+    <message>
+        <source>Review</source>
+        <translation>Prüfung</translation>
+    </message>
+    <message>
+        <source>Staged</source>
+        <translation>Vorgemerkt</translation>
+    </message>
+    <message>
+        <source>Direct</source>
+        <translation>Direkt</translation>
+    </message>
+    <message>
+        <source>Show older</source>
+        <translation>Ältere zeigen</translation>
+    </message>
+    <message>
+        <source>Conversation</source>
+        <translation>Unterhaltung</translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation>Eingereiht</translation>
+    </message>
+    <message>
+        <source>Your request</source>
+        <translation>Ihr Auftrag</translation>
+    </message>
+    <message>
+        <source>What should happen in this scope?</source>
+        <translation>Was soll in diesem Bereich geschehen?</translation>
+    </message>
+    <message>
+        <source>Queue</source>
+        <translation>Einreihen</translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation>Anhalten</translation>
+    </message>
+    <message>
+        <source>Run</source>
+        <translation>Ausführen</translation>
+    </message>
+    <message>
+        <source>Changes</source>
+        <translation>Änderungen</translation>
+    </message>
+    <message>
+        <source>Cost</source>
+        <translation>Kosten</translation>
+    </message>
+    <message>
+        <source>Scope of this thread</source>
+        <translation>Bereich dieses Threads</translation>
+    </message>
+    <message>
+        <source>What the thread may read and change. A node is one object; a subtree is a node and everything below it.</source>
+        <translation>Was der Thread lesen und ändern darf. Ein Knoten ist ein Objekt; ein Teilbaum ist ein Knoten und alles darunter.</translation>
+    </message>
+    <message>
+        <source>Add a node</source>
+        <translation>Knoten hinzufügen</translation>
+    </message>
+    <message>
+        <source>Name or node id</source>
+        <translation>Name oder Knoten-ID</translation>
+    </message>
+    <message>
+        <source>Nodes and subtrees</source>
+        <translation>Knoten und Teilbäume</translation>
+    </message>
+    <message>
+        <source>Classes</source>
+        <translation>Klassen</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Sprachen</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Abbrechen</translation>
+    </message>
+    <message>
+        <source>Save scope</source>
+        <translation>Bereich speichern</translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation>Rückgängig</translation>
+    </message>
+    <message>
+        <source>Pinned.</source>
+        <translation>Angeheftet.</translation>
+    </message>
+    <message>
+        <source>Unpinned.</source>
+        <translation>Nicht mehr angeheftet.</translation>
+    </message>
+    <message>
+        <source>Settled.</source>
+        <translation>Erledigt.</translation>
+    </message>
+    <message>
+        <source>Archived.</source>
+        <translation>Archiviert.</translation>
+    </message>
+    <message>
+        <source>Back in the active list.</source>
+        <translation>Wieder in der aktiven Liste.</translation>
+    </message>
+    <message>
+        <source>Nothing chosen yet</source>
+        <translation>Noch nichts gewählt</translation>
+    </message>
+    <message>
+        <source>Node</source>
+        <translation>Knoten</translation>
+    </message>
+    <message>
+        <source>Subtree</source>
+        <translation>Teilbaum</translation>
+    </message>
+    <message>
+        <source>Remove %name</source>
+        <translation>%name entfernen</translation>
+    </message>
+    <message>
+        <source>Include everything below</source>
+        <translation>Alles darunter einschließen</translation>
+    </message>
+    <message>
+        <source>Your role does not allow this kind of scope.</source>
+        <translation>Ihre Rolle erlaubt diese Art von Bereich nicht.</translation>
+    </message>
+    <message>
+        <source>Bulk</source>
+        <translation>Massenarbeit</translation>
+    </message>
+    <message>
+        <source>Bulk work starts with a plan: approve it before anything is written.</source>
+        <translation>Massenarbeit beginnt mit einem Plan: Geben Sie ihn frei, bevor etwas geschrieben wird.</translation>
+    </message>
+    <message>
+        <source>Plan mode: Vector reads and proposes; nothing is written.</source>
+        <translation>Planmodus: Vector liest und schlägt vor; nichts wird geschrieben.</translation>
+    </message>
+    <message>
+        <source>Staged review: changes are proposed for review; this thread reads only until staged changes are available.</source>
+        <translation>Vorgemerkte Prüfung: Änderungen werden zur Prüfung vorgeschlagen; dieser Thread liest nur, bis vorgemerkte Änderungen verfügbar sind.</translation>
+    </message>
+    <message>
+        <source>Direct: drafts are written at once (never published); you decide in the drafts list.</source>
+        <translation>Direkt: Entwürfe werden sofort geschrieben (nie veröffentlicht); Sie entscheiden in der Entwurfsliste.</translation>
+    </message>
+    <message>
+        <source>Direct review needs one object in one language and a role that allows it.</source>
+        <translation>Direkte Prüfung braucht ein Objekt in einer Sprache und eine Rolle, die es erlaubt.</translation>
+    </message>
+    <message>
+        <source>Your default (%model)</source>
+        <translation>Ihre Voreinstellung (%model)</translation>
+    </message>
+    <message>
+        <source>reads only</source>
+        <translation>liest nur</translation>
+    </message>
+    <message>
+        <source>batch: approved plans only</source>
+        <translation>Stapel: nur freigegebene Pläne</translation>
+    </message>
+    <message>
+        <source>Runs in this window use the standard lane; the chosen lane applies to background runs.</source>
+        <translation>Durchgänge in diesem Fenster nutzen die Standardspur; die gewählte Spur gilt für Hintergrunddurchgänge.</translation>
+    </message>
+    <message>
+        <source>Vector is working...</source>
+        <translation>Vector arbeitet ...</translation>
+    </message>
+    <message>
+        <source>Step %count</source>
+        <translation>Schritt %count</translation>
+    </message>
+    <message>
+        <source>Stop requested...</source>
+        <translation>Anhalten angefordert ...</translation>
+    </message>
+    <message>
+        <source>Stopped. The steps so far are kept.</source>
+        <translation>Angehalten. Die bisherigen Schritte bleiben erhalten.</translation>
+    </message>
+    <message>
+        <source>Press Esc once more to stop.</source>
+        <translation>Drücken Sie Esc noch einmal, um anzuhalten.</translation>
+    </message>
+    <message>
+        <source>Queued: it is sent when the current turn ends.</source>
+        <translation>Eingereiht: Sie wird gesendet, wenn der laufende Durchgang endet.</translation>
+    </message>
+    <message>
+        <source>Remove from the queue</source>
+        <translation>Aus der Warteschlange entfernen</translation>
+    </message>
+    <message>
+        <source>Sending the next queued message...</source>
+        <translation>Die nächste eingereihte Nachricht wird gesendet ...</translation>
+    </message>
+    <message>
+        <source>%run to run</source>
+        <translation>%run zum Ausführen</translation>
+    </message>
+    <message>
+        <source>%queue to queue, %stop to stop</source>
+        <translation>%queue zum Einreihen, %stop zum Anhalten</translation>
+    </message>
+    <message>
+        <source>You</source>
+        <translation>Sie</translation>
+    </message>
+    <message>
+        <source>%count lookup(s)</source>
+        <translation>%count Nachschlagen</translation>
+    </message>
+    <message>
+        <source>Drafts written</source>
+        <translation>Geschriebene Entwürfe</translation>
+    </message>
+    <message>
+        <source>(no answer yet)</source>
+        <translation>(noch keine Antwort)</translation>
+    </message>
+    <message>
+        <source>The last answer was interrupted.</source>
+        <translation>Die letzte Antwort wurde unterbrochen.</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>Fortsetzen</translation>
+    </message>
+    <message>
+        <source>Something went wrong:</source>
+        <translation>Etwas ist schiefgegangen:</translation>
+    </message>
+    <message>
+        <source>The server did not answer in time. Please try again.</source>
+        <translation>Der Server hat nicht rechtzeitig geantwortet. Bitte versuchen Sie es erneut.</translation>
+    </message>
+    <message>
+        <source>This thread does not exist or you may not open it.</source>
+        <translation>Diesen Thread gibt es nicht, oder Sie dürfen ihn nicht öffnen.</translation>
+    </message>
+    <message>
+        <source>Choose the scope first.</source>
+        <translation>Wählen Sie zuerst den Bereich.</translation>
+    </message>
+    <message>
+        <source>Type at least 2 characters or a node id.</source>
+        <translation>Geben Sie mindestens 2 Zeichen oder eine Knoten-ID ein.</translation>
+    </message>
+    <message>
+        <source>No readable node found.</source>
+        <translation>Kein lesbarer Knoten gefunden.</translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation>Bearbeiten</translation>
+    </message>
+    <message>
+        <source>View version</source>
+        <translation>Version ansehen</translation>
+    </message>
+    <message>
+        <source>Open the Intelligence tab</source>
+        <translation>Reiter Intelligence öffnen</translation>
+    </message>
+    <message>
+        <source>Draft</source>
+        <translation>Entwurf</translation>
+    </message>
+    <message>
+        <source>Saved as draft</source>
+        <translation>Als Entwurf gespeichert</translation>
+    </message>
+    <message>
+        <source>Waiting for approval</source>
+        <translation>Wartet auf Freigabe</translation>
+    </message>
+    <message>
+        <source>Published</source>
+        <translation>Veröffentlicht</translation>
+    </message>
+    <message>
+        <source>Staged changes are reviewed here, field by field. Accept and reject arrive with staged review.</source>
+        <translation>Vorgemerkte Änderungen werden hier Feld für Feld geprüft. Annehmen und Ablehnen kommen mit der vorgemerkten Prüfung.</translation>
+    </message>
+    <message>
+        <source>Spent</source>
+        <translation>Ausgegeben</translation>
+    </message>
+    <message>
+        <source>Tokens</source>
+        <translation>Tokens</translation>
+    </message>
+    <message>
+        <source>Requests</source>
+        <translation>Anfragen</translation>
+    </message>
+    <message>
+        <source>Costs are not shown on this site.</source>
+        <translation>Kosten werden auf dieser Website nicht angezeigt.</translation>
+    </message>
+    <message>
+        <source>today</source>
+        <translation>heute</translation>
+    </message>
+    <message>
+        <source>Accept and reject apply to staged changes, which arrive with staged review.</source>
+        <translation>Annehmen und Ablehnen gelten für vorgemerkte Änderungen, die mit der vorgemerkten Prüfung kommen.</translation>
+    </message>
+    <message>
+        <source>Estimated from the request log at list prices; the provider's invoice is authoritative.</source>
+        <translation>Aus dem Anfrageprotokoll zu Listenpreisen geschätzt; maßgeblich ist die Rechnung des Anbieters.</translation>
+    </message>
+    <message>
+        <source>Staged changes are reviewed here, field by field.</source>
+        <translation>Vorgemerkte Änderungen werden hier Feld für Feld geprüft.</translation>
+    </message>
+    <message>
+        <source>No drafts yet.</source>
+        <translation>Noch keine Entwürfe.</translation>
+    </message>
+    <message>
+        <source>No plan yet. In plan mode Vector reads first and answers with a plan; bulk work always starts here.</source>
+        <translation>Noch kein Plan. Im Planmodus liest Vector zuerst und antwortet mit einem Plan; Massenarbeit beginnt immer hier.</translation>
+    </message>
+    <message>
+        <source>You do not have access to Vector.</source>
+        <translation>Sie haben keinen Zugriff auf Vector.</translation>
+    </message>
+    <message>
+        <source>Node %id does not exist or you may not read it.</source>
+        <translation>Den Knoten %id gibt es nicht, oder Sie dürfen ihn nicht lesen.</translation>
+    </message>
+    <message>
+        <source>The class "%class" does not exist.</source>
+        <translation>Die Klasse „%class“ gibt es nicht.</translation>
+    </message>
+    <message>
+        <source>The language "%language" is not used on this site.</source>
+        <translation>Die Sprache „%language“ wird auf dieser Website nicht verwendet.</translation>
+    </message>
+    <message>
+        <source>Your role does not allow this kind of scope (%kinds).</source>
+        <translation>Ihre Rolle erlaubt diese Art von Bereich nicht (%kinds).</translation>
+    </message>
+    <message>
+        <source>Your role does not allow this review policy.</source>
+        <translation>Ihre Rolle erlaubt diese Prüfungsart nicht.</translation>
+    </message>
+    <message>
+        <source>Your role limits Vector to some subtrees: choose a location inside them.</source>
+        <translation>Ihre Rolle beschränkt Vector auf einige Teilbäume: Wählen Sie einen Ort darin.</translation>
+    </message>
+    <message>
+        <source>Part of the scope lies outside the subtrees your role allows for Vector.</source>
+        <translation>Ein Teil des Bereichs liegt außerhalb der Teilbäume, die Ihre Rolle für Vector erlaubt.</translation>
+    </message>
+    <message>
+        <source>Your role limits Vector to some sections: choose a location inside them.</source>
+        <translation>Ihre Rolle beschränkt Vector auf einige Sektionen: Wählen Sie einen Ort darin.</translation>
+    </message>
+    <message>
+        <source>Part of the scope lies in a section your role does not allow for Vector.</source>
+        <translation>Ein Teil des Bereichs liegt in einer Sektion, die Ihre Rolle für Vector nicht erlaubt.</translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Automatisch</translation>
+    </message>
+    <message>
+        <source>Standard</source>
+        <translation>Standard</translation>
+    </message>
+    <message>
+        <source>Flex</source>
+        <translation>Flex</translation>
+    </message>
+    <message>
+        <source>Batch</source>
+        <translation>Stapel</translation>
+    </message>
+    <message>
+        <source>Fast</source>
+        <translation>Schnell</translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation>Priorität</translation>
+    </message>
+    <message>
+        <source>Single nodes</source>
+        <translation>Einzelne Knoten</translation>
+    </message>
+    <message>
+        <source>Subtrees</source>
+        <translation>Teilbäume</translation>
+    </message>
+    <message>
+        <source>Content classes</source>
+        <translation>Inhaltsklassen</translation>
+    </message>
+    <message>
+        <source>Staged (review before writing)</source>
+        <translation>Vorgemerkt (vor dem Schreiben prüfen)</translation>
+    </message>
+    <message>
+        <source>Direct (write drafts at once)</source>
+        <translation>Direkt (Entwürfe sofort schreiben)</translation>
+    </message>
+    <message>
+        <source>Bulk work is always reviewed before it is written.</source>
+        <translation>Massenarbeit wird immer geprüft, bevor sie geschrieben wird.</translation>
+    </message>
+</context>
+<!-- expai threads/vector/keyboard: end -->
 </TS>

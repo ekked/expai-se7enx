@@ -2393,4 +2393,913 @@
         <translation>Compared with the period before</translation>
     </message>
 </context>
+<!-- expai threads/vector/keyboard: begin -->
+<context>
+    <name>design/admin/parts/my/menu</name>
+    <message>
+        <source>Vector</source>
+        <translation>Vector</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>Changing the shortcuts is switched off on this site.</source>
+        <translation>Changing the shortcuts is switched off on this site.</translation>
+    </message>
+    <message>
+        <source>Unknown command: %command</source>
+        <translation>Unknown command: %command</translation>
+    </message>
+    <message>
+        <source>This shortcut cannot be used: %keys</source>
+        <translation>This shortcut cannot be used: %keys</translation>
+    </message>
+    <message>
+        <source>You do not have access to Vector.</source>
+        <translation>You do not have access to Vector.</translation>
+    </message>
+    <message>
+        <source>The thread tables are missing. Please ask an administrator to update the database of Exponential Intelligence.</source>
+        <translation>The thread tables are missing. Please ask an administrator to update the database of Exponential Intelligence.</translation>
+    </message>
+    <message>
+        <source>This thread does not exist or you may not open it.</source>
+        <translation>This thread does not exist or you may not open it.</translation>
+    </message>
+    <message>
+        <source>This lane is not available for the model.</source>
+        <translation>This lane is not available for the model.</translation>
+    </message>
+    <message>
+        <source>Choose the scope first: a node or a subtree.</source>
+        <translation>Choose the scope first: a node or a subtree.</translation>
+    </message>
+    <message>
+        <source>The model of this thread is no longer available to you. Choose another model.</source>
+        <translation>The model of this thread is no longer available to you. Choose another model.</translation>
+    </message>
+    <message>
+        <source>This thread has no conversation any more.</source>
+        <translation>This thread has no conversation any more.</translation>
+    </message>
+    <message>
+        <source>At most 20 messages can wait.</source>
+        <translation>At most 20 messages can wait.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/keyboard</name>
+    <message>
+        <source>Command palette</source>
+        <translation>Command palette</translation>
+    </message>
+    <message>
+        <source>Type a command, a thread or a node...</source>
+        <translation>Type a command, a thread or a node...</translation>
+    </message>
+    <message>
+        <source>Nothing found.</source>
+        <translation>Nothing found.</translation>
+    </message>
+    <message>
+        <source>Searching...</source>
+        <translation>Searching...</translation>
+    </message>
+    <message>
+        <source>Commands</source>
+        <translation>Commands</translation>
+    </message>
+    <message>
+        <source>Threads</source>
+        <translation>Threads</translation>
+    </message>
+    <message>
+        <source>Nodes</source>
+        <translation>Nodes</translation>
+    </message>
+    <message>
+        <source>Models</source>
+        <translation>Models</translation>
+    </message>
+    <message>
+        <source>Field actions</source>
+        <translation>Field actions</translation>
+    </message>
+    <message>
+        <source>Open Vector</source>
+        <translation>Open Vector</translation>
+    </message>
+    <message>
+        <source>New thread</source>
+        <translation>New thread</translation>
+    </message>
+    <message>
+        <source>New thread here (%name)</source>
+        <translation>New thread here (%name)</translation>
+    </message>
+    <message>
+        <source>Open thread</source>
+        <translation>Open thread</translation>
+    </message>
+    <message>
+        <source>Jump to node</source>
+        <translation>Jump to node</translation>
+    </message>
+    <message>
+        <source>Switch model</source>
+        <translation>Switch model</translation>
+    </message>
+    <message>
+        <source>current</source>
+        <translation>current</translation>
+    </message>
+    <message>
+        <source>Model switched to %model.</source>
+        <translation>Model switched to %model.</translation>
+    </message>
+    <message>
+        <source>Keyboard shortcuts</source>
+        <translation>Keyboard shortcuts</translation>
+    </message>
+    <message>
+        <source>Up and down to choose, Enter to run, Esc to close</source>
+        <translation>Up and down to choose, Enter to run, Esc to close</translation>
+    </message>
+    <message>
+        <source>%action: %field</source>
+        <translation>%action: %field</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Close</translation>
+    </message>
+    <message>
+        <source>changed</source>
+        <translation>changed</translation>
+    </message>
+    <message>
+        <source>Change</source>
+        <translation>Change</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation>Reset</translation>
+    </message>
+    <message>
+        <source>Reset all shortcuts</source>
+        <translation>Reset all shortcuts</translation>
+    </message>
+    <message>
+        <source>Press the new keys for "%command" (Esc cancels)</source>
+        <translation>Press the new keys for "%command" (Esc cancels)</translation>
+    </message>
+    <message>
+        <source>Something went wrong:</source>
+        <translation>Something went wrong:</translation>
+    </message>
+    <message>
+        <source>Open the command palette</source>
+        <translation>Open the command palette</translation>
+    </message>
+    <message>
+        <source>Run / send the message</source>
+        <translation>Run / send the message</translation>
+    </message>
+    <message>
+        <source>Queue the message while a turn runs</source>
+        <translation>Queue the message while a turn runs</translation>
+    </message>
+    <message>
+        <source>Stop the thread (press twice)</source>
+        <translation>Stop the thread (press twice)</translation>
+    </message>
+    <message>
+        <source>Next item</source>
+        <translation>Next item</translation>
+    </message>
+    <message>
+        <source>Previous item</source>
+        <translation>Previous item</translation>
+    </message>
+    <message>
+        <source>Accept the change</source>
+        <translation>Accept the change</translation>
+    </message>
+    <message>
+        <source>Reject the change</source>
+        <translation>Reject the change</translation>
+    </message>
+    <message>
+        <source>Next thread</source>
+        <translation>Next thread</translation>
+    </message>
+    <message>
+        <source>Previous thread</source>
+        <translation>Previous thread</translation>
+    </message>
+    <message>
+        <source>Switch between plan and write</source>
+        <translation>Switch between plan and write</translation>
+    </message>
+    <message>
+        <source>Choose the model</source>
+        <translation>Choose the model</translation>
+    </message>
+    <message>
+        <source>Choose the lane</source>
+        <translation>Choose the lane</translation>
+    </message>
+    <message>
+        <source>Change the scope</source>
+        <translation>Change the scope</translation>
+    </message>
+    <message>
+        <source>Show the plan</source>
+        <translation>Show the plan</translation>
+    </message>
+    <message>
+        <source>Show the changes</source>
+        <translation>Show the changes</translation>
+    </message>
+    <message>
+        <source>Show the cost</source>
+        <translation>Show the cost</translation>
+    </message>
+    <message>
+        <source>Show the shortcuts</source>
+        <translation>Show the shortcuts</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/threads</name>
+    <message>
+        <source>New thread</source>
+        <translation>New thread</translation>
+    </message>
+    <message>
+        <source>Working</source>
+        <translation>Working</translation>
+    </message>
+    <message>
+        <source>Needs you</source>
+        <translation>Needs you</translation>
+    </message>
+    <message>
+        <source>Pinned</source>
+        <translation>Pinned</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Recent</translation>
+    </message>
+    <message>
+        <source>Waiting for your approval</source>
+        <translation>Waiting for your approval</translation>
+    </message>
+    <message>
+        <source>Settled</source>
+        <translation>Settled</translation>
+    </message>
+    <message>
+        <source>Archived</source>
+        <translation>Archived</translation>
+    </message>
+    <message>
+        <source>No threads yet.</source>
+        <translation>No threads yet.</translation>
+    </message>
+    <message>
+        <source>No thread matches.</source>
+        <translation>No thread matches.</translation>
+    </message>
+    <message>
+        <source>Idle</source>
+        <translation>Idle</translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation>Queued</translation>
+    </message>
+    <message>
+        <source>Waits for you</source>
+        <translation>Waits for you</translation>
+    </message>
+    <message>
+        <source>To review</source>
+        <translation>To review</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Done</translation>
+    </message>
+    <message>
+        <source>Failed</source>
+        <translation>Failed</translation>
+    </message>
+    <message>
+        <source>Stopped</source>
+        <translation>Stopped</translation>
+    </message>
+    <message>
+        <source>Intelligence tab</source>
+        <translation>Intelligence tab</translation>
+    </message>
+    <message>
+        <source>Vector</source>
+        <translation>Vector</translation>
+    </message>
+    <message>
+        <source>New activity</source>
+        <translation>New activity</translation>
+    </message>
+    <message>
+        <source>Threads on this page</source>
+        <translation>Threads on this page</translation>
+    </message>
+    <message>
+        <source>Your conversations here are threads too; they appear in Vector.</source>
+        <translation>Your conversations here are threads too; they appear in Vector.</translation>
+    </message>
+    <message>
+        <source>New thread in Vector for this page</source>
+        <translation>New thread in Vector for this page</translation>
+    </message>
+    <message>
+        <source>All threads</source>
+        <translation>All threads</translation>
+    </message>
+    <message>
+        <source>Open in Vector</source>
+        <translation>Open in Vector</translation>
+    </message>
+    <message>
+        <source>This conversation</source>
+        <translation>This conversation</translation>
+    </message>
+    <message>
+        <source>Threads</source>
+        <translation>Threads</translation>
+    </message>
+    <message>
+        <source>%count need you</source>
+        <translation>%count need you</translation>
+    </message>
+    <message>
+        <source>Open Vector</source>
+        <translation>Open Vector</translation>
+    </message>
+    <message>
+        <source>No threads yet. A conversation in the Intelligence tab of a page becomes a thread; Vector starts threads of its own.</source>
+        <translation>No threads yet. A conversation in the Intelligence tab of a page becomes a thread; Vector starts threads of its own.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/vector</name>
+    <message>
+        <source>Vector</source>
+        <translation>Vector</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation>Exponential Intelligence</translation>
+    </message>
+    <message>
+        <source>Search threads, commands, nodes...</source>
+        <translation>Search threads, commands, nodes...</translation>
+    </message>
+    <message>
+        <source>Threads</source>
+        <translation>Threads</translation>
+    </message>
+    <message>
+        <source>Plan, changes and cost</source>
+        <translation>Plan, changes and cost</translation>
+    </message>
+    <message>
+        <source>Keyboard shortcuts</source>
+        <translation>Keyboard shortcuts</translation>
+    </message>
+    <message>
+        <source>Vector is switched off on this site.</source>
+        <translation>Vector is switched off on this site.</translation>
+    </message>
+    <message>
+        <source>The database of Exponential Intelligence needs an update before Vector can be used. Please ask an administrator.</source>
+        <translation>The database of Exponential Intelligence needs an update before Vector can be used. Please ask an administrator.</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence is switched off or not configured: threads can be read, but not run.</source>
+        <translation>Exponential Intelligence is switched off or not configured: threads can be read, but not run.</translation>
+    </message>
+    <message>
+        <source>New thread</source>
+        <translation>New thread</translation>
+    </message>
+    <message>
+        <source>Filter threads</source>
+        <translation>Filter threads</translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation>Active</translation>
+    </message>
+    <message>
+        <source>Settled</source>
+        <translation>Settled</translation>
+    </message>
+    <message>
+        <source>Archived</source>
+        <translation>Archived</translation>
+    </message>
+    <message>
+        <source>Thread</source>
+        <translation>Thread</translation>
+    </message>
+    <message>
+        <source>Start a thread</source>
+        <translation>Start a thread</translation>
+    </message>
+    <message>
+        <source>Choose what it may touch (nodes, subtrees, classes, languages), then say what to do. Bulk work starts with a plan.</source>
+        <translation>Choose what it may touch (nodes, subtrees, classes, languages), then say what to do. Bulk work starts with a plan.</translation>
+    </message>
+    <message>
+        <source>New thread on "%name"</source>
+        <translation>New thread on "%name"</translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation>Title</translation>
+    </message>
+    <message>
+        <source>Pin</source>
+        <translation>Pin</translation>
+    </message>
+    <message>
+        <source>Settle</source>
+        <translation>Settle</translation>
+    </message>
+    <message>
+        <source>Archive</source>
+        <translation>Archive</translation>
+    </message>
+    <message>
+        <source>You see this thread because a version it wrote waits for your approval. Only its owner can change it.</source>
+        <translation>You see this thread because a version it wrote waits for your approval. Only its owner can change it.</translation>
+    </message>
+    <message>
+        <source>Scope</source>
+        <translation>Scope</translation>
+    </message>
+    <message>
+        <source>Change</source>
+        <translation>Change</translation>
+    </message>
+    <message>
+        <source>Mode</source>
+        <translation>Mode</translation>
+    </message>
+    <message>
+        <source>Plan</source>
+        <translation>Plan</translation>
+    </message>
+    <message>
+        <source>Write</source>
+        <translation>Write</translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>Model</translation>
+    </message>
+    <message>
+        <source>Lane</source>
+        <translation>Lane</translation>
+    </message>
+    <message>
+        <source>Review</source>
+        <translation>Review</translation>
+    </message>
+    <message>
+        <source>Staged</source>
+        <translation>Staged</translation>
+    </message>
+    <message>
+        <source>Direct</source>
+        <translation>Direct</translation>
+    </message>
+    <message>
+        <source>Show older</source>
+        <translation>Show older</translation>
+    </message>
+    <message>
+        <source>Conversation</source>
+        <translation>Conversation</translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation>Queued</translation>
+    </message>
+    <message>
+        <source>Your request</source>
+        <translation>Your request</translation>
+    </message>
+    <message>
+        <source>What should happen in this scope?</source>
+        <translation>What should happen in this scope?</translation>
+    </message>
+    <message>
+        <source>Queue</source>
+        <translation>Queue</translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation>Stop</translation>
+    </message>
+    <message>
+        <source>Run</source>
+        <translation>Run</translation>
+    </message>
+    <message>
+        <source>Changes</source>
+        <translation>Changes</translation>
+    </message>
+    <message>
+        <source>Cost</source>
+        <translation>Cost</translation>
+    </message>
+    <message>
+        <source>Scope of this thread</source>
+        <translation>Scope of this thread</translation>
+    </message>
+    <message>
+        <source>What the thread may read and change. A node is one object; a subtree is a node and everything below it.</source>
+        <translation>What the thread may read and change. A node is one object; a subtree is a node and everything below it.</translation>
+    </message>
+    <message>
+        <source>Add a node</source>
+        <translation>Add a node</translation>
+    </message>
+    <message>
+        <source>Name or node id</source>
+        <translation>Name or node id</translation>
+    </message>
+    <message>
+        <source>Nodes and subtrees</source>
+        <translation>Nodes and subtrees</translation>
+    </message>
+    <message>
+        <source>Classes</source>
+        <translation>Classes</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Languages</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancel</translation>
+    </message>
+    <message>
+        <source>Save scope</source>
+        <translation>Save scope</translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation>Undo</translation>
+    </message>
+    <message>
+        <source>Pinned.</source>
+        <translation>Pinned.</translation>
+    </message>
+    <message>
+        <source>Unpinned.</source>
+        <translation>Unpinned.</translation>
+    </message>
+    <message>
+        <source>Settled.</source>
+        <translation>Settled.</translation>
+    </message>
+    <message>
+        <source>Archived.</source>
+        <translation>Archived.</translation>
+    </message>
+    <message>
+        <source>Back in the active list.</source>
+        <translation>Back in the active list.</translation>
+    </message>
+    <message>
+        <source>Nothing chosen yet</source>
+        <translation>Nothing chosen yet</translation>
+    </message>
+    <message>
+        <source>Node</source>
+        <translation>Node</translation>
+    </message>
+    <message>
+        <source>Subtree</source>
+        <translation>Subtree</translation>
+    </message>
+    <message>
+        <source>Remove %name</source>
+        <translation>Remove %name</translation>
+    </message>
+    <message>
+        <source>Include everything below</source>
+        <translation>Include everything below</translation>
+    </message>
+    <message>
+        <source>Your role does not allow this kind of scope.</source>
+        <translation>Your role does not allow this kind of scope.</translation>
+    </message>
+    <message>
+        <source>Bulk</source>
+        <translation>Bulk</translation>
+    </message>
+    <message>
+        <source>Bulk work starts with a plan: approve it before anything is written.</source>
+        <translation>Bulk work starts with a plan: approve it before anything is written.</translation>
+    </message>
+    <message>
+        <source>Plan mode: Vector reads and proposes; nothing is written.</source>
+        <translation>Plan mode: Vector reads and proposes; nothing is written.</translation>
+    </message>
+    <message>
+        <source>Staged review: changes are proposed for review; this thread reads only until staged changes are available.</source>
+        <translation>Staged review: changes are proposed for review; this thread reads only until staged changes are available.</translation>
+    </message>
+    <message>
+        <source>Direct: drafts are written at once (never published); you decide in the drafts list.</source>
+        <translation>Direct: drafts are written at once (never published); you decide in the drafts list.</translation>
+    </message>
+    <message>
+        <source>Direct review needs one object in one language and a role that allows it.</source>
+        <translation>Direct review needs one object in one language and a role that allows it.</translation>
+    </message>
+    <message>
+        <source>Your default (%model)</source>
+        <translation>Your default (%model)</translation>
+    </message>
+    <message>
+        <source>reads only</source>
+        <translation>reads only</translation>
+    </message>
+    <message>
+        <source>batch: approved plans only</source>
+        <translation>batch: approved plans only</translation>
+    </message>
+    <message>
+        <source>Runs in this window use the standard lane; the chosen lane applies to background runs.</source>
+        <translation>Runs in this window use the standard lane; the chosen lane applies to background runs.</translation>
+    </message>
+    <message>
+        <source>Vector is working...</source>
+        <translation>Vector is working...</translation>
+    </message>
+    <message>
+        <source>Step %count</source>
+        <translation>Step %count</translation>
+    </message>
+    <message>
+        <source>Stop requested...</source>
+        <translation>Stop requested...</translation>
+    </message>
+    <message>
+        <source>Stopped. The steps so far are kept.</source>
+        <translation>Stopped. The steps so far are kept.</translation>
+    </message>
+    <message>
+        <source>Press Esc once more to stop.</source>
+        <translation>Press Esc once more to stop.</translation>
+    </message>
+    <message>
+        <source>Queued: it is sent when the current turn ends.</source>
+        <translation>Queued: it is sent when the current turn ends.</translation>
+    </message>
+    <message>
+        <source>Remove from the queue</source>
+        <translation>Remove from the queue</translation>
+    </message>
+    <message>
+        <source>Sending the next queued message...</source>
+        <translation>Sending the next queued message...</translation>
+    </message>
+    <message>
+        <source>%run to run</source>
+        <translation>%run to run</translation>
+    </message>
+    <message>
+        <source>%queue to queue, %stop to stop</source>
+        <translation>%queue to queue, %stop to stop</translation>
+    </message>
+    <message>
+        <source>You</source>
+        <translation>You</translation>
+    </message>
+    <message>
+        <source>%count lookup(s)</source>
+        <translation>%count lookup(s)</translation>
+    </message>
+    <message>
+        <source>Drafts written</source>
+        <translation>Drafts written</translation>
+    </message>
+    <message>
+        <source>(no answer yet)</source>
+        <translation>(no answer yet)</translation>
+    </message>
+    <message>
+        <source>The last answer was interrupted.</source>
+        <translation>The last answer was interrupted.</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>Continue</translation>
+    </message>
+    <message>
+        <source>Something went wrong:</source>
+        <translation>Something went wrong:</translation>
+    </message>
+    <message>
+        <source>The server did not answer in time. Please try again.</source>
+        <translation>The server did not answer in time. Please try again.</translation>
+    </message>
+    <message>
+        <source>This thread does not exist or you may not open it.</source>
+        <translation>This thread does not exist or you may not open it.</translation>
+    </message>
+    <message>
+        <source>Choose the scope first.</source>
+        <translation>Choose the scope first.</translation>
+    </message>
+    <message>
+        <source>Type at least 2 characters or a node id.</source>
+        <translation>Type at least 2 characters or a node id.</translation>
+    </message>
+    <message>
+        <source>No readable node found.</source>
+        <translation>No readable node found.</translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation>Edit</translation>
+    </message>
+    <message>
+        <source>View version</source>
+        <translation>View version</translation>
+    </message>
+    <message>
+        <source>Open the Intelligence tab</source>
+        <translation>Open the Intelligence tab</translation>
+    </message>
+    <message>
+        <source>Draft</source>
+        <translation>Draft</translation>
+    </message>
+    <message>
+        <source>Saved as draft</source>
+        <translation>Saved as draft</translation>
+    </message>
+    <message>
+        <source>Waiting for approval</source>
+        <translation>Waiting for approval</translation>
+    </message>
+    <message>
+        <source>Published</source>
+        <translation>Published</translation>
+    </message>
+    <message>
+        <source>Staged changes are reviewed here, field by field. Accept and reject arrive with staged review.</source>
+        <translation>Staged changes are reviewed here, field by field. Accept and reject arrive with staged review.</translation>
+    </message>
+    <message>
+        <source>Spent</source>
+        <translation>Spent</translation>
+    </message>
+    <message>
+        <source>Tokens</source>
+        <translation>Tokens</translation>
+    </message>
+    <message>
+        <source>Requests</source>
+        <translation>Requests</translation>
+    </message>
+    <message>
+        <source>Costs are not shown on this site.</source>
+        <translation>Costs are not shown on this site.</translation>
+    </message>
+    <message>
+        <source>today</source>
+        <translation>today</translation>
+    </message>
+    <message>
+        <source>Accept and reject apply to staged changes, which arrive with staged review.</source>
+        <translation>Accept and reject apply to staged changes, which arrive with staged review.</translation>
+    </message>
+    <message>
+        <source>Estimated from the request log at list prices; the provider's invoice is authoritative.</source>
+        <translation>Estimated from the request log at list prices; the provider's invoice is authoritative.</translation>
+    </message>
+    <message>
+        <source>Staged changes are reviewed here, field by field.</source>
+        <translation>Staged changes are reviewed here, field by field.</translation>
+    </message>
+    <message>
+        <source>No drafts yet.</source>
+        <translation>No drafts yet.</translation>
+    </message>
+    <message>
+        <source>No plan yet. In plan mode Vector reads first and answers with a plan; bulk work always starts here.</source>
+        <translation>No plan yet. In plan mode Vector reads first and answers with a plan; bulk work always starts here.</translation>
+    </message>
+    <message>
+        <source>You do not have access to Vector.</source>
+        <translation>You do not have access to Vector.</translation>
+    </message>
+    <message>
+        <source>Node %id does not exist or you may not read it.</source>
+        <translation>Node %id does not exist or you may not read it.</translation>
+    </message>
+    <message>
+        <source>The class "%class" does not exist.</source>
+        <translation>The class "%class" does not exist.</translation>
+    </message>
+    <message>
+        <source>The language "%language" is not used on this site.</source>
+        <translation>The language "%language" is not used on this site.</translation>
+    </message>
+    <message>
+        <source>Your role does not allow this kind of scope (%kinds).</source>
+        <translation>Your role does not allow this kind of scope (%kinds).</translation>
+    </message>
+    <message>
+        <source>Your role does not allow this review policy.</source>
+        <translation>Your role does not allow this review policy.</translation>
+    </message>
+    <message>
+        <source>Your role limits Vector to some subtrees: choose a location inside them.</source>
+        <translation>Your role limits Vector to some subtrees: choose a location inside them.</translation>
+    </message>
+    <message>
+        <source>Part of the scope lies outside the subtrees your role allows for Vector.</source>
+        <translation>Part of the scope lies outside the subtrees your role allows for Vector.</translation>
+    </message>
+    <message>
+        <source>Your role limits Vector to some sections: choose a location inside them.</source>
+        <translation>Your role limits Vector to some sections: choose a location inside them.</translation>
+    </message>
+    <message>
+        <source>Part of the scope lies in a section your role does not allow for Vector.</source>
+        <translation>Part of the scope lies in a section your role does not allow for Vector.</translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Automatic</translation>
+    </message>
+    <message>
+        <source>Standard</source>
+        <translation>Standard</translation>
+    </message>
+    <message>
+        <source>Flex</source>
+        <translation>Flex</translation>
+    </message>
+    <message>
+        <source>Batch</source>
+        <translation>Batch</translation>
+    </message>
+    <message>
+        <source>Fast</source>
+        <translation>Fast</translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation>Priority</translation>
+    </message>
+    <message>
+        <source>Single nodes</source>
+        <translation>Single nodes</translation>
+    </message>
+    <message>
+        <source>Subtrees</source>
+        <translation>Subtrees</translation>
+    </message>
+    <message>
+        <source>Content classes</source>
+        <translation>Content classes</translation>
+    </message>
+    <message>
+        <source>Staged (review before writing)</source>
+        <translation>Staged (review before writing)</translation>
+    </message>
+    <message>
+        <source>Direct (write drafts at once)</source>
+        <translation>Direct (write drafts at once)</translation>
+    </message>
+    <message>
+        <source>Bulk work is always reviewed before it is written.</source>
+        <translation>Bulk work is always reviewed before it is written.</translation>
+    </message>
+</context>
+<!-- expai threads/vector/keyboard: end -->
 </TS>

@@ -2393,4 +2393,913 @@
         <translation type="unfinished"></translation>
     </message>
 </context>
+<!-- expai threads/vector/keyboard: begin -->
+<context>
+    <name>design/admin/parts/my/menu</name>
+    <message>
+        <source>Vector</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>Changing the shortcuts is switched off on this site.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown command: %command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This shortcut cannot be used: %keys</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You do not have access to Vector.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The thread tables are missing. Please ask an administrator to update the database of Exponential Intelligence.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This thread does not exist or you may not open it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This lane is not available for the model.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose the scope first: a node or a subtree.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The model of this thread is no longer available to you. Choose another model.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This thread has no conversation any more.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At most 20 messages can wait.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/keyboard</name>
+    <message>
+        <source>Command palette</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type a command, a thread or a node...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commands</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Threads</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Models</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Field actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Vector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New thread</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New thread here (%name)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open thread</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to node</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>current</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model switched to %model.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyboard shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Up and down to choose, Enter to run, Esc to close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%action: %field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset all shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press the new keys for "%command" (Esc cancels)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Something went wrong:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open the command palette</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run / send the message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Queue the message while a turn runs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop the thread (press twice)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accept the change</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reject the change</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next thread</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous thread</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch between plan and write</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose the model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose the lane</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change the scope</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show the plan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show the changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show the cost</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show the shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/threads</name>
+    <message>
+        <source>New thread</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Working</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Needs you</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pinned</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting for your approval</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archived</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No threads yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No thread matches.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Idle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waits for you</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To review</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Intelligence tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New activity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Threads on this page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your conversations here are threads too; they appear in Vector.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New thread in Vector for this page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All threads</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in Vector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This conversation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Threads</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count need you</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Vector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No threads yet. A conversation in the Intelligence tab of a page becomes a thread; Vector starts threads of its own.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/vector</name>
+    <message>
+        <source>Vector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search threads, commands, nodes...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Threads</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plan, changes and cost</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyboard shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vector is switched off on this site.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The database of Exponential Intelligence needs an update before Vector can be used. Please ask an administrator.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence is switched off or not configured: threads can be read, but not run.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New thread</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter threads</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archived</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Thread</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start a thread</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose what it may touch (nodes, subtrees, classes, languages), then say what to do. Bulk work starts with a plan.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New thread on "%name"</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You see this thread because a version it wrote waits for your approval. Only its owner can change it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scope</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Write</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lane</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Review</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Staged</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Direct</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show older</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conversation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What should happen in this scope?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cost</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scope of this thread</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What the thread may read and change. A node is one object; a subtree is a node and everything below it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add a node</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name or node id</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nodes and subtrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Classes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save scope</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pinned.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unpinned.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archived.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Back in the active list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing chosen yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Node</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove %name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Include everything below</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your role does not allow this kind of scope.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bulk</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bulk work starts with a plan: approve it before anything is written.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plan mode: Vector reads and proposes; nothing is written.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Staged review: changes are proposed for review; this thread reads only until staged changes are available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Direct: drafts are written at once (never published); you decide in the drafts list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Direct review needs one object in one language and a role that allows it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your default (%model)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>reads only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>batch: approved plans only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Runs in this window use the standard lane; the chosen lane applies to background runs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vector is working...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Step %count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop requested...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stopped. The steps so far are kept.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press Esc once more to stop.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Queued: it is sent when the current turn ends.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from the queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sending the next queued message...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%run to run</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%queue to queue, %stop to stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count lookup(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drafts written</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(no answer yet)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The last answer was interrupted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Something went wrong:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The server did not answer in time. Please try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This thread does not exist or you may not open it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose the scope first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type at least 2 characters or a node id.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No readable node found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open the Intelligence tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draft</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saved as draft</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting for approval</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Published</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Staged changes are reviewed here, field by field. Accept and reject arrive with staged review.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Spent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tokens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Requests</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Costs are not shown on this site.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>today</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accept and reject apply to staged changes, which arrive with staged review.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Estimated from the request log at list prices; the provider's invoice is authoritative.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Staged changes are reviewed here, field by field.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No drafts yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No plan yet. In plan mode Vector reads first and answers with a plan; bulk work always starts here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You do not have access to Vector.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Node %id does not exist or you may not read it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The class "%class" does not exist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The language "%language" is not used on this site.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your role does not allow this kind of scope (%kinds).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your role does not allow this review policy.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your role limits Vector to some subtrees: choose a location inside them.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Part of the scope lies outside the subtrees your role allows for Vector.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your role limits Vector to some sections: choose a location inside them.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Part of the scope lies in a section your role does not allow for Vector.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Standard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flex</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Batch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single nodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Content classes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Staged (review before writing)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Direct (write drafts at once)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bulk work is always reviewed before it is written.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<!-- expai threads/vector/keyboard: end -->
 </TS>

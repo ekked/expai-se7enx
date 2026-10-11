@@ -343,3 +343,53 @@ See [mcp.md](mcp.md).
 | `dashboard.ini` | the dashboard block `expai_drafts` (Priority 35, 5 items, `expai/write`) |
 | `browse.ini` | `[ExpAiStartWriting]`: the content browser of "Change location" (single node) |
 | `site.ini` | `TranslationExtensions[]=expai`, `[TemplateSettings] ExtensionAutoloadPath[]=expai` (the template operators `expai_money`, `expai_tokens`, `expai_number`) |
+
+## Threads, Vector and the keyboard
+
+[threads.md](threads.md), [vector.md](vector.md), [keyboard.md](keyboard.md).
+
+**[PanelSettings]** `Sections[]=threads` adds the section *Threads on this page* to the Intelligence tab
+(**[PanelSection_threads]** `Template=expai/panel/threads.tpl`).
+
+**[ThreadSettings]**
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `ListLimit` | 100 | threads per shelf in Vector's list |
+| `TitleLength` | 80 | a thread's title is its first request, cut to this |
+| `StaleRunSeconds` | 900 | a `running` thread without a change for this long is shown as stopped (a closed tab never reports its end) |
+| `MaxEventPayloadBytes` | 16384 | the largest event payload; bigger ones keep their keys with long strings cut |
+| `EventKeepDays` | 30 | events (and sent or dropped follow-ups) are removed after this; 0 keeps them |
+| `ProposalKeepDays` | 30 | staged proposals and plans that are not running |
+| `CheckpointKeepDays` | 30 | checkpoints |
+
+**[VectorSettings]**
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `Enabled` | true | the view expai/vector and its functions |
+| `Panes[]` | plan, diff, cost | the tabs of the right pane, each `[VectorPane_<name>] Template=` |
+| `DefaultMode` | write | mode of a new thread (`plan` or `write`; bulk scopes always start in plan mode) |
+| `DefaultReview` | staged | review of a new thread (`staged`, or `direct` for one object in one language) |
+| `BulkObjectThreshold`, `BulkLanguageThreshold` | 1, 1 | more objects or languages than these (or any subtree or class) is bulk work: plan first, staged |
+| `PollActiveMs` | 1000 | poll interval while the open thread runs |
+| `PollWorkingMs` | 3000 | poll interval while another thread works |
+| `PollIdleMs` | 15000 | poll interval otherwise (doubled while the host is busy; no polling while the tab is hidden) |
+| `Transport` | auto | `auto` (Server-Sent Events under PHP-FPM/Apache, polling under Velocity), `poll`, `sse` |
+| `MaxStreams` | 4 | streams open at once (one PHP process each: at most 25 % of PHP-FPM `pm.max_children`) |
+| `StreamSeconds` | 25 | how long one stream is held before the browser reconnects |
+
+**[VectorPane_<name>]** `Template=`: the template of a right-pane tab (`expai/vector/pane_plan.tpl`, ...).
+
+**[KeyBindings]**
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `GlobalPalette` | enabled | Ctrl/Cmd+K opens the palette on every admin page (never in a field or rich text editor); Vector always has it |
+| `UserOverrides` | enabled | editors may change their shortcuts (preference `expai_keybindings`) |
+| `Binding[<command>]` | see [keyboard.md](keyboard.md) | the keys of a command: `Mod+KeyK`, `Alt+ArrowDown`, `Escape Escape`, `?` |
+| `When[<command>]` | | where the keys work: `global`, `vector`, `list`, `composer` |
+
+Other settings files: `menu.ini` `Links[expai_vector]=expai/vector` (with `expai/write` and `expai/vector`),
+`ezjscore.ini` `[ezjscServer_expaivector] Class=expAiVectorServerFunctions` (`Functions[]=expai`), `cronjob.ini`
+`Scripts[]=expai_thread_prune.php` in the part `expai`.

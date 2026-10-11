@@ -20,6 +20,9 @@
 | [package-authoring-for-agents.md](package-authoring-for-agents.md) | How a local CLI agent writes a package (terms, data, the validation loop) |
 | [permissions.md](permissions.md) | Policies, and how the editor's own permissions limit everything the assistant does |
 | [full-view-panel.md](full-view-panel.md) | The Intelligence tab: sections, conversation, history, context window, drafts |
+| [threads.md](threads.md) | Threads: what a thread is, states and shelves, who sees one, events, retention, the migration |
+| [vector.md](vector.md) | Vector (expai/vector): scope, plan and write, review, model and lane, run/stop/queue, polling and streaming, functions |
+| [keyboard.md](keyboard.md) | The command palette (Ctrl/Cmd+K), the shortcuts, your own keys, commands of your own |
 | [edit-view-integration.md](edit-view-integration.md) | The edit form hook, field actions, how values reach Tiptap / the Online Editor |
 | [dashboard.md](dashboard.md) | expai/dashboard (figures, chart, limits, Start writing, view parameters), the menu entries, the dashboard block, the log page |
 | [usage-tracking.md](usage-tracking.md) | What is recorded per request, turns, the estimated cost and how to check it, limits, retention, privacy |

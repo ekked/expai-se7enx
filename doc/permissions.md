@@ -56,3 +56,26 @@ The MCP bridge runs expmcp's audited read tools as the editor too; an external M
 Give `expai/write` to your editors' role (Setup > Roles and policies > role > New policy > module `expai`, function
 `write`). Administrator has every policy already. Anonymous users and members without the policy see nothing of
 expai.
+
+## Vector: expai/vector
+
+`expai/vector` opens Vector (`expai/vector`) and its functions (`expaivector::bootstrap`, `thread_save`, `turn`,
+`stop`, `followup`); `expai/write` is still needed. Limitations, per policy (with several policies, what any one of
+them allows):
+
+| Limitation | Values | Effect |
+| --- | --- | --- |
+| `Subtree` | subtrees (the role editor browses for them) | every node and subtree of a thread's scope must lie inside one of them; a scope of classes or languages alone is refused |
+| `Section` | sections | every node and subtree root of the scope must be in one of them |
+| `Scope` | `node`, `subtree`, `class` | the kinds of scope entries the user may pick (languages are always allowed) |
+| `Review` | `staged`, `direct` | the review policies the user may choose; without `direct` every Vector thread is staged |
+
+The scope is checked when it is saved and again at every run, together with the user's read access to every node.
+Writing still goes through the editor's own content/edit and content/create, as everywhere in expai.
+
+**Threads are private** to their owner; the approvers of a version a thread wrote may open it read only
+([threads.md](threads.md#who-sees-a-thread)). No policy shows another editor's threads.
+
+Example: an editor role for one site section, node work only, always reviewed:
+
+    module expai, function vector: Subtree /1/2/58/, Scope node, Review staged
