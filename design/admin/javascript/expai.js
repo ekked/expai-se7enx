@@ -48,10 +48,10 @@
         return '/';
     }
 
-    /** POST expai::<fn> through ezjscore; resolves with the content, rejects with { message } */
+    /** POST expai::<fn> (or <group>::<fn>, e.g. expaivector::threads) through ezjscore; resolves with the content, rejects with { message } */
     function api( fn, data ) {
         var post = $.extend( {}, data || {} );
-        post.ezjscServer_function_arguments = 'expai::' + fn;
+        post.ezjscServer_function_arguments = String( fn ).indexOf( '::' ) > 0 ? fn : 'expai::' + fn;
         post.ezxform_token = token();
         return new Promise( function ( resolve, reject ) {
             $.ajax( {
@@ -235,6 +235,11 @@
         },
         panelSections: {
             register: function ( name, init ) { panelSectionInits[name] = init; }
+        },
+        // the command palette's registry (doc/keyboard.md); commands registered before the palette is loaded wait here
+        commands: {
+            pending: [],
+            register: function ( id, def ) { this.pending.push( [ id, def ] ); }
         }
     };
 
@@ -1124,6 +1129,108 @@
         on( 'labels:done', update );
     }
 
+    /* ------------------------------------------------- threads (doc/threads.md) */
+
+    // the panel section "threads": the user's threads on this node, refreshed after each answer
+    panelSectionInits.threads = function ( panelRoot ) {
+        var box = panelRoot.querySelector( '.exp-ai-threads' );
+        if ( !box ) {
+            return;
+        }
+        var T = readJSON( box, '.exp-ai-thread-strings' );
+        var list = box.querySelector( '.exp-ai-thread-list' );
+        function load() {
+            api( 'expaivector::threads', { node: box.getAttribute( 'data-node-id' ), shared: '0', limit: 5 } ).then( function ( data ) {
+                var rows = data.threads || [];
+                box.querySelector( '.exp-ai-thread-empty' ).hidden = !!rows.length;
+                box.querySelector( '.exp-ai-thread-links' ).hidden = !data.has_vector;
+                list.innerHTML = rows.map( function ( t, i ) {
+                    var title = esc( t.title );
+                    return '<li class="exp-ai-thread-row exp-ai-thread-' + esc( t.state ) + '"><span class="exp-ai-thread-dot" aria-hidden="true"></span>'
+                         + ( data.has_vector ? '<a href="' + esc( url( 'expai/vector/(thread)/' + t.uuid ) ) + '" title="' + esc( T.open ) + '">' + title + '</a>' : title )
+                         + '<span class="exp-ai-thread-meta">' + esc( ( i === 0 && t.origin === 'panel' && t.shelf !== 'settled' ? T.this_conversation + ' · ' : '' )
+                         + ( T['state_' + t.state] || t.state ) + ( t.cost ? ' · ' + t.cost : '' ) ) + '</span></li>';
+                } ).join( '' );
+            } ).catch( function () {
+                box.hidden = true;
+            } );
+        }
+        load();
+        on( 'panel:done', load );
+    };
+
+    // Ctrl/Cmd+K on any admin page (outside fields and rich text editors): the palette, loaded on first use
+    function paletteHook() {
+        var stored = '';
+        try { stored = window.localStorage.getItem( 'exp-ai-palette-keys' ) || ''; } catch ( e ) { stored = ''; }
+        // "off:<time>": no palette for this user (no access, or switched off); asked again after a day
+        if ( stored.indexOf( 'off' ) === 0 ) {
+            if ( Date.now() - ( parseInt( stored.slice( 4 ), 10 ) || 0 ) < 86400000 ) {
+                return;
+            }
+            stored = '';
+        }
+        var loading = null;
+        function defaultMatch( e ) {
+            var mac = /Mac|iPhone|iPad|iPod/.test( navigator.platform || navigator.userAgent || '' );
+            return e.code === 'KeyK' && ( mac ? e.metaKey && !e.ctrlKey : e.ctrlKey && !e.metaKey ) && !e.altKey && !e.shiftKey;
+        }
+        function load() {
+            if ( window.ExpAiPalette && window.ExpAiPalette.config().strings.title ) {
+                return Promise.resolve();
+            }
+            if ( !loading ) {
+                loading = api( 'expaivector::palette', {} ).then( function ( cfg ) {
+                    if ( cfg.global === false ) {
+                        // [KeyBindings] GlobalPalette=disabled: the palette only in Vector
+                        try { window.localStorage.setItem( 'exp-ai-palette-keys', 'off:' + Date.now() ); } catch ( e ) { /* storage may be off */ }
+                        throw { message: '', kind: 'off' };
+                    }
+                    var gotScripts = window.ExpAiPalette ? Promise.resolve() : Promise.all( ( cfg.scripts || [] ).map( function ( src ) {
+                        return new Promise( function ( resolve, reject ) {
+                            var s = document.createElement( 'script' );
+                            s.src = src;
+                            s.onload = resolve;
+                            s.onerror = reject;
+                            document.head.appendChild( s );
+                        } );
+                    } ) );
+                    return gotScripts.then( function () {
+                        window.ExpAiPalette.configure( cfg );
+                        try { window.localStorage.setItem( 'exp-ai-palette-keys', cfg.bindings && cfg.bindings.palette ? cfg.bindings.palette.keys : 'off:' + Date.now() ); } catch ( e ) { /* storage may be off */ }
+                    } );
+                } ).catch( function ( err ) {
+                    loading = null;
+                    // no access to Exponential Intelligence: leave Ctrl+K to the browser from now on
+                    if ( err && err.kind === 'server' ) {
+                        try { window.localStorage.setItem( 'exp-ai-palette-keys', 'off:' + Date.now() ); } catch ( e ) { /* storage may be off */ }
+                    }
+                    throw err;
+                } );
+            }
+            return loading;
+        }
+        document.addEventListener( 'keydown', function ( e ) {
+            // Vector handles its own keys
+            if ( window.ExpAiVectorApp || e.defaultPrevented ) {
+                return;
+            }
+            var keys = window.ExpAiKeys && window.ExpAiPalette && window.ExpAiPalette.config().bindings.palette ? window.ExpAiPalette.config().bindings.palette.keys : stored;
+            var hit = window.ExpAiKeys && keys ? window.ExpAiKeys.matches( e, keys ) : defaultMatch( e );
+            if ( !hit ) {
+                return;
+            }
+            var t = e.target;
+            var inEditor = t && t.closest && ( t.isContentEditable || t.closest( '[contenteditable="true"], .ProseMirror, .tox, .mce-content-body' ) );
+            var inField = t && /^(INPUT|TEXTAREA|SELECT)$/.test( t.tagName );
+            if ( inEditor || inField ) {
+                return;
+            }
+            e.preventDefault();
+            load().then( function () { window.ExpAiPalette.open(); } ).catch( function () { /* the palette stays closed */ } );
+        } );
+    }
+
     function start() {
         var panelRoot = document.getElementById( 'exp-ai-panel' );
         // #exp-ai in the address (the dashboard's "Start writing") opens the tab
@@ -1150,6 +1257,7 @@
         modelStatesHook();
         surfaces();
         labels();
+        paletteHook();
     }
 
     if ( document.readyState === 'loading' ) {

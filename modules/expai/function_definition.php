@@ -40,3 +40,9 @@ $FunctionList['models'] = array( 'name' => 'models',
                                  'call_method' => array( 'class' => 'expAiFunctionCollection', 'method' => 'fetchModels' ),
                                  'parameter_type' => 'standard',
                                  'parameters' => array() );
+// threads (classes/vector/): fetch( 'expai', 'my_threads', hash( 'limit', 6 ) ) the current user's own threads
+$FunctionList['my_threads'] = array( 'name' => 'my_threads',
+                                     'operation_types' => array( 'read' ),
+                                     'call_method' => array( 'class' => 'expAiThreadFunctionCollection', 'method' => 'fetchMyThreads' ),
+                                     'parameter_type' => 'standard',
+                                     'parameters' => array( array( 'name' => 'limit', 'type' => 'integer', 'required' => false, 'default' => 6 ) ) );

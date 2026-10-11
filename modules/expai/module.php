@@ -15,6 +15,8 @@
  *   expai/model_manage  the view expai/models: providers, key presence, probe results, the local model (start,
  *                       stop, pull, remove, test prompt)
  *   expai/mcp           MCP tools in the panel (limitation Server: "exp" for the in-process bridge, or a server id)
+ *   expai/vector        the Vector workspace and its functions (expaivector::*), with expai/write; limitations
+ *                       Subtree, Section (the scope must lie inside), Scope (node, subtree, class), Review (staged, direct)
  *
  * Views:
  *   expai/log        the requests to the model and their usage; (view)/drafts the versions written; (export)/csv
@@ -22,6 +24,8 @@
  *   expai/packages   content packages: (package)/<uuid> one package, (offset)/<n> the list (expai/package_import)
  *   expai/dashboard  the Dashboard tab page
  *   expai/models     providers, models, probe results and the local model (expai/model_manage)
+ *   expai/vector     the Vector workspace: threads, conversation and steps, plan/diff/cost (doc/vector.md);
+ *                    (thread)/<uuid>, (node)/<node id>, (tab)/plan|diff|cost, (shelf)/settled|archived
  *
  * @copyright Copyright (C) 1998 - 2026 7x & Exponential Foundation. All rights reserved.
  * @license GNU General Public License v2.0 (or any later version)
@@ -82,6 +86,22 @@ $ViewList['models'] = array(
                                       'TestPrompt' => array( 'Model' => 'ExpAiTestModel' ) ),
     'unordered_params' => array( 'provider' => 'Provider' ) );
 
+// Vector (classes/vector/, doc/vector.md): the shell only; threads and steps come through expaivector::*
+$ViewList['vector'] = array(
+    'default_navigation_part' => 'ezmynavigationpart',
+    'script' => 'vector.php',
+    'functions' => array( 'vector' ),
+    'params' => array(),
+    'unordered_params' => array( 'thread' => 'Thread', 'node' => 'Node', 'tab' => 'Tab', 'shelf' => 'Shelf' ) );
+
+// the event stream of a thread (Server-Sent Events where [VectorSettings] Transport resolves to sse; else 204)
+$ViewList['stream'] = array(
+    'default_navigation_part' => 'ezmynavigationpart',
+    'script' => 'stream.php',
+    'functions' => array( 'vector' ),
+    'params' => array(),
+    'unordered_params' => array( 'thread' => 'Thread', 'after' => 'After' ) );
+
 $Provider = array( 'name' => 'Provider', 'values' => array(), 'class' => 'expAiPolicy', 'function' => 'providers', 'parameter' => array() );
 $Server = array( 'name' => 'Server', 'values' => array(), 'class' => 'expAiPolicy', 'function' => 'mcpServers', 'parameter' => array() );
 
@@ -95,5 +115,12 @@ $FunctionList['package_import'] = array();
 $FunctionList['package_export'] = array();
 $FunctionList['lane_fast'] = array();
 $FunctionList['mcp'] = array( 'Server' => $Server );
+
+// Vector: Subtree and Section are the kernel's limitation kinds (the role editor browses for subtrees)
+$FunctionList['vector'] = array(
+    'Subtree' => array( 'name' => 'Subtree', 'values' => array() ),
+    'Section' => array( 'name' => 'Section', 'values' => array(), 'class' => 'eZSection', 'function' => 'fetchList', 'parameter' => array( false ) ),
+    'Scope' => array( 'name' => 'Scope', 'values' => array(), 'class' => 'expAiVectorPolicy', 'function' => 'scopes', 'parameter' => array() ),
+    'Review' => array( 'name' => 'Review', 'values' => array(), 'class' => 'expAiVectorPolicy', 'function' => 'reviews', 'parameter' => array() ) );
 
 ?>

@@ -560,3 +560,59 @@ span.exp-ai-fallback-notice { display: inline-block; }
     .exp-ai-kpis { grid-template-columns: 1fr; }
     .exp-ai-recent li { grid-template-columns: 1fr; }
 }
+
+/* ------------------------------------------------------------------ threads, palette, shortcut sheet (#360)
+   doc/threads.md, doc/keyboard.md. Vector's own styles are in expai_vector.css (loaded by expai/vector only). */
+
+/* the panel section "threads" and the dashboard card "Threads" */
+.exp-ai-thread-list, .exp-ai-thread-rows { list-style: none; margin: 0.3em 0 0.5em; padding: 0; display: grid; gap: 0.25em; }
+.exp-ai-thread-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.2em 0.5em; }
+.exp-ai-thread-row a { font-weight: 600; }
+.exp-ai-thread-meta { color: var(--exp-ai-muted); font-size: 0.85em; }
+.exp-ai-thread-dot { width: 0.5em; height: 0.5em; flex: 0 0 auto; border-radius: 50%; border: 2px solid var(--exp-ai-muted); align-self: center; }
+.exp-ai-thread-running .exp-ai-thread-dot, .exp-ai-thread-queued .exp-ai-thread-dot { border-color: var(--exp-ai-accent); background: var(--exp-ai-accent); }
+.exp-ai-thread-review .exp-ai-thread-dot, .exp-ai-thread-waiting_input .exp-ai-thread-dot { border-color: var(--exp-ai-accent); border-radius: 1px; transform: rotate(45deg); }
+.exp-ai-thread-failed .exp-ai-thread-dot { border-color: var(--exp-ai-error); background: var(--exp-ai-error); }
+.exp-ai-card-link { margin-left: auto; font-weight: 600; }
+
+/* the palette and the shortcut sheet (appended to body, on any admin page) */
+.exp-ai-palette-overlay {
+    position: fixed; inset: 0; z-index: 10000; display: flex; align-items: flex-start; justify-content: center;
+    padding: 12vh 1em 1em; background: rgba(16, 24, 40, 0.38);
+}
+.exp-ai-palette-overlay[hidden] { display: none; }
+.exp-ai-palette {
+    width: min(38em, 100%); max-height: 72vh; display: flex; flex-direction: column; overflow: hidden;
+    border: 1px solid var(--exp-ai-line); border-radius: var(--a4-radius-s, 10px); background: var(--a4-card-bg, #fff); color: var(--a4-ink, #1f2430);
+    box-shadow: 0 24px 64px rgba(16, 24, 40, 0.30); font-family: var(--a4-font, inherit); line-height: 1.4;
+}
+.exp-ai-palette-search { display: flex; align-items: center; gap: 0.6em; padding: 0.7em 0.9em; border-bottom: 1px solid var(--exp-ai-line); }
+.exp-ai-palette-input { flex: 1; min-width: 0; padding: 0.2em 0; border: 0; outline: none; background: transparent; color: inherit; font: inherit; font-size: 1.05em; }
+.exp-ai-palette-close, .exp-ai-palette kbd {
+    padding: 0 0.45em; border: 1px solid var(--exp-ai-line); border-bottom-width: 2px; border-radius: 4px; background: transparent; color: var(--exp-ai-muted);
+    font: 600 0.75em/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: nowrap; cursor: pointer;
+}
+.exp-ai-palette kbd { cursor: default; }
+.exp-ai-palette-list { list-style: none; margin: 0; padding: 0.3em; overflow: auto; }
+.exp-ai-palette-group { padding: 0.6em 0.6em 0.2em; color: var(--exp-ai-muted); font-size: 0.72em; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.exp-ai-palette-list [role="option"] { display: flex; align-items: center; gap: 0.6em; padding: 0.45em 0.6em; border-radius: 6px; cursor: pointer; }
+.exp-ai-palette-list [role="option"].exp-ai-active, .exp-ai-palette-list [role="option"]:hover { background: var(--exp-ai-accent-soft); }
+.exp-ai-palette-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.exp-ai-palette-hint { color: var(--exp-ai-muted); font-size: 0.85em; white-space: nowrap; }
+.exp-ai-palette-empty { padding: 0.9em 0.6em; color: var(--exp-ai-muted); }
+.exp-ai-palette-foot { margin: 0; padding: 0.45em 0.9em; border-top: 1px solid var(--exp-ai-line); color: var(--exp-ai-muted); font-size: 0.8em; }
+.exp-ai-sheet { padding: 0 0 0.6em; }
+.exp-ai-sheet-head { display: flex; align-items: center; justify-content: space-between; padding: 0.8em 1em; border-bottom: 1px solid var(--exp-ai-line); }
+.exp-ai-sheet-head h2 { margin: 0; font-size: 1.1em; }
+.exp-ai-sheet-table { width: 100%; border-collapse: collapse; overflow: auto; display: block; max-height: 56vh; }
+.exp-ai-sheet-table th, .exp-ai-sheet-table td { padding: 0.35em 1em; border-bottom: 1px solid var(--exp-ai-line); text-align: left; font-weight: 400; vertical-align: middle; }
+.exp-ai-sheet-table td:last-child { white-space: nowrap; }
+.exp-ai-sheet-recording { margin: 0.6em 1em 0; padding: 0.5em 0.8em; border-radius: 6px; background: var(--exp-ai-accent-soft); font-weight: 600; }
+.exp-ai-sheet-error { margin: 0.6em 1em 0; color: var(--exp-ai-error); }
+.exp-ai-sheet-foot { margin: 0.6em 1em 0; }
+.exp-ai-palette-toast {
+    position: fixed; left: 50%; bottom: calc(1.25em + var(--exp-debug-bar-h, 0px)); z-index: 10001; transform: translateX(-50%); max-width: calc(100vw - 2em);
+    padding: 0.6em 1em; border-radius: 6px; background: #1f2430; color: #fff; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+}
+.exp-ai-palette-toast[hidden] { display: none; }
+@media (max-width: 640px) { .exp-ai-palette-overlay { padding-top: 4vh; } }

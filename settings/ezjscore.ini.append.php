@@ -11,4 +11,10 @@ FunctionList[]=expai
 Class=expAiServerFunctions
 Functions[]=expai
 
+# Threads, Vector and the keyboard: expaivector::<function> (classes/vector/expaivectorserverfunctions.php). The same
+# permission as expai::* (the function list "expai"); each function checks expai/write, and expai/vector where needed.
+[ezjscServer_expaivector]
+Class=expAiVectorServerFunctions
+Functions[]=expai
+
 */ ?>

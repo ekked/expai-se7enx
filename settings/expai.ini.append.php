@@ -550,6 +550,8 @@ Class=expAiToolUpdateDraft
 # The sections of the full view panel, in this order: [PanelSection_<name>] Template=
 Sections[]=conversation
 Sections[]=drafts
+# threads on this node and "Open in Vector" ([PanelSection_threads], doc/threads.md)
+Sections[]=threads
 
 [PanelSection_conversation]
 Template=expai/panel/conversation.tpl
@@ -788,5 +790,113 @@ ToolsCacheTTL=3600
 ProtocolVersion=2025-06-18
 AllowLoopback=disabled
 AllowPrivate=disabled
+
+# ------------------------------------------------------------------ threads, Vector and the keyboard (#360)
+# doc/threads.md, doc/vector.md, doc/keyboard.md
+
+[PanelSection_threads]
+Template=expai/panel/threads.tpl
+
+[ThreadSettings]
+# Threads: the panel's conversations and Vector's units of work (tables expai_thread, expai_thread_run,
+# expai_thread_event, ...). The list shows at most ListLimit threads per shelf; titles are cut to TitleLength.
+ListLimit=100
+TitleLength=80
+# A foreground run that has not reported for this many seconds (closed tab, request timed out) is shown as stopped
+StaleRunSeconds=900
+# The largest event payload (bytes); bigger ones keep their keys with long strings cut
+MaxEventPayloadBytes=16384
+# Retention in days (cronjob part "expai", bin/php/expaithreads.php --prune); 0 keeps the rows.
+# Owner decision: events, staged proposals and checkpoints are kept 30 days.
+EventKeepDays=30
+ProposalKeepDays=30
+CheckpointKeepDays=30
+
+[VectorSettings]
+# Vector (expai/vector, policy expai/vector): the workspace with threads, scope, mode, model and lane.
+Enabled=true
+# The tabs of the right pane, in this order: [VectorPane_<name>] Template=
+Panes[]=plan
+Panes[]=diff
+Panes[]=cost
+# A new thread: write | plan (bulk scopes always start in plan mode)
+DefaultMode=write
+# A new thread: staged (changes are reviewed before they are written) | direct (one object, one language only)
+DefaultReview=staged
+# Bulk work: more objects or languages than these (or any subtree or class) start with a plan
+BulkObjectThreshold=1
+BulkLanguageThreshold=1
+# How often Vector asks for changes (expaivector::events, milliseconds): while the open thread runs, while another
+# thread works, and otherwise. Doubled while the host is busy; no polling while the browser tab is hidden. Each poll
+# costs one kernel bootstrap (about 60-80 ms CPU), writes nothing and releases the session lock at once.
+PollActiveMs=1000
+PollWorkingMs=3000
+PollIdleMs=15000
+# How events reach the browser (expai/stream): auto | poll | sse. auto: Server-Sent Events under PHP-FPM/Apache
+# (the proxy must flush each packet: flushpackets=on), polling under Velocity (its pool workers do not stream yet).
+# A browser that gets no first line within 2 s falls back to polling.
+Transport=auto
+# Streams open at once (one PHP process each: at most 25 % of PHP-FPM pm.max_children); over it the browser polls
+MaxStreams=4
+# Seconds one stream is held before the browser reconnects (Last-Event-ID)
+StreamSeconds=25
+
+[VectorPane_plan]
+Template=expai/vector/pane_plan.tpl
+
+[VectorPane_diff]
+Template=expai/vector/pane_diff.tpl
+
+[VectorPane_cost]
+Template=expai/vector/pane_cost.tpl
+
+[KeyBindings]
+# The command palette and the shortcuts (doc/keyboard.md). Binding[<command>]=<keys>: modifiers Mod (Cmd on macOS,
+# Ctrl elsewhere), Ctrl, Alt, Shift, Meta joined with + to a KeyboardEvent.code (KeyK, Enter, Escape, ArrowDown,
+# Digit1) or one character (?); two chords separated by a space must follow within 600 ms ("Escape Escape").
+# When[<command>]: global (any admin page, never inside a field or a rich text editor), vector (Vector, also in a
+# field for combinations with Mod/Alt and Escape), list (Vector, not in a field), composer (the message field).
+# The palette on every admin page: GlobalPalette=enabled|disabled (Vector always has it).
+GlobalPalette=enabled
+# Users may change their shortcuts in Vector's shortcut sheet (preference expai_keybindings)
+UserOverrides=enabled
+Binding[palette]=Mod+KeyK
+When[palette]=global
+Binding[run]=Mod+Enter
+When[run]=vector
+Binding[queue]=Alt+Enter
+When[queue]=composer
+Binding[stop]=Escape Escape
+When[stop]=vector
+Binding[next]=KeyJ
+When[next]=list
+Binding[previous]=KeyK
+When[previous]=list
+Binding[accept]=KeyA
+When[accept]=list
+Binding[reject]=KeyX
+When[reject]=list
+Binding[thread_next]=Alt+ArrowDown
+When[thread_next]=vector
+Binding[thread_previous]=Alt+ArrowUp
+When[thread_previous]=vector
+Binding[new_thread]=KeyN
+When[new_thread]=list
+Binding[mode]=Alt+KeyP
+When[mode]=vector
+Binding[model]=Alt+KeyM
+When[model]=vector
+Binding[lane]=Alt+KeyL
+When[lane]=vector
+Binding[scope]=Alt+KeyS
+When[scope]=vector
+Binding[tab_plan]=Digit1
+When[tab_plan]=list
+Binding[tab_diff]=Digit2
+When[tab_diff]=list
+Binding[tab_cost]=Digit3
+When[tab_cost]=list
+Binding[help]=?
+When[help]=list
 
 */ ?>

@@ -265,6 +265,9 @@
         <p class="exp-ai-card-foot"><a href={concat( 'expai/log', $details_path )|ezurl}>{'Details in the log'|i18n( 'extension/expai/usage' )}</a></p>
     </section>
 
+    {* threads: the latest of the user's own threads and Vector (doc/threads.md) *}
+    {include uri='design:expai/parts/threads_card.tpl'}
+
     {* recent drafts *}
     <section class="exp-ai-card" aria-labelledby="exp-ai-recent-title">
         <div class="exp-ai-card-head">
