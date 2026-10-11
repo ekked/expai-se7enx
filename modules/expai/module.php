@@ -123,4 +123,8 @@ $FunctionList['vector'] = array(
     'Scope' => array( 'name' => 'Scope', 'values' => array(), 'class' => 'expAiVectorPolicy', 'function' => 'scopes', 'parameter' => array() ),
     'Review' => array( 'name' => 'Review', 'values' => array(), 'class' => 'expAiVectorPolicy', 'function' => 'reviews', 'parameter' => array() ) );
 
+// Web and history tools (#369): web_fetch, web_search, project_history; without the limitation Tool every one of them
+$FunctionList['web'] = array(
+    'Tool' => array( 'name' => 'Tool', 'values' => array(), 'class' => 'expAiWebPolicy', 'function' => 'tools', 'parameter' => array() ) );
+
 ?>

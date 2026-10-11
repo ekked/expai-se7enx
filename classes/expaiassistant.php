@@ -377,6 +377,10 @@ class expAiAssistant
                 if ( expAiMcp::isMcpTool( isset( $use['name'] ) ? (string) $use['name'] : '' ) )
                     $mcpCalls++;
                 $toolLog[] = array( 'name' => isset( $use['name'] ) ? (string) $use['name'] : '', 'ms' => (int) round( ( microtime( true ) - $toolStart ) * 1000 ), 'ok' => !$isError );
+                // the web tools add the host they read (never the URL or the query)
+                $loggedTool = $this->tools()->get( isset( $use['name'] ) ? (string) $use['name'] : '' );
+                if ( $loggedTool && method_exists( $loggedTool, 'logFields' ) )
+                    $toolLog[count( $toolLog ) - 1] += $loggedTool->logFields();
                 $result = array( 'type' => 'tool_result', 'tool_use_id' => (string) $use['id'], 'content' => $content );
                 if ( $isError )
                     $result['is_error'] = true;
@@ -445,7 +449,7 @@ class expAiAssistant
                           array( 'text' => ezpI18n::tr( 'extension/expai/step', 'An answer was too long and was cut off; retrying' ), 'ok' => false ) );
         try
         {
-            if ( expAiMcp::isExternal( $name ) && $context->conversation && $this->turn > 0 )
+            if ( ( expAiMcp::isExternal( $name ) || ( method_exists( $tool, 'external' ) && $tool->external() ) ) && $context->conversation && $this->turn > 0 )
                 $context->conversation->setTaintedTurn( $this->turn );
             $result = $tool->execute( $input, $context );
             if ( $context->reader->withheld > 0 && is_array( $result ) )

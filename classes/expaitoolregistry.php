@@ -28,7 +28,12 @@ class expAiToolRegistry
                 eZDebug::writeWarning( "expai: tool $name has no usable class ($class)", __METHOD__ );
                 continue;
             }
-            $this->tools[$name] = new $class( $name );
+            $tool = new $class( $name );
+            // a tool that decides itself whether it is offered (web_fetch, web_search, project_history: the policy
+            // expai/web and its settings)
+            if ( method_exists( $tool, 'available' ) && !$tool->available( $config ) )
+                continue;
+            $this->tools[$name] = $tool;
         }
         if ( $withMcp )
             foreach ( expAiMcp::tools( $config ) as $name => $tool )

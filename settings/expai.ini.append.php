@@ -899,4 +899,100 @@ When[tab_cost]=list
 Binding[help]=?
 When[help]=list
 
+# ------------------------------------------------------------------ web and history tools (#369)
+# doc/tools.md (web_fetch, web_search, project_history), doc/security.md. Each tool is offered only to users with
+# the policy expai/web (limitation Tool) and only once it is configured below.
+
+[ToolSettings]
+Tools[]=web_fetch
+Tools[]=web_search
+Tools[]=project_history
+
+[Tool_web_fetch]
+Class=expAiToolWebFetch
+
+[Tool_web_search]
+Class=expAiToolWebSearch
+
+[Tool_project_history]
+Class=expAiToolProjectHistory
+
+[WebSettings]
+# The sites web_fetch may read: an exact host (docs.example.org) or *.domain for its subdomains (not the domain
+# itself). Empty: web_fetch is not offered.
+AllowedDomains[]
+# Hosts that may resolve to private, loopback or link-local addresses (an intranet documentation server). Empty:
+# only public addresses.
+PrivateHosts[]
+# Ports besides 80 and 443
+AllowedPorts[]
+# The most bytes read of a page (the rest is cut), seconds for the whole fetch, same-host redirects followed
+MaxBytes=524288
+Timeout=10
+MaxRedirects=3
+# The most characters of text a result returns to the model
+MaxResultChars=12000
+MaxFetchesPerTurn=5
+# robots.txt (product token ExponentialIntelligence), cached RobotsCacheTTL seconds
+RespectRobots=enabled
+RobotsCacheTTL=3600
+# enabled: drafts may still be written in the same turn after a web_fetch or web_search result (default: not, as
+# after an external MCP tool; the editor asks again in the next message)
+WritesAfterWebResults=disabled
+
+[SearchSettings]
+# The search service: [SearchProvider_<id>]. web_search is offered only when its ApiKey is set.
+Provider=brave
+MaxResults=8
+MaxSearchesPerTurn=3
+# enabled: the URL of a search result in the conversation may be fetched although its host is not in
+# AllowedDomains[] (the SSRF guard still applies)
+SearchResultsFetchable=disabled
+
+[SearchProvider_brave]
+Label=Brave Search
+Class=expAiWebSearchBrave
+Endpoint=https://api.search.brave.com/res/v1/web/search
+# ONLY in settings/override (X-Subscription-Token)
+ApiKey=
+# The query leaves the site: the data policy checks the panel's node against these
+Region=us
+Retention=unknown
+Timeout=10
+SafeSearch=moderate
+# Optional: a country code (de) and a search language (en)
+Country=
+SearchLang=
+
+[HistorySettings]
+# The repositories project_history reads, each [HistoryRepository_<id>] (id: a-z, 0-9, _). Empty: not offered.
+Repositories[]
+# Local clones must lie under one of these directories (absolute, or relative to the installation root)
+Roots[]
+# Paths never named or read (fnmatch; dir/* covers the directory); commit titles and release note lines naming
+# such a directory are left out
+ExcludePaths[]=ai/*
+# Leave out titles that name a *.md file in a clone's root that git does not track (private notes)
+HideUntrackedRootMarkdown=enabled
+# enabled: commits carry the author's name
+ShowAuthors=disabled
+GitBinary=/usr/bin/git
+Timeout=10
+MaxCommits=30
+MaxCallsPerTurn=5
+MaxReleaseNotesChars=1500
+# The GitHub API (read without a token) and the cache of release lists
+GitHubApi=https://api.github.com
+ReleasesCacheTTL=3600
+
+# Example (not active until listed in Repositories[]):
+[HistoryRepository_example]
+Label=Example extension
+# A local clone (relative to the installation root or absolute), under Roots[]
+Path=extension/example
+# The public GitHub repository for release notes (owner/name)
+GitHub=example/example
+# The branch to read (default: the checked-out HEAD)
+Branch=
+
 */ ?>
