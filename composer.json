@@ -1,0 +1,27 @@
+{
+    "name": "se7enxweb/expai",
+    "description": "Exponential Intelligence (Powered by Claude from Anthropic): a writing assistant for the Exponential 6 administration interface that writes drafts as the editor and never publishes on its own",
+    "type": "ezpublish-legacy-extension",
+    "keywords": [ "Exponential", "Exponential 6", "legacy extension", "AI", "Claude", "Anthropic", "writing assistant", "drafts" ],
+    "homepage": "https://github.com/se7enxweb/expai",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        { "name": "7x", "homepage": "https://se7enx.com", "email": "info@se7enx.com", "role": "Author" }
+    ],
+    "support": {
+        "issues": "https://github.com/se7enxweb/expai/issues",
+        "source": "https://github.com/se7enxweb/expai"
+    },
+    "require": {
+        "php": ">=8.0",
+        "ext-json": "*",
+        "ext-curl": "*",
+        "ext-dom": "*",
+        "ext-mbstring": "*",
+        "se7enxweb/exponential": "^6.0.14",
+        "se7enxweb/ezpublish-legacy-installer": "*"
+    },
+    "extra": {
+        "ezpublish-legacy-extension-name": "expai"
+    }
+}

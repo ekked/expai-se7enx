@@ -1,0 +1,39 @@
+<?php
+/**
+ * A provider for expai (doc/extending.md, "A new provider"): answers every request with a fixed text, without
+ * calling any service. Shows the contract: send() gets the request in the Anthropic Messages shape and returns
+ * content, content_json, stop_reason, model and usage. Use it to try the interface without an account:
+ *   [AISettings] Provider=custom, ProviderClass=expAiExampleEchoProvider, Model=echo
+ */
+class expAiExampleEchoProvider implements expAiProvider
+{
+    protected $settings;
+
+    public function __construct( array $settings )
+    {
+        $this->settings = $settings;
+    }
+
+    public function providerId()
+    {
+        return 'echo';
+    }
+
+    public function modelName()
+    {
+        return isset( $this->settings['Model'] ) ? (string) $this->settings['Model'] : 'echo';
+    }
+
+    public function send( array $request )
+    {
+        $last = end( $request['messages'] );
+        $text = is_string( $last['content'] ) ? $last['content'] : 'your message';
+        if ( !empty( $request['output_schema'] ) )
+            $text = json_encode( array( 'value' => 'Echo: ' . mb_substr( $text, 0, 60 ), 'note' => 'expAiExampleEchoProvider' ) );
+        else
+            $text = 'Echo: ' . mb_substr( is_string( $text ) ? $text : 'tool results received', 0, 200 );
+        $content = array( array( 'type' => 'text', 'text' => $text ) );
+        return array( 'content' => $content, 'content_json' => json_encode( $content ), 'stop_reason' => 'end_turn',
+                      'model' => $this->modelName(), 'usage' => array() );
+    }
+}

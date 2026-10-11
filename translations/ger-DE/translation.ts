@@ -1,0 +1,1362 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="de_DE">
+<context>
+    <name>design/admin/parts/my/menu</name>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation>Exponential Intelligence</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence log</source>
+        <translation>Exponential-Intelligence-Protokoll</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/dashboard</name>
+    <message>
+        <source>The chosen location cannot be read.</source>
+        <translation>Der gewählte Ort kann nicht gelesen werden.</translation>
+    </message>
+    <message>
+        <source>Dashboard</source>
+        <translation>Dashboard</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation>Exponential Intelligence</translation>
+    </message>
+    <message>
+        <source>Choose where Exponential Intelligence should write</source>
+        <translation>Wählen Sie, wo Exponential Intelligence schreiben soll</translation>
+    </message>
+    <message>
+        <source>Choose the folder (or the content) to work on. Its full view opens with the Exponential Intelligence panel and your request.</source>
+        <translation>Wählen Sie den Ordner (oder den Inhalt), an dem gearbeitet werden soll. Seine Vollansicht öffnet sich mit dem Exponential-Intelligence-Bereich und Ihrer Anfrage.</translation>
+    </message>
+    <message>
+        <source>Powered by Claude from Anthropic</source>
+        <translation>Bereitgestellt von Claude von Anthropic</translation>
+    </message>
+    <message>
+        <source>Ready</source>
+        <translation>Bereit</translation>
+    </message>
+    <message>
+        <source>Not configured</source>
+        <translation>Nicht eingerichtet</translation>
+    </message>
+    <message>
+        <source>Switched off</source>
+        <translation>Ausgeschaltet</translation>
+    </message>
+    <message>
+        <source>Approval workflow on</source>
+        <translation>Freigabe-Workflow aktiv</translation>
+    </message>
+    <message>
+        <source>No approval workflow</source>
+        <translation>Kein Freigabe-Workflow</translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation>Details</translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>Modell</translation>
+    </message>
+    <message>
+        <source>You may create content</source>
+        <translation>Sie dürfen Inhalte anlegen</translation>
+    </message>
+    <message>
+        <source>everywhere</source>
+        <translation>überall</translation>
+    </message>
+    <message>
+        <source>in some places (your role limits it)</source>
+        <translation>an manchen Stellen (Ihre Rolle schränkt es ein)</translation>
+    </message>
+    <message>
+        <source>nowhere</source>
+        <translation>nirgends</translation>
+    </message>
+    <message>
+        <source>You may edit content</source>
+        <translation>Sie dürfen Inhalte bearbeiten</translation>
+    </message>
+    <message>
+        <source>Site default model</source>
+        <translation>Voreingestelltes Modell der Website</translation>
+    </message>
+    <message>
+        <source>%model, set in expai.ini [AISettings] Model (%placement: %file); change it there.</source>
+        <translation>%model, gesetzt in expai.ini [AISettings] Model (%placement: %file); dort ändern.</translation>
+    </message>
+    <message>
+        <source>Prices</source>
+        <translation>Preise</translation>
+    </message>
+    <message>
+        <source>Start writing</source>
+        <translation>Mit dem Schreiben beginnen</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence works on "%name" and everything below it: it may look up and write drafts in this location or any location under it, always only where your own permissions allow.</source>
+        <translation>Exponential Intelligence arbeitet an "%name" und allem darunter: Es darf an diesem Ort und an jedem Ort darunter nachschlagen und Entwürfe schreiben, immer nur dort, wo Ihre eigenen Berechtigungen es erlauben.</translation>
+    </message>
+    <message>
+        <source>change</source>
+        <translation>ändern</translation>
+    </message>
+    <message>
+        <source>and everything below it, within your permissions</source>
+        <translation>und alles darunter, im Rahmen Ihrer Rechte</translation>
+    </message>
+    <message>
+        <source>You may not create content in the default location. Choose a location for your request.</source>
+        <translation>Sie dürfen am voreingestellten Ort keine Inhalte anlegen. Wählen Sie einen Ort für Ihre Anfrage.</translation>
+    </message>
+    <message>
+        <source>The default location is not available to you. Choose a location for your request.</source>
+        <translation>Der voreingestellte Ort ist für Sie nicht verfügbar. Wählen Sie einen Ort für Ihre Anfrage.</translation>
+    </message>
+    <message>
+        <source>What should Exponential Intelligence write?</source>
+        <translation>Was soll Exponential Intelligence schreiben?</translation>
+    </message>
+    <message>
+        <source>What should Exponential Intelligence write? For example: three short articles about our spring events.</source>
+        <translation>Was soll Exponential Intelligence schreiben? Zum Beispiel: drei kurze Artikel über unsere Frühlingsveranstaltungen.</translation>
+    </message>
+    <message>
+        <source>Write</source>
+        <translation>Schreiben</translation>
+    </message>
+    <message>
+        <source>Choose the location</source>
+        <translation>Ort wählen</translation>
+    </message>
+    <message>
+        <source>Waiting for my approval</source>
+        <translation>Wartet auf meine Freigabe</translation>
+    </message>
+    <message>
+        <source>Recent drafts</source>
+        <translation>Neueste Entwürfe</translation>
+    </message>
+    <message>
+        <source>All in the log (%count)</source>
+        <translation>Alle im Protokoll (%count)</translation>
+    </message>
+    <message>
+        <source>Discarded</source>
+        <translation>Verworfen</translation>
+    </message>
+    <message>
+        <source>Nothing written with Exponential Intelligence yet.</source>
+        <translation>Noch nichts mit Exponential Intelligence geschrieben.</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence: my drafts</source>
+        <translation>Exponential Intelligence: meine Entwürfe</translation>
+    </message>
+    <message>
+        <source>Content</source>
+        <translation>Inhalt</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Status</translation>
+    </message>
+    <message>
+        <source>Written</source>
+        <translation>Geschrieben</translation>
+    </message>
+    <message>
+        <source>(removed)</source>
+        <translation>(entfernt)</translation>
+    </message>
+    <message>
+        <source>All my Exponential Intelligence drafts</source>
+        <translation>Alle meine Exponential-Intelligence-Entwürfe</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/edit</name>
+    <message>
+        <source>Describe what to write, and Exponential Intelligence fills in the fields of this form for you to review.</source>
+        <translation>Beschreiben Sie, was geschrieben werden soll, und Exponential Intelligence füllt die Felder dieses Formulars zur Prüfung für Sie aus.</translation>
+    </message>
+    <message>
+        <source>For example: A short article about the opening of our new office, friendly tone, about 200 words.</source>
+        <translation>Zum Beispiel: Ein kurzer Artikel über die Eröffnung unseres neuen Büros, freundlicher Ton, etwa 200 Wörter.</translation>
+    </message>
+    <message>
+        <source>Fill the fields</source>
+        <translation>Felder ausfüllen</translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation>Rückgängig</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence is working...</source>
+        <translation>Exponential Intelligence arbeitet...</translation>
+    </message>
+    <message>
+        <source>Per field: use the Exponential Intelligence buttons next to the fields (write, rewrite, shorten, translate, suggest). Nothing is saved until you store or publish the draft as usual.</source>
+        <translation>Pro Feld: Verwenden Sie die Exponential-Intelligence-Schaltflächen neben den Feldern (schreiben, umschreiben, kürzen, übersetzen, vorschlagen). Nichts wird gespeichert, bevor Sie den Entwurf wie gewohnt speichern oder veröffentlichen.</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation>Exponential Intelligence</translation>
+    </message>
+    <message>
+        <source>Powered by Claude from Anthropic</source>
+        <translation>Bereitgestellt von Claude von Anthropic</translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation>Anzeigen</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>Ausblenden</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence (Powered by Claude from Anthropic)</source>
+        <translation>Exponential Intelligence (Bereitgestellt von Claude von Anthropic)</translation>
+    </message>
+    <message>
+        <source>What should be written?</source>
+        <translation>Was soll geschrieben werden?</translation>
+    </message>
+    <message>
+        <source>Optional: how should it change?</source>
+        <translation>Optional: Wie soll es sich ändern?</translation>
+    </message>
+    <message>
+        <source>Into which language?</source>
+        <translation>In welche Sprache?</translation>
+    </message>
+    <message>
+        <source>Go</source>
+        <translation>Los</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Abbrechen</translation>
+    </message>
+    <message>
+        <source>Filled in by Exponential Intelligence. Review it before you store the draft.</source>
+        <translation>Von Exponential Intelligence ausgefüllt. Prüfen Sie es, bevor Sie den Entwurf speichern.</translation>
+    </message>
+    <message>
+        <source>%count field(s) filled in by Exponential Intelligence. Review them before you store the draft.</source>
+        <translation>%count Feld(er) von Exponential Intelligence ausgefüllt. Prüfen Sie sie, bevor Sie den Entwurf speichern.</translation>
+    </message>
+    <message>
+        <source>Restored the previous value.</source>
+        <translation>Der vorherige Wert wurde wiederhergestellt.</translation>
+    </message>
+    <message>
+        <source>Something went wrong:</source>
+        <translation>Etwas ist schiefgegangen:</translation>
+    </message>
+    <message>
+        <source>The server did not answer in time. Please try again.</source>
+        <translation>Der Server hat nicht rechtzeitig geantwortet. Bitte versuchen Sie es erneut.</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence suggested no values.</source>
+        <translation>Exponential Intelligence hat keine Werte vorgeschlagen.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>Exponential Intelligence is not configured correctly.</source>
+        <translation>Exponential Intelligence ist nicht richtig eingerichtet.</translation>
+    </message>
+    <message>
+        <source>The request could not be sent to Exponential Intelligence.</source>
+        <translation>Die Anfrage konnte nicht an Exponential Intelligence gesendet werden.</translation>
+    </message>
+    <message>
+        <source>The answer of Exponential Intelligence could not be read.</source>
+        <translation>Die Antwort von Exponential Intelligence konnte nicht gelesen werden.</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence declined this request.</source>
+        <translation>Exponential Intelligence hat diese Anfrage abgelehnt.</translation>
+    </message>
+    <message>
+        <source>Please write a message.</source>
+        <translation>Bitte schreiben Sie eine Nachricht.</translation>
+    </message>
+    <message>
+        <source>The message is too long (at most %max characters).</source>
+        <translation>Die Nachricht ist zu lang (höchstens %max Zeichen).</translation>
+    </message>
+    <message>
+        <source>This conversation is too long. Please start a new conversation.</source>
+        <translation>Diese Unterhaltung ist zu lang. Bitte beginnen Sie eine neue Unterhaltung.</translation>
+    </message>
+    <message>
+        <source>Node %id does not exist or you may not read it.</source>
+        <translation>Der Knoten %id existiert nicht oder Sie dürfen ihn nicht lesen.</translation>
+    </message>
+    <message>
+        <source>There is no content class "%identifier".</source>
+        <translation>Es gibt keine Inhaltsklasse "%identifier".</translation>
+    </message>
+    <message>
+        <source>The language %language is not used in this installation.</source>
+        <translation>Die Sprache %language wird in dieser Installation nicht verwendet.</translation>
+    </message>
+    <message>
+        <source>You may not create %class objects in %language under this node.</source>
+        <translation>Sie dürfen unter diesem Knoten keine Objekte der Klasse %class in %language anlegen.</translation>
+    </message>
+    <message>
+        <source>The draft could not be created.</source>
+        <translation>Der Entwurf konnte nicht angelegt werden.</translation>
+    </message>
+    <message>
+        <source>Object %id does not exist or you may not read it.</source>
+        <translation>Das Objekt %id existiert nicht oder Sie dürfen es nicht lesen.</translation>
+    </message>
+    <message>
+        <source>You may not edit object %id in %language.</source>
+        <translation>Sie dürfen das Objekt %id in %language nicht bearbeiten.</translation>
+    </message>
+    <message>
+        <source>Object %id is not published; open its draft in the edit form instead.</source>
+        <translation>Das Objekt %id ist nicht veröffentlicht; öffnen Sie stattdessen seinen Entwurf im Bearbeitungsformular.</translation>
+    </message>
+    <message>
+        <source>Only drafts can be written.</source>
+        <translation>Nur Entwürfe können geschrieben werden.</translation>
+    </message>
+    <message>
+        <source>Unknown field(s) %unknown. The fields of this class are: %valid.</source>
+        <translation>Unbekannte(s) Feld(er) %unknown. Die Felder dieser Klasse sind: %valid.</translation>
+    </message>
+    <message>
+        <source>The draft was not found.</source>
+        <translation>Der Entwurf wurde nicht gefunden.</translation>
+    </message>
+    <message>
+        <source>This is not a draft of yours.</source>
+        <translation>Dies ist keiner Ihrer Entwürfe.</translation>
+    </message>
+    <message>
+        <source>You may not edit this draft.</source>
+        <translation>Sie dürfen diesen Entwurf nicht bearbeiten.</translation>
+    </message>
+    <message>
+        <source>Unknown action.</source>
+        <translation>Unbekannte Aktion.</translation>
+    </message>
+    <message>
+        <source>The field was not found in this draft.</source>
+        <translation>Das Feld wurde in diesem Entwurf nicht gefunden.</translation>
+    </message>
+    <message>
+        <source>This action is not available for this field.</source>
+        <translation>Diese Aktion ist für dieses Feld nicht verfügbar.</translation>
+    </message>
+    <message>
+        <source>Please describe what to write.</source>
+        <translation>Bitte beschreiben Sie, was geschrieben werden soll.</translation>
+    </message>
+    <message>
+        <source>This content has no fields Exponential Intelligence can write.</source>
+        <translation>Dieser Inhalt hat keine Felder, die Exponential Intelligence schreiben kann.</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence is not available on this server.</source>
+        <translation>Exponential Intelligence ist auf diesem Server nicht verfügbar.</translation>
+    </message>
+    <message>
+        <source>The answer of Exponential Intelligence was too long.</source>
+        <translation>Die Antwort von Exponential Intelligence war zu lang.</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence did not answer in time. Please try again with a smaller request.</source>
+        <translation>Exponential Intelligence hat nicht rechtzeitig geantwortet. Bitte versuchen Sie es mit einer kleineren Anfrage erneut.</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence could not be reached.</source>
+        <translation>Exponential Intelligence ist nicht erreichbar.</translation>
+    </message>
+    <message>
+        <source>The limit %limit is reached (%used of %max). It resets %reset.</source>
+        <translation>Die Grenze %limit ist erreicht (%used von %max). Sie beginnt %reset neu.</translation>
+    </message>
+    <message>
+        <source>This draft was not written for you by Exponential Intelligence.</source>
+        <translation>Dieser Entwurf wurde nicht von Exponential Intelligence für Sie geschrieben.</translation>
+    </message>
+    <message>
+        <source>This draft belongs to another user.</source>
+        <translation>Dieser Entwurf gehört einem anderen Benutzer.</translation>
+    </message>
+    <message>
+        <source>This version is no longer a draft.</source>
+        <translation>Diese Version ist kein Entwurf mehr.</translation>
+    </message>
+    <message>
+        <source>You may not publish this draft.</source>
+        <translation>Sie dürfen diesen Entwurf nicht veröffentlichen.</translation>
+    </message>
+    <message>
+        <source>Required fields are empty: %fields. Open the draft in the edit form to complete it.</source>
+        <translation>Pflichtfelder sind leer: %fields. Öffnen Sie den Entwurf im Bearbeitungsformular, um ihn zu vervollständigen.</translation>
+    </message>
+    <message>
+        <source>You may not remove this draft.</source>
+        <translation>Sie dürfen diesen Entwurf nicht entfernen.</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence only accepts POST requests.</source>
+        <translation>Exponential Intelligence nimmt nur POST-Anfragen an.</translation>
+    </message>
+    <message>
+        <source>The form token is missing or wrong. Please reload the page.</source>
+        <translation>Das Formular-Token fehlt oder ist falsch. Bitte laden Sie die Seite neu.</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence is switched off.</source>
+        <translation>Exponential Intelligence ist ausgeschaltet.</translation>
+    </message>
+    <message>
+        <source>You do not have access to Exponential Intelligence.</source>
+        <translation>Sie haben keinen Zugriff auf Exponential Intelligence.</translation>
+    </message>
+    <message>
+        <source>Choosing a model is switched off on this site.</source>
+        <translation>Die Wahl des Modells ist auf dieser Website ausgeschaltet.</translation>
+    </message>
+    <message>
+        <source>This model is not available.</source>
+        <translation>Dieses Modell ist nicht verfügbar.</translation>
+    </message>
+    <message>
+        <source>This conversation has reached its limit of %max drafts. Start a new conversation to write more.</source>
+        <translation>Diese Unterhaltung hat ihre Grenze von %max Entwürfen erreicht. Beginnen Sie eine neue Unterhaltung, um mehr zu schreiben.</translation>
+    </message>
+    <message>
+        <source>Give the fields to write.</source>
+        <translation>Geben Sie die zu schreibenden Felder an.</translation>
+    </message>
+    <message>
+        <source>Please choose the target language.</source>
+        <translation>Bitte wählen Sie die Zielsprache.</translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to rewrite.</source>
+        <translation>Das Feld ist leer: Es gibt nichts umzuschreiben.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/fieldaction</name>
+    <message>
+        <source>Write</source>
+        <translation>Schreiben</translation>
+    </message>
+    <message>
+        <source>Rewrite</source>
+        <translation>Umschreiben</translation>
+    </message>
+    <message>
+        <source>Shorten</source>
+        <translation>Kürzen</translation>
+    </message>
+    <message>
+        <source>Translate</source>
+        <translation>Übersetzen</translation>
+    </message>
+    <message>
+        <source>Suggest</source>
+        <translation>Vorschlagen</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/label</name>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation>Exponential Intelligence</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence (Powered by Claude from Anthropic)</source>
+        <translation>Exponential Intelligence (Bereitgestellt von Claude von Anthropic)</translation>
+    </message>
+    <message>
+        <source>This version was written with Exponential Intelligence (Powered by Claude from Anthropic).</source>
+        <translation>Diese Version wurde mit Exponential Intelligence (Bereitgestellt von Claude von Anthropic) geschrieben.</translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>Modell</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/limits</name>
+    <message>
+        <source>when you start a new conversation</source>
+        <translation>wenn Sie eine neue Unterhaltung beginnen</translation>
+    </message>
+    <message>
+        <source>when you log in again</source>
+        <translation>wenn Sie sich neu anmelden</translation>
+    </message>
+    <message>
+        <source>at %time</source>
+        <translation>am %time</translation>
+    </message>
+    <message>
+        <source>API rate limits</source>
+        <translation>API-Ratenbegrenzungen</translation>
+    </message>
+    <message>
+        <source>No request has reported its rate limits yet.</source>
+        <translation>Noch keine Anfrage hat ihre Ratenbegrenzungen gemeldet.</translation>
+    </message>
+    <message>
+        <source>Spend limit</source>
+        <translation>Ausgabenlimit</translation>
+    </message>
+    <message>
+        <source>The organisation's monthly spend limit is not available through an API key; see it in the Anthropic Console.</source>
+        <translation>Das monatliche Ausgabenlimit der Organisation ist über einen API-Schlüssel nicht abrufbar; Sie finden es in der Anthropic Console.</translation>
+    </message>
+    <message>
+        <source>Limits</source>
+        <translation>Grenzen</translation>
+    </message>
+    <message>
+        <source>This conversation</source>
+        <translation>Diese Unterhaltung</translation>
+    </message>
+    <message>
+        <source>This session</source>
+        <translation>Diese Sitzung</translation>
+    </message>
+    <message>
+        <source>Today, tokens</source>
+        <translation>Heute, Tokens</translation>
+    </message>
+    <message>
+        <source>Today, cost</source>
+        <translation>Heute, Kosten</translation>
+    </message>
+    <message>
+        <source>This month, tokens</source>
+        <translation>Dieser Monat, Tokens</translation>
+    </message>
+    <message>
+        <source>This month, cost</source>
+        <translation>Dieser Monat, Kosten</translation>
+    </message>
+    <message>
+        <source>Site this month, tokens</source>
+        <translation>Website diesen Monat, Tokens</translation>
+    </message>
+    <message>
+        <source>Site this month, cost</source>
+        <translation>Website diesen Monat, Kosten</translation>
+    </message>
+    <message>
+        <source>%used of %max (%percent %)</source>
+        <translation>%used von %max (%percent %)</translation>
+    </message>
+    <message>
+        <source>Resets with a new conversation.</source>
+        <translation>Beginnt mit einer neuen Unterhaltung neu.</translation>
+    </message>
+    <message>
+        <source>Resets when you log in again.</source>
+        <translation>Beginnt neu, wenn Sie sich neu anmelden.</translation>
+    </message>
+    <message>
+        <source>Resets %time.</source>
+        <translation>Beginnt neu am %time.</translation>
+    </message>
+    <message>
+        <source>No limits configured.</source>
+        <translation>Keine Grenzen eingerichtet.</translation>
+    </message>
+    <message>
+        <source>How to set limits</source>
+        <translation>So richten Sie Grenzen ein</translation>
+    </message>
+    <message>
+        <source>API rate limits (as of %time)</source>
+        <translation>API-Ratenbegrenzungen (Stand %time)</translation>
+    </message>
+    <message>
+        <source>Requests per minute</source>
+        <translation>Anfragen pro Minute</translation>
+    </message>
+    <message>
+        <source>Input tokens per minute</source>
+        <translation>Eingabe-Tokens pro Minute</translation>
+    </message>
+    <message>
+        <source>Output tokens per minute</source>
+        <translation>Ausgabe-Tokens pro Minute</translation>
+    </message>
+    <message>
+        <source>%remaining of %max left</source>
+        <translation>Noch %remaining von %max</translation>
+    </message>
+    <message>
+        <source>The last request was rate limited; retry after %s seconds.</source>
+        <translation>Die letzte Anfrage wurde begrenzt; erneut versuchen nach %s Sekunden.</translation>
+    </message>
+    <message>
+        <source>Top users this month</source>
+        <translation>Die meisten Tokens diesen Monat</translation>
+    </message>
+    <message>
+        <source>User %id</source>
+        <translation>Benutzer %id</translation>
+    </message>
+    <message>
+        <source>tokens</source>
+        <translation>Tokens</translation>
+    </message>
+    <message>
+        <source>tokens per conversation</source>
+        <translation>Tokens pro Unterhaltung</translation>
+    </message>
+    <message>
+        <source>tokens per session</source>
+        <translation>Tokens pro Sitzung</translation>
+    </message>
+    <message>
+        <source>tokens per day</source>
+        <translation>Tokens pro Tag</translation>
+    </message>
+    <message>
+        <source>cost per day</source>
+        <translation>Kosten pro Tag</translation>
+    </message>
+    <message>
+        <source>tokens per month</source>
+        <translation>Tokens pro Monat</translation>
+    </message>
+    <message>
+        <source>cost per month</source>
+        <translation>Kosten pro Monat</translation>
+    </message>
+    <message>
+        <source>tokens of the whole site per month</source>
+        <translation>Tokens der ganzen Website pro Monat</translation>
+    </message>
+    <message>
+        <source>cost of the whole site per month</source>
+        <translation>Kosten der ganzen Website pro Monat</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/links</name>
+    <message>
+        <source>deleted</source>
+        <translation>gelöscht</translation>
+    </message>
+    <message>
+        <source>in trash</source>
+        <translation>im Papierkorb</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Ansehen</translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation>Bearbeiten</translation>
+    </message>
+    <message>
+        <source>Prompt again</source>
+        <translation>Erneut anfragen</translation>
+    </message>
+    <message>
+        <source>Intelligence tab</source>
+        <translation>Reiter Intelligenz</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/log</name>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation>Exponential Intelligence</translation>
+    </message>
+    <message>
+        <source>Log</source>
+        <translation>Protokoll</translation>
+    </message>
+    <message>
+        <source>Day</source>
+        <translation>Tag</translation>
+    </message>
+    <message>
+        <source>Powered by Claude from Anthropic</source>
+        <translation>Bereitgestellt von Claude von Anthropic</translation>
+    </message>
+    <message>
+        <source>Requests and usage</source>
+        <translation>Anfragen und Verbrauch</translation>
+    </message>
+    <message>
+        <source>Versions written</source>
+        <translation>Geschriebene Versionen</translation>
+    </message>
+    <message>
+        <source>Everyone's activity.</source>
+        <translation>Die Aktivität aller.</translation>
+    </message>
+    <message>
+        <source>Your own activity.</source>
+        <translation>Ihre eigene Aktivität.</translation>
+    </message>
+    <message>
+        <source>From</source>
+        <translation>Von</translation>
+    </message>
+    <message>
+        <source>To</source>
+        <translation>Bis</translation>
+    </message>
+    <message>
+        <source>User ID</source>
+        <translation>Benutzer-ID</translation>
+    </message>
+    <message>
+        <source>Node ID</source>
+        <translation>Knoten-ID</translation>
+    </message>
+    <message>
+        <source>Action</source>
+        <translation>Aktion</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>Alle</translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>Modell</translation>
+    </message>
+    <message>
+        <source>Errors only</source>
+        <translation>Nur Fehler</translation>
+    </message>
+    <message>
+        <source>Filter</source>
+        <translation>Filtern</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation>Zurücksetzen</translation>
+    </message>
+    <message>
+        <source>Export CSV</source>
+        <translation>CSV exportieren</translation>
+    </message>
+    <message>
+        <source>Totals of the filtered requests</source>
+        <translation>Summen der gefilterten Anfragen</translation>
+    </message>
+    <message>
+        <source>Requests</source>
+        <translation>Anfragen</translation>
+    </message>
+    <message>
+        <source>Input tokens</source>
+        <translation>Eingabe-Tokens</translation>
+    </message>
+    <message>
+        <source>Output tokens</source>
+        <translation>Ausgabe-Tokens</translation>
+    </message>
+    <message>
+        <source>Cache write / read</source>
+        <translation>Cache schreiben / lesen</translation>
+    </message>
+    <message>
+        <source>Estimated cost</source>
+        <translation>Geschätzte Kosten</translation>
+    </message>
+    <message>
+        <source>not configured</source>
+        <translation>nicht eingerichtet</translation>
+    </message>
+    <message>
+        <source>Average latency</source>
+        <translation>Mittlere Latenz</translation>
+    </message>
+    <message>
+        <source>Error rate</source>
+        <translation>Fehlerquote</translation>
+    </message>
+    <message>
+        <source>Tool calls</source>
+        <translation>Werkzeugaufrufe</translation>
+    </message>
+    <message>
+        <source>Drafts written</source>
+        <translation>Geschriebene Entwürfe</translation>
+    </message>
+    <message>
+        <source>Only the newest 20000 requests are counted; narrow the filter.</source>
+        <translation>Nur die neuesten 20000 Anfragen werden gezählt; schränken Sie den Filter ein.</translation>
+    </message>
+    <message>
+        <source>Per day</source>
+        <translation>Pro Tag</translation>
+    </message>
+    <message>
+        <source>Errors</source>
+        <translation>Fehler</translation>
+    </message>
+    <message>
+        <source>Per user</source>
+        <translation>Pro Benutzer</translation>
+    </message>
+    <message>
+        <source>Turns</source>
+        <translation>Durchgänge</translation>
+    </message>
+    <message>
+        <source>A turn is one message in the panel, one field action or one "Fill the fields", with every request it led to. Open a turn for its requests and tool calls.</source>
+        <translation>Ein Durchgang ist eine Nachricht im Bereich, eine Feldaktion oder ein "Felder ausfüllen" mit allen Anfragen, zu denen es führte. Öffnen Sie einen Durchgang für seine Anfragen und Werkzeugaufrufe.</translation>
+    </message>
+    <message>
+        <source>Sort</source>
+        <translation>Sortieren</translation>
+    </message>
+    <message>
+        <source>Time</source>
+        <translation>Zeit</translation>
+    </message>
+    <message>
+        <source>Latency</source>
+        <translation>Latenz</translation>
+    </message>
+    <message>
+        <source>node</source>
+        <translation>Knoten</translation>
+    </message>
+    <message>
+        <source>user</source>
+        <translation>Benutzer</translation>
+    </message>
+    <message>
+        <source>%count request(s)</source>
+        <translation>%count Anfrage(n)</translation>
+    </message>
+    <message>
+        <source>%in in / %out out</source>
+        <translation>%in ein / %out aus</translation>
+    </message>
+    <message>
+        <source>cache %w / %r</source>
+        <translation>Cache %w / %r</translation>
+    </message>
+    <message>
+        <source>cost not configured</source>
+        <translation>Kosten nicht eingerichtet</translation>
+    </message>
+    <message>
+        <source>%count draft(s)</source>
+        <translation>%count Entwurf/Entwürfe</translation>
+    </message>
+    <message>
+        <source>%count error(s)</source>
+        <translation>%count Fehler</translation>
+    </message>
+    <message>
+        <source>Tokens in / out / cache write / read</source>
+        <translation>Tokens ein / aus / Cache schreiben / lesen</translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation>Ende</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation>Werkzeuge</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Fehler</translation>
+    </message>
+    <message>
+        <source>%count retry</source>
+        <translation>%count Wiederholung</translation>
+    </message>
+    <message>
+        <source>No requests match.</source>
+        <translation>Keine passenden Anfragen.</translation>
+    </message>
+    <message>
+        <source>Content</source>
+        <translation>Inhalt</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation>Version</translation>
+    </message>
+    <message>
+        <source>Written</source>
+        <translation>Geschrieben</translation>
+    </message>
+    <message>
+        <source>Where</source>
+        <translation>Wo</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Status</translation>
+    </message>
+    <message>
+        <source>Request</source>
+        <translation>Anfrage</translation>
+    </message>
+    <message>
+        <source>Links</source>
+        <translation>Verweise</translation>
+    </message>
+    <message>
+        <source>(no access)</source>
+        <translation>(kein Zugriff)</translation>
+    </message>
+    <message>
+        <source>(removed)</source>
+        <translation>(entfernt)</translation>
+    </message>
+    <message>
+        <source>Edit form</source>
+        <translation>Bearbeitungsformular</translation>
+    </message>
+    <message>
+        <source>Panel</source>
+        <translation>Bereich</translation>
+    </message>
+    <message>
+        <source>Saved as draft</source>
+        <translation>Als Entwurf gespeichert</translation>
+    </message>
+    <message>
+        <source>Waiting for approval</source>
+        <translation>Wartet auf Freigabe</translation>
+    </message>
+    <message>
+        <source>Published</source>
+        <translation>Veröffentlicht</translation>
+    </message>
+    <message>
+        <source>Discarded</source>
+        <translation>Verworfen</translation>
+    </message>
+    <message>
+        <source>Draft</source>
+        <translation>Entwurf</translation>
+    </message>
+    <message>
+        <source>Nothing written with Exponential Intelligence yet.</source>
+        <translation>Noch nichts mit Exponential Intelligence geschrieben.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/model</name>
+    <message>
+        <source>The model you chose is no longer available; the default is used.</source>
+        <translation>Das gewählte Modell ist nicht mehr verfügbar; die Voreinstellung wird verwendet.</translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>Modell</translation>
+    </message>
+    <message>
+        <source>(default)</source>
+        <translation>(Voreinstellung)</translation>
+    </message>
+    <message>
+        <source>Reset to default</source>
+        <translation>Auf Voreinstellung zurücksetzen</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/panel</name>
+    <message>
+        <source>(The answer was cut off at the length limit.)</source>
+        <translation>(Die Antwort wurde an der Längengrenze abgeschnitten.)</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation>Exponential Intelligence</translation>
+    </message>
+    <message>
+        <source>Powered by Claude from Anthropic</source>
+        <translation>Bereitgestellt von Claude von Anthropic</translation>
+    </message>
+    <message>
+        <source>Ask for new content under "%name" or for changes to it. Everything is written as drafts that you own; nothing is published until you decide.</source>
+        <translation>Bitten Sie um neue Inhalte unter "%name" oder um Änderungen daran. Alles wird als Entwürfe geschrieben, die Ihnen gehören; nichts wird veröffentlicht, bevor Sie es entscheiden.</translation>
+    </message>
+    <message>
+        <source>You</source>
+        <translation>Sie</translation>
+    </message>
+    <message>
+        <source>%count lookup(s)</source>
+        <translation>%count Nachschlagen</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence is working...</source>
+        <translation>Exponential Intelligence arbeitet...</translation>
+    </message>
+    <message>
+        <source>Something went wrong:</source>
+        <translation>Etwas ist schiefgegangen:</translation>
+    </message>
+    <message>
+        <source>The server did not answer in time. Please try again.</source>
+        <translation>Der Server hat nicht rechtzeitig geantwortet. Bitte versuchen Sie es erneut.</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>Fortsetzen</translation>
+    </message>
+    <message>
+        <source>The last answer was interrupted.</source>
+        <translation>Die letzte Antwort wurde unterbrochen.</translation>
+    </message>
+    <message>
+        <source>Start a new conversation? The drafts stay.</source>
+        <translation>Eine neue Unterhaltung beginnen? Die Entwürfe bleiben erhalten.</translation>
+    </message>
+    <message>
+        <source>No drafts yet.</source>
+        <translation>Noch keine Entwürfe.</translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation>Bearbeiten</translation>
+    </message>
+    <message>
+        <source>View version</source>
+        <translation>Version ansehen</translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation>Öffnen</translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation>Verwerfen</translation>
+    </message>
+    <message>
+        <source>Discard the draft "%name"? This cannot be undone.</source>
+        <translation>Den Entwurf "%name" verwerfen? Das kann nicht rückgängig gemacht werden.</translation>
+    </message>
+    <message>
+        <source>Version %version</source>
+        <translation>Version %version</translation>
+    </message>
+    <message>
+        <source>Draft</source>
+        <translation>Entwurf</translation>
+    </message>
+    <message>
+        <source>Saved as draft</source>
+        <translation>Als Entwurf gespeichert</translation>
+    </message>
+    <message>
+        <source>Waiting for approval</source>
+        <translation>Wartet auf Freigabe</translation>
+    </message>
+    <message>
+        <source>Published</source>
+        <translation>Veröffentlicht</translation>
+    </message>
+    <message>
+        <source>Waits for approval when sent</source>
+        <translation>Wartet nach dem Senden auf Freigabe</translation>
+    </message>
+    <message>
+        <source>May wait for approval when sent</source>
+        <translation>Wartet nach dem Senden möglicherweise auf Freigabe</translation>
+    </message>
+    <message>
+        <source>Published at once when sent (no approval applies)</source>
+        <translation>Wird beim Senden sofort veröffentlicht (keine Freigabe nötig)</translation>
+    </message>
+    <message>
+        <source>Select at least one draft.</source>
+        <translation>Wählen Sie mindestens einen Entwurf aus.</translation>
+    </message>
+    <message>
+        <source>%count will wait for approval</source>
+        <translation>%count wartet/warten auf Freigabe</translation>
+    </message>
+    <message>
+        <source>%count may wait for approval</source>
+        <translation>%count wartet/warten möglicherweise auf Freigabe</translation>
+    </message>
+    <message>
+        <source>%count will be published at once (no approval applies)</source>
+        <translation>%count wird/werden sofort veröffentlicht (keine Freigabe nötig)</translation>
+    </message>
+    <message>
+        <source>Send %count draft(s)? %summary.</source>
+        <translation>%count Entwurf/Entwürfe senden? %summary.</translation>
+    </message>
+    <message>
+        <source>Kept as drafts. You find them under My drafts.</source>
+        <translation>Als Entwürfe behalten. Sie finden sie unter Meine Entwürfe.</translation>
+    </message>
+    <message>
+        <source>"%name" was published.</source>
+        <translation>"%name" wurde veröffentlicht.</translation>
+    </message>
+    <message>
+        <source>"%name" is waiting for approval.</source>
+        <translation>"%name" wartet auf Freigabe.</translation>
+    </message>
+    <message>
+        <source>"%name" was not published: the publishing workflow stopped it. It is still a draft.</source>
+        <translation>"%name" wurde nicht veröffentlicht: Der Veröffentlichungs-Workflow hat es angehalten. Es ist weiterhin ein Entwurf.</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence (Powered by Claude from Anthropic)</source>
+        <translation>Exponential Intelligence (Bereitgestellt von Claude von Anthropic)</translation>
+    </message>
+    <message>
+        <source>Show older</source>
+        <translation>Ältere anzeigen</translation>
+    </message>
+    <message>
+        <source>Expand all</source>
+        <translation>Alle aufklappen</translation>
+    </message>
+    <message>
+        <source>Collapse all</source>
+        <translation>Alle zuklappen</translation>
+    </message>
+    <message>
+        <source>Conversation</source>
+        <translation>Unterhaltung</translation>
+    </message>
+    <message>
+        <source>Your request</source>
+        <translation>Ihre Anfrage</translation>
+    </message>
+    <message>
+        <source>For example: Write three short articles about our spring events under this folder.</source>
+        <translation>Zum Beispiel: Schreibe in diesem Ordner drei kurze Artikel über unsere Frühlingsveranstaltungen.</translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation>Senden</translation>
+    </message>
+    <message>
+        <source>New conversation</source>
+        <translation>Neue Unterhaltung</translation>
+    </message>
+    <message>
+        <source>Drafts written with Exponential Intelligence</source>
+        <translation>Mit Exponential Intelligence geschriebene Entwürfe</translation>
+    </message>
+    <message>
+        <source>Save as drafts</source>
+        <translation>Als Entwürfe speichern</translation>
+    </message>
+    <message>
+        <source>Send for approval</source>
+        <translation>Zur Freigabe senden</translation>
+    </message>
+    <message>
+        <source>"Save as drafts" keeps the selected drafts; you find them under My drafts and can edit them in the normal edit form. "Send for approval" publishes them the normal way: where an approval workflow applies they wait for the approver, otherwise they are published at once. Each draft says which applies.</source>
+        <translation>"Als Entwürfe speichern" behält die ausgewählten Entwürfe; Sie finden sie unter Meine Entwürfe und können sie im normalen Bearbeitungsformular bearbeiten. "Zur Freigabe senden" veröffentlicht sie auf dem normalen Weg: Wo ein Freigabe-Workflow greift, warten sie auf die freigebende Person, sonst werden sie sofort veröffentlicht. Bei jedem Entwurf steht, was gilt.</translation>
+    </message>
+    <message>
+        <source>All drafts written with Exponential Intelligence</source>
+        <translation>Alle mit Exponential Intelligence geschriebenen Entwürfe</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/step</name>
+    <message>
+        <source>Unknown tool %tool</source>
+        <translation>Unbekanntes Werkzeug %tool</translation>
+    </message>
+    <message>
+        <source>An answer was too long and was cut off; retrying</source>
+        <translation>Eine Antwort war zu lang und wurde abgeschnitten; neuer Versuch</translation>
+    </message>
+    <message>
+        <source>Used the tool %tool</source>
+        <translation>Werkzeug %tool verwendet</translation>
+    </message>
+    <message>
+        <source>Created the draft "%name"</source>
+        <translation>Entwurf "%name" angelegt</translation>
+    </message>
+    <message>
+        <source>Read the class "%class"</source>
+        <translation>Klasse "%class" gelesen</translation>
+    </message>
+    <message>
+        <source>Read "%name"</source>
+        <translation>"%name" gelesen</translation>
+    </message>
+    <message>
+        <source>Looked at the content tree around "%name"</source>
+        <translation>Inhaltsbaum um "%name" angesehen</translation>
+    </message>
+    <message>
+        <source>Listed the children of node %id</source>
+        <translation>Unterelemente von Knoten %id aufgelistet</translation>
+    </message>
+    <message>
+        <source>Checked which content you may create here</source>
+        <translation>Geprüft, welche Inhalte Sie hier anlegen dürfen</translation>
+    </message>
+    <message>
+        <source>Wrote the draft "%name"</source>
+        <translation>Entwurf "%name" geschrieben</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/tab</name>
+    <message>
+        <source>Intelligence</source>
+        <translation>Intelligenz</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/usage</name>
+    <message>
+        <source>Estimated at prices as of %date; Anthropic's invoice is authoritative.</source>
+        <translation>Geschätzt mit den Preisen vom %date; maßgeblich ist die Rechnung von Anthropic.</translation>
+    </message>
+    <message>
+        <source>Period</source>
+        <translation>Zeitraum</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>Heute</translation>
+    </message>
+    <message>
+        <source>7d</source>
+        <translation>7 T</translation>
+    </message>
+    <message>
+        <source>30d</source>
+        <translation>30 T</translation>
+    </message>
+    <message>
+        <source>Month</source>
+        <translation>Monat</translation>
+    </message>
+    <message>
+        <source>Scope</source>
+        <translation>Umfang</translation>
+    </message>
+    <message>
+        <source>Mine</source>
+        <translation>Meiner</translation>
+    </message>
+    <message>
+        <source>Site</source>
+        <translation>Website</translation>
+    </message>
+    <message>
+        <source>Usage of the site</source>
+        <translation>Verbrauch der Website</translation>
+    </message>
+    <message>
+        <source>Your usage</source>
+        <translation>Ihr Verbrauch</translation>
+    </message>
+    <message>
+        <source>Estimated cost</source>
+        <translation>Geschätzte Kosten</translation>
+    </message>
+    <message>
+        <source>Tokens</source>
+        <translation>Tokens</translation>
+    </message>
+    <message>
+        <source>in</source>
+        <translation>ein</translation>
+    </message>
+    <message>
+        <source>out</source>
+        <translation>aus</translation>
+    </message>
+    <message>
+        <source>cached</source>
+        <translation>Cache</translation>
+    </message>
+    <message>
+        <source>Requests</source>
+        <translation>Anfragen</translation>
+    </message>
+    <message>
+        <source>average %time s</source>
+        <translation>durchschnittlich %time s</translation>
+    </message>
+    <message>
+        <source>%count error</source>
+        <translation>%count Fehler</translation>
+    </message>
+    <message>
+        <source>%count errors</source>
+        <translation>%count Fehler</translation>
+    </message>
+    <message>
+        <source>Drafts</source>
+        <translation>Entwürfe</translation>
+    </message>
+    <message>
+        <source>%count sent or published</source>
+        <translation>%count gesendet oder veröffentlicht</translation>
+    </message>
+    <message>
+        <source>Estimated cost per day</source>
+        <translation>Geschätzte Kosten pro Tag</translation>
+    </message>
+    <message>
+        <source>Tokens per day</source>
+        <translation>Tokens pro Tag</translation>
+    </message>
+    <message>
+        <source>Chart</source>
+        <translation>Diagramm</translation>
+    </message>
+    <message>
+        <source>Cost</source>
+        <translation>Kosten</translation>
+    </message>
+    <message>
+        <source>today</source>
+        <translation>heute</translation>
+    </message>
+    <message>
+        <source>Details in the log</source>
+        <translation>Details im Protokoll</translation>
+    </message>
+    <message>
+        <source>Compared with the period before</source>
+        <translation>Im Vergleich zum Zeitraum davor</translation>
+    </message>
+</context>
+</TS>

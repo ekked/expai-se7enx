@@ -1,0 +1,38 @@
+<?php
+/**
+ * A tool for expai (doc/extending.md, "A new tool"): how many children a node has, per class.
+ * Runs as the current user: readableNode() checks content/read, subTreeCount() applies the user's limitations.
+ */
+class expAiExampleToolCountChildren extends expAiTool
+{
+    public function description()
+    {
+        return 'Counts the children of a node per class (only those you may read). Without node_id: the open node.';
+    }
+
+    public function inputSchema()
+    {
+        return array( 'type' => 'object', 'properties' => array(
+            'node_id' => array( 'type' => 'integer', 'description' => 'The node (default: the open node)' ),
+        ), 'additionalProperties' => false );
+    }
+
+    public function execute( array $input, expAiToolContext $context )
+    {
+        $node = $context->reader->readableNode( $this->nodeID( $input, $context ) );
+        $counts = array();
+        foreach ( $context->reader->children( $node, 200 ) as $child )
+            $counts[$child['class_identifier']] = ( isset( $counts[$child['class_identifier']] ) ? $counts[$child['class_identifier']] : 0 ) + 1;
+        return array( 'node_id' => (int) $node->attribute( 'node_id' ), 'children_per_class' => $counts );
+    }
+
+    public function stepText( array $input )
+    {
+        return 'Counted the children of node %id';
+    }
+
+    public function stepArguments( array $input, $result )
+    {
+        return array( '%id' => isset( $result['node_id'] ) ? $result['node_id'] : '' );
+    }
+}

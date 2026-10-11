@@ -1,0 +1,4 @@
+# expai: never commit secrets or local files
+*.append.php.local
+.DS_Store
+node_modules/

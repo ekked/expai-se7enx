@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<software>
+    <metadata>
+        <name>Exponential Intelligence (Powered by Claude from Anthropic)</name>
+        <version>0.1.0</version>
+        <copyright>Copyright (C) 1998 - 2026 7x &amp; Exponential Foundation. All rights reserved.</copyright>
+        <license>GNU General Public License v2.0 (or any later version)</license>
+        <info_url>https://github.com/se7enxweb/expai</info_url>
+        <description>A writing assistant for the Exponential administration interface: a conversation panel on the content full view and controls in the content edit form. It writes drafts only, as the logged-in editor and with the editor's permissions, labels them "Exponential Intelligence" and leaves publishing (with approval where the site requires it) to the editor.</description>
+
+        <software>
+            <uses>
+                <name>Anthropic Messages API (Claude)</name>
+                <license>Anthropic Commercial Terms of Service (a service, no software included)</license>
+                <copyright>Claude and Anthropic are trademarks of Anthropic, PBC.</copyright>
+                <info_url>https://docs.anthropic.com/</info_url>
+                <version>2023-06-01</version>
+            </uses>
+        </software>
+    </metadata>
+
+    <dependencies>
+        <requires>
+            <extension name="ezjscore" />
+        </requires>
+    </dependencies>
+</software>
