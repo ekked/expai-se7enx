@@ -764,10 +764,20 @@ StatusFile=/var/lib/expai-llm/status.json
 Models[]=qwen3.5:4b
 
 [McpBridge]
-# enabled: the panel can use audited read tools of the extension expmcp in process, as the current user, named
-# exp__<tool> (policy expai/mcp with Server "exp"). Only tools audited in expAiMcp::BRIDGE_TOOLS are accepted.
+# enabled: the panel can use the bridge-safe read tools of the extension expmcp in process, as the current user,
+# named exp__<tool> (policy expai/mcp with Server "exp"). Tools[] is the opt-in allowlist; a name expmcp does not
+# declare bridge-safe (expMcpBridge::isBridgeSafe(), expmcp 0.3.1 or later) is ignored. With an older expmcp only
+# exp_content_query is offered. Also bridge-safe, not listed by default: exp_url, exp_access_check.
 Enabled=disabled
+Tools[]
 Tools[]=exp_content_query
+Tools[]=exp_content_get
+Tools[]=exp_search
+Tools[]=exp_content_relations
+Tools[]=exp_content_versions
+Tools[]=exp_content_meta
+Tools[]=exp_class_list
+Tools[]=exp_class_describe
 
 [McpSettings]
 # External MCP servers (streamable HTTP), each [McpServer_<id>] (id: a-z and 0-9, at most 20 characters).

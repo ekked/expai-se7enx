@@ -8,29 +8,53 @@ expai can use tools of MCP servers in the panel, in two layers. Both are read-on
 ```ini
 [McpBridge]
 Enabled=enabled
+Tools[]
 Tools[]=exp_content_query
+Tools[]=exp_content_get
+Tools[]=exp_search
+Tools[]=exp_content_relations
+Tools[]=exp_content_versions
+Tools[]=exp_content_meta
+Tools[]=exp_class_list
+Tools[]=exp_class_describe
 ```
 
-Audited read tools of the extension expmcp are called in the same PHP process, as the current user, named
-`exp__<tool>` (e.g. `exp__exp_content_query`). The tool object is built the way expmcp builds it, with its own security
-object (expmcp's siteaccess allowlist, `expmcp.ini [Security] AllowedSiteAccesses`, still applies, and writes are off)
-and a logger that drops everything; expmcp is not changed. Nodes the data policy keeps away from the panel's provider
-are left out of the results.
+Read tools of the extension expmcp are called in the same PHP process, as the current user, named `exp__<tool>`
+(e.g. `exp__exp_content_get`). expai calls them through expmcp's own bridge seam, `expMcpBridge` (expmcp 0.3.1 or
+later; its `doc/bridge.md`):
 
-Only tools audited in `expAiMcp::BRIDGE_TOOLS` are accepted; any other name in `Tools[]` is ignored with a warning.
+- **Which tools**: expmcp decides which of its tools are safe in process (`expMcpBridge::isBridgeSafe()`); `Tools[]`
+  is expai's opt-in allowlist on top. A name expmcp does not declare bridge-safe is ignored with a warning.
+- **As the current user**: `expMcpBridge::call()` runs the tool in bridge mode, as `eZUser::currentUser()`, never as
+  expmcp's service or write account. Every answer is limited to what the editor may read; content he may not read is
+  answered like content that does not exist. No bridge tool writes.
+- **The siteaccess allowlist** of expmcp (`expmcp.ini [Security] AllowedSiteAccesses`) still applies: on another
+  siteaccess a call is a tool error.
+- **Description and schema** come from expmcp (`expMcpBridge::description()`, `inputSchema()`), prefixed with
+  "[Exponential, read only]".
+- **The data policy** of the panel's provider applies on top of the user's read access: rows of `nodes`
+  (`exp_content_query`), `items` (`exp_search`, `exp_content_relations`, the `drafts` and `pending` lists of
+  `exp_content_versions`) and `locations` whose object the policy keeps away are left out (counted as
+  `withheld_by_data_policy`), and an answer about one object it keeps away (a top-level `object_id` or `node_id`, as
+  from `exp_content_get`, `exp_content_meta` or `exp_url`) is a tool error.
 
-| expmcp tool | Verdict (2026-10-11) | Why |
+| expmcp tool | Bridge-safe | Offered by default |
 | --- | --- | --- |
-| `exp_content_query` | allowed | the subtree fetch applies the current user's read limitations |
-| `exp_content_get` | refused | fetches any object without `canRead()` |
-| `exp_search` | refused | runs as expmcp's service user |
-| `exp_fetch` | refused | runs any template fetch function |
-| every write tool | refused | the panel writes only through its own draft tools |
+| `exp_content_query`, `exp_content_get`, `exp_search` | yes | yes |
+| `exp_content_relations`, `exp_content_versions`, `exp_content_meta` | yes | yes |
+| `exp_class_list`, `exp_class_describe` | yes | yes |
+| `exp_url`, `exp_access_check` | yes | no (administration parts; add them to `Tools[]` if wanted) |
+| `exp_fetch`, `exp_solr_query`, `exp_user_get`, `exp_role_describe`, the system and every write tool | no | never |
+
+**An older expmcp** (before 0.3.1, no `expMcpBridge`): only `exp_content_query` is offered, built the old way with
+expmcp's own security object and a logger that drops everything; the other names are ignored with a notice.
 
 expai's own lookup tools (`get_node`, `list_children`, ...) already cover most reading; the bridge adds expmcp's
-richer content query (attribute filters, sorting, depth). A cleaner seam would be a constructor of expmcp's tools
-without the security and logger objects (or a small factory such as `expMcpToolBase::forCurrentUser()`); the bridge
-does not need it.
+richer content query (attribute filters, sorting, depth), search, relations, versions and metadata.
+
+Tests: `tests/expaiprovider_test.php` (the bridge-safe set, the old-expmcp fallback and the data-policy filter, no
+database writes) and `tests/expaibridge_e2e_test.php` (an administrator and a restricted user the test creates and
+removes again).
 
 ## External MCP servers
 

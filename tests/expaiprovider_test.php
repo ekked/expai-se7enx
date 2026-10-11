@@ -286,7 +286,79 @@ $check( 'ssrf: credentials in the URL refused', $e !== null, true );
 $check( 'ssrf: loopback allowed when enabled', ( new expAiMcpClient( array( 'ServerId' => 't', 'URL' => 'http://127.0.0.1:9/mcp', 'AllowLoopback' => 'enabled' ) ) )->checkedUrl(), 'http://127.0.0.1:9/mcp' );
 $check( 'mcp: tool names', array( expAiMcp::isMcpTool( 'exp__exp_content_query' ), expAiMcp::isExternal( 'exp__x' ), expAiMcp::isExternal( 'mcp__docs__s' ), expAiMcp::isMcpTool( 'get_node' ) ),
         array( true, false, true, false ) );
-$check( 'mcp: only audited bridge tools', expAiMcpBridgeTool::create( 'exp_content_get' ), null );
+// ---------------------------------------------------------------- MCP bridge (expmcp's expMcpBridge seam)
+$check( 'bridge: shipped Tools[] are bridge-safe', array_values( array_filter( $shipped->variable( 'McpBridge', 'Tools' ), function ( $n ) { return class_exists( 'expMcpBridge' ) && !expAiMcp::bridgeSafe( $n ); } ) ), array() );
+if ( class_exists( 'expMcpBridge' ) )
+{
+    $check( 'bridge: the seam is detected', expAiMcp::hasBridgeSeam(), true );
+    $check( 'bridge: exp_content_get is bridge-safe', expAiMcp::bridgeSafe( 'exp_content_get' ), true );
+    $check( 'bridge: exp_fetch is not', expAiMcp::bridgeSafe( 'exp_fetch' ), false );
+    $check( 'bridge: the names are expmcp\'s', expAiMcp::bridgeSafeNames(), expMcpBridge::toolNames() );
+    $check( 'bridge: a tool that is not bridge-safe is not offered', expAiMcpBridgeTool::create( 'exp_fetch' ), null );
+    $check( 'bridge: a write tool is not offered', expAiMcpBridgeTool::create( 'exp_content_publish' ), null );
+    $get = expAiMcpBridgeTool::create( 'exp_content_get' );
+    $check( 'bridge: exp_content_get is offered as exp__exp_content_get', $get ? $get->name() : null, 'exp__exp_content_get' );
+    $check( 'bridge: description from expmcp, marked read only', $get ? $get->description() : null, '[Exponential, read only] ' . expMcpBridge::description( 'exp_content_get' ) );
+    $check( 'bridge: schema from expmcp', $get ? $get->inputSchema() : null, expMcpBridge::inputSchema( 'exp_content_get' ) );
+    $check( 'bridge: no write', $get ? $get->writes() : null, false );
+
+    // an older expmcp without expMcpBridge: only exp_content_query, built the old way
+    expAiMcp::$bridgeSeam = false;
+    $check( 'old expmcp: no seam', expAiMcp::hasBridgeSeam(), false );
+    $check( 'old expmcp: exp_content_get is not offered', expAiMcpBridgeTool::create( 'exp_content_get' ), null );
+    $check( 'old expmcp: the names', expAiMcp::bridgeSafeNames(), array( 'exp_content_query' ) );
+    $old = expAiMcpBridgeTool::create( 'exp_content_query' );
+    $check( 'old expmcp: exp_content_query is offered', $old ? $old->name() : null, 'exp__exp_content_query' );
+    $check( 'old expmcp: its schema from the tool class', $old ? $old->inputSchema() : null, expMcpContentTool::queryInputSchema() );
+    expAiMcp::$bridgeSeam = null;
+}
+else
+    $check( 'bridge: without expMcpBridge only the old set', expAiMcp::bridgeSafeNames(), class_exists( 'expMcpContentTool' ) ? array( 'exp_content_query' ) : array() );
+
+// the data policy on bridge answers: a reader that keeps chosen objects away
+$denyReader = new class( $config ) extends expAiContentReader
+{
+    public $deny = array();
+    public function policy() { return true; }
+    public function allowed( eZContentObject $object ) { return !in_array( (int) $object->attribute( 'id' ), $this->deny, true ); }
+    public function assertAllowed( eZContentObject $object )
+    {
+        if ( !$this->allowed( $object ) )
+            throw new expAiException( 'kept away', 'data policy' );
+    }
+};
+$rootNode = eZContentObjectTreeNode::fetch( 2 );
+$children = $rootNode ? $rootNode->subTree( array( 'Depth' => 1, 'Limit' => 2, 'Limitation' => array() ) ) : array();
+if ( $rootNode && count( $children ) === 2 )
+{
+    $keepObject = (int) $children[0]->attribute( 'contentobject_id' );
+    $keepNode = (int) $children[0]->attribute( 'node_id' );
+    $denyObject = (int) $children[1]->attribute( 'contentobject_id' );
+    $denyNode = (int) $children[1]->attribute( 'node_id' );
+    $denyReader->deny = array( $denyObject );
+    $answer = array( 'total' => 3, 'returned' => 3, 'items' => array(
+        array( 'node_id' => $keepNode, 'object_id' => $keepObject ),
+        array( 'node_id' => null, 'object_id' => $denyObject ),
+        array( 'node_id' => $denyNode ) ) );
+    $filtered = expAiMcpBridgeTool::applyDataPolicy( $answer, $denyReader );
+    $check( 'policy: items keeps the allowed row', array_column( $filtered['items'], 'object_id' ), array( $keepObject ) );
+    $check( 'policy: items returned recounted', $filtered['returned'], 1 );
+    $check( 'policy: items withheld counted (by object_id and by node_id)', $denyReader->withheld, 2 );
+    $denyReader->withheld = 0;
+    $filtered = expAiMcpBridgeTool::applyDataPolicy( array( 'returned' => 2, 'nodes' => array( array( 'node_id' => $keepNode, 'object_id' => $keepObject ), array( 'node_id' => $denyNode, 'object_id' => $denyObject ) ) ), $denyReader );
+    $check( 'policy: nodes filtered', array_column( $filtered['nodes'], 'node_id' ), array( $keepNode ) );
+    $denyReader->withheld = 0;
+    $e = $thrown( function () use ( $denyReader, $denyObject ) { expAiMcpBridgeTool::applyDataPolicy( array( 'object_id' => $denyObject, 'name' => 'x' ), $denyReader ); } );
+    $check( 'policy: an answer about a kept-away object (object_id) is an error', $e ? $e->getMessage() : null, 'kept away' );
+    $e = $thrown( function () use ( $denyReader, $denyNode ) { expAiMcpBridgeTool::applyDataPolicy( array( 'node_id' => $denyNode, 'url' => '/x' ), $denyReader ); } );
+    $check( 'policy: an answer about a kept-away node (node_id) is an error', $e ? $e->getMessage() : null, 'kept away' );
+    $check( 'policy: an answer about an allowed object passes', expAiMcpBridgeTool::applyDataPolicy( array( 'object_id' => $keepObject, 'locations' => array( array( 'node_id' => $keepNode ) ) ), $denyReader ),
+            array( 'object_id' => $keepObject, 'locations' => array( array( 'node_id' => $keepNode ) ) ) );
+    $check( 'policy: an error answer passes unchanged', expAiMcpBridgeTool::applyDataPolicy( array( 'error' => 'no', 'object_id' => $denyObject ), $denyReader ), array( 'error' => 'no', 'object_id' => $denyObject ) );
+    $check( 'policy: without a policy nothing is filtered', expAiMcpBridgeTool::applyDataPolicy( $answer, new expAiContentReader( $config ) ), $answer );
+}
+else
+    $check( 'policy: node 2 needs two children for the bridge policy checks', count( $children ), 2 );
 
 echo ( $failures ? 'FAIL' : 'PASS' ) . " $checks checks, $failures failure(s)\n";
 $script = eZScript::instance();

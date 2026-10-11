@@ -10,8 +10,9 @@
 /**
  * expai as an MCP client, two layers:
  *
- *   exp__<tool>            the in-process bridge to audited read tools of the extension expmcp, run as the current
- *                          user ([McpBridge] Enabled, Tools[]; policy expai/mcp with Server "exp")
+ *   exp__<tool>            the in-process bridge to the bridge-safe read tools of the extension expmcp
+ *                          (expMcpBridge), run as the current user ([McpBridge] Enabled, Tools[] as the opt-in
+ *                          allowlist; policy expai/mcp with Server "exp")
  *   mcp__<server>__<tool>  external MCP servers over streamable HTTP ([McpSettings] Servers[], [McpServer_<id>]
  *                          URL, AllowedTools[] ...; policy expai/mcp with Server <id>)
  *
@@ -21,17 +22,42 @@
 class expAiMcp
 {
     /**
-     * The expmcp tools audited for the bridge: name => array( class, method, parameters, description method,
-     * schema method ). Only tools whose kernel calls apply the current user's permissions are here.
-     *
-     * Audited and refused (2026-10-11): exp_content_get (fetches any object without canRead()), exp_search (runs as
-     * expmcp's service user), exp_fetch (runs arbitrary fetch functions), and every write tool.
+     * The bridge with an older expmcp, before 0.3.1 brought its own bridge seam (expMcpBridge): name => array( class,
+     * method, parameters, description method, schema method ). Only exp_content_query applied the current user's
+     * permissions there. With expMcpBridge, expMcpBridge::isBridgeSafe() decides instead (see bridgeSafe()).
      */
-    const BRIDGE_TOOLS = array(
+    const LEGACY_BRIDGE_TOOLS = array(
         'exp_content_query' => array( 'expMcpContentTool', 'runQuery',
             array( 'parent_node_id', 'class_identifier', 'depth', 'limit', 'offset', 'sort_by', 'attribute_filter', 'name_contains', 'main_node_only', 'with_child_count' ),
             'queryDescription', 'queryInputSchema' ),
     );
+
+    /** @var bool|null tests only: true or false pretends expmcp has or lacks the bridge seam; null detects it */
+    public static $bridgeSeam = null;
+
+    /** @return bool expmcp offers the bridge seam expMcpBridge (0.3.1 or later) */
+    public static function hasBridgeSeam()
+    {
+        if ( self::$bridgeSeam !== null )
+            return self::$bridgeSeam && class_exists( 'expMcpBridge' );
+        return class_exists( 'expMcpBridge' ) && method_exists( 'expMcpBridge', 'call' ) && method_exists( 'expMcpBridge', 'isBridgeSafe' );
+    }
+
+    /** @return bool expmcp may run the tool in process as the current user */
+    public static function bridgeSafe( $name )
+    {
+        if ( self::hasBridgeSeam() )
+            return expMcpBridge::isBridgeSafe( (string) $name );
+        return isset( self::LEGACY_BRIDGE_TOOLS[(string) $name] );
+    }
+
+    /** @return string[] the expmcp tools the bridge could offer with the installed expmcp */
+    public static function bridgeSafeNames()
+    {
+        if ( self::hasBridgeSeam() )
+            return expMcpBridge::toolNames();
+        return class_exists( 'expMcpContentTool' ) ? array_keys( self::LEGACY_BRIDGE_TOOLS ) : array();
+    }
 
     /** @return bool the name is an MCP tool (bridge or external) */
     public static function isMcpTool( $name )

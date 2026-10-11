@@ -312,8 +312,8 @@ See [mcp.md](mcp.md).
 
 | Setting | Default | Effect |
 | --- | --- | --- |
-| `[McpBridge] Enabled` | `disabled` | `enabled`: audited read tools of the extension expmcp, in process as the current user (`exp__<tool>`, policy `expai/mcp` with Server `exp`). |
-| `[McpBridge] Tools[]` | `exp_content_query` | The expmcp tools offered; only the audited ones are accepted. |
+| `[McpBridge] Enabled` | `disabled` | `enabled`: the bridge-safe read tools of the extension expmcp, in process as the current user (`exp__<tool>`, policy `expai/mcp` with Server `exp`). |
+| `[McpBridge] Tools[]` | `exp_content_query`, `exp_content_get`, `exp_search`, `exp_content_relations`, `exp_content_versions`, `exp_content_meta`, `exp_class_list`, `exp_class_describe` | The opt-in allowlist of expmcp tools offered; names expmcp does not declare bridge-safe are ignored (with expmcp before 0.3.1 only `exp_content_query`). |
 | `[McpSettings] Servers[]` | (none) | External MCP servers (streamable HTTP), each `[McpServer_<id>]` (id: a-z, 0-9, at most 20 characters). |
 
 | `[McpServer_<id>]` setting | Effect |
