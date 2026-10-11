@@ -45,6 +45,13 @@ $schema = array (
         'not_null' => '1',
         'default' => '',
       ),
+      'model_alias' => 
+      array (
+        'length' => 100,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
       'modified' => 
       array (
         'length' => 11,
@@ -58,6 +65,13 @@ $schema = array (
         'type' => 'int',
         'not_null' => '1',
         'default' => 0,
+      ),
+      'provider' => 
+      array (
+        'length' => 40,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => 'anthropic',
       ),
       'turn_count' => 
       array (
@@ -175,6 +189,13 @@ $schema = array (
         'not_null' => '1',
         'default' => '',
       ),
+      'provider' => 
+      array (
+        'length' => 40,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => 'anthropic',
+      ),
       'source' => 
       array (
         'length' => 20,
@@ -238,6 +259,113 @@ $schema = array (
         'fields' => 
         array (
           0 => 'node_id',
+        ),
+      ),
+    ),
+  ),
+  'expai_probe_result' => 
+  array (
+    'name' => 'expai_probe_result',
+    'fields' => 
+    array (
+      'created' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'details' => 
+      array (
+        'type' => 'longtext',
+        'default' => false,
+      ),
+      'id' => 
+      array (
+        'type' => 'auto_increment',
+        'default' => false,
+      ),
+      'probe_mode' => 
+      array (
+        'length' => 10,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'model' => 
+      array (
+        'length' => 100,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'model_alias' => 
+      array (
+        'length' => 100,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'pass_rate' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'passed' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'provider' => 
+      array (
+        'length' => 40,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'tasks' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'tool_mode' => 
+      array (
+        'length' => 10,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'user_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+    ),
+    'indexes' => 
+    array (
+      'PRIMARY' => 
+      array (
+        'type' => 'primary',
+        'fields' => 
+        array (
+          0 => 'id',
+        ),
+      ),
+      'expai_probe_result_alias' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'model_alias',
+          1 => 'created',
         ),
       ),
     ),
@@ -336,7 +464,21 @@ $schema = array (
         'not_null' => '1',
         'default' => 0,
       ),
+      'mcp_calls' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
       'model' => 
+      array (
+        'length' => 100,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'model_alias' => 
       array (
         'length' => 100,
         'type' => 'varchar',
@@ -369,10 +511,38 @@ $schema = array (
         'type' => 'longtext',
         'default' => false,
       ),
+      'reasoning_tokens' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'region' => 
+      array (
+        'length' => 10,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'reported_cost_micros' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
       'request_debug' => 
       array (
         'type' => 'longtext',
         'default' => false,
+      ),
+      'retention' => 
+      array (
+        'length' => 10,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
       ),
       'retries' => 
       array (
@@ -406,6 +576,13 @@ $schema = array (
         'type' => 'int',
         'not_null' => '1',
         'default' => 0,
+      ),
+      'tool_mode' => 
+      array (
+        'length' => 10,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
       ),
       'tool_ms' => 
       array (
@@ -445,6 +622,15 @@ $schema = array (
         'fields' => 
         array (
           0 => 'created',
+        ),
+      ),
+      'expai_usage_log_provider' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'provider',
+          1 => 'created',
         ),
       ),
       'expai_usage_log_user' => 

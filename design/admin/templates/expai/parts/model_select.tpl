@@ -1,4 +1,5 @@
-{* The model choice (preference expai_model): a select of [AISettings] AllowedModels[], the default marked. expai.js
+{* The model choice (preference expai_model, a model alias): the models the user may choose, grouped by provider, each
+   with its region, tool mode, relative cost and "slow" for a local model; the default marked. expai.js
    saves a change through expai::model. Parameters: compact (bool), reset (bool: show "Reset to default"), cached (bool:
    the page is view-cached, so the default is selected here and expai.js selects the user's choice from expai::load). *}
 {def $exp_ai_models = fetch( 'expai', 'models' )}
@@ -6,8 +7,12 @@
 <span class="exp-ai-model{if first_set( $compact, false() )} exp-ai-model-compact{/if}">
     <label>{'Model'|i18n( 'extension/expai/model' )}
         <select class="exp-ai-model-select" data-default="{$exp_ai_models.default|wash}">
-{foreach $exp_ai_models.allowed as $exp_ai_id => $exp_ai_label}
-            <option value="{$exp_ai_id|wash}"{if eq( $exp_ai_id, cond( first_set( $cached, false() ), $exp_ai_models.default, $exp_ai_models.current ) )} selected="selected"{/if}>{$exp_ai_label|wash}{if eq( $exp_ai_id, $exp_ai_models.default )} {'(default)'|i18n( 'extension/expai/model' )}{/if}</option>
+{foreach $exp_ai_models.groups as $exp_ai_group}
+{if gt( $exp_ai_models.groups|count, 1 )}            <optgroup label="{$exp_ai_group.label|wash}{if $exp_ai_group.region} ({$exp_ai_group.region|upcase|wash}){/if}">{/if}
+{foreach $exp_ai_group.models as $exp_ai_m}
+            <option value="{$exp_ai_m.alias|wash}"{if eq( $exp_ai_m.alias, cond( first_set( $cached, false() ), $exp_ai_models.default, $exp_ai_models.current ) )} selected="selected"{/if}>{$exp_ai_m.label|wash}{if eq( $exp_ai_m.alias, $exp_ai_models.default )} {'(default)'|i18n( 'extension/expai/model' )}{/if}{if gt( $exp_ai_models.groups|count, 1 )} &middot; {$exp_ai_m.cost|wash}{if $exp_ai_m.slow} &middot; {'slow'|i18n( 'extension/expai/model' )}{/if}{if eq( $exp_ai_m.tool_use, 'prompted' )} &middot; {'prompted tools'|i18n( 'extension/expai/model' )}{elseif eq( $exp_ai_m.tool_use, 'none' )} &middot; {'no tools'|i18n( 'extension/expai/model' )}{/if}{if $exp_ai_m.writes|not} &middot; {'read only'|i18n( 'extension/expai/model' )}{/if}{/if}</option>
+{/foreach}
+{if gt( $exp_ai_models.groups|count, 1 )}            </optgroup>{/if}
 {/foreach}
         </select>
     </label>

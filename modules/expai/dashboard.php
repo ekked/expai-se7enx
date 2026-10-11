@@ -79,6 +79,10 @@ $summary = expAiUsage::periodSummary( $summaryUser, $period );
 $chartDays = array( 'today' => 7, '7d' => 7, '30d' => 30, 'month' => max( 7, (int) date( 'j' ) ) );
 $config = expAiConfig::instance();
 $models = $config->allowedModels();
+$providerFilters = array( 'from' => $summary['range']['from'], 'to' => $summary['range']['to'] );
+if ( $summaryUser !== false )
+    $providerFilters['user_id'] = (int) $summaryUser;
+$perProvider = expAiUsage::aggregate( $providerFilters );
 
 $tpl = eZTemplate::factory();
 $tpl->setVariable( 'error', $error );
@@ -107,6 +111,7 @@ $tpl->setVariable( 'limits', array_values( array_filter( expAiLimits::status(), 
     return $l['max'] > 0 && ( $l['scope'] === 'user' || $canSeeSite );
 } ) ) );
 $tpl->setVariable( 'rate_limits', expAiLimits::latestRateLimits() );
+$tpl->setVariable( 'per_provider', $perProvider['per_provider'] );
 $monthStats = $canSeeSite && $scope === 'site' ? expAiUsage::aggregate( array( 'from' => expAiLimits::periodStart( 'month' ) ) ) : false;
 $tpl->setVariable( 'top_users', $monthStats ? array_slice( $monthStats['per_user'], 0, 5 ) : array() );
 $tpl->setVariable( 'drafts', expAiDashboard::myDrafts( 0, 5 ) );

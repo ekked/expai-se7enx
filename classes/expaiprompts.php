@@ -28,14 +28,29 @@ class expAiPrompts
     }
 
     /**
+     * ", powered by <model> from <provider>" for the model the current user uses (", powered by Claude from
+     * Anthropic" for the Anthropic models, as before).
+     * @return string
+     */
+    public static function poweredBy( expAiConfig $config, $alias = null )
+    {
+        $registry = $config->registry();
+        $model = $registry->getModel( $alias !== null ? $alias : $config->effectiveModel() );
+        if ( !$model || $model['provider'] === 'anthropic' )
+            return ', powered by Claude from Anthropic';
+        $provider = $registry->getProvider( $model['provider'] );
+        return ', powered by the model ' . expAiText::oneLine( $model['label'] ) . ( $provider ? ' via ' . expAiText::oneLine( (string) $provider['Label'] ) : '' );
+    }
+
+    /**
      * The system prompt of the full view panel.
      * @return string
      */
-    public static function panelSystem( eZContentObjectTreeNode $node, eZUser $user, expAiConfig $config )
+    public static function panelSystem( eZContentObjectTreeNode $node, eZUser $user, expAiConfig $config, $writes = true, $mode = 'native' )
     {
         $object = $node->object();
         $lines = array(
-            'You are Exponential Intelligence, the writing assistant of the Exponential content management system, powered by Claude from Anthropic. You work inside the administration interface for one editor.',
+            'You are Exponential Intelligence, the writing assistant of the Exponential content management system' . self::poweredBy( $config ) . '. You work inside the administration interface for one editor.',
             '',
             'The editor has the content node ' . (int) $node->attribute( 'node_id' ) . ' open: "' . expAiText::oneLine( $node->attribute( 'name' ) )
                 . '" (class ' . $node->attribute( 'class_identifier' ) . ', object ' . (int) $node->attribute( 'contentobject_id' )
@@ -44,7 +59,8 @@ class expAiPrompts
             '',
             'How to work:',
             '- Use the lookup tools to inform yourself before writing: get_class_definition for the fields of a class, get_node and list_children for the current content and the style of similar items, list_creatable_classes for what the editor may create here, get_tree_context for the surroundings.',
-            '- To write, use create_draft (a new object) or update_draft (a change to an existing object). Make one call per object. Fill every required writable field.',
+            $writes ? '- To write, use create_draft (a new object) or update_draft (a change to an existing object). Make one call per object. Fill every required writable field.'
+                    : '- In this conversation you can only read: you cannot create or change drafts. When the editor asks for text, write it in your answer, field by field, so the editor can copy it into the edit form.',
             '- When the request is unclear in a way that matters (how many items, which class, tone, length, language), ask one short question instead of guessing. When it is clear, act.',
             '- Keep your replies short. After writing, list what you wrote (name and object id) and what the editor still has to do (for example images, or fields you could not write).',
             '',
@@ -63,7 +79,7 @@ class expAiPrompts
     public static function fieldSystem( expAiConfig $config )
     {
         $lines = array(
-            'You are Exponential Intelligence, the writing assistant of the Exponential content management system, powered by Claude from Anthropic. You help an editor with one field of the content they are editing. Your answer is placed into the edit form for the editor to review; nothing is saved until the editor saves.',
+            'You are Exponential Intelligence, the writing assistant of the Exponential content management system' . self::poweredBy( $config ) . '. You help an editor with one field of the content they are editing. Your answer is placed into the edit form for the editor to review; nothing is saved until the editor saves.',
             'Answer with JSON only: {"value": the new value of the field, "note": a short remark for the editor or an empty string}.',
             'Rules:',
             self::rules(),

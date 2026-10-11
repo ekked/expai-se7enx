@@ -61,6 +61,139 @@ ConnectTimeout=10
 # The longest answer accepted from the provider, in bytes.
 MaxResponseBytes=4194304
 
+# Where Anthropic processes the requests (us, eu or local) and how long it keeps them (none, zdr, 30d or unknown),
+# for the data policy ([DataPolicy]) and the region shown per request. 30d: the commercial terms keep API data up
+# to 30 days for abuse monitoring unless zero data retention was agreed. Check your own contract and write the day
+# you did into TermsCheckedAt (YYYY-MM-DD; empty: not checked).
+Region=us
+Retention=30d
+TermsCheckedAt=
+
+[ProviderSettings]
+# The providers the model picker offers, in this order. "anthropic" without a [Provider_anthropic] group is built
+# from [AISettings] above (the settings of 0.1.0), with one model anthropic.<id> per [AISettings] AllowedModels[].
+# Add another with Providers[]=<id> and a [Provider_<id>] group; its models are the [Model_<alias>] groups that name
+# it. The groups below are examples that are not active until listed here (and given a key in settings/override).
+Providers[]=anthropic
+
+# The site default model alias (empty: anthropic.<[AISettings] Model>).
+DefaultModel=
+
+# The models of these providers can be chosen by every user with expai/write (as in 0.1.0). The models of every
+# other provider need the policy expai/model_use (limitation Provider). Empty it ("ProvidersWithoutPolicy[]" alone)
+# to require the policy for every choice but the site default.
+ProvidersWithoutPolicy[]=anthropic
+
+# A provider: Type=anthropic | openai_chat | custom (Class=<class implementing expAiProvider>)
+#   BaseURL         the API (openai_chat: the base, /chat/completions is added; anthropic: the messages URL)
+#   ApiKey          ONLY in settings/override; ApiKeyHeader authorization (Bearer, default of openai_chat) |
+#                   x-api-key (default of anthropic) | api-key (Azure) | x-goog-api-key | none (a local server)
+#   Headers[]       extra request headers ("Name: value"; key headers are refused)
+#   Flavor          openai | huggingface | openrouter | mistral | xai | ollama | llamacpp | generic (small differences)
+#   Region          us | eu | local; Retention none | zdr | 30d | unknown; TermsCheckedAt YYYY-MM-DD
+#   ExtraBody       a JSON object merged into every request body (e.g. OpenRouter provider routing)
+#   Timeout, ConnectTimeout, MaxResponseBytes, RateLimitHeaders[] (glob patterns of headers kept for the log),
+#   RetryAfterMax (seconds of retry-after waited for once, default 5), RetryOnServerError (enabled)
+#   Label           the name in the picker and in error texts; Managed=ollama: a local server expai/models manages
+#
+# Example: Hugging Face Inference Providers (router). The model id may end in :fastest, :cheapest, :preferred or
+# :<provider> to choose the inference provider; pin one provider for a known data processor.
+[Provider_huggingface]
+Type=openai_chat
+Flavor=huggingface
+Label=Hugging Face
+BaseURL=https://router.huggingface.co/v1
+ApiKey=
+Region=us
+Retention=unknown
+TermsCheckedAt=
+Timeout=115
+
+# Example: OpenRouter. It reports the cost of every request (usage.cost), which the log shows as "reported".
+# ExtraBody keeps requests away from endpoints that store or train on data.
+[Provider_openrouter]
+Type=openai_chat
+Flavor=openrouter
+Label=OpenRouter
+BaseURL=https://openrouter.ai/api/v1
+ApiKey=
+Headers[]
+Headers[]=X-OpenRouter-Title: Exponential Intelligence
+ExtraBody={"provider":{"data_collection":"deny","zdr":true}}
+Region=us
+Retention=zdr
+TermsCheckedAt=
+Timeout=115
+
+# Example: Mistral (EU hosting).
+[Provider_mistral]
+Type=openai_chat
+Flavor=mistral
+Label=Mistral
+BaseURL=https://api.mistral.ai/v1
+ApiKey=
+Region=eu
+Retention=30d
+TermsCheckedAt=
+Timeout=115
+
+# Example: a local Ollama on this server (see doc/local-models.md). No key; nothing leaves the server.
+[Provider_local]
+Type=openai_chat
+Flavor=ollama
+Label=Local model
+BaseURL=http://127.0.0.1:11434/v1
+ApiKeyHeader=none
+Region=local
+Retention=none
+TermsCheckedAt=
+Timeout=280
+Managed=ollama
+
+# A model: Provider, Id (what the API expects), Label, ToolUse=native | prompted | none, WriteTools=enabled (drafts;
+# also needs a passed probe unless WriteGate=trusted), Capabilities[] (json_schema, json_object, reasoning_effort,
+# tool_choice_none, no_tool_choice, vision), MaxOutput, Effort, prices per million tokens (InputPerMTok,
+# OutputPerMTok, CacheWritePerMTok, CacheReadPerMTok; 0 = free; none: [Pricing] by Id, else "cost unknown"),
+# Slow=true ("slow" in the picker; default for Region=local), MaxTokensParameter, ParallelToolCalls, ExtraBody.
+# The ids below are the examples of the providers' documentation on 2026-10-11: check the provider's model list.
+[Model_huggingface.gpt-oss-120b]
+Provider=huggingface
+Id=openai/gpt-oss-120b:fastest
+Label=gpt-oss-120b (Hugging Face)
+ToolUse=native
+WriteTools=enabled
+Capabilities[]=json_schema
+Capabilities[]=reasoning_effort
+Effort=low
+MaxOutput=8000
+
+[Model_openrouter.gpt-oss-120b]
+Provider=openrouter
+Id=openai/gpt-oss-120b
+Label=gpt-oss-120b (OpenRouter)
+ToolUse=native
+WriteTools=enabled
+Capabilities[]=json_schema
+Capabilities[]=reasoning_effort
+Effort=low
+MaxOutput=8000
+
+[Model_local.qwen3.5-4b]
+Provider=local
+Id=qwen3.5:4b
+Label=Qwen3.5 4B (local)
+ToolUse=native
+WriteTools=enabled
+Capabilities[]=json_object
+Capabilities[]=reasoning_effort
+Capabilities[]=no_tool_choice
+# thinking off: much faster on a CPU
+Effort=none
+MaxOutput=2000
+InputPerMTok=0
+OutputPerMTok=0
+Slow=true
+
 [AssistantSettings]
 # The most provider calls one message of the editor may lead to (each tool round is one call).
 # The last allowed call is made without tools, so the assistant always answers in words.
@@ -255,6 +388,9 @@ MaxTokensPerSitePerMonth=
 MaxCostPerSitePerMonth=
 # The most model calls one editor message may lead to; empty: [AssistantSettings] MaxToolIterations.
 MaxRequestsPerTurn=
+# All users together on one provider per month, e.g. ProviderMaxCostPerMonth[openrouter]=20
+ProviderMaxTokensPerMonth[]
+ProviderMaxCostPerMonth[]
 
 [Pricing]
 # Prices per million tokens per model (USD) for the ESTIMATED cost on expai/log and the dashboard. Anthropic's invoice
@@ -321,5 +457,63 @@ InputPerMTok[claude-haiku-4-5-20251001]=1
 CacheWritePerMTok[claude-haiku-4-5-20251001]=1.25
 CacheReadPerMTok[claude-haiku-4-5-20251001]=0.10
 OutputPerMTok[claude-haiku-4-5-20251001]=5
+
+[DataPolicy]
+# Where content may be sent (doc/data-policy.md). Every provider has a Region (us, eu, local) and a Retention (none,
+# zdr, 30d, unknown). A requirement names the regions content may go to, separated by ";"; a local provider meets
+# every region requirement. Zero retention is met by Retention=none or zdr. Without any rule everything is allowed.
+# Regions any content may go to (empty: every region):
+DefaultRegions[]
+# SectionRegions[<section id>]=eu;local   ClassRegions[<class identifier>]=local
+SectionRegions[]
+ClassRegions[]
+# enabled: every request needs zero retention
+ZeroRetention=disabled
+ZeroRetentionSections[]
+ZeroRetentionClasses[]
+
+[ProbeSettings]
+# The pass rate (percent) of a live probe (bin/php/expaiprobe.php --model=<alias> --live) a model needs before it may
+# write drafts (WriteTools=enabled, ToolUse=native, and not WriteGate=trusted).
+WritePassRate=90
+# The node and class the probe tasks name (nothing is read or written: the tools are not run). Empty: the content root.
+NodeID=
+ClassIdentifier=folder
+
+[LocalModelSettings]
+# A local Ollama managed through expai/models (doc/local-models.md). The web process never runs commands: it writes a
+# request into the spool directory, which a root-owned helper (share/systemd/) carries out.
+SpoolDirectory=/var/lib/expai-llm/spool
+StatusFile=/var/lib/expai-llm/status.json
+# The models the view offers to pull and remove (the helper has its own allowlist, /etc/expai-llm/models.allow).
+Models[]=qwen3.5:4b
+
+[McpBridge]
+# enabled: the panel can use audited read tools of the extension expmcp in process, as the current user, named
+# exp__<tool> (policy expai/mcp with Server "exp"). Only tools audited in expAiMcp::BRIDGE_TOOLS are accepted.
+Enabled=disabled
+Tools[]=exp_content_query
+
+[McpSettings]
+# External MCP servers (streamable HTTP), each [McpServer_<id>] (id: a-z and 0-9, at most 20 characters).
+Servers[]
+
+# Example (not active until listed in Servers[]):
+[McpServer_docs]
+Label=Documentation search
+# https only; http only for a loopback address with AllowLoopback=enabled
+URL=https://mcp.example.org/mcp
+# ONLY in settings/override
+Token=
+# The tools the panel may call; everything else the server offers is ignored.
+AllowedTools[]=search_docs
+Region=us
+Retention=unknown
+MaxResultBytes=16000
+Timeout=20
+ToolsCacheTTL=3600
+ProtocolVersion=2025-06-18
+AllowLoopback=disabled
+AllowPrivate=disabled
 
 */ ?>

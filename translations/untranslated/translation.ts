@@ -91,7 +91,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%model, set in expai.ini [AISettings] Model (%placement: %file); change it there.</source>
+        <source>%model, set in expai.ini (%placement: %file); change it there.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -281,10 +281,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The request could not be sent to Exponential Intelligence.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The answer of Exponential Intelligence could not be read.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -345,6 +341,14 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>The data policy keeps "%name" (object %id) away from %provider: %rule.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The data policy keeps content of the class %class away from %provider: %rule.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>The draft was not found.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -394,6 +398,58 @@
     </message>
     <message>
         <source>The limit %limit is reached (%used of %max). It resets %reset.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This model is not on the list of allowed local models.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please choose a model.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The local model helper is not installed (the spool directory is missing or not writable).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The request could not be written for the local model helper.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The answer of %provider could not be read.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%provider refused the request (access). Please tell the administrator.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%provider refused the request (no credit left). Please tell the administrator.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%provider is busy or over its limit. Please try again later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The request is too long for %provider.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%provider does not know the configured model. Please tell the administrator.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%provider did not answer in time. Please try again with a smaller request.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%provider reported an error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The request could not be sent to Exponential Intelligence.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -460,6 +516,42 @@
         <source>The field is empty: there is nothing to rewrite.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>The tool %tool failed: %error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The MCP server %server is not configured correctly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The MCP server %server could not be reached.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The MCP server %server is not allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The MCP server %server reported an error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The MCP server %server refused the request (access).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The MCP server %server sent an answer that could not be read.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The external tool %tool reported an error: %error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No local model server is configured.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/fieldaction</name>
@@ -518,6 +610,14 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>cost of the provider %provider per month</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>tokens of the provider %provider per month</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>API rate limits</source>
         <translation type="unfinished"></translation>
     </message>
@@ -535,6 +635,14 @@
     </message>
     <message>
         <source>Limits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Provider %provider this month, cost</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Provider %provider this month, tokens</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -752,6 +860,14 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Provider</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Region</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Errors only</source>
         <translation type="unfinished"></translation>
     </message>
@@ -848,6 +964,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Provider and region</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>node</source>
         <translation type="unfinished"></translation>
     </message>
@@ -868,7 +988,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>reported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>cost not configured</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count reasoning tokens</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -979,15 +1107,306 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Model</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>(default)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>slow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>prompted tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>no tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>read only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Reset to default</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/models</name>
+    <message>
+        <source>The request %id was handed to the local model helper.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Models</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Models and providers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Providers, regions, probe results and the local model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keys in the wrong place</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Region</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Retention</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Terms checked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>not checked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>present</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>not needed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>missing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Id</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drafts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Probe</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cost</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>slow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>prompted JSON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>native</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>may write</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>trusted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>read only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>live %rate% (%passed/%tasks)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>no live probe</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>mock %rate%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test prompt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%output tokens in %seconds s (%tps tokens/s), model %model:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A model writes drafts only with native tool calling and a live probe pass rate of at least %threshold% (bin/php/expaiprobe.php --model=&lt;alias&gt; --live), unless it is marked trusted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A data policy is active: content of some sections or classes only goes to providers in the regions it allows.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No data policy rule is set: content may go to every active provider.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local model server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>State</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>running</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unknown while stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Helper</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count waiting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>not installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>last run %time: %result</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start the server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop the server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pull the model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove the model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh the status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send to the helper</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Install the helper of share/systemd/ (doc/local-models.md) to start, stop and pull models from here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MCP tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exponential bridge</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>on, but the extension expmcp is not active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>region unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>token present</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>no token</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No external MCP server is configured.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1193,7 +1612,19 @@
 <context>
     <name>extension/expai/step</name>
     <message>
+        <source>A tool call had unreadable arguments; retrying</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Unknown tool %tool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This model may not write drafts (%tool refused)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Writing refused after an external tool result (%tool)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1230,6 +1661,14 @@
     </message>
     <message>
         <source>Wrote the draft "%name"</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Queried the content (%tool)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Asked the external tool %tool</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1331,6 +1770,30 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>By provider</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Provider</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Region</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cost</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Errors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Estimated cost per day</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1340,10 +1803,6 @@
     </message>
     <message>
         <source>Chart</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cost</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

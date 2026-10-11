@@ -43,6 +43,7 @@ class expAiDraftLog extends eZPersistentObject
                 'source' => $str( 'Source' ),
                 'status' => $str( 'Status', self::STATUS_DRAFT ),
                 'model' => $str( 'Model' ),
+                'provider' => $str( 'Provider', 'anthropic' ),
                 'prompt_summary' => $str( 'PromptSummary' ),
                 'created' => $int( 'Created' ),
                 'modified' => $int( 'Modified' ),

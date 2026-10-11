@@ -124,14 +124,16 @@ class expAiDashboard
         return array(
             'enabled' => $config->isEnabled(),
             'configured' => $config->isConfigured(),
-            'provider' => (string) $config->get( 'AISettings', 'Provider', 'anthropic' ),
+            'provider' => (string) ( ( $m = $config->registry()->getModel( $config->model() ) ) ? $m['provider'] : 'anthropic' ),
             'model' => $config->model(),
+            'model_label' => $m ? (string) $m['label'] : $config->model(),
+            'can_manage' => expAiServerFunctions::hasPolicy( 'model_manage' ),
             'placement' => expAiServerFunctions::hasPolicy( 'settings' ) ? $config->modelPlacement() : false,
             'create' => $word( 'content', 'create' ),
             'edit' => $word( 'content', 'edit' ),
             'publish_note' => self::approvalWorkflowExists(),
             'recent' => $recent,
-            'tables' => !expAiSchema::missingTables( $db ),
+            'tables' => !expAiSchema::missingTables( $db ) && !expAiSchema::missingColumns( $db ),
         );
     }
 }

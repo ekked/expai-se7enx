@@ -18,6 +18,8 @@
  *   MaxTokensPerUserPerMonth, MaxCostPerUserPerMonth   (reset on the 1st of the month)
  *   MaxTokensPerSitePerMonth, MaxCostPerSitePerMonth   all users together (reset on the 1st)
  *   MaxRequestsPerTurn         model calls per editor message (expAiAssistant)
+ *   ProviderMaxTokensPerMonth[<provider>], ProviderMaxCostPerMonth[<provider>]
+ *                              all users together on one provider (reset on the 1st)
  */
 class expAiLimits
 {
@@ -41,6 +43,24 @@ class expAiLimits
             'site_month_tokens' => array( 'MaxTokensPerSitePerMonth', 'tokens', 'site', 'month' ),
             'site_month_cost' => array( 'MaxCostPerSitePerMonth', 'cost', 'site', 'month' ),
         );
+    }
+
+    /**
+     * The per-provider limits that are set: [Limits] ProviderMaxTokensPerMonth[<provider>], ProviderMaxCostPerMonth[<provider>].
+     * @return array key (provider_month_tokens:<id> ...) => array( setting, unit, scope (site), period (month), provider, max )
+     */
+    public static function providerDefinitions( ?expAiConfig $config = null )
+    {
+        $config = $config ?: expAiConfig::instance();
+        $out = array();
+        foreach ( array( 'ProviderMaxTokensPerMonth' => array( 'provider_month_tokens', 'tokens' ), 'ProviderMaxCostPerMonth' => array( 'provider_month_cost', 'cost' ) ) as $setting => $def )
+        {
+            $values = $config->get( 'Limits', $setting, array() );
+            foreach ( is_array( $values ) ? $values : array() as $provider => $max )
+                if ( is_numeric( $max ) && (float) $max > 0 && preg_match( '/^[a-z0-9_-]{1,40}$/', (string) $provider ) )
+                    $out[$def[0] . ':' . $provider] = array( $setting . '[' . $provider . ']', $def[1], 'site', 'month', (string) $provider, (float) $max );
+        }
+        return $out;
     }
 
     /** @return int the start of the period (Unix time) */
@@ -110,6 +130,26 @@ class expAiLimits
                                 'used' => $unit === 'cost' ? round( $used, 4 ) : (int) $used, 'max' => $max, 'percent' => $percent,
                                 'level' => $level, 'reset' => self::periodEnd( $period ), 'cost_known' => $t['cost_known'] );
         }
+        foreach ( self::providerDefinitions( $config ) as $key => $def )
+        {
+            list( $setting, $unit, $scope, $period, $provider, $max ) = $def;
+            if ( isset( $context['provider'] ) && $context['provider'] !== $provider && !empty( $context['only_provider'] ) )
+                continue;
+            $filters = array( 'provider' => $provider, 'from' => self::periodStart( $period ) );
+            $cacheKey = md5( serialize( $filters ) );
+            if ( !isset( $cache[$cacheKey] ) )
+            {
+                $agg = expAiUsage::aggregate( $filters );
+                $cache[$cacheKey] = $agg['totals'];
+            }
+            $t = $cache[$cacheKey];
+            $used = $unit === 'cost' ? (float) $t['cost'] : (float) ( $t['input'] + $t['output'] + $t['cache_write'] + $t['cache_read'] );
+            $percent = min( 100, round( 100 * $used / $max, 1 ) );
+            $level = $used >= $max ? 'over' : ( $percent >= 90 ? 'high' : ( $percent >= 75 ? 'warn' : 'ok' ) );
+            $out[$key] = array( 'key' => $key, 'setting' => $setting, 'unit' => $unit, 'scope' => $scope, 'period' => $period, 'provider' => $provider,
+                                'used' => $unit === 'cost' ? round( $used, 4 ) : (int) $used, 'max' => $max, 'percent' => $percent,
+                                'level' => $level, 'reset' => self::periodEnd( $period ), 'cost_known' => $t['cost_known'] );
+        }
         return $out;
     }
 
@@ -128,11 +168,16 @@ class expAiLimits
             if ( is_numeric( $raw ) && (float) $raw > 0 )
                 $any = true;
         }
+        if ( self::providerDefinitions( $config ) )
+            $any = true;
         if ( !$any )
             return;
         foreach ( self::status( $context ) as $limit )
         {
             if ( $limit['level'] !== 'over' )
+                continue;
+            // a provider's limit stops only requests to that provider
+            if ( isset( $limit['provider'] ) && ( !isset( $context['provider'] ) || $context['provider'] !== $limit['provider'] ) )
                 continue;
             $resets = array(
                 'conversation' => ezpI18n::tr( 'extension/expai/limits', 'when you start a new conversation' ),
@@ -157,6 +202,12 @@ class expAiLimits
             'month_tokens' => 'tokens per month', 'month_cost' => 'cost per month',
             'site_month_tokens' => 'tokens of the whole site per month', 'site_month_cost' => 'cost of the whole site per month',
         );
+        if ( preg_match( '/^provider_month_(tokens|cost):(.+)$/', $key, $m ) )
+        {
+            if ( $m[1] === 'cost' )
+                return ezpI18n::tr( 'extension/expai/limits', 'cost of the provider %provider per month', null, array( '%provider' => $m[2] ) );
+            return ezpI18n::tr( 'extension/expai/limits', 'tokens of the provider %provider per month', null, array( '%provider' => $m[2] ) );
+        }
         return isset( $labels[$key] ) ? ezpI18n::tr( 'extension/expai/limits', $labels[$key] ) : $key;
     }
 
@@ -166,8 +217,9 @@ class expAiLimits
      */
     public static function latestRateLimits()
     {
+        // the dashboard reads the Anthropic headers; other providers' headers stay in their log rows
         $rows = (array) eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), array( 'created', 'rate_limits' ),
-            array( 'rate_limits' => array( '!=', '' ) ), array( 'id' => 'desc' ), array( 'offset' => 0, 'length' => 1 ), false );
+            array( 'rate_limits' => array( '!=', '' ), 'provider' => 'anthropic' ), array( 'id' => 'desc' ), array( 'offset' => 0, 'length' => 1 ), false );
         if ( !$rows )
             return array();
         $values = json_decode( (string) $rows[0]['rate_limits'], true );

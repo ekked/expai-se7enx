@@ -82,36 +82,42 @@ class expAiConfig
         return $this->flag( 'AISettings', 'Enabled', false );
     }
 
-    /** @return bool a provider can be called: enabled, a model, and a key (for anthropic) or a custom class */
+    /** @return bool a provider can be called: enabled, a default model, and its provider has a key or needs none */
     public function isConfigured()
     {
-        if ( !$this->isEnabled() || trim( (string) $this->get( 'AISettings', 'Model', '' ) ) === '' )
+        if ( !$this->isEnabled() )
             return false;
-        $provider = (string) $this->get( 'AISettings', 'Provider', 'anthropic' );
-        if ( $provider === 'custom' )
-            return trim( (string) $this->get( 'AISettings', 'ProviderClass', '' ) ) !== '';
-        return trim( (string) $this->get( 'AISettings', 'ApiKey', '' ) ) !== '';
+        $registry = $this->registry();
+        $model = $registry->getModel( $registry->defaultAlias() );
+        return $model && $registry->providerReady( $model['provider'] );
     }
 
-    /** @return string the configured model name */
-    public function model()
+    /** @return expAiProviderRegistry */
+    public function registry()
+    {
+        return new expAiProviderRegistry( $this );
+    }
+
+    /** @return string the model id of [AISettings] Model (0.1.0: the only model setting) */
+    public function defaultModelId()
     {
         return trim( (string) $this->get( 'AISettings', 'Model', '' ) );
     }
 
+    /** @return string the alias of the site default model ([ProviderSettings] DefaultModel, else anthropic.<[AISettings] Model>) */
+    public function model()
+    {
+        return $this->registry()->defaultAlias();
+    }
+
     /**
-     * The [AISettings] values for a provider, with the model the current user chose (the key included: never log or
+     * The settings of the provider of the current user's model, with that model (the key included: never log or
      * output this array).
      * @return array
      */
     public function providerSettings()
     {
-        $settings = array();
-        foreach ( array( 'Endpoint', 'AnthropicVersion', 'Model', 'ApiKey', 'AnthropicWorkspaceId', 'MaxTokens', 'Effort',
-                         'RefusalFallback', 'PromptCaching', 'Timeout', 'ConnectTimeout', 'MaxResponseBytes' ) as $name )
-            $settings[$name] = $this->get( 'AISettings', $name, '' );
-        $settings['Model'] = $this->effectiveModel();
-        return $settings;
+        return $this->registry()->settingsFor( $this->effectiveModel() );
     }
 
     /** @return bool users may choose a model ([AISettings] AllowUserModelChoice) */
@@ -121,32 +127,74 @@ class expAiConfig
     }
 
     /**
-     * The models users may choose: [AISettings] AllowedModels[] (and always the site default), with their labels
-     * from ModelLabels[<id>].
-     * @return array id => label
+     * The models the current user may choose, as alias => label: the site default always; with model choice on,
+     * the models of [ProviderSettings] ProvidersWithoutPolicy[] (default anthropic) and of the providers the policy
+     * expai/model_use allows (limitation Provider).
+     * @return array alias => label
      */
     public function allowedModels()
     {
-        $labels = $this->get( 'AISettings', 'ModelLabels', array() );
-        $labels = is_array( $labels ) ? $labels : array();
         $out = array();
-        foreach ( array_merge( array( $this->model() ), $this->arr( 'AISettings', 'AllowedModels' ) ) as $id )
+        foreach ( $this->allowedModelRows() as $alias => $model )
+            $out[$alias] = $model['label'];
+        return $out;
+    }
+
+    /** @return array alias => model (expAiProviderRegistry::models()) of allowedModels() */
+    public function allowedModelRows()
+    {
+        $registry = $this->registry();
+        $default = $registry->defaultAlias();
+        $models = $registry->models();
+        $out = array();
+        if ( isset( $models[$default] ) )
+            $out[$default] = $models[$default];
+        if ( !$this->modelChoiceEnabled() )
+            return $out;
+        $open = $this->get( 'ProviderSettings', 'ProvidersWithoutPolicy', null ) === null ? array( 'anthropic' ) : $this->arr( 'ProviderSettings', 'ProvidersWithoutPolicy' );
+        $policy = expAiPolicy::limitationValues( 'model_use', 'Provider' );
+        foreach ( $models as $alias => $model )
         {
-            $id = trim( (string) $id );
-            if ( $id !== '' && !isset( $out[$id] ) )
-                $out[$id] = isset( $labels[$id] ) && $labels[$id] !== '' ? (string) $labels[$id] : $id;
+            if ( isset( $out[$alias] ) )
+                continue;
+            if ( in_array( $model['provider'], $open, true ) || $policy === true || ( is_array( $policy ) && in_array( $model['provider'], $policy, true ) ) )
+                $out[$alias] = $model;
         }
         return $out;
     }
 
-    /** @return string the model the current user chose (preference expai_model), '' when none */
+    /**
+     * The models of allowedModels() grouped by provider, for the model picker.
+     * @return array list of { id, label, region, retention, models: list of { alias, label, tool_use, cost (free, $, $$, $$$), slow, writes } }
+     */
+    public function modelChoices()
+    {
+        $registry = $this->registry();
+        $groups = array();
+        foreach ( $this->allowedModelRows() as $alias => $model )
+        {
+            $id = $model['provider'];
+            if ( !isset( $groups[$id] ) )
+            {
+                $provider = $registry->getProvider( $id );
+                $groups[$id] = array( 'id' => $id, 'label' => (string) $provider['Label'], 'region' => (string) $provider['Region'],
+                                      'retention' => (string) $provider['Retention'], 'models' => array() );
+            }
+            $groups[$id]['models'][] = array( 'alias' => $alias, 'label' => $model['label'], 'tool_use' => $model['tool_use'],
+                                              'cost' => expAiCost::costClass( $alias ), 'slow' => $model['slow'],
+                                              'writes' => expAiProbe::writeAllowed( $alias, $this ) );
+        }
+        return array_values( $groups );
+    }
+
+    /** @return string the model the current user chose (preference expai_model, an alias), '' when none */
     public function preferredModel()
     {
         $user = eZUser::currentUser();
         if ( !$user instanceof eZUser || !$user->isRegistered() )
             return '';
         $value = eZPreferences::value( 'expai_model', $user );
-        return is_string( $value ) ? trim( $value ) : '';
+        return is_string( $value ) && trim( $value ) !== '' ? $this->registry()->resolveAlias( $value ) ?: trim( $value ) : '';
     }
 
     /** @return bool the user chose a model that is no longer allowed (the default is used instead) */
@@ -156,13 +204,19 @@ class expAiConfig
         return $preferred !== '' && ( !$this->modelChoiceEnabled() || !isset( $this->allowedModels()[$preferred] ) );
     }
 
-    /** @return string the model requests use: the user's allowed choice, else the site default */
+    /** @return string the alias requests use: the user's allowed choice, else the site default */
     public function effectiveModel()
     {
         $preferred = $this->preferredModel();
         if ( $preferred !== '' && $this->modelChoiceEnabled() && isset( $this->allowedModels()[$preferred] ) )
             return $preferred;
         return $this->model();
+    }
+
+    /** @return bool the current user may use the model (the default, or allowed by the policy) */
+    public function mayUseModel( $alias )
+    {
+        return isset( $this->allowedModels()[$alias] );
     }
 
     /**
@@ -174,7 +228,8 @@ class expAiConfig
         // loadPlacement() with its default $reset = true empties the values of the shared instance: keep them
         $this->ini->loadPlacement( false );
         $placements = $this->ini->groupPlacements();
-        $path = isset( $placements['AISettings']['Model'] ) ? $placements['AISettings']['Model'] : '';
+        $path = isset( $placements['ProviderSettings']['DefaultModel'] ) && trim( (string) $this->get( 'ProviderSettings', 'DefaultModel', '' ) ) !== ''
+              ? $placements['ProviderSettings']['DefaultModel'] : ( isset( $placements['AISettings']['Model'] ) ? $placements['AISettings']['Model'] : '' );
         $file = is_array( $path ) ? ( isset( $path[0] ) ? $path[0] : '' ) : (string) $path;
         return array( 'placement' => $path ? $this->ini->findSettingPlacement( $path ) : '',
                       'file' => ltrim( str_replace( eZSys::rootDir(), '', $file ), '/' ) );

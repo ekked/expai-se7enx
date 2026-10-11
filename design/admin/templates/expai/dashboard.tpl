@@ -42,7 +42,10 @@
                 <div><dt>{'You may create content'|i18n( 'extension/expai/dashboard' )}</dt><dd>{switch match=$status.create}{case match='yes'}{'everywhere'|i18n( 'extension/expai/dashboard' )}{/case}{case match='limited'}{'in some places (your role limits it)'|i18n( 'extension/expai/dashboard' )}{/case}{case}{'nowhere'|i18n( 'extension/expai/dashboard' )}{/case}{/switch}</dd></div>
                 <div><dt>{'You may edit content'|i18n( 'extension/expai/dashboard' )}</dt><dd>{switch match=$status.edit}{case match='yes'}{'everywhere'|i18n( 'extension/expai/dashboard' )}{/case}{case match='limited'}{'in some places (your role limits it)'|i18n( 'extension/expai/dashboard' )}{/case}{case}{'nowhere'|i18n( 'extension/expai/dashboard' )}{/case}{/switch}</dd></div>
 {if $status.placement}
-                <div><dt>{'Site default model'|i18n( 'extension/expai/dashboard' )}</dt><dd>{'%model, set in expai.ini [AISettings] Model (%placement: %file); change it there.'|i18n( 'extension/expai/dashboard',, hash( '%model', $status.model, '%placement', $status.placement.placement, '%file', $status.placement.file ) )|wash}</dd></div>
+                <div><dt>{'Site default model'|i18n( 'extension/expai/dashboard' )}</dt><dd>{'%model, set in expai.ini (%placement: %file); change it there.'|i18n( 'extension/expai/dashboard',, hash( '%model', concat( $status.model_label, ' (', $status.model, ')' ), '%placement', $status.placement.placement, '%file', $status.placement.file ) )|wash}</dd></div>
+{/if}
+{if $status.can_manage}
+                <div><dt>{'Models and providers'|i18n( 'extension/expai/models' )}</dt><dd><a href={'expai/models'|ezurl}>{'Providers, regions, probe results and the local model'|i18n( 'extension/expai/models' )}</a></dd></div>
 {/if}
 {if $cost_enabled}
                 <div><dt>{'Prices'|i18n( 'extension/expai/dashboard' )}</dt><dd>{$prices_note|wash}</dd></div>
@@ -87,6 +90,20 @@
         </div>
     </section>
 
+{if gt( $per_provider|count, 1 )}
+    <section class="exp-ai-card exp-ai-providers" aria-labelledby="exp-ai-providers-title">
+        <h2 id="exp-ai-providers-title">{'By provider'|i18n( 'extension/expai/usage' )}</h2>
+        <table class="list exp-ai-draft-table" cellspacing="0">
+            <thead><tr><th>{'Provider'|i18n( 'extension/expai/usage' )}</th><th>{'Region'|i18n( 'extension/expai/usage' )}</th><th>{'Requests'|i18n( 'extension/expai/usage' )}</th><th>{'Tokens'|i18n( 'extension/expai/usage' )}</th>{if $cost_enabled}<th>{'Cost'|i18n( 'extension/expai/usage' )}</th>{/if}<th>{'Errors'|i18n( 'extension/expai/usage' )}</th></tr></thead>
+            <tbody>
+{foreach $per_provider as $pp}
+                <tr><td>{$pp.provider|wash}</td><td>{if $pp.regions}{$pp.regions|upcase|wash}{else}-{/if}</td><td>{$pp.requests|expai_number}</td><td>{sum( $pp.input, $pp.output, $pp.cache_write, $pp.cache_read )|expai_tokens}</td>{if $cost_enabled}<td>{if $pp.cost_known}{$pp.cost|expai_money}{else}{'unknown'|i18n( 'extension/expai/usage' )}{/if}</td>{/if}<td>{$pp.errors}</td></tr>
+{/foreach}
+            </tbody>
+        </table>
+    </section>
+{/if}
+
     <div class="exp-ai-dash-grid2">
         {* Start writing: the main action *}
         <section class="exp-ai-card exp-ai-start" aria-labelledby="exp-ai-start-title">
@@ -125,7 +142,7 @@
                     {def $used_text = cond( eq( $l.unit, 'cost' ), $l.used|expai_money, $l.used|expai_number )
                          $max_text = cond( eq( $l.unit, 'cost' ), $l.max|expai_money, $l.max|expai_number )}
                     <li>
-                        <span class="exp-ai-limit-name">{switch match=$l.key}
+                        <span class="exp-ai-limit-name">{if is_set( $l.provider )}{cond( eq( $l.unit, 'cost' ), 'Provider %provider this month, cost'|i18n( 'extension/expai/limits',, hash( '%provider', $l.provider ) ), 'Provider %provider this month, tokens'|i18n( 'extension/expai/limits',, hash( '%provider', $l.provider ) ) )|wash}{else}{switch match=$l.key}
                             {case match='conversation'}{'This conversation'|i18n( 'extension/expai/limits' )}{/case}
                             {case match='session'}{'This session'|i18n( 'extension/expai/limits' )}{/case}
                             {case match='day_tokens'}{'Today, tokens'|i18n( 'extension/expai/limits' )}{/case}
@@ -134,7 +151,7 @@
                             {case match='month_cost'}{'This month, cost'|i18n( 'extension/expai/limits' )}{/case}
                             {case match='site_month_tokens'}{'Site this month, tokens'|i18n( 'extension/expai/limits' )}{/case}
                             {case}{'Site this month, cost'|i18n( 'extension/expai/limits' )}{/case}
-                        {/switch}</span>
+                        {/switch}{/if}</span>
                         {include uri='design:expai/parts/bar.tpl' value=$l.used max=$l.max level=$l.level label=$l.key
                                  text='%used of %max (%percent %)'|i18n( 'extension/expai/limits',, hash( '%used', $used_text, '%max', $max_text, '%percent', $l.percent ) )}
                         <span class="exp-ai-hint">{switch match=$l.period}

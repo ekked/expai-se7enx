@@ -40,6 +40,7 @@ class expAiToolUpdateDraft extends expAiTool
         $object = eZContentObject::fetch( isset( $input['object_id'] ) ? (int) $input['object_id'] : 0 );
         if ( !$object instanceof eZContentObject || !$object->canRead() )
             throw new expAiException( 'Object %id does not exist or you may not read it.', '', 0, array( '%id' => isset( $input['object_id'] ) ? (int) $input['object_id'] : 0 ) );
+        $context->reader->assertAllowed( $object );
         $reuse = 0;
         foreach ( expAiDraftLog::fetchForUserNode( $context->user->attribute( 'contentobject_id' ), $context->nodeID ) as $log )
         {
@@ -63,7 +64,7 @@ class expAiToolUpdateDraft extends expAiTool
                 'user_id' => (int) $context->user->attribute( 'contentobject_id' ), 'node_id' => $context->nodeID,
                 'parent_node_id' => $mainNode ? (int) $mainNode->attribute( 'parent_node_id' ) : 0, 'language_code' => $language,
                 'conversation_id' => $context->conversation ? (int) $context->conversation->attribute( 'id' ) : 0,
-                'action' => 'update', 'source' => 'panel', 'model' => $context->model, 'prompt_summary' => $context->request ) );
+                'action' => 'update', 'source' => 'panel', 'model' => $context->model, 'provider' => $context->provider, 'prompt_summary' => $context->request ) );
             $context->addWritten( $log );
         }
         else

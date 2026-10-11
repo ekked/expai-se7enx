@@ -41,6 +41,9 @@ class expAiToolCreateDraft extends expAiTool
         if ( !isset( $input['fields'] ) || !is_array( $input['fields'] ) || !$input['fields'] )
             throw new expAiException( 'Give the fields to write.' );
         $parent = $context->reader->readableNode( $this->nodeID( $input, $context, 'parent_node_id' ) );
+        if ( $context->reader->policy() )
+            $context->reader->policy()->assertClass( isset( $input['class_identifier'] ) ? (string) $input['class_identifier'] : '',
+                                                     (int) $parent->object()->attribute( 'section_id' ) );
         list( $object, $version, $written ) = $context->writer->createDraft( $parent, (string) $input['class_identifier'], $input['fields'],
                                                                          isset( $input['language'] ) ? (string) $input['language'] : '' );
         $language = $version->initialLanguageCode();
@@ -49,7 +52,7 @@ class expAiToolCreateDraft extends expAiTool
             'user_id' => (int) $context->user->attribute( 'contentobject_id' ), 'node_id' => $context->nodeID,
             'parent_node_id' => (int) $parent->attribute( 'node_id' ), 'language_code' => $language,
             'conversation_id' => $context->conversation ? (int) $context->conversation->attribute( 'id' ) : 0,
-            'action' => 'create', 'source' => 'panel', 'model' => $context->model, 'prompt_summary' => $context->request ) );
+            'action' => 'create', 'source' => 'panel', 'model' => $context->model, 'provider' => $context->provider, 'prompt_summary' => $context->request ) );
         $context->addWritten( $log );
         $object = eZContentObject::fetch( (int) $object->attribute( 'id' ) );
         return array( 'status' => 'draft created (not published)', 'object_id' => (int) $object->attribute( 'id' ),

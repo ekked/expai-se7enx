@@ -13,50 +13,31 @@
  * refusal fallback. Earlier assistant turns are sent back exactly as they were received (content_json), as the
  * API requires for thinking blocks; the conversation is only ever appended to.
  */
-class expAiAnthropicProvider implements expAiProvider
+class expAiAnthropicProvider extends expAiProviderBase
 {
     const DEFAULT_ENDPOINT = 'https://api.anthropic.com/v1/messages';
     const DEFAULT_VERSION = '2023-06-01';
     const FALLBACK_BETA = 'server-side-fallback-2026-07-01';
     const BINDING_BETA = 'thinking-binding-controls-2026-08-01';
 
-    /** @var array */
-    protected $settings;
+    /** @var string[] */
+    protected $defaultRateLimitHeaders = array( 'anthropic-ratelimit-*', 'retry-after' );
 
-    /** @var expAiHttpClient */
-    protected $http;
-
-    /**
-     * @param array $settings [AISettings] values (expAiConfig::providerSettings())
-     * @param expAiHttpClient|null $http
-     */
-    public function __construct( array $settings, $http = null )
-    {
-        $this->settings = $settings;
-        $this->http = $http ?: new expAiHttpClient(
-            $this->setting( 'Timeout', 115 ), $this->setting( 'ConnectTimeout', 10 ), $this->setting( 'MaxResponseBytes', 4194304 ) );
-    }
-
-    protected function setting( $name, $default = '' )
-    {
-        return isset( $this->settings[$name] ) && $this->settings[$name] !== '' && $this->settings[$name] !== null
-             ? $this->settings[$name] : $default;
-    }
-
-    protected function enabled( $name, $default )
-    {
-        $value = strtolower( trim( (string) $this->setting( $name, $default ) ) );
-        return in_array( $value, array( 'enabled', 'true', '1', 'yes', 'on' ), true );
-    }
-
-    public function providerId()
+    protected function defaultProviderId()
     {
         return 'anthropic';
     }
 
-    public function modelName()
+    public function providerLabel()
     {
-        return trim( (string) $this->setting( 'Model', '' ) );
+        // the texts of the Anthropic provider name the assistant, as before the provider registry
+        return (string) $this->setting( 'Label', 'Anthropic' );
+    }
+
+    /** @return bool the Anthropic-only extras (prompt caching, refusal fallback, workspace, betas) are sent */
+    protected function extras()
+    {
+        return $this->enabled( 'AnthropicExtras', 'enabled' );
     }
 
     /** @return array the request body (exposed for tests and doc examples; contains no key) */
@@ -89,24 +70,22 @@ class expAiAnthropicProvider implements expAiProvider
             $outputConfig['format'] = array( 'type' => 'json_schema', 'schema' => $request['output_schema'] );
         if ( $outputConfig )
             $payload['output_config'] = $outputConfig;
-        if ( $this->enabled( 'PromptCaching', 'enabled' ) )
+        if ( $this->extras() && $this->enabled( 'PromptCaching', 'enabled' ) )
             $payload['cache_control'] = array( 'type' => 'ephemeral' );
-        if ( $this->enabled( 'RefusalFallback', 'enabled' ) )
+        if ( $this->extras() && $this->enabled( 'RefusalFallback', 'enabled' ) )
             $payload['fallbacks'] = 'default';
         return $payload;
     }
 
     public function send( array $request )
     {
-        $endpoint = trim( (string) $this->setting( 'Endpoint', self::DEFAULT_ENDPOINT ) );
-        $key = (string) $this->setting( 'ApiKey', '' );
-        if ( $key === '' )
-            throw new expAiException( 'Exponential Intelligence is not configured correctly.', 'ApiKey is not set' );
+        $endpoint = trim( (string) $this->setting( 'Endpoint', $this->setting( 'BaseURL', self::DEFAULT_ENDPOINT ) ) );
         if ( $this->modelName() === '' )
             throw new expAiException( 'Exponential Intelligence is not configured correctly.', 'Model is not set' );
 
-        $headers = array( 'x-api-key: ' . $key, 'anthropic-version: ' . $this->setting( 'AnthropicVersion', self::DEFAULT_VERSION ) );
-        $workspace = trim( (string) $this->setting( 'AnthropicWorkspaceId', '' ) );
+        $headers = array_merge( $this->keyHeaders( 'x-api-key' ), array( 'anthropic-version: ' . $this->setting( 'AnthropicVersion', self::DEFAULT_VERSION ) ),
+                                $this->extraHeaders() );
+        $workspace = $this->extras() ? trim( (string) $this->setting( 'AnthropicWorkspaceId', '' ) ) : '';
         if ( $workspace !== '' )
         {
             if ( !preg_match( '/^[A-Za-z0-9_-]{1,100}$/', $workspace ) )
@@ -117,9 +96,7 @@ class expAiAnthropicProvider implements expAiProvider
         if ( isset( $payload['fallbacks'] ) )
             $headers[] = 'anthropic-beta: ' . self::FALLBACK_BETA;
 
-        $body = json_encode( $payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE );
-        if ( $body === false )
-            throw new expAiException( 'The request could not be sent to Exponential Intelligence.', 'json_encode failed' );
+        $body = $this->encode( $payload );
 
         list( $status, $received, $rateHeaders ) = array_pad( $this->http->postJson( $endpoint, $headers, $body ), 3, array() );
         $data = json_decode( $received, true );
@@ -128,7 +105,7 @@ class expAiAnthropicProvider implements expAiProvider
         // stored before its instructions were kept with it), the API refuses the old blocks: retry once and let it
         // drop them (the conversation goes on without the earlier reasoning).
         if ( $status === 400 && is_array( $data ) && isset( $data['error']['message'] ) && is_string( $data['error']['message'] )
-             && strpos( $data['error']['message'], 'block_binding' ) !== false && empty( $request['_drop_block'] ) )
+             && strpos( $data['error']['message'], 'block_binding' ) !== false && empty( $request['_drop_block'] ) && $this->extras() )
         {
             eZDebug::writeNotice( 'expai: thinking blocks bound to another conversation start, retrying with drop_block', __METHOD__ );
             $payload['thinking'] = array( 'type' => 'adaptive', 'block_binding' => array( 'prefix_mismatch_behavior' => 'drop_block' ) );
@@ -172,7 +149,9 @@ class expAiAnthropicProvider implements expAiProvider
             'tokens' => array( 'input' => isset( $data['usage']['input_tokens'] ) ? (int) $data['usage']['input_tokens'] : 0,
                                'output' => isset( $data['usage']['output_tokens'] ) ? (int) $data['usage']['output_tokens'] : 0,
                                'cache_write' => isset( $data['usage']['cache_creation_input_tokens'] ) ? (int) $data['usage']['cache_creation_input_tokens'] : 0,
-                               'cache_read' => isset( $data['usage']['cache_read_input_tokens'] ) ? (int) $data['usage']['cache_read_input_tokens'] : 0 ),
+                               'cache_read' => isset( $data['usage']['cache_read_input_tokens'] ) ? (int) $data['usage']['cache_read_input_tokens'] : 0,
+                               'reasoning' => 0, 'reported_cost' => null ),
+            'provider' => $this->providerId(),
             'http_status' => $status,
             'retries' => $retries,
             'rate_limits' => $rateHeaders,
@@ -180,22 +159,12 @@ class expAiAnthropicProvider implements expAiProvider
     }
 
     /**
-     * The provider of the settings.
+     * The provider of the current user's model (kept for code written for 0.1.0: the registry decides now).
      * @return expAiProvider
      * @throws expAiException
      */
     public static function fromConfig( expAiConfig $config )
     {
-        $provider = (string) $config->get( 'AISettings', 'Provider', 'anthropic' );
-        if ( $provider === 'custom' )
-        {
-            $class = trim( (string) $config->get( 'AISettings', 'ProviderClass', '' ) );
-            if ( $class === '' || !class_exists( $class ) || !in_array( 'expAiProvider', class_implements( $class ), true ) )
-                throw new expAiException( 'Exponential Intelligence is not configured correctly.', 'ProviderClass does not implement expAiProvider' );
-            return new $class( $config->providerSettings() );
-        }
-        if ( $provider !== 'anthropic' )
-            throw new expAiException( 'Exponential Intelligence is not configured correctly.', 'unknown Provider' );
-        return new self( $config->providerSettings() );
+        return expAiProviderRegistry::instance( $config )->providerFor( $config->effectiveModel() );
     }
 }

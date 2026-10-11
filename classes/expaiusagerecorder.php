@@ -45,11 +45,32 @@ class expAiUsageRecorder implements expAiProvider
         return $this->inner->modelName();
     }
 
+    /** @return expAiProvider the wrapped provider */
+    public function inner()
+    {
+        return $this->inner;
+    }
+
+    /** @return string the model alias of the wrapped provider ('' for a provider without one) */
+    public function modelAlias()
+    {
+        return method_exists( $this->inner, 'modelAlias' ) ? (string) $this->inner->modelAlias() : '';
+    }
+
+    /** @return string native | prompted | none */
+    public function toolUse()
+    {
+        return method_exists( $this->inner, 'toolUse' ) ? (string) $this->inner->toolUse() : 'native';
+    }
+
     public function send( array $request )
     {
-        expAiLimits::check( $this->context );
         $config = expAiConfig::instance();
-        $row = array( 'user_id' => (int) $this->context['user_id'], 'node_id' => (int) $this->context['node_id'],
+        $providerID = $this->inner->providerId();
+        expAiLimits::check( $this->context + array( 'provider' => $providerID ) );
+        $provider = $config->registry()->getProvider( $providerID );
+        $row = array( 'model_alias' => $this->modelAlias(), 'tool_mode' => $this->toolUse(),
+                      'region' => $provider ? (string) $provider['Region'] : '', 'retention' => $provider ? (string) $provider['Retention'] : '', 'user_id' => (int) $this->context['user_id'], 'node_id' => (int) $this->context['node_id'],
                       'conversation_id' => (int) $this->context['conversation_id'], 'turn' => (int) $this->context['turn'],
                       'action' => (string) $this->context['action'], 'iteration' => (int) $this->context['iteration'],
                       'model' => $this->inner->modelName(), 'provider' => $this->inner->providerId(), 'session_key' => expAiLimits::sessionKey() );
@@ -65,7 +86,7 @@ class expAiUsageRecorder implements expAiProvider
             $row['latency_ms'] = (int) round( ( microtime( true ) - $start ) * 1000 );
             $row['http_status'] = (int) $e->getCode();
             $row['error_class'] = get_class( $e );
-            $row['error_message'] = $e->getMessage() . ( $e->detail() !== '' ? ' (' . $e->detail() . ')' : '' );
+            $row['error_message'] = strtr( $e->getMessage(), $e->arguments() ) . ( $e->detail() !== '' ? ' (' . $e->detail() . ')' : '' );
             $row['rate_limits'] = $e->rateLimits ? json_encode( $e->rateLimits ) : '';
             $this->last = expAiUsage::record( $row );
             throw $e;
@@ -80,6 +101,9 @@ class expAiUsageRecorder implements expAiProvider
         $row['output_tokens'] = (int) ( isset( $tokens['output'] ) ? $tokens['output'] : 0 );
         $row['cache_write_tokens'] = (int) ( isset( $tokens['cache_write'] ) ? $tokens['cache_write'] : 0 );
         $row['cache_read_tokens'] = (int) ( isset( $tokens['cache_read'] ) ? $tokens['cache_read'] : 0 );
+        $row['reasoning_tokens'] = (int) ( isset( $tokens['reasoning'] ) ? $tokens['reasoning'] : 0 );
+        $row['reported_cost_micros'] = isset( $tokens['reported_cost'] ) && is_numeric( $tokens['reported_cost'] ) && $tokens['reported_cost'] > 0
+                                     ? (int) round( (float) $tokens['reported_cost'] * 1000000 ) : 0;
         $row['latency_ms'] = (int) round( ( microtime( true ) - $start ) * 1000 );
         $row['model'] = isset( $answer['model'] ) && $answer['model'] !== '' ? (string) $answer['model'] : $row['model'];
         $row['stop_reason'] = isset( $answer['stop_reason'] ) ? (string) $answer['stop_reason'] : '';
@@ -93,7 +117,7 @@ class expAiUsageRecorder implements expAiProvider
     }
 
     /** Adds what happened after the request (the tool calls of the step, the drafts written) to its row */
-    public function complete( array $tools, $draftsWritten )
+    public function complete( array $tools, $draftsWritten, $mcpCalls = 0 )
     {
         if ( !$this->last )
             return;
@@ -104,6 +128,7 @@ class expAiUsageRecorder implements expAiProvider
         $this->last->setAttribute( 'tool_count', count( $tools ) );
         $this->last->setAttribute( 'tool_ms', $ms );
         $this->last->setAttribute( 'drafts_written', (int) $draftsWritten );
+        $this->last->setAttribute( 'mcp_calls', (int) $mcpCalls );
         $this->last->store();
     }
 }

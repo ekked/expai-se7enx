@@ -30,11 +30,14 @@ class expAiFunctionCollection
         return array( 'result' => expAiServerFunctions::hasPolicy() ? expAiDashboard::waitingForMyApproval() : array() );
     }
 
-    /** @return array allowed (id => label), default, current, choice (bool), refused (bool: a stored choice is no longer allowed), pricing */
+    /**
+     * @return array allowed (alias => label), groups (by provider, expAiConfig::modelChoices()), default, current, choice
+     *               (bool), refused (bool: a stored choice is no longer allowed), pricing
+     */
     public function fetchModels()
     {
         $config = expAiConfig::instance();
-        return array( 'result' => array( 'allowed' => $config->allowedModels(), 'default' => $config->model(),
+        return array( 'result' => array( 'allowed' => $config->allowedModels(), 'groups' => $config->modelChoices(), 'default' => $config->model(),
                                          'current' => $config->effectiveModel(), 'choice' => $config->modelChoiceEnabled(),
                                          'refused' => $config->preferredModelRefused(),
                                          'placement' => expAiServerFunctions::hasPolicy( 'settings' ) ? $config->modelPlacement() : false,

@@ -28,6 +28,8 @@ class expAiConversation extends eZPersistentObject
                 'iterations' => $int( 'Iterations' ),
                 'draft_count' => $int( 'DraftCount' ),
                 'model' => array( 'name' => 'Model', 'datatype' => 'string', 'default' => '', 'required' => true ),
+                'model_alias' => array( 'name' => 'ModelAlias', 'datatype' => 'string', 'default' => '', 'required' => true ),
+                'provider' => array( 'name' => 'Provider', 'datatype' => 'string', 'default' => 'anthropic', 'required' => true ),
                 'created' => $int( 'Created' ),
                 'modified' => $int( 'Modified' ),
             ),
@@ -149,6 +151,37 @@ class expAiConversation extends eZPersistentObject
     {
         $document = $this->document();
         return isset( $document['history'] );
+    }
+
+    /**
+     * The model the conversation is bound to: its alias and provider. A conversation of 0.1.0 has none (it was
+     * Anthropic's). Thinking blocks and provider state (native_json) are only ever sent back to the same model, so a
+     * change of model starts a fresh window (expAiAssistant::compact()).
+     * @return string alias, '' when unbound
+     */
+    public function boundAlias()
+    {
+        return (string) $this->attribute( 'model_alias' );
+    }
+
+    public function bindTo( $alias, $provider )
+    {
+        $this->setAttribute( 'model_alias', expAiText::cut( (string) $alias, 100 ) );
+        $this->setAttribute( 'provider', expAiText::cut( (string) $provider, 40 ) );
+    }
+
+    /** @return int the turn in which an external (MCP) tool result entered the conversation, 0 when none */
+    public function taintedTurn()
+    {
+        $document = $this->document();
+        return isset( $document['tainted_turn'] ) ? (int) $document['tainted_turn'] : 0;
+    }
+
+    public function setTaintedTurn( $turn )
+    {
+        $document = $this->document();
+        $document['tainted_turn'] = (int) $turn;
+        $this->storeDocument( $document );
     }
 
     /** @return int exchanges in the window sent to the provider */

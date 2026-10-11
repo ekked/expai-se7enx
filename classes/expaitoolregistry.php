@@ -8,14 +8,17 @@
  */
 
 /**
- * The tools of expai.ini [ToolSettings] Tools[], each [Tool_<name>] Class=<expAiTool subclass>.
+ * The tools of expai.ini [ToolSettings] Tools[], each [Tool_<name>] Class=<expAiTool subclass>, plus the MCP tools
+ * the current user may use (expAiMcp::tools(): the in-process bridge exp__<tool> and external servers
+ * mcp__<server>__<tool>). Write tools are part of the definitions only for models that may write
+ * (expAiProbe::writeAllowed()); expAiAssistant refuses them a second time when they are called anyway.
  */
 class expAiToolRegistry
 {
     /** @var expAiTool[] name => tool */
     protected $tools = array();
 
-    public function __construct( expAiConfig $config )
+    public function __construct( expAiConfig $config, $withMcp = true )
     {
         foreach ( $config->arr( 'ToolSettings', 'Tools' ) as $name )
         {
@@ -27,6 +30,16 @@ class expAiToolRegistry
             }
             $this->tools[$name] = new $class( $name );
         }
+        if ( $withMcp )
+            foreach ( expAiMcp::tools( $config ) as $name => $tool )
+                if ( !isset( $this->tools[$name] ) )
+                    $this->tools[$name] = $tool;
+    }
+
+    /** Adds a tool (tests, extensions) */
+    public function add( expAiTool $tool )
+    {
+        $this->tools[$tool->name()] = $tool;
     }
 
     /** @return expAiTool[] */
@@ -41,12 +54,16 @@ class expAiToolRegistry
         return isset( $this->tools[$name] ) ? $this->tools[$name] : null;
     }
 
-    /** @return array the definitions for the provider */
-    public function definitions()
+    /**
+     * @param bool $writes include the write tools (only for a model that may write)
+     * @return array the definitions for the provider
+     */
+    public function definitions( $writes = true )
     {
         $out = array();
         foreach ( $this->tools as $tool )
-            $out[] = $tool->definition();
+            if ( $writes || !$tool->writes() )
+                $out[] = $tool->definition();
         return $out;
     }
 }

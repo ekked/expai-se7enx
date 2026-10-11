@@ -137,9 +137,10 @@ class expAiServerFunctions extends ezjscServerFunctions
         $config = self::guard( true, false );
         return self::run( function () use ( $config )
         {
-            $model = self::post( 'model' );
+            $model = $config->registry()->resolveAlias( self::post( 'model' ) ) ?: self::post( 'model' );
             if ( !$config->modelChoiceEnabled() )
                 throw new expAiException( 'Choosing a model is switched off on this site.' );
+            // only the models of allowedModels(): the site default, open providers, and those expai/model_use allows
             if ( $model !== '' && !isset( $config->allowedModels()[$model] ) )
                 throw new expAiException( 'This model is not available.' );
             eZPreferences::setValue( 'expai_model', $model === $config->model() ? '' : $model );
@@ -156,7 +157,8 @@ class expAiServerFunctions extends ezjscServerFunctions
         return self::run( function () use ( $config )
         {
             $nodeID = self::nodeID();
-            $timeout = $config->int( 'AISettings', 'Timeout', 115, 1, 600 );
+            $settings = $config->providerSettings();
+            $timeout = max( 1, min( 600, (int) ( isset( $settings['Timeout'] ) && $settings['Timeout'] !== '' ? $settings['Timeout'] : $config->int( 'AISettings', 'Timeout', 115, 1, 600 ) ) ) );
             if ( function_exists( 'set_time_limit' ) )
                 @set_time_limit( $timeout + 30 );
             ignore_user_abort( true );
@@ -237,7 +239,7 @@ class expAiServerFunctions extends ezjscServerFunctions
         return self::run( function () use ( $config )
         {
             if ( function_exists( 'set_time_limit' ) )
-                @set_time_limit( $config->int( 'AISettings', 'Timeout', 115, 1, 600 ) + 30 );
+                @set_time_limit( self::timeout( $config ) + 30 );
             return expAiEditForm::fieldAction( $config, self::formPost() );
         } );
     }
@@ -249,9 +251,16 @@ class expAiServerFunctions extends ezjscServerFunctions
         return self::run( function () use ( $config )
         {
             if ( function_exists( 'set_time_limit' ) )
-                @set_time_limit( $config->int( 'AISettings', 'Timeout', 115, 1, 600 ) + 30 );
+                @set_time_limit( self::timeout( $config ) + 30 );
             return expAiEditForm::fill( $config, self::formPost() );
         } );
+    }
+
+    /** @return int seconds the provider of the current user's model may take */
+    protected static function timeout( expAiConfig $config )
+    {
+        $settings = $config->providerSettings();
+        return max( 1, min( 600, (int) ( isset( $settings['Timeout'] ) && $settings['Timeout'] !== '' ? $settings['Timeout'] : 115 ) ) );
     }
 
     protected static function formPost()

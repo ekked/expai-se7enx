@@ -49,10 +49,17 @@ class expAiUsageLog extends eZPersistentObject
                 'session_key' => $str( 'SessionKey' ),
                 'rate_limits' => $str( 'RateLimits' ),
                 'request_debug' => $str( 'RequestDebug' ),
+                'model_alias' => $str( 'ModelAlias' ),
+                'reasoning_tokens' => $int( 'ReasoningTokens' ),
+                'reported_cost_micros' => $int( 'ReportedCostMicros' ),
+                'tool_mode' => $str( 'ToolMode' ),
+                'mcp_calls' => $int( 'McpCalls' ),
+                'region' => $str( 'Region' ),
+                'retention' => $str( 'Retention' ),
             ),
             'keys' => array( 'id' ),
             'increment_key' => 'id',
-            'function_attributes' => array( 'tools' => 'tools', 'cost' => 'cost', 'total_tokens' => 'totalTokens' ),
+            'function_attributes' => array( 'tools' => 'tools', 'cost' => 'cost', 'cost_source' => 'costSource', 'total_tokens' => 'totalTokens' ),
             'class_name' => 'expAiUsageLog',
             'sort' => array( 'id' => 'desc' ),
             'name' => 'expai_usage_log',
@@ -77,6 +84,16 @@ class expAiUsageLog extends eZPersistentObject
     public function cost()
     {
         return expAiUsage::cost( $this->attribute( 'model' ), $this->attribute( 'input_tokens' ), $this->attribute( 'output_tokens' ),
-                                 $this->attribute( 'cache_write_tokens' ), $this->attribute( 'cache_read_tokens' ) );
+                                 $this->attribute( 'cache_write_tokens' ), $this->attribute( 'cache_read_tokens' ),
+                                 (string) $this->attribute( 'model_alias' ), (int) $this->attribute( 'reported_cost_micros' ) );
+    }
+
+    /** @return string reported | alias | table | default: where the cost comes from */
+    public function costSource()
+    {
+        if ( !expAiCost::enabled() )
+            return '';
+        $cost = expAiCost::of( $this->attribute( 'model' ), 0, 0, 0, 0, (string) $this->attribute( 'model_alias' ), (int) $this->attribute( 'reported_cost_micros' ) );
+        return $cost['source'];
     }
 }

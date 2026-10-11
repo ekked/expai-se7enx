@@ -361,6 +361,10 @@ div#node-tab-expai_media-content.tab-content {
 .exp-ai-figures > div { padding: 0.4em 0.6em; border: 1px solid var(--exp-ai-line); border-radius: var(--exp-ai-radius); }
 .exp-ai-figures dt { font-size: 0.8em; color: var(--exp-ai-muted); margin: 0; }
 .exp-ai-figures dd { font-size: 1.15em; font-weight: 600; margin: 0; }
+.exp-ai-models-page .exp-ai-figures dd { font-size: 1em; overflow-wrap: anywhere; }
+.exp-ai-models-page .exp-ai-warning { border-color: var(--exp-ai-danger, #b42318); }
+.exp-ai-models-page td small, .exp-ai-models-page td code { overflow-wrap: anywhere; }
+.exp-ai-test-result { background: var(--exp-ai-soft, transparent); }
 .exp-ai-card > summary { cursor: pointer; }
 .exp-ai-card > summary h2 { display: inline; }
 .exp-ai-turns { list-style: none; margin: 0; padding: 0; }

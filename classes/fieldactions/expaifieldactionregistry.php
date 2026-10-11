@@ -64,7 +64,8 @@ class expAiFieldActionRegistry
         foreach ( $answer['content'] as $block )
             if ( isset( $block['type'] ) && $block['type'] === 'text' )
                 $text .= $block['text'];
-        $data = json_decode( trim( $text ), true );
+        // a model without structured output may wrap the JSON in words or a code fence
+        $data = expAiPromptedToolProvider::extractJson( $text );
         if ( !is_array( $data ) || !isset( $data['value'] ) )
             throw new expAiException( 'The answer of Exponential Intelligence could not be read.', 'no structured value' );
         return array( 'value' => $request->clean( $data['value'] ), 'note' => isset( $data['note'] ) ? (string) $data['note'] : '',

@@ -16,6 +16,10 @@
  * prefix (anthropic., us.anthropic. ...), then the family and version (claude-sonnet-5-5-... -> claude-sonnet-5-5).
  * An unknown model is priced with the Default* prices and marked approximate. [Pricing] Enabled=false switches
  * costs off.
+ *
+ * Since the provider registry: a request is priced, in this order, with the cost its provider reported (OpenRouter
+ * usage.cost, stored as reported_cost_micros; shown "reported"), the prices of its model alias ([Model_<alias>]
+ * InputPerMTok ...; a local model with prices 0 is free), then the [Pricing] table by model id as before.
  */
 class expAiCost
 {
@@ -99,16 +103,75 @@ class expAiCost
     }
 
     /**
-     * The estimated cost of one request.
-     * @return array amount (float), approx (bool), key
+     * The prices of a model alias from its [Model_<alias>] group, when it has input and output prices.
+     * @return array|null input, output, cache_write, cache_read, approx (false), key (alias:<alias>)
      */
-    public static function of( $model, $input, $output, $cacheWrite, $cacheRead )
+    public static function aliasPrices( $alias, ?expAiConfig $config = null )
     {
+        $alias = (string) $alias;
+        if ( $alias === '' )
+            return null;
+        $config = $config ?: expAiConfig::instance();
+        $model = $config->registry()->getModel( $alias );
+        if ( !$model || $model['prices']['input'] === null || $model['prices']['output'] === null )
+            return null;
+        $multiplier = (float) $config->get( 'Pricing', 'Multiplier', 1 );
+        $multiplier = $multiplier > 0 ? $multiplier : 1.0;
+        $p = $model['prices'];
+        return array( 'input' => $p['input'] * $multiplier, 'output' => $p['output'] * $multiplier,
+                      'cache_write' => ( $p['cache_write'] !== null ? $p['cache_write'] : $p['input'] ) * $multiplier,
+                      'cache_read' => ( $p['cache_read'] !== null ? $p['cache_read'] : $p['input'] ) * $multiplier,
+                      'approx' => false, 'key' => 'alias:' . $alias );
+    }
+
+    /**
+     * The cost of one request.
+     * @param string $alias the model alias of the request ('' for rows logged before the registry)
+     * @param int $reportedMicros the cost the provider reported, in millionths of the currency (0: none)
+     * @return array amount (float), approx (bool), key, source (reported | alias | table | default)
+     */
+    public static function of( $model, $input, $output, $cacheWrite, $cacheRead, $alias = '', $reportedMicros = 0 )
+    {
+        if ( (int) $reportedMicros > 0 )
+            return array( 'amount' => (int) $reportedMicros / 1000000, 'approx' => false, 'key' => 'reported', 'source' => 'reported' );
         $prompt = (int) $input + (int) $cacheWrite + (int) $cacheRead;
-        $p = self::prices( $model, $prompt );
+        $p = self::aliasPrices( $alias );
+        $source = 'alias';
+        if ( !$p )
+        {
+            $p = self::prices( $model, $prompt );
+            $source = $p['approx'] ? 'default' : 'table';
+            // a model of another provider without prices is not priced like a Claude model: its cost is unknown
+            if ( $p['approx'] && (string) $alias !== '' && strpos( (string) $alias, 'anthropic.' ) !== 0 )
+            {
+                $known = expAiConfig::instance()->registry()->getModel( $alias );
+                if ( !$known || $known['provider'] !== 'anthropic' )
+                    return array( 'amount' => 0.0, 'approx' => true, 'key' => 'unknown', 'source' => 'unknown' );
+            }
+        }
         $amount = ( (int) $input * $p['input'] + (int) $output * $p['output'] + (int) $cacheWrite * $p['cache_write']
                   + (int) $cacheRead * $p['cache_read'] ) / 1000000;
-        return array( 'amount' => $amount, 'approx' => $p['approx'], 'key' => $p['key'] );
+        return array( 'amount' => $amount, 'approx' => $p['approx'], 'key' => $p['key'], 'source' => $source );
+    }
+
+    /**
+     * The relative cost of a model for the picker, by its output price: free, $ (< 1 per million tokens),
+     * $$ (< 8), $$$.
+     * @return string
+     */
+    public static function costClass( $alias, ?expAiConfig $config = null )
+    {
+        $config = $config ?: expAiConfig::instance();
+        $p = self::aliasPrices( $alias, $config );
+        if ( !$p )
+        {
+            $model = $config->registry()->getModel( $alias );
+            $p = self::prices( $model ? $model['id'] : $alias, 0, $config );
+        }
+        $out = (float) $p['output'];
+        if ( $out <= 0 )
+            return 'free';
+        return $out < 1 ? '$' : ( $out < 8 ? '$$' : '$$$' );
     }
 
     /** @return string the currency symbol of [Pricing] Currency */

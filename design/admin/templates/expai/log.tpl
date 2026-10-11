@@ -23,6 +23,10 @@
         <label>{'Node ID'|i18n( 'extension/expai/log' )} <input type="number" min="0" name="ExpAiFilter_node" value="{$query.node|wash}" /></label>
         <label>{'Action'|i18n( 'extension/expai/log' )} <select name="ExpAiFilter_action"><option value="">{'All'|i18n( 'extension/expai/log' )}</option>{foreach $actions as $a}<option value="{$a|wash}"{if eq( $query.action, $a )} selected="selected"{/if}>{$a|wash}</option>{/foreach}</select></label>
         <label>{'Model'|i18n( 'extension/expai/log' )} <input type="text" name="ExpAiFilter_model" value="{$query.model|wash}" size="18" /></label>
+{if gt( $providers|count, 1 )}
+        <label>{'Provider'|i18n( 'extension/expai/log' )} <select name="ExpAiFilter_provider"><option value="">{'All'|i18n( 'extension/expai/log' )}</option>{foreach $providers as $pv}<option value="{$pv|wash}"{if eq( $query.provider, $pv )} selected="selected"{/if}>{$pv|wash}</option>{/foreach}</select></label>
+        <label>{'Region'|i18n( 'extension/expai/log' )} <select name="ExpAiFilter_region"><option value="">{'All'|i18n( 'extension/expai/log' )}</option>{foreach array( 'us', 'eu', 'local' ) as $rg}<option value="{$rg}"{if eq( $query.region, $rg )} selected="selected"{/if}>{$rg|upcase}</option>{/foreach}</select></label>
+{/if}
         <label class="exp-ai-check-label"><input type="checkbox" name="ExpAiFilter_errors" value="1"{if $query.errors} checked="checked"{/if} /> {'Errors only'|i18n( 'extension/expai/log' )}</label>
         <span class="exp-ai-actions">
             <input type="submit" class="defaultbutton exp-ai-btn" name="ExpAiFilterButton" value="{'Filter'|i18n( 'extension/expai/log' )}" />
@@ -89,23 +93,25 @@
                 <details>
                     <summary class="exp-ai-turn-head">
                         <span class="exp-ai-x-time">{$turn.created|l10n( 'shortdatetime' )}</span>
-                        <span><strong>{$turn.action|wash}</strong>{if $turn.node_id} &middot; {'node'|i18n( 'extension/expai/log' )} {$turn.node_id}{/if}{if $can_see_all} &middot; {'user'|i18n( 'extension/expai/log' )} {$turn.user_id}{/if}</span>
+                        <span><strong>{$turn.action|wash}</strong>{if $turn.provider} &middot; <span class="exp-ai-badge" title="{'Provider and region'|i18n( 'extension/expai/log' )}">{$turn.provider|wash}{if $turn.region} {$turn.region|upcase|wash}{/if}</span>{/if}{if $turn.node_id} &middot; {'node'|i18n( 'extension/expai/log' )} {$turn.node_id}{/if}{if $can_see_all} &middot; {'user'|i18n( 'extension/expai/log' )} {$turn.user_id}{/if}</span>
                         <span>{'%count request(s)'|i18n( 'extension/expai/log',, hash( '%count', $turn.requests ) )}</span>
                         <span>{'%in in / %out out'|i18n( 'extension/expai/log',, hash( '%in', $turn.input, '%out', $turn.output ) )}{if or( $turn.cache_write, $turn.cache_read )} &middot; {'cache %w / %r'|i18n( 'extension/expai/log',, hash( '%w', $turn.cache_write, '%r', $turn.cache_read ) )}{/if}</span>
                         <span>{$turn.latency} ms</span>
-                        <span>{if $turn.cost_known}{$turn.cost|mul( 10000 )|round|div( 10000 )} {$currency|wash}{else}{'cost not configured'|i18n( 'extension/expai/log' )}{/if}</span>
+                        <span>{if $turn.cost_known}{$turn.cost|mul( 10000 )|round|div( 10000 )} {$currency|wash}{if $turn.cost_reported} ({'reported'|i18n( 'extension/expai/log' )}){/if}{else}{'cost not configured'|i18n( 'extension/expai/log' )}{/if}</span>
+                        {if $turn.reasoning}<span>{'%count reasoning tokens'|i18n( 'extension/expai/log',, hash( '%count', $turn.reasoning ) )}</span>{/if}
                         {if $turn.drafts}<span class="exp-ai-status-published">{'%count draft(s)'|i18n( 'extension/expai/log',, hash( '%count', $turn.drafts ) )}</span>{/if}
                         {include uri='design:expai/parts/links.tpl' links=$turn.links}
                         {if $turn.errors}<span class="exp-ai-step-failed">{'%count error(s)'|i18n( 'extension/expai/log',, hash( '%count', $turn.errors ) )}</span>{/if}
                     </summary>
                     <table class="list exp-ai-draft-table" cellspacing="0">
-                        <thead><tr><th>#</th><th>{'Time'|i18n( 'extension/expai/log' )}</th><th>{'Model'|i18n( 'extension/expai/log' )}</th><th>{'Tokens in / out / cache write / read'|i18n( 'extension/expai/log' )}</th><th>{'Stop'|i18n( 'extension/expai/log' )}</th><th>HTTP</th><th>{'Latency'|i18n( 'extension/expai/log' )}</th><th>{'Tools'|i18n( 'extension/expai/log' )}</th><th>{'Error'|i18n( 'extension/expai/log' )}</th></tr></thead>
+                        <thead><tr><th>#</th><th>{'Time'|i18n( 'extension/expai/log' )}</th><th>{'Model'|i18n( 'extension/expai/log' )}</th><th>{'Region'|i18n( 'extension/expai/log' )}</th><th>{'Tokens in / out / cache write / read'|i18n( 'extension/expai/log' )}</th><th>{'Stop'|i18n( 'extension/expai/log' )}</th><th>HTTP</th><th>{'Latency'|i18n( 'extension/expai/log' )}</th><th>{'Tools'|i18n( 'extension/expai/log' )}</th><th>{'Error'|i18n( 'extension/expai/log' )}</th></tr></thead>
                         <tbody>
 {foreach $turn.rows as $r}
                             <tr>
                                 <td>{$r.iteration}</td>
                                 <td>{$r.created|l10n( 'shorttime' )}</td>
-                                <td>{$r.model|wash}</td>
+                                <td>{$r.model|wash}{if $r.model_alias}<br /><small>{$r.model_alias|wash}{if and( $r.tool_mode, ne( $r.tool_mode, 'native' ) )} &middot; {$r.tool_mode|wash}{/if}</small>{/if}</td>
+                                <td>{if $r.region}{$r.region|upcase|wash}{if $r.retention} <small>({$r.retention|wash})</small>{/if}{else}-{/if}</td>
                                 <td>{$r.input_tokens} / {$r.output_tokens} / {$r.cache_write_tokens} / {$r.cache_read_tokens}</td>
                                 <td>{$r.stop_reason|wash}{if $r.retries} ({'%count retry'|i18n( 'extension/expai/log',, hash( '%count', $r.retries ) )}){/if}</td>
                                 <td>{$r.http_status}</td>

@@ -9,16 +9,49 @@
 
 /**
  * Nodes, objects, fields and classes as small arrays for the assistant to read. Every fetch goes through the
- * kernel's permission checks of the current user (canRead, subTree with the user's limitations).
+ * kernel's permission checks of the current user (canRead, subTree with the user's limitations), and, with a data
+ * policy set (setPolicy()), through the policy of the provider the content goes to: a node it keeps away is refused,
+ * lists leave such objects out and say how many.
  */
 class expAiContentReader
 {
     /** @var expAiConfig */
     protected $config;
 
-    public function __construct( ?expAiConfig $config = null )
+    /** @var expAiDataPolicy|null */
+    protected $policy;
+
+    /** @var int objects the policy left out of lists */
+    public $withheld = 0;
+
+    public function __construct( ?expAiConfig $config = null, ?expAiDataPolicy $policy = null )
     {
         $this->config = $config ?: expAiConfig::instance();
+        $this->policy = $policy;
+    }
+
+    public function setPolicy( ?expAiDataPolicy $policy )
+    {
+        $this->policy = $policy;
+    }
+
+    /** @return expAiDataPolicy|null */
+    public function policy()
+    {
+        return $this->policy;
+    }
+
+    /** @throws expAiException when the data policy keeps the object away from the provider */
+    public function assertAllowed( eZContentObject $object )
+    {
+        if ( $this->policy )
+            $this->policy->assertObject( $object );
+    }
+
+    /** @return bool the data policy lets the object go to the provider */
+    public function allowed( eZContentObject $object )
+    {
+        return !$this->policy || $this->policy->allowsObject( $object );
     }
 
     /** @return int */
@@ -36,6 +69,9 @@ class expAiContentReader
         $node = eZContentObjectTreeNode::fetch( (int) $nodeID );
         if ( !$node instanceof eZContentObjectTreeNode || !$node->canRead() )
             throw new expAiException( 'Node %id does not exist or you may not read it.', '', 0, array( '%id' => (int) $nodeID ) );
+        $object = $node->object();
+        if ( $object )
+            $this->assertAllowed( $object );
         return $node;
     }
 
@@ -225,13 +261,24 @@ class expAiContentReader
         }
         $out = array();
         foreach ( $node->subTree( $params ) as $child )
+        {
+            $object = $child->object();
+            if ( $object && !$this->allowed( $object ) )
+            {
+                $this->withheld++;
+                continue;
+            }
             $out[] = $this->shortNode( $child );
+        }
         return $out;
     }
 
-    /** @return array */
+    /** @return array the node in a few fields; only its id when the data policy keeps it away */
     public function shortNode( eZContentObjectTreeNode $node )
     {
+        $object = $node->object();
+        if ( $object && !$this->allowed( $object ) )
+            return array( 'node_id' => (int) $node->attribute( 'node_id' ), 'withheld' => 'kept away by the data policy' );
         return array(
             'node_id' => (int) $node->attribute( 'node_id' ),
             'object_id' => (int) $node->attribute( 'contentobject_id' ),

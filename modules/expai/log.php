@@ -8,7 +8,8 @@
  *   expai/log/(export)/csv         the filtered requests as CSV (no request texts)
  *
  * Filters are view parameters, e.g. expai/log/(from)/2026-10-01/(to)/2026-10-31/(user)/14/(errors)/1/(sort)/latency_ms/(dir)/asc:
- * from, to (YYYY-MM-DD), user (user object id, with expai/log only), node, action, model, errors (1),
+ * from, to (YYYY-MM-DD), user (user object id, with expai/log only), node, action, model, provider, region (us, eu,
+ * local), errors (1),
  * sort (created, latency_ms, input_tokens, output_tokens), dir (asc, desc), offset. The filter form posts and is
  * redirected to that address.
  * Users with expai/write see their own rows; with expai/log everyone's.
@@ -35,7 +36,10 @@ $clean = function ( array $in ) use ( $canSeeAll )
     $id = function ( $v ) { return ctype_digit( $v ) && (int) $v > 0 ? (string) (int) $v : ''; };
     return array( 'from' => $day( $value( 'from' ) ), 'to' => $day( $value( 'to' ) ), 'user' => $canSeeAll ? $id( $value( 'user' ) ) : '',
                   'node' => $id( $value( 'node' ) ), 'action' => preg_replace( '/[^a-z_:]/', '', $value( 'action' ) ),
-                  'model' => preg_replace( '/[^A-Za-z0-9._:-]/', '', $value( 'model' ) ), 'errors' => $value( 'errors' ) === '1' ? '1' : '' );
+                  'model' => preg_replace( '/[^A-Za-z0-9._:\/-]/', '', $value( 'model' ) ),
+                  'provider' => preg_replace( '/[^a-z0-9_-]/', '', $value( 'provider' ) ),
+                  'region' => in_array( $value( 'region' ), array( 'us', 'eu', 'local' ), true ) ? $value( 'region' ) : '',
+                  'errors' => $value( 'errors' ) === '1' ? '1' : '' );
 };
 // the view parameters of a set of filters: /(from)/2026-10-01/(errors)/1 ...
 $path = function ( array $query )
@@ -51,7 +55,7 @@ $path = function ( array $query )
 if ( $http->hasPostVariable( 'ExpAiFilterButton' ) )
 {
     $posted = array();
-    foreach ( array( 'from', 'to', 'user', 'node', 'action', 'model', 'errors' ) as $name )
+    foreach ( array( 'from', 'to', 'user', 'node', 'action', 'model', 'provider', 'region', 'errors' ) as $name )
         $posted[$name] = $http->hasPostVariable( 'ExpAiFilter_' . $name ) ? $http->postVariable( 'ExpAiFilter_' . $name ) : '';
     return $Module->redirectTo( '/expai/log' . $path( $clean( $posted ) ) );
 }
@@ -64,6 +68,8 @@ $filters = array(
     'node_id' => (int) $query['node'],
     'action' => $query['action'],
     'model' => $query['model'],
+    'provider' => $query['provider'],
+    'region' => $query['region'],
     'errors' => $query['errors'] === '1',
 );
 $sort = isset( $user['sort'] ) && in_array( $user['sort'], array( 'created', 'latency_ms', 'input_tokens', 'output_tokens' ), true ) ? $user['sort'] : 'created';
@@ -78,7 +84,8 @@ if ( isset( $user['export'] ) && $user['export'] === 'csv' )
     $out = fopen( 'php://temp', 'w+' );
     fputcsv( $out, array( 'id', 'time', 'user_id', 'node_id', 'conversation_id', 'turn', 'action', 'model', 'input_tokens', 'output_tokens',
                           'cache_write_tokens', 'cache_read_tokens', 'stop_reason', 'http_status', 'latency_ms', 'iteration', 'tool_count',
-                          'tool_ms', 'tools', 'retries', 'error_class', 'error_message', 'drafts_written', 'cost_' . expAiUsage::currency() ), ',', '"', '' );
+                          'tool_ms', 'tools', 'retries', 'error_class', 'error_message', 'drafts_written', 'cost_' . expAiUsage::currency(),
+                          'provider', 'model_alias', 'region', 'retention', 'reasoning_tokens', 'cost_source', 'tool_mode', 'mcp_calls' ), ',', '"', '' );
     foreach ( $rows as $row )
     {
         $cost = $row->cost();
@@ -90,7 +97,9 @@ if ( isset( $user['export'] ) && $user['export'] === 'csv' )
                               $row->attribute( 'tool_count' ), $row->attribute( 'tool_ms' ),
                               implode( ' ', array_map( function ( $t ) { return $t['name']; }, $row->tools() ) ), $row->attribute( 'retries' ),
                               $row->attribute( 'error_class' ), $row->attribute( 'error_message' ), $row->attribute( 'drafts_written' ),
-                              $cost === null ? '' : number_format( $cost, 6, '.', '' ) ), ',', '"', '' );
+                              $cost === null ? '' : number_format( $cost, 6, '.', '' ),
+                              $row->attribute( 'provider' ), $row->attribute( 'model_alias' ), $row->attribute( 'region' ), $row->attribute( 'retention' ),
+                              $row->attribute( 'reasoning_tokens' ), $row->costSource(), $row->attribute( 'tool_mode' ), $row->attribute( 'mcp_calls' ) ), ',', '"', '' );
     }
     rewind( $out );
     $csv = stream_get_contents( $out );
@@ -147,7 +156,8 @@ else
     $tpl->setVariable( 'turns', $turns['turns'] );
     $tpl->setVariable( 'total', $turns['count'] );
     $tpl->setVariable( 'stats', expAiUsage::aggregate( $filters ) );
-    $tpl->setVariable( 'actions', array( 'panel', 'fill', 'field:write', 'field:rewrite', 'field:shorten', 'field:translate', 'field:suggest' ) );
+    $tpl->setVariable( 'actions', array( 'panel', 'fill', 'field:write', 'field:rewrite', 'field:shorten', 'field:translate', 'field:suggest', 'probe', 'test' ) );
+    $tpl->setVariable( 'providers', array_keys( expAiConfig::instance()->registry()->providers() ) );
 }
 
 $Result = array();

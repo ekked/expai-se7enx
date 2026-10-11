@@ -34,16 +34,22 @@ class expAiToolContext
     /** @var string */
     public $model = '';
 
+    /** @var string the provider id of the model */
+    public $provider = '';
+
+    /** @var string the model alias */
+    public $modelAlias = '';
+
     /** @var string the editor's last message */
     public $request = '';
 
     /** @var array drafts written in this step: list of expAiDraftLog */
     public $written = array();
 
-    public function __construct( expAiConfig $config, $nodeID, $conversation = null )
+    public function __construct( expAiConfig $config, $nodeID, $conversation = null, ?expAiDataPolicy $policy = null )
     {
         $this->config = $config;
-        $this->reader = new expAiContentReader( $config );
+        $this->reader = new expAiContentReader( $config, $policy );
         $this->writer = new expAiContentWriter( $config );
         $this->user = eZUser::currentUser();
         $this->nodeID = (int) $nodeID;

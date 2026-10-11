@@ -48,11 +48,13 @@ class expAiUsage
      * not configured for the model.
      * @return float|null
      */
-    public static function cost( $model, $input, $output, $cacheWrite, $cacheRead )
+    public static function cost( $model, $input, $output, $cacheWrite, $cacheRead, $alias = '', $reportedMicros = 0 )
     {
         if ( !expAiCost::enabled() )
             return null;
-        $cost = expAiCost::of( $model, $input, $output, $cacheWrite, $cacheRead );
+        $cost = expAiCost::of( $model, $input, $output, $cacheWrite, $cacheRead, $alias, $reportedMicros );
+        if ( $cost['source'] === 'unknown' )
+            return null;
         if ( $cost['approx'] )
             self::$approx = true;
         return $cost['amount'];
@@ -111,7 +113,7 @@ class expAiUsage
         foreach ( array( 'user_id', 'node_id', 'conversation_id' ) as $field )
             if ( !empty( $filters[$field] ) )
                 $conds[$field] = (int) $filters[$field];
-        foreach ( array( 'action', 'model', 'session_key' ) as $field )
+        foreach ( array( 'action', 'model', 'session_key', 'provider', 'region' ) as $field )
             if ( isset( $filters[$field] ) && $filters[$field] !== '' )
                 $conds[$field] = (string) $filters[$field];
         if ( !empty( $filters['errors'] ) )
@@ -145,7 +147,8 @@ class expAiUsage
         $rows = self::rows( eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), null, self::conditions( $filters ) ?: null,
             array( 'id' => 'desc' ), array( 'offset' => 0, 'length' => self::AGGREGATE_LIMIT ), false ) );
         $empty = array( 'requests' => 0, 'input' => 0, 'output' => 0, 'cache_write' => 0, 'cache_read' => 0, 'latency' => 0,
-                        'errors' => 0, 'cost' => 0.0, 'cost_known' => true, 'tools' => 0, 'drafts' => 0 );
+                        'errors' => 0, 'cost' => 0.0, 'cost_known' => true, 'tools' => 0, 'drafts' => 0, 'reasoning' => 0 );
+        $perProvider = array();
         $totals = $empty;
         $perUser = array();
         $perDay = array();
@@ -161,7 +164,9 @@ class expAiUsage
             $t['drafts'] += (int) $row['drafts_written'];
             if ( $row['error_class'] !== '' && $row['error_class'] !== null )
                 $t['errors']++;
-            $cost = expAiUsage::cost( $row['model'], $row['input_tokens'], $row['output_tokens'], $row['cache_write_tokens'], $row['cache_read_tokens'] );
+            $cost = expAiUsage::cost( $row['model'], $row['input_tokens'], $row['output_tokens'], $row['cache_write_tokens'], $row['cache_read_tokens'],
+                                      isset( $row['model_alias'] ) ? (string) $row['model_alias'] : '', isset( $row['reported_cost_micros'] ) ? (int) $row['reported_cost_micros'] : 0 );
+            $t['reasoning'] += isset( $row['reasoning_tokens'] ) ? (int) $row['reasoning_tokens'] : 0;
             if ( $cost === null )
                 $t['cost_known'] = false;
             else
@@ -174,6 +179,13 @@ class expAiUsage
             if ( !isset( $perUser[$user] ) )
                 $perUser[$user] = $empty + array( 'user_id' => $user );
             $add( $perUser[$user], $row );
+            $provider = isset( $row['provider'] ) && $row['provider'] !== '' ? (string) $row['provider'] : 'anthropic';
+            $region = isset( $row['region'] ) ? (string) $row['region'] : '';
+            if ( !isset( $perProvider[$provider] ) )
+                $perProvider[$provider] = $empty + array( 'provider' => $provider, 'regions' => array() );
+            $add( $perProvider[$provider], $row );
+            if ( $region !== '' )
+                $perProvider[$provider]['regions'][$region] = true;
             $day = date( 'Y-m-d', (int) $row['created'] );
             if ( !isset( $perDay[$day] ) )
                 $perDay[$day] = $empty + array( 'day' => $day );
@@ -190,10 +202,13 @@ class expAiUsage
         expAiUsage::approxSeen();
         $totals['cost_approx'] = false;
         foreach ( $rows as $row )
-            if ( expAiCost::enabled() && expAiCost::of( $row['model'], 0, 0, 0, 0 )['approx'] )
+            if ( expAiCost::enabled() && expAiCost::of( $row['model'], 0, 0, 0, 0, isset( $row['model_alias'] ) ? (string) $row['model_alias'] : '',
+                                                         isset( $row['reported_cost_micros'] ) ? (int) $row['reported_cost_micros'] : 0 )['approx'] )
                 $totals['cost_approx'] = true;
         return array( 'totals' => $finish( $totals ), 'per_user' => array_map( $finish, array_values( $perUser ) ),
-                      'per_day' => array_map( $finish, array_values( $perDay ) ), 'truncated' => count( $rows ) >= self::AGGREGATE_LIMIT );
+                      'per_day' => array_map( $finish, array_values( $perDay ) ),
+                      'per_provider' => array_map( function ( $t ) use ( $finish ) { $t['regions'] = implode( ', ', array_keys( $t['regions'] ) ); return $finish( $t ); }, array_values( $perProvider ) ),
+                      'truncated' => count( $rows ) >= self::AGGREGATE_LIMIT );
     }
 
     /**
@@ -214,7 +229,9 @@ class expAiUsage
             if ( !isset( $turns[$key] ) )
                 $turns[$key] = array( 'key' => $key, 'created' => (int) $row->attribute( 'created' ), 'user_id' => (int) $row->attribute( 'user_id' ),
                                       'node_id' => (int) $row->attribute( 'node_id' ), 'action' => (string) $row->attribute( 'action' ),
-                                      'model' => (string) $row->attribute( 'model' ), 'requests' => 0, 'input' => 0, 'output' => 0,
+                                      'model' => (string) $row->attribute( 'model' ), 'provider' => (string) $row->attribute( 'provider' ),
+                                      'region' => (string) $row->attribute( 'region' ), 'retention' => (string) $row->attribute( 'retention' ),
+                                      'reasoning' => 0, 'cost_reported' => false, 'requests' => 0, 'input' => 0, 'output' => 0,
                                       'cache_write' => 0, 'cache_read' => 0, 'latency' => 0, 'tool_ms' => 0, 'tools' => array(),
                                       'drafts' => 0, 'errors' => 0, 'cost' => 0.0, 'cost_known' => true, 'rows' => array() );
             $t =& $turns[$key];
@@ -226,6 +243,9 @@ class expAiUsage
             $t['cache_read'] += (int) $row->attribute( 'cache_read_tokens' );
             $t['latency'] += (int) $row->attribute( 'latency_ms' );
             $t['tool_ms'] += (int) $row->attribute( 'tool_ms' );
+            $t['reasoning'] += (int) $row->attribute( 'reasoning_tokens' );
+            if ( (int) $row->attribute( 'reported_cost_micros' ) > 0 )
+                $t['cost_reported'] = true;
             $t['drafts'] += (int) $row->attribute( 'drafts_written' );
             if ( (string) $row->attribute( 'error_class' ) !== '' )
                 $t['errors']++;

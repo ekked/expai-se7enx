@@ -8,9 +8,10 @@
  */
 
 /**
- * JSON POST to an AI provider with curl: http(s) only, no redirects, a total and a connect timeout and a limit on
- * the size of the answer. Errors are expAiException whose texts never contain the request, the answer or the
- * headers (the API key travels in a header).
+ * JSON POST to an AI provider (or an MCP server) with curl: http(s) only, no redirects, a total and a connect timeout
+ * and a limit on the size of the answer. Of the response headers only the ones of the allowlist are kept (rate limit
+ * headers for the usage log, glob patterns such as anthropic-ratelimit-* or x-ratelimit-*). Errors are expAiException
+ * whose texts never contain the request, the answer or the headers (the API key travels in a header).
  */
 class expAiHttpClient
 {
@@ -23,21 +24,57 @@ class expAiHttpClient
     /** @var int */
     protected $maxResponseBytes;
 
-    public function __construct( $timeout = 115, $connectTimeout = 10, $maxResponseBytes = 4194304 )
+    /** @var string[] lower-case glob patterns of the response headers to keep */
+    protected $keepHeaders;
+
+    /**
+     * @param string[]|null $keepHeaders glob patterns of the response headers to keep (default: the Anthropic rate
+     *                                   limit headers and retry-after)
+     */
+    public function __construct( $timeout = 115, $connectTimeout = 10, $maxResponseBytes = 4194304, $keepHeaders = null )
     {
         $this->timeout = max( 1, min( 600, (int) $timeout ) );
         $this->connectTimeout = max( 1, min( $this->timeout, (int) $connectTimeout ) );
         $this->maxResponseBytes = max( 1024, (int) $maxResponseBytes );
+        $this->keepHeaders = array_map( 'strtolower', is_array( $keepHeaders ) && $keepHeaders ? array_values( $keepHeaders )
+                                                      : array( 'anthropic-ratelimit-*', 'retry-after' ) );
+    }
+
+    /** @return int seconds */
+    public function timeout()
+    {
+        return $this->timeout;
+    }
+
+    /** @return bool the header is on the allowlist */
+    public function keeps( $name )
+    {
+        $name = strtolower( $name );
+        foreach ( $this->keepHeaders as $pattern )
+            if ( fnmatch( $pattern, $name ) )
+                return true;
+        return false;
     }
 
     /**
      * @param string $url
      * @param array $headers list of "Name: value"
      * @param string $body JSON
-     * @return array( int status, string body, array rate limit headers: lower-case name => value )
+     * @return array( int status, string body, array kept headers: lower-case name => value )
      * @throws expAiException
      */
     public function postJson( $url, array $headers, $body )
+    {
+        return $this->request( $url, $headers, $body );
+    }
+
+    /**
+     * @param array $options accept (Accept header, default application/json), resolve (curl CURLOPT_RESOLVE list,
+     *                       used to pin a checked address), method (GET; default POST)
+     * @return array( int status, string body, array kept headers )
+     * @throws expAiException
+     */
+    public function request( $url, array $headers, $body, array $options = array() )
     {
         if ( !is_string( $url ) || !preg_match( '~^https?://[^\s/?#@]+(?::\d+)?(?:[/?#]\S*)?$~i', $url ) )
             throw new expAiException( 'Exponential Intelligence is not configured correctly.', 'invalid endpoint (http or https without credentials)' );
@@ -48,11 +85,14 @@ class expAiHttpClient
         $tooLarge = false;
         $responseHeaders = array();
         $limit = $this->maxResponseBytes;
+        $client = $this;
+        $accept = isset( $options['accept'] ) ? (string) $options['accept'] : 'application/json';
         $ch = curl_init( $url );
+        $get = isset( $options['method'] ) && $options['method'] === 'GET';
         curl_setopt_array( $ch, array(
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => $body,
-            CURLOPT_HTTPHEADER => array_merge( array( 'Content-Type: application/json', 'Accept: application/json' ), $headers ),
+            CURLOPT_POST => !$get,
+            CURLOPT_HTTPGET => $get,
+            CURLOPT_HTTPHEADER => array_merge( $get ? array( 'Accept: ' . $accept ) : array( 'Content-Type: application/json', 'Accept: ' . $accept ), $headers ),
             CURLOPT_FOLLOWLOCATION => false,
             CURLOPT_TIMEOUT => $this->timeout,
             CURLOPT_CONNECTTIMEOUT => $this->connectTimeout,
@@ -60,11 +100,11 @@ class expAiHttpClient
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
             CURLOPT_USERAGENT => 'Exponential expai',
-            // the rate limit headers (anthropic-ratelimit-*, retry-after) for the usage log; nothing else is kept
-            CURLOPT_HEADERFUNCTION => static function ( $handle, $line ) use ( &$responseHeaders )
+            // only the headers of the allowlist (rate limits, retry-after, content-type, mcp-session-id ...) are kept
+            CURLOPT_HEADERFUNCTION => static function ( $handle, $line ) use ( &$responseHeaders, $client )
             {
-                if ( preg_match( '/^(anthropic-ratelimit-[a-z-]+|retry-after):\s*(.*?)\s*$/i', $line, $m ) )
-                    $responseHeaders[strtolower( $m[1] )] = $m[2];
+                if ( preg_match( '/^([A-Za-z0-9-]+):\s*(.*?)\s*$/', $line, $m ) && $client->keeps( $m[1] ) )
+                    $responseHeaders[strtolower( $m[1] )] = substr( $m[2], 0, 200 );
                 return strlen( $line );
             },
             CURLOPT_WRITEFUNCTION => static function ( $handle, $chunk ) use ( &$received, &$tooLarge, $limit )
@@ -78,6 +118,10 @@ class expAiHttpClient
                 return strlen( $chunk );
             },
         ) );
+        if ( !$get )
+            curl_setopt( $ch, CURLOPT_POSTFIELDS, $body );
+        if ( !empty( $options['resolve'] ) )
+            curl_setopt( $ch, CURLOPT_RESOLVE, (array) $options['resolve'] );
         if ( defined( 'CURLOPT_PROTOCOLS_STR' ) )
             curl_setopt( $ch, CURLOPT_PROTOCOLS_STR, 'http,https' );
         elseif ( defined( 'CURLOPT_PROTOCOLS' ) )
