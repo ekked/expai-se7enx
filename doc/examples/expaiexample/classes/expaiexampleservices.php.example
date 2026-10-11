@@ -1,0 +1,23 @@
+<?php
+/**
+ * A service of expservices that is also an MCP tool and a tool of the assistant (doc/service-tools.md): one declaration,
+ * three channels. HTTP: ezjscore/call/expexample::childNames::2. MCP: exp_svc_example_child_names (expmcp generates it
+ * from the catalogue). The assistant: exp_svc_example_child_names, because the declaration says 'ai' => true.
+ * Registered in settings/ezjscore.ini.append.php as [ezjscServer_expexample].
+ */
+class expAiExampleServices extends expServiceBase
+{
+    public static $services = array( 'childNames' => array( 'summary' => 'The names of the children of a node',
+        'access' => array( 'content', 'read' ), 'write' => false, 'ai' => true,
+        'args' => array( 'node_id' => 'int' ), 'returns' => 'list of node_id, object_id, name' ) );
+
+    public static function childNames( $args )
+    {
+        self::guard( __FUNCTION__ );
+        $out = array();
+        foreach ( self::node( self::arg( $args, 0, 'int' ) )->children() as $child )
+            $out[] = array( 'node_id' => (int) $child->attribute( 'node_id' ), 'object_id' => (int) $child->attribute( 'contentobject_id' ),
+                            'name' => $child->attribute( 'name' ) );
+        return self::ok( $out );
+    }
+}
