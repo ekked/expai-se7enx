@@ -303,6 +303,26 @@
         <source>The chain run cannot be continued.</source>
         <translation>The chain run cannot be continued.</translation>
     </message>
+    <message>
+        <source>You may not use the service %service.</source>
+        <translation>You may not use the service %service.</translation>
+    </message>
+    <message>
+        <source>The service %service answered with an error: %error</source>
+        <translation>The service %service answered with an error: %error</translation>
+    </message>
+    <message>
+        <source>The argument %name of %tool must not be a list.</source>
+        <translation>The argument %name of %tool must not be a list.</translation>
+    </message>
+    <message>
+        <source>This request was refused: %reason</source>
+        <translation>This request was refused: %reason</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence is switched off on this site.</source>
+        <translation>Exponential Intelligence is switched off on this site.</translation>
+    </message>
 </context>
 <!-- expai chains: end -->
 <!-- expai lanes/budgets/packages: begin -->
@@ -2689,6 +2709,10 @@
     <message>
         <source>Read the project history</source>
         <translation>Read the project history</translation>
+    </message>
+    <message>
+        <source>Called the service %service</source>
+        <translation>Called the service %service</translation>
     </message>
 </context>
 <context>

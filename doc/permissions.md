@@ -16,11 +16,12 @@
 | `expai/chain` | AI chains ([chains.md](chains.md#permissions)): with `expai/write`, starting runs (Intelligence tab, dashboard), the view `expai/chain`, approving, asking for changes, stopping and continuing runs at their checkpoint. Limitation **Chain**: only those chains |
 | `expai/web` | the web and history tools in the panel ([tools.md](tools.md#web-and-history-tools)). Limitation **Tool**: `web_fetch`, `web_search`, `project_history`; without it all three (each is still offered only once configured) |
 | `expai/translation_sync` | in the Translations section of the Intelligence tab: Check translations, Approve, Translate in full, Skip (`expaitranslation::check`, `approve`, `skip`), with `expai/write`; Approve and Skip also need `content/edit` in that language ([translation-sync.md](translation-sync.md)) |
+| `expai/services` | service tools: the read services of expservices that opted in, called by the assistant as the editor ([service-tools.md](service-tools.md)); each call also needs `ezjscore/call` and the access the service declares. Limitation **Domain**: only the services of those domains (`node`, `tags`, ...); without it every opted-in service |
 
 `expai/log` also opens `expai/budgets` (the site budget, job groups, lanes, batches); with `expai/settings` its
 "Resume held jobs" button ([budgets.md](budgets.md)).
 
-`expai/model_use`, `expai/mcp`, `expai/web` and `expai/chain` have one limitation each; the others none. What the assistant may do in the content
+`expai/model_use`, `expai/mcp`, `expai/web`, `expai/services` and `expai/chain` have one limitation each; the others none. What the assistant may do in the content
 tree is decided by the editor's content policies (below). The tab, the menu entry and the dashboard block are not shown at all without `expai/write`.
 
 ## ezjscore

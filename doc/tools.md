@@ -189,3 +189,12 @@ Never shown: a path filter that matches `ExcludePaths[]` (default `ai/*`) or tha
 file is never named, read or confirmed); commit titles and release note lines that name an excluded directory or an
 untracked `*.md` in the clone's root (`HideUntrackedRootMarkdown`); author names by default. git log reads committed
 history only, never the working tree. Cap: `MaxCallsPerTurn` (5).
+
+## Service tools (exp_svc_*)
+
+Read services of the extension expservices that opted in (`'ai' => true` in their declaration, or
+`[ServiceTools] Services[]`), named as expmcp names them: `exp_svc_node_children_names`, `exp_svc_tags_tree`, ... Each
+is offered only to a user with the policy `expai/services` (limitation **Domain**), `ezjscore/call` and the access the
+service declares; it runs in process as the editor through `expServiceBase::invoke()`, its arguments and answer pass
+the data policy, and the answer is wrapped as data (`service`, `note`, `data`, `meta`). A service that writes is never
+offered. The usage log adds `service` (`node::childrenNames`) to the tool's entry. See [service-tools.md](service-tools.md).

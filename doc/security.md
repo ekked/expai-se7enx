@@ -21,7 +21,7 @@ apply.
 
 Every function is POST only and checks the form token (ezformtoken) against the session's, in addition to ezformtoken
 itself. ezjscore checks `ezjscore/call` for the function list `expai`; expai checks `expai/write` (and enabled +
-configured). Ids from the browser are cast to integers; actions on drafts are limited to versions in the log written
+configured, the master switch and the veto hook of [switch-and-veto.md](switch-and-veto.md)). Ids from the browser are cast to integers; actions on drafts are limited to versions in the log written
 for this editor and still the editor's own drafts.
 
 ## What goes to the provider

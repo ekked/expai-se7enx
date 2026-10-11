@@ -18,7 +18,8 @@ a list, empty it where you set it: a line with only `FieldActions[]`, then the e
 
 | Setting | Default | Effect |
 | --- | --- | --- |
-| `Enabled` | `false` | `true` or `enabled` switches the assistant on. Off: no tab, no edit form controls; the dashboard says "Switched off". |
+| `Enabled` | `false` | The master switch: `true` or `enabled` switches the assistant on. Off: no tab, no edit form controls, no Vector, nothing queued, queued jobs held, no request to any provider; the dashboard says "Switched off" ([switch-and-veto.md](switch-and-veto.md)). |
+| `DisabledSiteAccesses[]` | (none) | Siteaccesses on which expai is off although `Enabled` is on; a queued request is checked against the siteaccess it was queued from. |
 | `Provider` | `anthropic` | `anthropic` (the built-in Anthropic Messages API) or `custom` (the class in `ProviderClass`). |
 | `ProviderClass` | (empty) | With `Provider=custom`: a class implementing `expAiProvider` (extending.md). |
 | `Endpoint` | `https://api.anthropic.com/v1/messages` | The Messages API URL (http or https, no credentials in it). |
@@ -212,6 +213,31 @@ See [data-policy.md](data-policy.md). Without any rule every active provider may
 | `ClassRegions[<class identifier>]` | (none) | The same per class. Section, class and default narrow each other. |
 | `ZeroRetention` | `disabled` | `enabled`: every request needs a provider with `Retention=none` or `zdr`. |
 | `ZeroRetentionSections[]`, `ZeroRetentionClasses[]` | (none) | Sections and classes whose content needs zero retention. |
+
+## [RequestVeto] and [RequestVeto_<rule>]: the veto hook
+
+See [switch-and-veto.md](switch-and-veto.md). Checked before every request to a provider and before a request is
+queued; after the rules, the ezpEvent filter `expai/request/veto` (site.ini `[Event] Listeners[]`) may refuse too.
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `[RequestVeto] Rules[]` | (none) | The rules, in order; the first whose conditions all match refuses the request with its `Reason`. |
+| `[RequestVeto_<rule>] Sections[]`, `Classes[]`, `Subtrees[]` | (none) | Section ids, class identifiers, node ids (at or below) of the request's content. |
+| `[RequestVeto_<rule>] SiteAccesses[]`, `Providers[]`, `Regions[]` | (none) | The siteaccess, the provider id, the provider's region. |
+| `[RequestVeto_<rule>] Purposes[]` | (none) | `panel`, `vector`, a field action, `test`, `probe`, `queue.<purpose>`; a trailing `*` matches the rest. |
+| `[RequestVeto_<rule>] Reason` | "This request is not allowed on this site." | Shown to the editor and logged. A rule without conditions refuses every request. |
+
+## [ServiceTools]: service tools
+
+See [service-tools.md](service-tools.md). The read services of expservices the assistant may call
+(`exp_svc_<domain>_<method>`); a service opts in in its declaration with `'ai' => true`.
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `Enabled` | `enabled` | `disabled`: no service is offered. |
+| `Services[]` | (none) | More services offered without code changes: `<domain>::<method>`, or `<domain>::*`. Never a write. |
+| `Domains[]` | (none) | Every read service of these domains. |
+| `Exclude[]` | (none) | Never offered (same patterns as `Services[]`), e.g. `node::countByClass`. |
 
 ## [ProbeSettings]: the write gate
 

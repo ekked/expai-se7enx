@@ -10,6 +10,7 @@
 | [providers.md](providers.md) | The provider registry, the anthropic and openai_chat adapters, models, the picker, tool modes, errors and retries |
 | [provider-support.md](provider-support.md) | What is proven with which provider: live, against docs-derived mocks, or not yet |
 | [data-policy.md](data-policy.md) | Regions and retention of providers, rules per section and class, where they are enforced |
+| [switch-and-veto.md](switch-and-veto.md) | The master switch (on, off, off per siteaccess) at every entry point, and the veto hook: rules and the ezpEvent filter expai/request/veto |
 | [probe.md](probe.md) | The tool-calling probe and the write gate |
 | [local-models.md](local-models.md) | A local open-weight model: install, limits, the helper, expai/models |
 | [mcp.md](mcp.md) | MCP tools: the in-process expmcp bridge and external servers |
@@ -30,6 +31,7 @@
 | [dashboard.md](dashboard.md) | expai/dashboard (figures, chart, limits, Start writing, view parameters), the menu entries, the dashboard block, the log page |
 | [usage-tracking.md](usage-tracking.md) | What is recorded per request, turns, the estimated cost and how to check it, limits, retention, privacy |
 | [tools.md](tools.md) | Every tool Claude can call: input, result, permission checks, limits |
+| [service-tools.md](service-tools.md) | Service tools: one expservices declaration as HTTP endpoint, MCP tool and assistant tool; opting in, checks, the tested example |
 | [approval-workflow.md](approval-workflow.md) | Drafts, ezapprove, the collaboration item and the label, the tested path |
 | [security.md](security.md) | The key, permissions as the user, no auto-publish, prompt injection, logging and privacy |
 | [database.md](database.md) | The four tables, per engine, the install and upgrade script |

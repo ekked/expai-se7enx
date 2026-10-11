@@ -303,6 +303,26 @@
         <source>The chain run cannot be continued.</source>
         <translation>Der Kettenlauf kann nicht fortgesetzt werden.</translation>
     </message>
+    <message>
+        <source>You may not use the service %service.</source>
+        <translation>Sie dürfen den Dienst %service nicht verwenden.</translation>
+    </message>
+    <message>
+        <source>The service %service answered with an error: %error</source>
+        <translation>Der Dienst %service hat mit einem Fehler geantwortet: %error</translation>
+    </message>
+    <message>
+        <source>The argument %name of %tool must not be a list.</source>
+        <translation>Das Argument %name von %tool darf keine Liste sein.</translation>
+    </message>
+    <message>
+        <source>This request was refused: %reason</source>
+        <translation>Diese Anfrage wurde abgelehnt: %reason</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence is switched off on this site.</source>
+        <translation>Exponential Intelligence ist auf dieser Website ausgeschaltet.</translation>
+    </message>
 </context>
 <!-- expai chains: end -->
 <!-- expai lanes/budgets/packages: begin -->
@@ -2689,6 +2709,10 @@
     <message>
         <source>Read the project history</source>
         <translation>Projektverlauf gelesen</translation>
+    </message>
+    <message>
+        <source>Called the service %service</source>
+        <translation>Dienst %service aufgerufen</translation>
     </message>
 </context>
 <context>

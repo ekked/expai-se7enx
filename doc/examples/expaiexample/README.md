@@ -2,7 +2,8 @@
 
 The worked examples of [../../extending.md](../../extending.md) as one extension: a field action "Headline", a tool
 `count_children`, a panel section "Tips" with its JavaScript, and a provider `expAiExampleEchoProvider` that answers
-without calling any service.
+without calling any service, and a read service `expexample::childNames` that is an HTTP endpoint, an MCP tool and a
+tool of the assistant from one declaration ([../../service-tools.md](../../service-tools.md); needs expservices).
 
 Try it: copy this directory to `extension/expaiexample`, rename `classes/*.php.example` to `*.php` (they carry the
 suffix here so that the autoload generator does not pick them up from inside expai), activate it after expai (for example
