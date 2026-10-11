@@ -449,3 +449,40 @@ configured.
 
 The shipped `[SearchProvider_brave]` and the example `[HistoryRepository_example]` (not listed in `Repositories[]`)
 show the settings.
+
+## [DiffSettings], [TranslationSync]: diff and translation sync
+
+See [diff.md](diff.md) and [translation-sync.md](translation-sync.md).
+
+| `[DiffSettings]` setting | Default | Effect |
+| --- | --- | --- |
+| `Segmenters[<datatype>]` | string, text, rich text, keyword segmenters | The class (implementing `expAiSegmenter`) that cuts values of a datatype into blocks and sentences. |
+| `FallbackSegmenter` | `expAiSegmenterGeneric` | The segmenter of datatypes not listed: the value as one block. |
+| `ModifiedSimilarity` | `0.5` | Two leftover blocks with this share of words in common are one modified block; below it, one deleted and one inserted block. |
+| `Abbreviations[<family>]` | (none) | More abbreviations for the sentence splitter per language family (`eng`, `ger`, ...), separated by `;`, without the final dot. |
+
+| `[TranslationSync]` setting | Default | Effect |
+| --- | --- | --- |
+| `Enabled` | `enabled` | The workflow event, the CLI and the Translations section of the Intelligence tab. |
+| `SourceLanguages[]` | (empty) | The source language of objects (the first one an object has); empty: the object's main language. |
+| `TargetLanguages[]` | (empty) | Only these translations are kept in step; empty: every other translation. |
+| `Datatypes[]` | `ezstring`, `eztext`, `ezxmltext`, `ezkeyword` | The datatypes whose changes are translated. |
+| `PatchMaxChangedRatio` | `0.25` | Up to this share of changed source characters a patch is queued at once (below the cost threshold). |
+| `FullMinChangedRatio` | `0.6` | From this share on: a full translation (waits for an editor). Between the two: a patch that waits for an editor. |
+| `PatchMaxSegments` | `40` | A patch with more changed blocks waits for an editor. |
+| `CostThreshold` | `0.02` | In `[Pricing] Currency`: a patch estimated at or below it is queued at once; above it, it waits for an editor. |
+| `AutoQueuePatch` | `enabled` | `disabled`: every patch waits for an editor. |
+| `FullIfStructureMismatch` | `enabled` | A translation without the block structure of its base is translated in full. |
+| `Model` | (site default) | The model alias of the sync, e.g. `anthropic.claude-haiku-5-5`. |
+| `PatchLane`, `FullLane` | `auto` | The lanes of patches and full translations (`auto`: `[LanePolicy] ClassOrder[translation_patch]`, `ClassOrder[translation_full]`). |
+| `MaxOutputTokens` | `8000` | The most output tokens of one request. |
+| `QueueCheck` | `enabled` | The workflow event queues the check as a job (`expai.translation.check`); `disabled` (or no queue): it runs during the publish. |
+| `Instructions` | (empty) | Extra instructions for the translator (glossary, tone), appended to the system prompt. |
+
+The section is added to the panel with `[PanelSettings] Sections[]=translations` (`[PanelSection_translations]
+Template=expai/panel/translations.tpl`), and the answers are written by `[QueueSettings]
+Appliers[translation_sync]=expAiTranslationSyncApplier`.
+
+Other files: `expqueue.ini [JobType_expai.translation.check]` (the check job, class `system`), `ezjscore.ini
+[ezjscServer_expaitranslation]` (the functions `expaitranslation::status`, `check`, `approve`, `skip`), and
+`workflow.ini [EventSettings]` (the event type `event_expaitranslationsync`).

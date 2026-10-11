@@ -17,4 +17,11 @@ Functions[]=expai
 Class=expAiVectorServerFunctions
 Functions[]=expai
 
+# The translation sync in the Intelligence tab: expaitranslation::status|check|approve|skip
+# (classes/diff/expaitranslationsyncserverfunctions.php). The same permission as expai::*; each function checks
+# expai/write, and expai/translation_sync for check, approve and skip.
+[ezjscServer_expaitranslation]
+Class=expAiTranslationSyncServerFunctions
+Functions[]=expai
+
 */ ?>

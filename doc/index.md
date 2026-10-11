@@ -18,6 +18,8 @@
 | [packages.md](packages.md) | Content packages: export, validate, diff, import as drafts, conflicts, expai/packages |
 | [package-format.md](package-format.md) | The package format 1.0 and its JSON Schema, attribute values per datatype, the checksum |
 | [package-authoring-for-agents.md](package-authoring-for-agents.md) | How a local CLI agent writes a package (terms, data, the validation loop) |
+| [diff.md](diff.md) | The diff engine: segmenters per datatype, sentences, hunks with stable ids, metrics, compare and apply |
+| [translation-sync.md](translation-sync.md) | Translation sync: no-op / patch / full after a source change, thresholds, the workflow event, the Translations section, the CLI |
 | [permissions.md](permissions.md) | Policies, and how the editor's own permissions limit everything the assistant does |
 | [full-view-panel.md](full-view-panel.md) | The Intelligence tab: sections, conversation, history, context window, drafts |
 | [threads.md](threads.md) | Threads: what a thread is, states and shelves, who sees one, events, retention, the migration |

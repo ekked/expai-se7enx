@@ -17,6 +17,7 @@
  *   expai/mcp           MCP tools in the panel (limitation Server: "exp" for the in-process bridge, or a server id)
  *   expai/vector        the Vector workspace and its functions (expaivector::*), with expai/write; limitations
  *                       Subtree, Section (the scope must lie inside), Scope (node, subtree, class), Review (staged, direct)
+ *   expai/translation_sync  Check, Approve and Skip of translation updates (the Translations section of the tab)
  *
  * Views:
  *   expai/log        the requests to the model and their usage; (view)/drafts the versions written; (export)/csv
@@ -126,5 +127,9 @@ $FunctionList['vector'] = array(
 // Web and history tools (#369): web_fetch, web_search, project_history; without the limitation Tool every one of them
 $FunctionList['web'] = array(
     'Tool' => array( 'name' => 'Tool', 'values' => array(), 'class' => 'expAiWebPolicy', 'function' => 'tools', 'parameter' => array() ) );
+
+// Translation sync (classes/diff/, doc/translation-sync.md): Check, Approve and Skip in the Translations section of the
+// Intelligence tab (expaitranslation::check|approve|skip), with expai/write; the drafts need content/edit in the language
+$FunctionList['translation_sync'] = array();
 
 ?>

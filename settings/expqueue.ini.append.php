@@ -66,4 +66,15 @@ MaxConcurrent=4
 [QueueResource_openrouter:flex]
 MaxConcurrent=4
 
+# The translation sync: after a publish in the source language, decides for each translation and queues the small
+# patches (no model call; the patches themselves are expai.request jobs of the class translation_patch).
+[JobType_expai.translation.check]
+Handler=expAiTranslationCheckHandler
+Class=system
+MaxAttempts=3
+Timeout=120
+RetryBase=30
+MaxBackoff=600
+Description=Checks the translations of an object after its source language was published
+
 */ ?>

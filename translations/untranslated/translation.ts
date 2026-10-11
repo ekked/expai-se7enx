@@ -3442,4 +3442,188 @@
     </message>
 </context>
 <!-- expai threads/vector/keyboard: end -->
+<!-- expai translation sync: begin -->
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>The content to compare was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The changes could not be applied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The translation does not fit the markup of the text.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This change cannot be taken on its own.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This translation cannot be patched; translate it again in full.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is nothing to translate.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You may not start or skip translations.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The translation sync is switched off.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The language %language is not a translation of this object.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/translation</name>
+    <message>
+        <source>Translations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Estimate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check translations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Small changes of the source are queued as translation patches at once; full translations and larger or more expensive changes wait for your approval. Results are drafts of the translation; nothing is published.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source language: %language, version %version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not checked yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Up to date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waits for an editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Held by the budget</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draft written</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skipped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>no change</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>patch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>full translation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The source changed again; check the translations.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count block(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Approve</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Translate in full</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mark the %language translation as up to date without changing it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Translate the whole object into %language again? Estimated cost: %estimate.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View draft</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open the job</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checking...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Queued. The draft appears here when the job is done.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Marked as up to date.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>After a version in the source language is published, the translations of the object are checked. Small changes are queued as translation patches; larger ones wait for an editor in the Intelligence tab. The settings are in expai.ini [TranslationSync].</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checks the translations after a publish in the source language; small changes are queued as translation patches.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence: translation sync</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<!-- expai translation sync: end -->
 </TS>

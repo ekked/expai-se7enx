@@ -1005,4 +1005,77 @@ GitHub=example/example
 # The branch to read (default: the checked-out HEAD)
 Branch=
 
+# ---------------------------------------------------------------------------------------------------------------
+# Diff and translation sync (classes/diff/, doc/diff.md, doc/translation-sync.md)
+
+[DiffSettings]
+# The segmenter of each datatype: Segmenters[<datatype>]=<class implementing expAiSegmenter>. Datatypes not listed
+# use FallbackSegmenter (the value as one block).
+Segmenters[]
+Segmenters[ezstring]=expAiSegmenterString
+Segmenters[ezemail]=expAiSegmenterString
+Segmenters[ezisbn]=expAiSegmenterString
+Segmenters[eztext]=expAiSegmenterText
+Segmenters[ezxmltext]=expAiSegmenterRichText
+Segmenters[ezrichtext]=expAiSegmenterRichText
+Segmenters[ezkeyword]=expAiSegmenterKeyword
+FallbackSegmenter=expAiSegmenterGeneric
+# Two blocks left over between equal blocks are one modified block when this share of their words is the same
+# (0..1), else one deleted and one inserted block
+ModifiedSimilarity=0.5
+# More abbreviations for the sentence splitter, per language family (eng, ger, ...), separated by ";", without the
+# final dot, e.g. Abbreviations[ger]=Bhf;Kfz
+Abbreviations[]
+
+[TranslationSync]
+# enabled: translations are checked after a publish in the source language (workflow event expaitranslationsync),
+# with ./console ext:expai:translation-sync and in the Intelligence tab
+Enabled=enabled
+# The source language of objects (the first one an object has); empty: the object's main language
+SourceLanguages[]
+# Only these translations are kept in step; empty: every other translation of the object
+TargetLanguages[]
+# The datatypes whose changes are translated (others are copied as the kernel copies them)
+Datatypes[]
+Datatypes[]=ezstring
+Datatypes[]=eztext
+Datatypes[]=ezxmltext
+Datatypes[]=ezkeyword
+# A change up to this share of the source characters is a patch (only the changed blocks are sent)
+PatchMaxChangedRatio=0.25
+# From this share on, the translation is done again in full (between the two: a patch that waits for an editor)
+FullMinChangedRatio=0.6
+# A patch with more changed blocks than this waits for an editor
+PatchMaxSegments=40
+# Owner rule: a patch estimated at or below this cost (in [Pricing] Currency) is queued at once; a full translation
+# and anything above waits for an editor (Approve in the Intelligence tab)
+CostThreshold=0.02
+# disabled: every patch waits for an editor
+AutoQueuePatch=enabled
+# A translation whose blocks do not match its base (other count or kinds of blocks) cannot be patched: full
+FullIfStructureMismatch=enabled
+# The model alias (e.g. anthropic.claude-haiku-5-5); empty: the site default model
+Model=
+# The lanes (auto: [LanePolicy] ClassOrder[translation_patch] / ClassOrder[translation_full])
+PatchLane=auto
+FullLane=auto
+# The most output tokens of one request
+MaxOutputTokens=8000
+# enabled: the workflow event queues the check as a job (expai.translation.check); disabled or no queue: it runs
+# during the publish
+QueueCheck=enabled
+# Extra instructions for the translator (glossary, tone), appended to the system prompt
+Instructions=
+
+[PanelSettings]
+# the translations of the object: decision, change, estimate, Approve / Skip ([PanelSection_translations])
+Sections[]=translations
+
+[PanelSection_translations]
+Template=expai/panel/translations.tpl
+
+[QueueSettings]
+# translation patches and full translations write their answer into a draft of the target language
+Appliers[translation_sync]=expAiTranslationSyncApplier
+
 */ ?>

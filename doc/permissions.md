@@ -14,6 +14,7 @@
 | `expai/package_export` | `./console ext:expai:package export` (only what the user may read) |
 | `expai/lane_fast` | a queued request may ask for a fast lane (a price premium; [lanes.md](lanes.md)) |
 | `expai/web` | the web and history tools in the panel ([tools.md](tools.md#web-and-history-tools)). Limitation **Tool**: `web_fetch`, `web_search`, `project_history`; without it all three (each is still offered only once configured) |
+| `expai/translation_sync` | in the Translations section of the Intelligence tab: Check translations, Approve, Translate in full, Skip (`expaitranslation::check`, `approve`, `skip`), with `expai/write`; Approve and Skip also need `content/edit` in that language ([translation-sync.md](translation-sync.md)) |
 
 `expai/log` also opens `expai/budgets` (the site budget, job groups, lanes, batches); with `expai/settings` its
 "Resume held jobs" button ([budgets.md](budgets.md)).

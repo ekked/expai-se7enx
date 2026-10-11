@@ -3442,4 +3442,188 @@
     </message>
 </context>
 <!-- expai threads/vector/keyboard: end -->
+<!-- expai translation sync: begin -->
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>The content to compare was not found.</source>
+        <translation>Der zu vergleichende Inhalt wurde nicht gefunden.</translation>
+    </message>
+    <message>
+        <source>The changes could not be applied.</source>
+        <translation>Die Änderungen konnten nicht übernommen werden.</translation>
+    </message>
+    <message>
+        <source>The translation does not fit the markup of the text.</source>
+        <translation>Die Übersetzung passt nicht zum Markup des Textes.</translation>
+    </message>
+    <message>
+        <source>This change cannot be taken on its own.</source>
+        <translation>Diese Änderung kann nicht einzeln übernommen werden.</translation>
+    </message>
+    <message>
+        <source>This translation cannot be patched; translate it again in full.</source>
+        <translation>Diese Übersetzung kann nicht gepatcht werden; übersetzen Sie sie vollständig neu.</translation>
+    </message>
+    <message>
+        <source>There is nothing to translate.</source>
+        <translation>Es gibt nichts zu übersetzen.</translation>
+    </message>
+    <message>
+        <source>You may not start or skip translations.</source>
+        <translation>Sie dürfen keine Übersetzungen starten oder überspringen.</translation>
+    </message>
+    <message>
+        <source>The translation sync is switched off.</source>
+        <translation>Der Übersetzungsabgleich ist ausgeschaltet.</translation>
+    </message>
+    <message>
+        <source>The language %language is not a translation of this object.</source>
+        <translation>Die Sprache %language ist keine Übersetzung dieses Objekts.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/translation</name>
+    <message>
+        <source>Translations</source>
+        <translation>Übersetzungen</translation>
+    </message>
+    <message>
+        <source>Language</source>
+        <translation>Sprache</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Status</translation>
+    </message>
+    <message>
+        <source>Changed</source>
+        <translation>Geändert</translation>
+    </message>
+    <message>
+        <source>Estimate</source>
+        <translation>Schätzung</translation>
+    </message>
+    <message>
+        <source>Job</source>
+        <translation>Job</translation>
+    </message>
+    <message>
+        <source>Check translations</source>
+        <translation>Übersetzungen prüfen</translation>
+    </message>
+    <message>
+        <source>Small changes of the source are queued as translation patches at once; full translations and larger or more expensive changes wait for your approval. Results are drafts of the translation; nothing is published.</source>
+        <translation>Kleine Änderungen der Quelle werden sofort als Übersetzungs-Patches eingereiht; vollständige Übersetzungen und größere oder teurere Änderungen warten auf Ihre Freigabe. Das Ergebnis sind Entwürfe der Übersetzung; nichts wird veröffentlicht.</translation>
+    </message>
+    <message>
+        <source>Source language: %language, version %version</source>
+        <translation>Quellsprache: %language, Version %version</translation>
+    </message>
+    <message>
+        <source>Not checked yet</source>
+        <translation>Noch nicht geprüft</translation>
+    </message>
+    <message>
+        <source>Up to date</source>
+        <translation>Aktuell</translation>
+    </message>
+    <message>
+        <source>Waits for an editor</source>
+        <translation>Wartet auf eine Redakteurin oder einen Redakteur</translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation>Eingereiht</translation>
+    </message>
+    <message>
+        <source>Held by the budget</source>
+        <translation>Vom Budget angehalten</translation>
+    </message>
+    <message>
+        <source>Draft written</source>
+        <translation>Entwurf geschrieben</translation>
+    </message>
+    <message>
+        <source>Failed</source>
+        <translation>Fehlgeschlagen</translation>
+    </message>
+    <message>
+        <source>Skipped</source>
+        <translation>Übersprungen</translation>
+    </message>
+    <message>
+        <source>no change</source>
+        <translation>keine Änderung</translation>
+    </message>
+    <message>
+        <source>patch</source>
+        <translation>Patch</translation>
+    </message>
+    <message>
+        <source>full translation</source>
+        <translation>vollständige Übersetzung</translation>
+    </message>
+    <message>
+        <source>The source changed again; check the translations.</source>
+        <translation>Die Quelle hat sich erneut geändert; prüfen Sie die Übersetzungen.</translation>
+    </message>
+    <message>
+        <source>%count block(s)</source>
+        <translation>%count Block/Blöcke</translation>
+    </message>
+    <message>
+        <source>Approve</source>
+        <translation>Freigeben</translation>
+    </message>
+    <message>
+        <source>Translate in full</source>
+        <translation>Vollständig übersetzen</translation>
+    </message>
+    <message>
+        <source>Skip</source>
+        <translation>Überspringen</translation>
+    </message>
+    <message>
+        <source>Mark the %language translation as up to date without changing it?</source>
+        <translation>Die Übersetzung %language als aktuell markieren, ohne sie zu ändern?</translation>
+    </message>
+    <message>
+        <source>Translate the whole object into %language again? Estimated cost: %estimate.</source>
+        <translation>Das ganze Objekt erneut in %language übersetzen? Geschätzte Kosten: %estimate.</translation>
+    </message>
+    <message>
+        <source>View draft</source>
+        <translation>Entwurf ansehen</translation>
+    </message>
+    <message>
+        <source>Open the job</source>
+        <translation>Job öffnen</translation>
+    </message>
+    <message>
+        <source>Checking...</source>
+        <translation>Wird geprüft...</translation>
+    </message>
+    <message>
+        <source>Queued. The draft appears here when the job is done.</source>
+        <translation>Eingereiht. Der Entwurf erscheint hier, sobald der Job fertig ist.</translation>
+    </message>
+    <message>
+        <source>Marked as up to date.</source>
+        <translation>Als aktuell markiert.</translation>
+    </message>
+    <message>
+        <source>After a version in the source language is published, the translations of the object are checked. Small changes are queued as translation patches; larger ones wait for an editor in the Intelligence tab. The settings are in expai.ini [TranslationSync].</source>
+        <translation>Nachdem eine Version in der Quellsprache veröffentlicht wurde, werden die Übersetzungen des Objekts geprüft. Kleine Änderungen werden als Übersetzungs-Patches eingereiht; größere warten im Intelligence-Tab auf eine Redakteurin oder einen Redakteur. Die Einstellungen stehen in expai.ini [TranslationSync].</translation>
+    </message>
+    <message>
+        <source>Checks the translations after a publish in the source language; small changes are queued as translation patches.</source>
+        <translation>Prüft die Übersetzungen nach einer Veröffentlichung in der Quellsprache; kleine Änderungen werden als Übersetzungs-Patches eingereiht.</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence: translation sync</source>
+        <translation>Exponential Intelligence: Übersetzungsabgleich</translation>
+    </message>
+</context>
+<!-- expai translation sync: end -->
 </TS>
