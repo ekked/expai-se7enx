@@ -448,17 +448,21 @@
             var stopSent = false;
             var lastError = '';
             var steps = 0;
+            // its own cursor (T373 stream): the open stream advances app.cursor too, and a shared one let it take the
+            // steps away from here, so the exchange was never reloaded and the answer never shown
+            var seen = app.cursor[uuid] || 0;
             return new Promise( function ( resolve ) {
                 function tick() {
                     if ( !app.current || app.current.uuid !== uuid ) { resolve( null ); return; }
                     var after = {};
-                    after[uuid] = app.cursor[uuid] || 0;
+                    after[uuid] = seen;
                     var ask = app.stopRequested && !stopSent ? api( 'stop', { thread: uuid } ).then( function () { stopSent = true; } ) : Promise.resolve();
                     ask.then( function () {
                         return api( 'events', { threads: uuid, after: JSON.stringify( after ), open: uuid } );
                     } ).then( function ( data ) {
                         var news = ( data.events || [] ).filter( function ( ev ) { return ev.thread === uuid; } );
                         news.forEach( function ( ev ) {
+                            seen = Math.max( seen, ev.id );
                             app.cursor[uuid] = Math.max( app.cursor[uuid] || 0, ev.id );
                             if ( ev.kind === 'error' && ev.payload ) { lastError = ev.payload.message || ''; }
                             if ( ev.kind === 'step_end' && ev.payload && ev.payload.text ) {

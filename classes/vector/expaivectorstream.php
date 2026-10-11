@@ -76,16 +76,14 @@ class expAiVectorStream
     {
         $config = $config ?: expAiConfig::instance();
         $seconds = $config->int( 'VectorSettings', 'StreamSeconds', 25, 5, 25 );
-        // PHP-FPM: no output buffer may hold the stream back. Velocity captures the answer in its own buffer and sends
-        // it on flush(): its buffers stay
-        if ( PHP_SAPI !== 'cli' )
-            while ( ob_get_level() > 0 && @ob_end_clean() )
-                ;
+        // No output buffer may hold the stream back: the kernel's own (ezpKernelWeb::run()) and PHP's
+        // output_buffering go. A Velocity pool worker keeps its capture buffer, which cannot be removed: it
+        // sends what reaches it on ob_flush()/flush() once the answer is a text/event-stream (self::send())
+        eZExecution::discardOutputBuffers();
         header( 'Content-Type: text/event-stream; charset=utf-8' );
         header( 'Cache-Control: no-store' );
         header( 'X-Accel-Buffering: no' );
-        echo ": ok\nretry: 3000\n\n";
-        flush();
+        self::send( ": ok\nretry: 3000\n\n" );
         $threadID = (int) $thread->attribute( 'id' );
         $uuid = (string) $thread->attribute( 'uuid' );
         $cursor = (int) $after;
@@ -97,11 +95,19 @@ class expAiVectorStream
                 $cursor = (int) $event->attribute( 'id' );
                 echo 'id: ' . $cursor . "\nevent: thread\ndata: " . json_encode( array( 'thread' => $uuid ) + $event->present(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . "\n\n";
             }
-            echo ": ping\n\n";
-            flush();
+            self::send( ": ping\n\n" );
             if ( connection_aborted() )
                 return;
             sleep( 1 );
         }
+    }
+
+    /** Prints $text and pushes it out through every buffer that is left (Velocity's capture) to the client */
+    protected static function send( $text )
+    {
+        echo $text;
+        if ( ob_get_level() > 0 )
+            @ob_flush();
+        flush();
     }
 }
