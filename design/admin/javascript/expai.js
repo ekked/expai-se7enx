@@ -720,7 +720,7 @@
             showHistory( data.history, false );
             if ( data.model ) {
                 Array.prototype.forEach.call( root.querySelectorAll( '.exp-ai-model-select' ), function ( select ) { select.value = data.model.current; } );
-                Array.prototype.forEach.call( root.querySelectorAll( '.exp-ai-model-note' ), function ( n ) { n.textContent = data.model.refused || ''; } );
+                Array.prototype.forEach.call( root.querySelectorAll( '.exp-ai-model-note' ), function ( n ) { n.textContent = data.model.refused || data.model.slow || ''; } );
             }
             if ( data.prefill && input ) {
                 input.value = data.prefill;
@@ -984,7 +984,8 @@
                     select.value = data.model;
                     // keep every model select of the page in step
                     Array.prototype.forEach.call( document.querySelectorAll( '.exp-ai-model-select' ), function ( s ) { s.value = data.model; } );
-                    if ( note ) { note.textContent = ''; }
+                    // a slow (local) model says how long a step takes
+                    Array.prototype.forEach.call( document.querySelectorAll( '.exp-ai-model-note' ), function ( n ) { n.textContent = data.slow || ''; } );
                     if ( reset ) { reset.hidden = data.model === data['default']; }
                     emit( 'model:changed', data );
                 } ).catch( function ( err ) {

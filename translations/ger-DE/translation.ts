@@ -1107,6 +1107,14 @@
         <translation>Das gewählte Modell ist nicht mehr verfügbar; die Voreinstellung wird verwendet.</translation>
     </message>
     <message>
+        <source>This model runs on this server and is slow: an answer can take several minutes.</source>
+        <translation>Dieses Modell läuft auf diesem Server und ist langsam: eine Antwort kann mehrere Minuten dauern.</translation>
+    </message>
+    <message>
+        <source>This model runs on this server and is slow: each step takes about %seconds seconds (measured), an answer with lookups several minutes.</source>
+        <translation>Dieses Modell läuft auf diesem Server und ist langsam: jeder Schritt dauert etwa %seconds Sekunden (gemessen), eine Antwort mit Nachschlagen mehrere Minuten.</translation>
+    </message>
+    <message>
         <source>(default)</source>
         <translation>(Voreinstellung)</translation>
     </message>

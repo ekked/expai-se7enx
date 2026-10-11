@@ -1107,6 +1107,14 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>This model runs on this server and is slow: an answer can take several minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This model runs on this server and is slow: each step takes about %seconds seconds (measured), an answer with lookups several minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>(default)</source>
         <translation type="unfinished"></translation>
     </message>

@@ -19,7 +19,7 @@
 {if first_set( $reset, false() )}
     <button type="button" class="exp-ai-link exp-ai-model-reset"{if eq( $exp_ai_models.current, $exp_ai_models.default )} hidden="hidden"{/if}>{'Reset to default'|i18n( 'extension/expai/model' )}</button>
 {/if}
-    <span class="exp-ai-model-note" aria-live="polite">{if and( $exp_ai_models.refused, first_set( $cached, false() )|not )}{'The model you chose is no longer available; the default is used.'|i18n( 'extension/expai/model' )}{/if}</span>
+    <span class="exp-ai-model-note" aria-live="polite">{if first_set( $cached, false() )|not}{if $exp_ai_models.refused}{'The model you chose is no longer available; the default is used.'|i18n( 'extension/expai/model' )}{else}{$exp_ai_models.slow|wash}{/if}{/if}</span>
 </span>
 {else}
 <span class="exp-ai-model">{$exp_ai_models.allowed[$exp_ai_models.current]|wash}</span>

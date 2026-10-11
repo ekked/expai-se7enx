@@ -40,6 +40,7 @@ class expAiFunctionCollection
         return array( 'result' => array( 'allowed' => $config->allowedModels(), 'groups' => $config->modelChoices(), 'default' => $config->model(),
                                          'current' => $config->effectiveModel(), 'choice' => $config->modelChoiceEnabled(),
                                          'refused' => $config->preferredModelRefused(),
+                                         'slow' => expAiUsage::slowNotice( $config->effectiveModel(), $config ),
                                          'placement' => expAiServerFunctions::hasPolicy( 'settings' ) ? $config->modelPlacement() : false,
                                          'pricing' => expAiUsage::pricingInfo() ) );
     }

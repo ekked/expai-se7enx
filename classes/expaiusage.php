@@ -383,6 +383,26 @@ class expAiUsage
         return array( 'series' => $series, 'max' => $max, 'metric' => $metric, 'days' => $days );
     }
 
+    /**
+     * The notice for a slow model (Slow=true, e.g. a local model on a CPU): how long one request took on average
+     * (the last 20 successful requests of the alias in the usage log), so editors know what to expect.
+     * @return string translated, '' for a model that is not slow
+     */
+    public static function slowNotice( $alias, ?expAiConfig $config = null )
+    {
+        $config = $config ?: expAiConfig::instance();
+        $model = $config->registry()->getModel( $alias );
+        if ( !$model || !$model['slow'] )
+            return '';
+        $rows = self::rows( eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), array( 'latency_ms' ),
+            array( 'model_alias' => (string) $alias, 'error_class' => '' ), array( 'id' => 'desc' ), array( 'offset' => 0, 'length' => 20 ), false ) );
+        if ( !$rows )
+            return ezpI18n::tr( 'extension/expai/model', 'This model runs on this server and is slow: an answer can take several minutes.' );
+        $avg = array_sum( array_map( function ( $r ) { return (int) $r['latency_ms']; }, $rows ) ) / count( $rows ) / 1000;
+        return ezpI18n::tr( 'extension/expai/model', 'This model runs on this server and is slow: each step takes about %seconds seconds (measured), an answer with lookups several minutes.',
+                            null, array( '%seconds' => (int) round( $avg ) ) );
+    }
+
     /** @return int rows removed: older than [UsageSettings] RetentionDays (0 keeps everything) */
     public static function prune( $days = null )
     {

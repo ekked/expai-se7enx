@@ -1107,6 +1107,14 @@
         <translation>The model you chose is no longer available; the default is used.</translation>
     </message>
     <message>
+        <source>This model runs on this server and is slow: an answer can take several minutes.</source>
+        <translation>This model runs on this server and is slow: an answer can take several minutes.</translation>
+    </message>
+    <message>
+        <source>This model runs on this server and is slow: each step takes about %seconds seconds (measured), an answer with lookups several minutes.</source>
+        <translation>This model runs on this server and is slow: each step takes about %seconds seconds (measured), an answer with lookups several minutes.</translation>
+    </message>
+    <message>
         <source>(default)</source>
         <translation>(default)</translation>
     </message>

@@ -11,6 +11,7 @@
  *   php extension/expai/bin/php/expaiprobe.php --model=<alias> --base-url=<url> calls a test server instead (mode mock;
  *                                                                               never counts for the write gate)
  *   --login=<user>   the user the requests are logged for (default: the anonymous user)
+ *   --timeout=<s>    seconds per request instead of the provider's Timeout (a slow local model on a CPU)
  *   --list           the models of the registry with their latest probe
  *
  * @copyright Copyright (C) 1998 - 2026 7x & Exponential Foundation. All rights reserved.
@@ -24,11 +25,12 @@ $cli = eZCLI::instance();
 $script = eZScript::instance( array( 'description' => "The tool-calling probe of Exponential Intelligence models\n",
                                      'use-session' => false, 'use-modules' => true, 'use-extensions' => true ) );
 $script->startup();
-$options = $script->getOptions( '[model:][live][base-url:][login:][list]', '', array(
+$options = $script->getOptions( '[model:][live][base-url:][login:][list][timeout:]', '', array(
     'model' => 'The model alias ([Model_<alias>] or anthropic.<id>)',
     'live' => 'Call the model and store the result',
     'base-url' => 'Call this test server instead of the provider (stored as mode mock)',
     'login' => 'The user the requests are logged for',
+    'timeout' => 'Seconds per request instead of the provider\'s Timeout',
     'list' => 'List the models and their latest probe' ) );
 $script->initialize();
 
@@ -95,14 +97,16 @@ if ( $options['base-url'] )
     $settings['Endpoint'] = (string) $options['base-url'];
     $mode = 'mock';
 }
+if ( $options['timeout'] && (int) $options['timeout'] > 0 )
+    $settings['Timeout'] = min( 3600, (int) $options['timeout'] );
 $types = expAiProviderRegistry::TYPES;
 if ( !isset( $types[$settings['Type']] ) )
 {
     $cli->error( 'FAIL the probe supports the built-in provider types only' );
     $script->shutdown( 1 );
 }
-$class = $types[$settings['Type']];
-$inner = new $class( $settings );
+$providerClass = $types[$settings['Type']];
+$inner = new $providerClass( $settings );
 if ( $model['tool_use'] === 'prompted' )
     $inner = new expAiPromptedToolProvider( $inner );
 $recorder = new expAiUsageRecorder( $inner, array( 'action' => 'probe' ) );

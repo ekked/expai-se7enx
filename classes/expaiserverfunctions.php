@@ -110,7 +110,8 @@ class expAiServerFunctions extends ezjscServerFunctions
             }
             return array( 'prefill' => $prefill, 'history' => ( new expAiAssistant( $config ) )->history( $user, $nodeID ),
                           'model' => array( 'current' => $config->effectiveModel(),
-                                            'refused' => $config->preferredModelRefused() ? ezpI18n::tr( 'extension/expai/model', 'The model you chose is no longer available; the default is used.' ) : '' ),
+                                            'refused' => $config->preferredModelRefused() ? ezpI18n::tr( 'extension/expai/model', 'The model you chose is no longer available; the default is used.' ) : '',
+                                            'slow' => expAiUsage::slowNotice( $config->effectiveModel(), $config ) ),
                           'drafts' => expAiAssistant::drafts( $user, $nodeID ),
                           'pending' => $conversation ? $conversation->awaitsAnswer() : false );
         } );
@@ -146,7 +147,7 @@ class expAiServerFunctions extends ezjscServerFunctions
             eZPreferences::setValue( 'expai_model', $model === $config->model() ? '' : $model );
             $fresh = expAiConfig::instance();
             return array( 'model' => $fresh->effectiveModel(), 'label' => $fresh->allowedModels()[$fresh->effectiveModel()],
-                          'default' => $fresh->model() );
+                          'default' => $fresh->model(), 'slow' => expAiUsage::slowNotice( $fresh->effectiveModel(), $fresh ) );
         } );
     }
 
