@@ -82,3 +82,21 @@ php bin/php/ezexec.php extension/expai/tests/expaicost_test.php -s <siteaccess>
 ```
 
 Results of 2026-10-11: unit 135/135, end to end 100/100, cost 92/92, live probe of the local model 14/15.
+
+## Lanes and batches (proof of 2026-10-11)
+
+| What | Proof |
+| --- | --- |
+| Anthropic Message Batches (lane batch) | **live**: 2 requests on Claude Haiku 5.5 submitted as one batch, polled every 30 s, ended after 5.5 minutes, both answered, usage rows with lane batch, tier batch and price factor 50, the batch deleted at Anthropic right after its results were fetched (cost: about $0.000004) |
+| Anthropic fast lane, its fallback to standard, a 529 with retry-after | mock (`tests/mock/batch_server.php`) |
+| OpenAI Batch API (file upload, batch, output and error files, deletion of the files), flex and its "Resource Unavailable" escalation | mock, from the documentation |
+| Gemini batchGenerateContent (inline), Mistral batch jobs (inline), OpenRouter batches | mock, from the documentation; the shape of one Mistral inline output and of an OpenRouter result item are not shown in the documentation (both readings are accepted) |
+
+```
+php -S 127.0.0.1:18359 extension/expai/tests/mock/batch_server.php &
+EXPAI_BATCH_MOCK_URL=http://127.0.0.1:18359 EXPAI_MOCK_STATE=<dir> EXPAI_TEST_LOGIN=<editor> \
+  php bin/php/ezexec.php extension/expai/tests/expaiqueue_e2e_test.php -s <siteaccess>
+```
+
+Results of 2026-10-11: lanes, batches and budgets end to end 167/167; packages 48/48 and the 200-object queued import
+5/5.
