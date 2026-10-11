@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/se7enxweb/expai/share/package/schema/v1.json",
+  "title": "Exponential Intelligence content package, format 1.0",
+  "description": "package.json of an expai content package (doc/package-format.md). Files named in files[] travel next to it as files/<sha256>.<ext>, in a directory or a zip file. checksum is the SHA-256 of the canonical JSON of the package without the checksum member.",
+  "type": "object",
+  "required": ["format", "format_version", "package", "objects", "files", "checksum"],
+  "additionalProperties": false,
+  "properties": {
+    "format": { "const": "expai-package" },
+    "format_version": { "type": "string", "pattern": "^1\\.[0-9]+$" },
+    "package": {
+      "type": "object",
+      "required": ["uuid", "name", "created"],
+      "additionalProperties": false,
+      "properties": {
+        "uuid": { "$ref": "#/$defs/uuid" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 150 },
+        "created": { "type": "string", "description": "ISO 8601 date and time" },
+        "description": { "type": "string" },
+        "generator": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "tool": { "type": "string", "description": "expai-export, claude-code, a script name ..." },
+            "version": { "type": "string" }
+          }
+        },
+        "source_site": { "type": "string" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "ai_generated": { "type": "boolean", "description": "true: written (partly) by an AI model; the drafts carry the AI label" },
+        "models": { "type": "array", "items": { "type": "string" } },
+        "tools": { "type": "array", "items": { "type": "string" } },
+        "human_reviewed": { "type": "boolean" },
+        "notes": { "type": "string" },
+        "exported_by": { "type": "integer" }
+      }
+    },
+    "objects": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/object" }
+    },
+    "files": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/file" }
+    },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "checksum": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  },
+  "$defs": {
+    "uuid": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$" },
+    "remote_id": { "type": "string", "pattern": "^[A-Za-z0-9_.:-]{1,100}$" },
+    "file_ref": { "type": ["string", "null"], "pattern": "^files/[0-9a-f]{64}\\.[a-z0-9]{1,8}$" },
+    "language": { "type": "string", "pattern": "^[a-z]{3}-[A-Z]{2}$", "description": "a locale of the installation, e.g. eng-US, ger-DE" },
+    "object": {
+      "type": "object",
+      "required": ["remote_id", "class_identifier", "initial_language", "locations", "translations"],
+      "additionalProperties": false,
+      "properties": {
+        "remote_id": { "$ref": "#/$defs/remote_id" },
+        "class_identifier": { "type": "string", "pattern": "^[a-z0-9_]{1,50}$" },
+        "section_identifier": { "type": "string" },
+        "always_available": { "type": "boolean" },
+        "initial_language": { "$ref": "#/$defs/language" },
+        "locations": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/location" } },
+        "translations": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": { "$ref": "#/$defs/language" },
+          "additionalProperties": { "$ref": "#/$defs/translation" }
+        },
+        "expected": { "$ref": "#/$defs/expected" }
+      }
+    },
+    "location": {
+      "type": "object",
+      "required": ["parent"],
+      "additionalProperties": false,
+      "properties": {
+        "main": { "type": "boolean" },
+        "priority": { "type": "integer" },
+        "hidden": { "type": "boolean" },
+        "node_remote_id": { "type": "string", "description": "the node's remote id where the package was made (information)" },
+        "parent": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": false,
+          "description": "object_remote_id: an object of this package or of the installation (its main node); node_remote_id: a node of the installation; path: its URL path. Never a numeric id.",
+          "properties": {
+            "object_remote_id": { "$ref": "#/$defs/remote_id" },
+            "node_remote_id": { "type": "string" },
+            "path": { "type": "string" }
+          }
+        }
+      }
+    },
+    "translation": {
+      "type": "object",
+      "required": ["attributes"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "attributes": {
+          "type": "object",
+          "propertyNames": { "pattern": "^[a-z0-9_]{1,50}$" },
+          "additionalProperties": { "$ref": "#/$defs/attribute" }
+        },
+        "base": {
+          "type": "object",
+          "properties": {
+            "source_language": { "type": ["string", "null"] },
+            "source_content_hash": { "type": "string" }
+          }
+        }
+      }
+    },
+    "attribute": {
+      "type": "object",
+      "required": ["datatype"],
+      "properties": { "datatype": { "type": "string" } },
+      "oneOf": [
+        { "properties": { "datatype": { "enum": ["ezstring", "eztext", "ezemail"] }, "value": { "type": "string" } }, "required": ["value"] },
+        { "properties": { "datatype": { "const": "ezinteger" }, "value": { "type": ["integer", "null"] } }, "required": ["value"] },
+        { "properties": { "datatype": { "const": "ezfloat" }, "value": { "type": ["number", "null"] } }, "required": ["value"] },
+        { "properties": { "datatype": { "const": "ezboolean" }, "value": { "type": "boolean" } }, "required": ["value"] },
+        { "properties": { "datatype": { "enum": ["ezdate", "ezdatetime"] }, "value": { "type": ["string", "null"] } }, "required": ["value"] },
+        { "properties": { "datatype": { "const": "ezkeyword" }, "value": { "type": "array", "items": { "type": "string" } } }, "required": ["value"] },
+        { "properties": { "datatype": { "const": "ezurl" }, "url": { "type": "string" }, "text": { "type": "string" } }, "required": ["url"] },
+        { "properties": { "datatype": { "const": "ezxmltext" }, "format": { "enum": ["ezxml", "html"] }, "value": { "type": "string" } }, "required": ["format", "value"] },
+        { "properties": { "datatype": { "const": "ezimage" }, "file": { "$ref": "#/$defs/file_ref" }, "alt": { "type": "string" }, "filename": { "type": "string" } }, "required": ["file"] },
+        { "properties": { "datatype": { "enum": ["ezbinaryfile", "ezmedia"] }, "file": { "$ref": "#/$defs/file_ref" }, "filename": { "type": "string" } }, "required": ["file"] },
+        { "properties": { "datatype": { "const": "ezobjectrelation" }, "remote_id": { "type": ["string", "null"] } }, "required": ["remote_id"] },
+        { "properties": { "datatype": { "const": "ezobjectrelationlist" }, "remote_ids": { "type": "array", "items": { "type": "string" } } }, "required": ["remote_ids"] },
+        { "properties": { "datatype": { "not": { "enum": ["ezstring", "eztext", "ezemail", "ezinteger", "ezfloat", "ezboolean", "ezdate", "ezdatetime", "ezkeyword", "ezurl", "ezxmltext", "ezimage", "ezbinaryfile", "ezmedia", "ezobjectrelation", "ezobjectrelationlist"] } }, "value": { "type": "string" } }, "required": ["value"], "description": "a datatype of [PackageSettings] StringDatatypes[] (toString / fromString); any other is refused on import" }
+      ]
+    },
+    "expected": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "what the package expects of the installation, for conflict detection",
+      "properties": {
+        "exists": { "type": "boolean" },
+        "modified": { "type": "integer", "description": "Unix time of the object's last modification when the package was made" },
+        "current_version": { "type": "integer" },
+        "content_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "file": {
+      "type": "object",
+      "required": ["path", "sha256", "size", "mime"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "type": "string", "pattern": "^files/[0-9a-f]{64}\\.[a-z0-9]{1,8}$" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "size": { "type": "integer", "minimum": 0 },
+        "mime": { "type": "string" },
+        "name": { "type": "string" }
+      }
+    }
+  }
+}
