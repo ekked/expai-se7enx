@@ -7,6 +7,12 @@
 | [../USAGE.md](../USAGE.md) | For editors: the Intelligence tab, the edit form, the label, approval, the dashboard |
 | [architecture.md](architecture.md) | How the parts fit: browser, ezjscore, the step loop, tools, provider, storage, long turns |
 | [configuration.md](configuration.md) | Every setting of expai.ini and the other settings files, with default and effect |
+| [providers.md](providers.md) | The provider registry, the anthropic and openai_chat adapters, models, the picker, tool modes, errors and retries |
+| [provider-support.md](provider-support.md) | What is proven with which provider: live, against docs-derived mocks, or not yet |
+| [data-policy.md](data-policy.md) | Regions and retention of providers, rules per section and class, where they are enforced |
+| [probe.md](probe.md) | The tool-calling probe and the write gate |
+| [local-models.md](local-models.md) | A local open-weight model: install, limits, the helper, expai/models |
+| [mcp.md](mcp.md) | MCP tools: the in-process expmcp bridge and external servers |
 | [permissions.md](permissions.md) | Policies, and how the editor's own permissions limit everything the assistant does |
 | [full-view-panel.md](full-view-panel.md) | The Intelligence tab: sections, conversation, history, context window, drafts |
 | [edit-view-integration.md](edit-view-integration.md) | The edit form hook, field actions, how values reach Tiptap / the Online Editor |
@@ -15,7 +21,7 @@
 | [tools.md](tools.md) | Every tool Claude can call: input, result, permission checks, limits |
 | [approval-workflow.md](approval-workflow.md) | Drafts, ezapprove, the collaboration item and the label, the tested path |
 | [security.md](security.md) | The key, permissions as the user, no auto-publish, prompt injection, logging and privacy |
-| [database.md](database.md) | The three tables, per engine, the install script |
+| [database.md](database.md) | The four tables, per engine, the install and upgrade script |
 | [extending.md](extending.md) | Adding field actions, panel sections, tools, providers, JavaScript hooks (worked examples) |
 | [customization.md](customization.md) | Template overrides, CSS tokens, labels, translations, instructions |
 | [translations.md](translations.md) | Contexts, the shipped languages, adding one |

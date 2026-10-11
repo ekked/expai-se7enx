@@ -7,9 +7,12 @@
 | `expai/write` | The Intelligence tab, the edit form controls, every ezjscore function except `labels`, the dashboard page (own usage), the dashboard block, the left menu entries, `expai/log` (own requests and versions) |
 | `expai/log` | everyone's requests and versions on `expai/log` (filter by user with `/(user)/<id>`), the "Site" view of the dashboard with the top users, the site limits |
 | `expai/settings` | for administrators: the dashboard's Details show where the site default model is set (settings file and placement) |
+| `expai/model_use` | choosing models of providers outside `[ProviderSettings] ProvidersWithoutPolicy[]` (default: every provider but anthropic). Limitation **Provider**: only the models of those providers. Without it a user has the site default and the open providers' models; a model posted that is not allowed is refused ("This model is not available.") |
+| `expai/model_manage` | the view expai/models: providers, key presence, probe results, the local model server (start, stop, pull, remove, test prompt) |
+| `expai/mcp` | MCP tools in the panel ([mcp.md](mcp.md)). Limitation **Server**: `exp` (the in-process expmcp bridge) or the id of an external server |
 
-None has limitations: what the assistant may do in the content tree is decided by the editor's content policies
-(below). The tab, the menu entry and the dashboard block are not shown at all without `expai/write`.
+`expai/model_use` and `expai/mcp` have one limitation each; the others none. What the assistant may do in the content
+tree is decided by the editor's content policies (below). The tab, the menu entry and the dashboard block are not shown at all without `expai/write`.
 
 ## ezjscore
 
@@ -37,6 +40,10 @@ the user needs the policy `ezjscore/call` without limitation or with the limitat
   the user takes part in.
 
 expai never uses another account, never switches the current user and has no setting to publish on its own.
+
+On top of the editor's permissions: the data policy decides which content may go to which provider
+([data-policy.md](data-policy.md)), and the write gate which models may write drafts at all ([probe.md](probe.md)).
+The MCP bridge runs expmcp's audited read tools as the editor too; an external MCP server sees only its own token.
 
 ## Setting up roles
 

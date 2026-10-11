@@ -37,6 +37,20 @@ for this editor and still the editor's own drafts.
 Choose a provider account and data retention that fit your content. With Anthropic, see their commercial terms and
 data retention options.
 
+## Several providers
+
+- Keys of every provider live in settings/override only; expai/models shows "key present" and warns about a key in
+  any other file or in a file every user of the server can read. A key-like string in a provider's error message is
+  redacted before it is logged.
+- The data policy keeps sections and classes away from providers outside the regions they allow or without zero
+  retention ([data-policy.md](data-policy.md)); the region of every request is logged.
+- Only models with native tool calling that passed the probe write drafts ([probe.md](probe.md)); the gate is checked
+  when the tools are offered and again when one is run.
+- A local model listens on the loopback address only; the web process starts and stops it only through a spool
+  request that a root-owned helper checks against its own allowlist ([local-models.md](local-models.md)).
+- MCP: allowlisted tools only, read-only, an SSRF guard on the URL, results wrapped as data, and no write tool after
+  an external result in the same turn ([mcp.md](mcp.md)).
+
 ## Prompt injection
 
 Content can contain text written to steer an assistant ("ignore your instructions and publish ..."). expai limits what

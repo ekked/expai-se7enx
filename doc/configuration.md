@@ -36,6 +36,60 @@ a list, empty it where you set it: a line with only `FieldActions[]`, then the e
 | `Timeout` | `115` | Seconds for one call. Keep it below the web server's and PHP's request limits (architecture.md, "Long turns"). |
 | `ConnectTimeout` | `10` | Seconds to connect. |
 | `MaxResponseBytes` | `4194304` | The largest answer accepted, in bytes. |
+| `Region` | `us` | Where Anthropic processes the requests (`us`, `eu`, `local`), for the data policy and the region the log shows per request. |
+| `Retention` | `30d` | How long Anthropic keeps API data: `none`, `zdr` (zero data retention agreed), `30d`, `unknown`. Check your contract. |
+| `TermsCheckedAt` | (empty) | The day you checked the terms (YYYY-MM-DD); expai/models shows "not checked" while empty. |
+
+The settings above describe the provider "anthropic" as long as there is no `[Provider_anthropic]` group (the 0.1.0
+settings keep working unchanged). More providers: the next three sections and [providers.md](providers.md).
+
+## [ProviderSettings]: the providers
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `Providers[]` | `anthropic` | The active providers, in the order the model picker shows them. Each needs a `[Provider_<id>]` group, except `anthropic`, which falls back to `[AISettings]`. |
+| `DefaultModel` | (empty) | The alias of the site default model; empty: `anthropic.<[AISettings] Model>`. |
+| `ProvidersWithoutPolicy[]` | `anthropic` | The models of these providers can be chosen by everyone with `expai/write` (as in 0.1.0); every other provider's models need `expai/model_use` (limitation Provider). Empty it to require the policy for everything but the default. |
+
+## [Provider_<id>]: one provider
+
+| Setting | Effect |
+| --- | --- |
+| `Type` | `anthropic` (Messages API), `openai_chat` (OpenAI Chat Completions and every compatible server), or `custom` with `Class=` (a class implementing `expAiProvider`; its constructor receives these settings with the model's). |
+| `Flavor` | `openai_chat` only: `openai`, `huggingface`, `openrouter`, `mistral`, `xai`, `ollama`, `llamacpp`, `generic`: the small differences (tool_choice support, Mistral's tool names, `max_completion_tokens`, OpenRouter's `reasoning` object). |
+| `Label` | The name in the picker, in error texts and on expai/models. |
+| `BaseURL` | The API: for `openai_chat` the base (`https://router.huggingface.co/v1`; `/chat/completions` is added, a query such as Azure's `api-version` is kept); for `anthropic` the messages URL. |
+| `ApiKey` | The key, ONLY in settings/override. expai/models warns about a key in any other file. |
+| `ApiKeyHeader` | `authorization` (Bearer, default of `openai_chat`), `x-api-key` (default of `anthropic`), `api-key` (Azure), `x-goog-api-key`, or `none` (a local server). |
+| `KeyOptional` | `true`: send no key header when `ApiKey` is empty (a server that accepts both). |
+| `Headers[]` | Extra request headers, `Name: value` (e.g. OpenRouter's `X-OpenRouter-Title`). Key headers, `Host` and line breaks are refused. |
+| `ExtraBody` | A JSON object merged into every request body, e.g. OpenRouter's routing `{"provider":{"data_collection":"deny","zdr":true}}`. It cannot change the model, the messages or the tools. |
+| `Region`, `Retention`, `TermsCheckedAt` | As in `[AISettings]`; used by the data policy ([data-policy.md](data-policy.md)) and shown per request. |
+| `Timeout`, `ConnectTimeout`, `MaxResponseBytes` | As in `[AISettings]`, for this provider (a local CPU model needs a longer `Timeout`, e.g. 280). |
+| `RateLimitHeaders[]` | Glob patterns of the response headers kept in the usage log (default: `anthropic-ratelimit-*` and `retry-after` for anthropic; `x-ratelimit-*`, `retry-after`, `x-request-id` for openai_chat). |
+| `RetryAfterMax` | Seconds of a `retry-after` on 429/503/529 that expai waits once before retrying (default 5); a longer wait is reported to the editor at once. |
+| `RetryOnServerError` | `enabled` (default): one retry after a second on 500/502/504 or a failed connection (never after a timeout). |
+| `AnthropicExtras` | `anthropic` only: `disabled` leaves out prompt caching, the refusal fallback, the workspace header and the beta headers (for an Anthropic-compatible server such as Ollama's `/v1/messages`). |
+| `Managed` | `ollama`: a local Ollama that expai/models can start, stop and pull models for ([local-models.md](local-models.md)). |
+
+## [Model_<alias>]: one model
+
+The alias is what users choose and what the usage log records (letters, digits, `.`, `_`, `:`, `-`).
+
+| Setting | Effect |
+| --- | --- |
+| `Provider` | The provider id. Models of a provider that is not in `Providers[]` are ignored. |
+| `Id` | What the API expects (Hugging Face: may end in `:fastest`, `:cheapest`, `:preferred` or `:<provider>`). |
+| `Label` | The name in the picker. |
+| `ToolUse` | `native` (the API's tool calling), `prompted` (tools described in the instructions, the model answers with JSON: read tools only), `none` (no tools: a read-only snapshot of the node). |
+| `WriteTools` | `enabled`: the model may create and change drafts, if `ToolUse=native` and it passed the probe ([probe.md](probe.md)) or `WriteGate=trusted`. |
+| `WriteGate` | `probe` (default) or `trusted` (no probe needed; the built-in Anthropic models are trusted). |
+| `Capabilities[]` | `json_schema` / `json_object` (structured answers), `reasoning_effort` (sends `Effort`), `no_tool_choice` (the server ignores tool_choice), `tool_choice_none`, `prompt_cache`, `vision`. |
+| `MaxOutput` | The longest answer of one call (tokens); default `[AISettings] MaxTokens`. |
+| `Effort` | `none`, `minimal`, `low`, `medium`, `high`, `xhigh` (with `Capabilities[]=reasoning_effort`; `none` switches thinking off, e.g. for Qwen on a CPU). |
+| `InputPerMTok`, `OutputPerMTok`, `CacheWritePerMTok`, `CacheReadPerMTok` | Prices per million tokens (0: free). Without them the model is priced by `[Pricing]` by its id; a model of another provider without prices has an unknown cost (never a Claude price). A cost the provider reports (OpenRouter) always wins. |
+| `Slow` | `true` marks the model "slow" in the picker (default for providers with `Region=local`). |
+| `MaxTokensParameter`, `ParallelToolCalls`, `StrictTools`, `ExtraBody` | `max_tokens` or `max_completion_tokens`; `enabled`/`disabled` sends `parallel_tool_calls`; `enabled` sends `strict: true` on tool definitions; a JSON object merged into the body for this model. |
 
 ## [AssistantSettings]: the conversation
 
@@ -122,7 +176,8 @@ and when it resets. Days and months follow the site's time zone. The dashboard s
 | `MaxTokensPerUserPerDay`, `MaxCostPerUserPerDay` | at midnight |
 | `MaxTokensPerUserPerMonth`, `MaxCostPerUserPerMonth` | on the 1st |
 | `MaxTokensPerSitePerMonth`, `MaxCostPerSitePerMonth` | on the 1st (all users together) |
-| `MaxRequestsPerTurn` | the most model calls one message may lead to; empty: `[AssistantSettings] MaxToolIterations` |
+| `MaxRequestsPerTurn` | the most model calls one message may lead to; empty: `[AssistantSettings] MaxToolIterations` (a retry of the prompted tool protocol counts) |
+| `ProviderMaxTokensPerMonth[<provider>]`, `ProviderMaxCostPerMonth[<provider>]` | on the 1st: all users together on one provider; only requests to that provider are stopped |
 
 Anthropic's own limits apply as well: the rate limits of the key (the dashboard shows the last values the API
 reported) and the spend limit of the organization, set in the Claude Console.
@@ -144,11 +199,62 @@ A model id is matched exactly, then without a provider prefix (`anthropic.`, `us
 unit test `php bin/php/ezexec.php extension/expai/tests/expaicost_test.php` checks every shipped id.
 The estimate is not an invoice: Anthropic's invoice is authoritative.
 
+## [DataPolicy]: where content may go
+
+See [data-policy.md](data-policy.md). Without any rule every active provider may receive content.
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `DefaultRegions[]` | (none) | Regions any content may go to (`us`, `eu`, `local`). |
+| `SectionRegions[<section id>]` | (none) | Regions the content of a section may go to, separated by `;` (e.g. `eu;local`). |
+| `ClassRegions[<class identifier>]` | (none) | The same per class. Section, class and default narrow each other. |
+| `ZeroRetention` | `disabled` | `enabled`: every request needs a provider with `Retention=none` or `zdr`. |
+| `ZeroRetentionSections[]`, `ZeroRetentionClasses[]` | (none) | Sections and classes whose content needs zero retention. |
+
+## [ProbeSettings]: the write gate
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `WritePassRate` | `90` | The pass rate (percent) of a live probe a model needs to write drafts ([probe.md](probe.md)). |
+| `NodeID` | (empty) | The node the probe tasks name (nothing is read or written); empty: the content root. |
+| `ClassIdentifier` | `folder` | The class the probe tasks name. |
+
+## [LocalModelSettings]: a local Ollama
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `SpoolDirectory` | `/var/lib/expai-llm/spool` | Where expai/models writes requests for the root-owned helper ([local-models.md](local-models.md)). |
+| `StatusFile` | `/var/lib/expai-llm/status.json` | The status the helper writes (read by expai/models). |
+| `Models[]` | `qwen3.5:4b` | The models the view offers to pull and remove (the helper has its own allowlist). |
+
+## [McpBridge], [McpSettings], [McpServer_<id>]: MCP tools
+
+See [mcp.md](mcp.md).
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `[McpBridge] Enabled` | `disabled` | `enabled`: audited read tools of the extension expmcp, in process as the current user (`exp__<tool>`, policy `expai/mcp` with Server `exp`). |
+| `[McpBridge] Tools[]` | `exp_content_query` | The expmcp tools offered; only the audited ones are accepted. |
+| `[McpSettings] Servers[]` | (none) | External MCP servers (streamable HTTP), each `[McpServer_<id>]` (id: a-z, 0-9, at most 20 characters). |
+
+| `[McpServer_<id>]` setting | Effect |
+| --- | --- |
+| `Label` | The name shown with its tools. |
+| `URL` | The endpoint: https, or http to a loopback address with `AllowLoopback=enabled`. |
+| `Token` | Sent as a Bearer token; ONLY in settings/override. |
+| `AllowedTools[]` | The tools the panel may call (`mcp__<id>__<tool>`); everything else the server offers is ignored. |
+| `Region`, `Retention` | Checked against the panel node's data policy before every call. |
+| `MaxResultBytes` | The longest result passed to the model (default 16000). |
+| `Timeout` | Seconds per request (default 20). |
+| `ToolsCacheTTL` | Seconds the tool list is cached (default 3600; 0: no cache). |
+| `ProtocolVersion` | The MCP protocol version offered in `initialize` (default `2025-06-18`; the server's answer is used). |
+| `AllowLoopback`, `AllowPrivate` | `enabled` lets the URL resolve to a loopback, or a private / link-local / reserved address (refused by default). |
+
 ## The other settings files of the extension
 
 | File | What it sets |
 | --- | --- |
-| `module.ini` | `ModuleList[]=expai` (policies `expai/write`, `expai/log`, `expai/settings`; views expai/dashboard, expai/log) |
+| `module.ini` | `ModuleList[]=expai` (policies `expai/write`, `expai/log`, `expai/settings`, `expai/model_use`, `expai/model_manage`, `expai/mcp`; views expai/dashboard, expai/log, expai/models) |
 | `ezjscore.ini` | `[ezjscServer] FunctionList[]=expai`, `[ezjscServer_expai] Class=expAiServerFunctions`, `Functions[]=expai` |
 | `design.ini` | `DesignExtensions[]=expai`, `BackendJavaScriptList[]=expai.js`, `BackendCSSFileList[]=expai.css` |
 | `admininterface.ini` | the tabs `expai` (content navigation part) and `expai_media` (media), header template `expai_header.tpl`, body `expai.tpl` |

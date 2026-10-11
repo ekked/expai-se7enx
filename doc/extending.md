@@ -277,6 +277,16 @@ table by model id; add the provider's models there, or they are estimated with t
 
 **Another Anthropic model** needs no code: `[AISettings] Model=<model id>` (and `Effort=` as that model supports).
 
+**An OpenAI-compatible server or another Anthropic-compatible one** needs no code either: a `[Provider_<id>]` group
+with `Type=openai_chat` (or `anthropic`) and `[Model_<alias>]` groups ([providers.md](providers.md)). A provider class
+of your own in the registry: `[Provider_<id>] Type=custom`, `Class=<your class>`; its constructor receives the
+provider's settings merged with the model's (`Model`, `MaxTokens`, `ProviderId`, `ModelAlias`, `ToolUse`,
+`Capabilities`). Extending `expAiProviderBase` gives you the settings, the key header, the extra headers, one retry
+and the error texts that name the provider. Optional answer fields since the registry: `tokens.reasoning`,
+`tokens.reported_cost` (in the currency), `native_json` + `native_for` (your API's own form of the turn, sent back
+to you only), `invalid_tool_input` (call id => the arguments that could not be read: the assistant answers that call
+with an error).
+
 ## 6. The server side of the browser
 
 The ezjscore functions (expAiServerFunctions) are the browser's API: `load`, `history`, `chat`, `reset`, `drafts`,

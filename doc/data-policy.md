@@ -1,0 +1,46 @@
+# Data policy: regions and retention
+
+Every provider says where it processes requests and how long it keeps them:
+
+```ini
+[Provider_mistral]
+Region=eu            # us | eu | local
+Retention=30d        # none | zdr | 30d | unknown
+TermsCheckedAt=2026-10-11
+```
+
+`local` means the data never leaves the server (a local Ollama). `Retention=zdr` means zero data retention is agreed
+with the provider; `none` that it keeps nothing (local). Read the provider's terms for your contract and write the day
+into `TermsCheckedAt`; expai/models shows "not checked" until you do. The values shipped for the examples are a
+starting point, not a legal statement.
+
+## Rules
+
+```ini
+[DataPolicy]
+DefaultRegions[]                  # empty: every region
+SectionRegions[6]=eu;local        # section 6 only to EU or local providers
+ClassRegions[contract]=local      # contracts never leave the server
+ZeroRetention=disabled
+ZeroRetentionSections[]=7         # section 7 only to providers that keep nothing
+ZeroRetentionClasses[]
+```
+
+The requirement of a content object is the intersection of the default regions, its section's and its class's. A
+`local` provider meets every region requirement. Zero retention is met by `Retention=none` or `zdr`. A provider with
+an unknown region meets no region requirement. Without any rule everything may go to every active provider.
+
+## Where it is enforced
+
+- **The panel**: before the first request, the node the panel is open on. The editor gets "The data policy keeps
+  "<name>" (object <id>) away from <provider>: regions eu or local required; the provider is in region us ..." and
+  can choose another model.
+- **Every tool**: `get_node`, `list_children`, `get_tree_context`, `create_draft` (the class and the parent's
+  section), `update_draft`: a refused object is a tool error the model reads; lists leave such objects out and add
+  `withheld_by_data_policy: <n>`; a path shows only the node id of a withheld ancestor.
+- **The edit form**: field actions and "Fill the fields" check the object before anything is sent.
+- **MCP**: the in-process bridge leaves withheld nodes out of its results; an external server has its own `Region`
+  and `Retention`, checked against the panel node before every call ([mcp.md](mcp.md)).
+
+The usage log stores the region and retention of the provider with every request; expai/log shows them per request
+and filters by provider and region, and the dashboard shows a table by provider.

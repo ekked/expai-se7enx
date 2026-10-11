@@ -30,8 +30,15 @@ turns with their totals; opening a turn shows its requests.
 
 ### Providers
 
-The provider normalises the usage it reports into the four token counts, and the row stores the provider id
-(`expAiProvider::providerId()`), so a custom provider's rows are counted the same way (extending.md).
+The provider normalises the usage it reports into the four token counts (an OpenAI-style provider's cached tokens are
+taken out of the input and counted as cache reads, as Anthropic reports them), plus reasoning tokens and a cost it
+reported. The row stores the provider id, the model alias, the provider's region and retention, and the tool mode, so
+every provider's rows are counted the same way ([providers.md](providers.md), extending.md).
+
+The cost of a row is, in this order: the cost the provider reported (OpenRouter, shown "reported"), the prices of its
+model alias (`[Model_<alias>] InputPerMTok` ...; a local model is free), the `[Pricing]` table by model id; a model of
+another provider without prices has an unknown cost rather than a Claude price. The limits use the same cost.
+`[Limits] ProviderMaxTokensPerMonth[<provider>]` and `ProviderMaxCostPerMonth[<provider>]` cap one provider.
 
 ## Where to see it
 

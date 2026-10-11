@@ -109,7 +109,17 @@ Filters, sorting and paging are view parameters; the filter form posts and is re
 expai/log/(from)/2026-10-01/(to)/2026-10-31/(user)/14/(node)/2/(action)/field:rewrite/(model)/claude-sonnet-5-5/(errors)/1
 expai/log/(sort)/latency_ms/(dir)/asc/(offset)/25
 expai/log/(export)/csv/(from)/2026-10-01        the filtered requests as CSV (no request texts, user ids only)
+expai/log/(provider)/openrouter/(region)/eu      the requests of one provider, or of the providers of one region
 ```
 
+With more than one provider every turn shows its provider and region, every request its model alias, region,
+retention and tool mode (when not native), and the cost says "reported" when the provider reported it (OpenRouter).
+The CSV has the columns `provider`, `model_alias`, `region`, `retention`, `reasoning_tokens`, `cost_source`
+(`reported`, `alias`, `table`, `default`, or `unknown`), `tool_mode` and `mcp_calls`. The dashboard adds a
+"By provider" table (requests, tokens, cost, errors per provider and its region) when more than one provider was used
+in the period. The action filter also offers `probe` (bin/php/expaiprobe.php) and `test` (the test prompt of
+expai/models).
+
 `sort` is one of `created` (default), `latency_ms`, `input_tokens`, `output_tokens`; `dir` `desc` (default) or
-`asc`; `action` one of `panel`, `fill`, `field:<name>`. `user` is honoured only with `expai/log`.
+`asc`; `action` one of `panel`, `fill`, `field:<name>`, `probe`, `test`; `provider` a provider id; `region` `us`, `eu` or
+`local`. `user` is honoured only with `expai/log`.
