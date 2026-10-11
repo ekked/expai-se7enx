@@ -66,3 +66,11 @@ $FunctionList['switched_on'] = array( 'name' => 'switched_on',
                                       'call_method' => array( 'class' => 'expAiGate', 'method' => 'fetchSwitchedOn' ),
                                       'parameter_type' => 'standard',
                                       'parameters' => array() );
+
+// alt text for images (#370 M5 alt text, classes/alttext/): fetch( 'expai', 'alt_text_model', hash( 'object', $object ) )
+// the vision model the "Write alt text" button uses for the object's images, or why there is none
+$FunctionList['alt_text_model'] = array( 'name' => 'alt_text_model',
+                                         'operation_types' => array( 'read' ),
+                                         'call_method' => array( 'class' => 'expAiAltTextFunctionCollection', 'method' => 'fetchModel' ),
+                                         'parameter_type' => 'standard',
+                                         'parameters' => array( array( 'name' => 'object', 'type' => 'object', 'required' => true ) ) );

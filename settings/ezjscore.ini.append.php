@@ -24,4 +24,11 @@ Functions[]=expai
 Class=expAiTranslationSyncServerFunctions
 Functions[]=expai
 
+
+# Alt text for images (#370 M5 alt text): expaialttext::suggest (classes/alttext/expaialttextserverfunctions.php).
+# The same permission and checks as expai::field.
+[ezjscServer_expaialttext]
+Class=expAiAltTextServerFunctions
+Functions[]=expai
+
 */ ?>

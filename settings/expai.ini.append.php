@@ -1215,4 +1215,63 @@ Template=expai/panel/translations.tpl
 # translation patches and full translations write their answer into a draft of the target language
 Appliers[translation_sync]=expAiTranslationSyncApplier
 
+
+# ---- Alt text for images (doc/alt-text.md, #370 M5 alt text) ----------------------------------------------------
+# "Write alt text" next to every image field of the edit form (expai_alttext.js) and the report expai/alttext.
+[EditViewSettings]
+Sections[]=alttext
+FieldActions[]=alt_text
+
+[EditSection_alttext]
+Template=expai/edit/alttext.tpl
+
+# The field action of image fields. Its button is drawn by expai_alttext.js (the image fields are not in
+# [ToolSettings] WritableDatatypes[]: only the alt text is written, and only into the form).
+[FieldAction_alt_text]
+Label=Write alt text
+Handler=expAiAltTextFieldAction
+Datatypes[]=ezimage
+Input=none
+
+[AltTextSettings]
+# enabled: the button in the edit form, the report and its jobs
+Enabled=enabled
+# The model that looks at the images (an alias with Capabilities[]=vision). Empty: the user's model, then the site
+# default, then any other vision model, the first one the user may use, that runs and that the data policy allows.
+Model=
+# The image alias that is sent (original: the stored file, scaled down here to the limits below)
+ImageAlias=original
+# The longest edge in pixels and the most bytes of the image that is sent; per provider [Provider_<id>]
+# ImageMaxEdge and ImageMaxBytes (Anthropic: 1568 px is what the model sees, 5 MB per image)
+MaxEdge=1568
+MaxBytes=3750000
+# JPEG quality of a scaled-down image (1-100)
+JpegQuality=85
+# Images may only go to these regions (us, eu, local), on top of the object's section and class rules of
+# [DataPolicy]; empty: as the object
+ImageRegions[]
+# enabled: images only go to providers with zero retention (none or zdr), whatever the section says
+ImageZeroRetention=disabled
+# The longest alt text in characters (the suggestion is cut at a word)
+MaxLength=150
+# The most output tokens of one suggestion
+MaxTokens=600
+# The longest text of the page sent as context, in characters
+MaxContextLength=4000
+# Plain text fields (ezstring) of the same object that repeat the alt text (e.g. the alternative_text field of an
+# image class): filled too when they are empty or equal to the image's alt text
+CompanionAttributes[]
+CompanionAttributes[]=alternative_text
+CompanionAttributes[]=alt_text
+# House rules added to the prompt (e.g. "Name our products by their full name.")
+ExtraInstructions=
+# The report: the most objects looked at under a node
+ReportMaxObjects=500
+# Queue suggestions: the most jobs per click, the default budget of a job group (in [Pricing] Currency; 0: none)
+MaxQueuePerRequest=100
+GroupBudget=0
+# The estimate of one queued suggestion: the text tokens (prompt, page text) and the answer, besides the image
+EstimateTextTokens=1200
+EstimateOutputTokens=120
+
 */ ?>

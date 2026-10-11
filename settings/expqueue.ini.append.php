@@ -89,4 +89,16 @@ RetryBase=30
 MaxBackoff=600
 Description=Checks the translations of an object after its source language was published
 
+
+# Alt text for images (#370 M5 alt text, doc/alt-text.md): one suggestion of the "Missing alt text" report, written
+# into a new draft of the object (never published). The resource is <provider>:standard.
+[JobType_expai.alttext]
+Handler=expAiAltTextJobHandler
+Class=bulk
+MaxAttempts=4
+Timeout=300
+RetryBase=60
+MaxBackoff=1800
+Description=Writes the alt text of an image into a new draft (a vision model looks at the image)
+
 */ ?>
