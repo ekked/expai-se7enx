@@ -559,6 +559,127 @@ Template=expai/panel/conversation.tpl
 [PanelSection_drafts]
 Template=expai/panel/drafts.tpl
 
+# ------------------------------------------------------------------ AI chains (#359 P4)
+# doc/chains.md: multi-step writing pipelines. Each model step is one queued request (expqueue), the run has a job
+# group with the run budget, the result is one draft, a human checkpoint comes before anything else happens.
+
+# "Write with a chain" in the Intelligence tab (users with expai/chain)
+[PanelSettings]
+Sections[]=chains
+
+[PanelSection_chains]
+Template=expai/panel/chains.tpl
+
+# The applier that records a chain step's answer and queues the next step
+[QueueSettings]
+Appliers[chain]=expAiChainApplier
+
+[ChainSettings]
+# The chains users may start (policy expai/chain, limitation Chain): [Chain_<id>] and [ChainStep_<id>.<step>]
+Chains[]
+Chains[]=article
+# Where prompt templates (PromptTemplate=) are looked up, relative to the installation; the first that has the file
+# wins, extension/expai/design/admin/templates comes last. Put site prompts in your own extension's directory.
+PromptDirectories[]
+# Added to the system prompt of every chain step (house style, audience)
+SystemPrompt=
+# The longest brief, in characters
+MaxBriefLength=4000
+# The longest context the read tools of a step (Tools[]) may add to its prompt, in characters
+MaxContextChars=12000
+# The longest step output kept in expai_chain_step.output, in bytes
+MaxStoredOutputBytes=200000
+# The class that takes the translation step (a static method chainTranslate( expAiChainRun $run, array $languages )
+# that queues the translations of the run's draft; expAiChainTranslateSync hands it to the translation sync,
+# doc/translation-sync.md); empty: the step is skipped
+TranslateHandler=expAiChainTranslateSync
+
+# The default chain: Opus writes, Sonnet reviews (revised until it passes, at most three reviews), Haiku prepares
+# title, summary and keywords and checks the links, then an editor approves before the translation.
+[Chain_article]
+Label=Article: write, review, SEO, approve
+Description=Writes an article from a brief, reviews and revises it until it passes, adds title, summary and keywords; an editor approves the draft before it is translated.
+Class=article
+Fields[]
+Fields[]=title
+Fields[]=intro
+Fields[]=body
+Steps[]
+Steps[]=write
+Steps[]=review
+Steps[]=seo
+Steps[]=checkpoint
+Steps[]=translate
+# USD; the run is held when its next step would go beyond it (also the budget of its job group)
+MaxCostPerRun=1.00
+# The most items (runs) one start may ask for
+MaxItems=5
+
+[ChainStep_article.write]
+Type=generate
+Label=Write
+Model=anthropic.claude-opus-5-5
+Lane=auto
+PromptTemplate=expai/chains/article_write.tpl
+Tools[]
+Tools[]=get_tree_context
+Tools[]=list_children
+MaxTokens=6000
+
+[ChainStep_article.review]
+Type=review
+Label=Review
+Model=anthropic.claude-sonnet-5-5
+Lane=auto
+PromptTemplate=expai/chains/article_review.tpl
+Checklist[]
+Checklist[]=It does what the brief asks for
+Checklist[]=No invented facts, figures, names or quotes
+Checklist[]=The intro stands on its own and matches the body
+Checklist[]=Clear structure and readable sentences
+PassCriteria[]
+PassCriteria[]=score>=80
+PassCriteria[]=issues.high==0
+PassCriteria[]=checklist.failed==0
+MaxIterations=3
+OnFail=revise
+ReviseStep=revise
+OnExhausted=escalate
+MaxTokens=3000
+
+[ChainStep_article.revise]
+Type=generate
+Label=Revise
+Model=anthropic.claude-opus-5-5
+Lane=auto
+PromptTemplate=expai/chains/article_revise.tpl
+Next=review
+MaxTokens=6000
+
+[ChainStep_article.seo]
+Type=transform
+Label=SEO and QA
+Model=anthropic.claude-haiku-5-5
+Lane=auto
+PromptTemplate=expai/chains/article_seo.tpl
+OutputFields[]
+OutputFields[]=short_title
+PassCriteria[]
+PassCriteria[]=links.broken==0
+PassCriteria[]=issues.high==0
+OnFail=escalate
+MaxTokens=1500
+
+[ChainStep_article.checkpoint]
+Type=human
+Label=Editor approves
+
+[ChainStep_article.translate]
+Type=translate
+Label=Translate
+Languages[]
+Languages[]=all
+
 [EditViewSettings]
 # The controls in the content edit form (content.ini [EditSettings] AdditionalTemplates[]).
 Enabled=true

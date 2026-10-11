@@ -129,6 +129,8 @@
 {else}
                     <input type="submit" class="defaultbutton exp-ai-btn exp-ai-btn-big" name="ChangeLocationButton" value="{'Choose the location'|i18n( 'extension/expai/dashboard' )}" />
 {/if}
+                    {* or start an AI chain with the same request and location (doc/chains.md) *}
+                    {include uri='design:expai/parts/chain_pick.tpl' start=$start}
                 </div>
             </form>
         </section>
@@ -267,6 +269,9 @@
 
     {* threads: the latest of the user's own threads and Vector (doc/threads.md) *}
     {include uri='design:expai/parts/threads_card.tpl'}
+
+    {* chains: the user's latest chain runs and the checkpoints waiting (doc/chains.md) *}
+    {include uri='design:expai/parts/chain_runs.tpl'}
 
     {* recent drafts *}
     <section class="exp-ai-card" aria-labelledby="exp-ai-recent-title">

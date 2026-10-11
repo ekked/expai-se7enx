@@ -35,6 +35,19 @@ $FunctionList['budget_status'] = array( 'name' => 'budget_status',
                                         'call_method' => array( 'class' => 'expAiBudgetFunctionCollection', 'method' => 'fetchStatus' ),
                                         'parameter_type' => 'standard',
                                         'parameters' => array() );
+// AI chains (classes/chain/): fetch( 'expai', 'chains' ) the chains the user may start; fetch( 'expai', 'chain_runs',
+// hash( 'limit', 5, 'node_id', 0 ) ) the user's own latest runs and how many wait for an editor
+$FunctionList['chains'] = array( 'name' => 'chains',
+                                 'operation_types' => array( 'read' ),
+                                 'call_method' => array( 'class' => 'expAiChainFunctionCollection', 'method' => 'fetchChains' ),
+                                 'parameter_type' => 'standard',
+                                 'parameters' => array() );
+$FunctionList['chain_runs'] = array( 'name' => 'chain_runs',
+                                     'operation_types' => array( 'read' ),
+                                     'call_method' => array( 'class' => 'expAiChainFunctionCollection', 'method' => 'fetchRuns' ),
+                                     'parameter_type' => 'standard',
+                                     'parameters' => array( array( 'name' => 'limit', 'type' => 'integer', 'required' => false, 'default' => 5 ),
+                                                            array( 'name' => 'node_id', 'type' => 'integer', 'required' => false, 'default' => 0 ) ) );
 $FunctionList['models'] = array( 'name' => 'models',
                                  'operation_types' => array( 'read' ),
                                  'call_method' => array( 'class' => 'expAiFunctionCollection', 'method' => 'fetchModels' ),

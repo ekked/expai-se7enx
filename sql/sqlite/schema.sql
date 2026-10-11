@@ -300,3 +300,63 @@ CREATE TABLE expai_package (
 );
 
 CREATE  INDEX expai_package_uuid ON expai_package  ( uuid );
+CREATE TABLE expai_chain_run (
+  brief longtext,
+  chain varchar(40) NOT NULL DEFAULT '',
+  chain_hash varchar(40) NOT NULL DEFAULT '',
+  class_identifier varchar(50) NOT NULL DEFAULT '',
+  cost_micros INTEGER(11) NOT NULL DEFAULT '0',
+  created INTEGER(11) NOT NULL DEFAULT '0',
+  current_step varchar(40) NOT NULL DEFAULT '',
+  data longtext,
+  finished INTEGER(11) NOT NULL DEFAULT '0',
+  group_uuid varchar(36) NOT NULL DEFAULT '',
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  input_tokens INTEGER(11) NOT NULL DEFAULT '0',
+  item INTEGER(11) NOT NULL DEFAULT '0',
+  item_count INTEGER(11) NOT NULL DEFAULT '0',
+  label varchar(150) NOT NULL DEFAULT '',
+  language varchar(20) NOT NULL DEFAULT '',
+  last_error varchar(255) NOT NULL DEFAULT '',
+  modified INTEGER(11) NOT NULL DEFAULT '0',
+  node_id INTEGER(11) NOT NULL DEFAULT '0',
+  object_id INTEGER(11) NOT NULL DEFAULT '0',
+  output_tokens INTEGER(11) NOT NULL DEFAULT '0',
+  snapshot longtext,
+  state varchar(20) NOT NULL DEFAULT 'running',
+  user_id INTEGER(11) NOT NULL DEFAULT '0',
+  uuid varchar(36) NOT NULL DEFAULT '',
+  version INTEGER(11) NOT NULL DEFAULT '0'
+);
+
+CREATE  INDEX expai_chain_run_state ON expai_chain_run  ( state, user_id );
+CREATE  INDEX expai_chain_run_uuid ON expai_chain_run  ( uuid );
+CREATE TABLE expai_chain_step (
+  cost_micros INTEGER(11) NOT NULL DEFAULT '0',
+  created INTEGER(11) NOT NULL DEFAULT '0',
+  finished INTEGER(11) NOT NULL DEFAULT '0',
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  input_hash varchar(40) NOT NULL DEFAULT '',
+  input_tokens INTEGER(11) NOT NULL DEFAULT '0',
+  issue_count INTEGER(11) NOT NULL DEFAULT '0',
+  iteration INTEGER(11) NOT NULL DEFAULT '0',
+  job_uuid varchar(36) NOT NULL DEFAULT '',
+  lane varchar(16) NOT NULL DEFAULT '',
+  language varchar(20) NOT NULL DEFAULT '',
+  model varchar(100) NOT NULL DEFAULT '',
+  note varchar(255) NOT NULL DEFAULT '',
+  output longtext,
+  output_tokens INTEGER(11) NOT NULL DEFAULT '0',
+  provider varchar(40) NOT NULL DEFAULT '',
+  run_id INTEGER(11) NOT NULL DEFAULT '0',
+  score INTEGER(11) NOT NULL DEFAULT '-1',
+  service_tier varchar(20) NOT NULL DEFAULT '',
+  state varchar(20) NOT NULL DEFAULT 'queued',
+  step varchar(40) NOT NULL DEFAULT '',
+  step_type varchar(20) NOT NULL DEFAULT '',
+  usage_log_id INTEGER(11) NOT NULL DEFAULT '0',
+  verdict varchar(10) NOT NULL DEFAULT ''
+);
+
+CREATE  INDEX expai_chain_step_job ON expai_chain_step  ( job_uuid );
+CREATE  INDEX expai_chain_step_run ON expai_chain_step  ( run_id );

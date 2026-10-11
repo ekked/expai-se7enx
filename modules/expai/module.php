@@ -25,6 +25,8 @@
  *   expai/packages   content packages: (package)/<uuid> one package, (offset)/<n> the list (expai/package_import)
  *   expai/dashboard  the Dashboard tab page
  *   expai/models     providers, models, probe results and the local model (expai/model_manage)
+ *   expai/chain      AI chains (expai/chain, limitation Chain): the runs, (run)/<id> one run and its checkpoint,
+ *                    (offset)/<n>; POST starts runs and approves, asks for changes, stops or continues them
  *   expai/vector     the Vector workspace: threads, conversation and steps, plan/diff/cost (doc/vector.md);
  *                    (thread)/<uuid>, (node)/<node id>, (tab)/plan|diff|cost, (shelf)/settled|archived
  *
@@ -87,6 +89,17 @@ $ViewList['models'] = array(
                                       'TestPrompt' => array( 'Model' => 'ExpAiTestModel' ) ),
     'unordered_params' => array( 'provider' => 'Provider' ) );
 
+// AI chains (classes/chain/, doc/chains.md): the runs, one run with its checkpoint, starting runs
+$ViewList['chain'] = array(
+    'default_navigation_part' => 'ezmynavigationpart',
+    'script' => 'chain.php',
+    'functions' => array( 'chain' ),
+    'params' => array(),
+    'single_post_actions' => array( 'ExpAiChainStartButton' => 'StartChain', 'ExpAiChainApproveButton' => 'Approve',
+                                    'ExpAiChainChangesButton' => 'RequestChanges', 'ExpAiChainStopButton' => 'StopRun',
+                                    'ExpAiChainResumeButton' => 'ResumeRun' ),
+    'unordered_params' => array( 'run' => 'Run', 'offset' => 'Offset' ) );
+
 // Vector (classes/vector/, doc/vector.md): the shell only; threads and steps come through expaivector::*
 $ViewList['vector'] = array(
     'default_navigation_part' => 'ezmynavigationpart',
@@ -116,6 +129,9 @@ $FunctionList['package_import'] = array();
 $FunctionList['package_export'] = array();
 $FunctionList['lane_fast'] = array();
 $FunctionList['mcp'] = array( 'Server' => $Server );
+// AI chains: start runs and act at their checkpoints (limitation Chain: the chains of [ChainSettings] Chains[])
+$FunctionList['chain'] = array(
+    'Chain' => array( 'name' => 'Chain', 'values' => array(), 'class' => 'expAiChainPolicy', 'function' => 'chains', 'parameter' => array() ) );
 
 // Vector: Subtree and Section are the kernel's limitation kinds (the role editor browses for subtrees)
 $FunctionList['vector'] = array(

@@ -30,8 +30,9 @@ class expAiSchema
     public static function definition( $withQueue = true )
     {
         // the batch and package tables and the lane columns of the tables below: expAiQueueSchema (classes/queue/)
+        // and the chain tables: expAiChainSchema (classes/chain/)
         if ( $withQueue )
-            return expAiQueueSchema::extend( self::definition( false ) );
+            return expAiChainSchema::extend( expAiQueueSchema::extend( self::definition( false ) ) );
         $int = array( 'length' => 11, 'type' => 'int', 'not_null' => '1', 'default' => 0 );
         $varchar = function ( $length, $default = '' )
         {

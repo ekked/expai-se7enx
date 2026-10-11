@@ -26,6 +26,67 @@
             ]
         },
         {
+            "name": "expai_chain_run",
+            "indexes": [
+                {
+                    "keys": {
+                        "id": 1
+                    },
+                    "options": {
+                        "unique": true,
+                        "name": "PRIMARY"
+                    }
+                },
+                {
+                    "keys": {
+                        "uuid": 1
+                    },
+                    "options": {
+                        "name": "expai_chain_run_uuid"
+                    }
+                },
+                {
+                    "keys": {
+                        "state": 1,
+                        "user_id": 1
+                    },
+                    "options": {
+                        "name": "expai_chain_run_state"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "expai_chain_step",
+            "indexes": [
+                {
+                    "keys": {
+                        "id": 1
+                    },
+                    "options": {
+                        "unique": true,
+                        "name": "PRIMARY"
+                    }
+                },
+                {
+                    "keys": {
+                        "run_id": 1
+                    },
+                    "options": {
+                        "name": "expai_chain_step_run"
+                    }
+                },
+                {
+                    "keys": {
+                        "job_uuid": 1
+                    },
+                    "options": {
+                        "name": "expai_chain_step_job"
+                    }
+                }
+            ]
+        },
+        {
             "name": "expai_change",
             "indexes": [
                 {

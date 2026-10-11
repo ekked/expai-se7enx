@@ -616,3 +616,25 @@ span.exp-ai-fallback-notice { display: inline-block; }
 }
 .exp-ai-palette-toast[hidden] { display: none; }
 @media (max-width: 640px) { .exp-ai-palette-overlay { padding-top: 4vh; } }
+
+/* AI chains (doc/chains.md): the run view, the panel section, the dashboard card */
+.exp-ai-status-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(12em, 1fr)); gap: 0.6em 1.2em; margin: 0 0 0.8em; }
+.exp-ai-status-list dt { color: var(--exp-ai-muted); font-size: 0.85em; }
+.exp-ai-status-list dd { margin: 0.1em 0 0; overflow-wrap: anywhere; }
+.exp-ai-chain-plan { display: flex; flex-wrap: wrap; gap: 0.4em; list-style: none; margin: 0.6em 0 0; padding: 0; counter-reset: exp-ai-chain; }
+.exp-ai-chain-plan li { counter-increment: exp-ai-chain; padding: 0.25em 0.7em; border: 1px solid var(--exp-ai-line); border-radius: 999px; color: var(--exp-ai-muted); }
+.exp-ai-chain-plan li::before { content: counter(exp-ai-chain) ". "; }
+.exp-ai-chain-plan li.exp-ai-chain-done { color: var(--exp-ai-ok); border-color: currentColor; }
+.exp-ai-chain-plan li.exp-ai-chain-current { color: var(--exp-ai-accent); border-color: currentColor; background: var(--exp-ai-accent-soft); font-weight: 600; }
+.exp-ai-chain-pill-waiting_human, .exp-ai-chain-pill-held { background: var(--exp-ai-accent-soft); color: var(--exp-ai-accent); }
+.exp-ai-chain-pill-failed, .exp-ai-chain-verdict-fail { color: var(--exp-ai-error); }
+.exp-ai-chain-pill-done, .exp-ai-chain-verdict-pass { color: var(--exp-ai-ok); }
+.exp-ai-chain-checkpoint { border-color: var(--exp-ai-accent); }
+.exp-ai-chain-flags { margin: 0 0 0.8em; padding-left: 1.2em; color: var(--exp-ai-accent); }
+.exp-ai-chain-field { padding: 0.4em 0.8em; border-left: 3px solid var(--exp-ai-line); margin-bottom: 0.8em; }
+.exp-ai-chain-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4em 0.8em; }
+.exp-ai-chain-count, .exp-ai .exp-ai-chain-count { width: 4.5em; min-height: 0; height: auto; padding: 0.3em 0.45em; }
+.exp-ai-chain-pick { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.4em; }
+.exp-ai-chain-table td { vertical-align: top; }
+.exp-ai-sev-high { color: var(--exp-ai-error); }
+.exp-ai-chain-page .exp-ai-notice { padding: 0.5em 0.8em; border-radius: var(--exp-ai-radius); background: var(--exp-ai-surface); }

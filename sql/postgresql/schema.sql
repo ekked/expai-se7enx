@@ -391,3 +391,77 @@ CREATE TABLE IF NOT EXISTS expai_package (
 
 CREATE INDEX expai_package_uuid ON expai_package USING btree ( uuid );
 ALTER TABLE ONLY expai_package ADD CONSTRAINT expai_package_pkey PRIMARY KEY ( id );
+CREATE SEQUENCE IF NOT EXISTS expai_chain_run_id_seq
+  START 1
+  INCREMENT 1
+  MAXVALUE 9223372036854775807
+  MINVALUE 1
+  CACHE 1;
+CREATE TABLE IF NOT EXISTS expai_chain_run (
+  brief text,
+  "chain" character varying(40) DEFAULT ''::character varying NOT NULL,
+  chain_hash character varying(40) DEFAULT ''::character varying NOT NULL,
+  class_identifier character varying(50) DEFAULT ''::character varying NOT NULL,
+  cost_micros integer DEFAULT 0 NOT NULL,
+  created integer DEFAULT 0 NOT NULL,
+  current_step character varying(40) DEFAULT ''::character varying NOT NULL,
+  data text,
+  finished integer DEFAULT 0 NOT NULL,
+  group_uuid character varying(36) DEFAULT ''::character varying NOT NULL,
+  id integer DEFAULT nextval('expai_chain_run_id_seq'::text) NOT NULL,
+  input_tokens integer DEFAULT 0 NOT NULL,
+  item integer DEFAULT 0 NOT NULL,
+  item_count integer DEFAULT 0 NOT NULL,
+  label character varying(150) DEFAULT ''::character varying NOT NULL,
+  "language" character varying(20) DEFAULT ''::character varying NOT NULL,
+  last_error character varying(255) DEFAULT ''::character varying NOT NULL,
+  modified integer DEFAULT 0 NOT NULL,
+  node_id integer DEFAULT 0 NOT NULL,
+  object_id integer DEFAULT 0 NOT NULL,
+  output_tokens integer DEFAULT 0 NOT NULL,
+  snapshot text,
+  state character varying(20) DEFAULT 'running'::character varying NOT NULL,
+  user_id integer DEFAULT 0 NOT NULL,
+  uuid character varying(36) DEFAULT ''::character varying NOT NULL,
+  "version" integer DEFAULT 0 NOT NULL
+);
+
+CREATE INDEX expai_chain_run_uuid ON expai_chain_run USING btree ( uuid );
+CREATE INDEX expai_chain_run_state ON expai_chain_run USING btree ( state, user_id );
+ALTER TABLE ONLY expai_chain_run ADD CONSTRAINT expai_chain_run_pkey PRIMARY KEY ( id );
+CREATE SEQUENCE IF NOT EXISTS expai_chain_step_id_seq
+  START 1
+  INCREMENT 1
+  MAXVALUE 9223372036854775807
+  MINVALUE 1
+  CACHE 1;
+CREATE TABLE IF NOT EXISTS expai_chain_step (
+  cost_micros integer DEFAULT 0 NOT NULL,
+  created integer DEFAULT 0 NOT NULL,
+  finished integer DEFAULT 0 NOT NULL,
+  id integer DEFAULT nextval('expai_chain_step_id_seq'::text) NOT NULL,
+  input_hash character varying(40) DEFAULT ''::character varying NOT NULL,
+  input_tokens integer DEFAULT 0 NOT NULL,
+  issue_count integer DEFAULT 0 NOT NULL,
+  iteration integer DEFAULT 0 NOT NULL,
+  job_uuid character varying(36) DEFAULT ''::character varying NOT NULL,
+  lane character varying(16) DEFAULT ''::character varying NOT NULL,
+  "language" character varying(20) DEFAULT ''::character varying NOT NULL,
+  model character varying(100) DEFAULT ''::character varying NOT NULL,
+  note character varying(255) DEFAULT ''::character varying NOT NULL,
+  output text,
+  output_tokens integer DEFAULT 0 NOT NULL,
+  provider character varying(40) DEFAULT ''::character varying NOT NULL,
+  run_id integer DEFAULT 0 NOT NULL,
+  score integer DEFAULT -1 NOT NULL,
+  service_tier character varying(20) DEFAULT ''::character varying NOT NULL,
+  state character varying(20) DEFAULT 'queued'::character varying NOT NULL,
+  step character varying(40) DEFAULT ''::character varying NOT NULL,
+  step_type character varying(20) DEFAULT ''::character varying NOT NULL,
+  usage_log_id integer DEFAULT 0 NOT NULL,
+  verdict character varying(10) DEFAULT ''::character varying NOT NULL
+);
+
+CREATE INDEX expai_chain_step_run ON expai_chain_step USING btree ( run_id );
+CREATE INDEX expai_chain_step_job ON expai_chain_step USING btree ( job_uuid );
+ALTER TABLE ONLY expai_chain_step ADD CONSTRAINT expai_chain_step_pkey PRIMARY KEY ( id );

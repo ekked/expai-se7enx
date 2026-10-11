@@ -482,3 +482,91 @@ END;
 /
 
 CREATE INDEX expai_package_uuid ON expai_package ( uuid );
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE SEQUENCE se_expai_chain_run';
+EXCEPTION WHEN OTHERS THEN
+  IF SQLCODE != -955 THEN RAISE; END IF;
+END;
+/
+CREATE TABLE expai_chain_run (
+  brief CLOB,
+  chain VARCHAR2(40),
+  chain_hash VARCHAR2(40),
+  class_identifier VARCHAR2(50),
+  cost_micros INTEGER DEFAULT 0 NOT NULL,
+  created INTEGER DEFAULT 0 NOT NULL,
+  current_step VARCHAR2(40),
+  data CLOB,
+  finished INTEGER DEFAULT 0 NOT NULL,
+  group_uuid VARCHAR2(36),
+  id INTEGER NOT NULL,
+  input_tokens INTEGER DEFAULT 0 NOT NULL,
+  item INTEGER DEFAULT 0 NOT NULL,
+  item_count INTEGER DEFAULT 0 NOT NULL,
+  label VARCHAR2(150),
+  language VARCHAR2(20),
+  last_error VARCHAR2(255),
+  modified INTEGER DEFAULT 0 NOT NULL,
+  node_id INTEGER DEFAULT 0 NOT NULL,
+  object_id INTEGER DEFAULT 0 NOT NULL,
+  output_tokens INTEGER DEFAULT 0 NOT NULL,
+  snapshot CLOB,
+  state VARCHAR2(20) DEFAULT 'running',
+  user_id INTEGER DEFAULT 0 NOT NULL,
+  uuid VARCHAR2(36),
+  version INTEGER DEFAULT 0 NOT NULL,
+  PRIMARY KEY ( id )
+);
+
+CREATE OR REPLACE TRIGGER expai_chain_run_id_tr
+BEFORE INSERT ON expai_chain_run FOR EACH ROW WHEN (new.id IS NULL)
+BEGIN
+  SELECT se_expai_chain_run.nextval INTO :new.id FROM dual;
+END;
+/
+
+CREATE INDEX expai_chain_run_state ON expai_chain_run ( state, user_id );
+CREATE INDEX expai_chain_run_uuid ON expai_chain_run ( uuid );
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE SEQUENCE se_expai_chain_step';
+EXCEPTION WHEN OTHERS THEN
+  IF SQLCODE != -955 THEN RAISE; END IF;
+END;
+/
+CREATE TABLE expai_chain_step (
+  cost_micros INTEGER DEFAULT 0 NOT NULL,
+  created INTEGER DEFAULT 0 NOT NULL,
+  finished INTEGER DEFAULT 0 NOT NULL,
+  id INTEGER NOT NULL,
+  input_hash VARCHAR2(40),
+  input_tokens INTEGER DEFAULT 0 NOT NULL,
+  issue_count INTEGER DEFAULT 0 NOT NULL,
+  iteration INTEGER DEFAULT 0 NOT NULL,
+  job_uuid VARCHAR2(36),
+  lane VARCHAR2(16),
+  language VARCHAR2(20),
+  model VARCHAR2(100),
+  note VARCHAR2(255),
+  output CLOB,
+  output_tokens INTEGER DEFAULT 0 NOT NULL,
+  provider VARCHAR2(40),
+  run_id INTEGER DEFAULT 0 NOT NULL,
+  score INTEGER DEFAULT -1 NOT NULL,
+  service_tier VARCHAR2(20),
+  state VARCHAR2(20) DEFAULT 'queued',
+  step VARCHAR2(40),
+  step_type VARCHAR2(20),
+  usage_log_id INTEGER DEFAULT 0 NOT NULL,
+  verdict VARCHAR2(10),
+  PRIMARY KEY ( id )
+);
+
+CREATE OR REPLACE TRIGGER expai_chain_step_id_tr
+BEFORE INSERT ON expai_chain_step FOR EACH ROW WHEN (new.id IS NULL)
+BEGIN
+  SELECT se_expai_chain_step.nextval INTO :new.id FROM dual;
+END;
+/
+
+CREATE INDEX expai_chain_step_job ON expai_chain_step ( job_uuid );
+CREATE INDEX expai_chain_step_run ON expai_chain_step ( run_id );
