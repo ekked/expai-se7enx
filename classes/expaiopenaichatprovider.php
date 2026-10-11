@@ -19,6 +19,8 @@
  *   tool_choice none / any      -> "none" / "required" (Mistral "any"); servers without tool_choice (Ollama) get no
  *                                  tools on a call that must answer in words
  *   output_schema               -> response_format json_schema (Capabilities[]=json_schema) or json_object
+ *   image blocks (base64)       -> user content parts { type: image_url, image_url: { url: data:<type>;base64,... } }
+ *                                  (vision models, Capabilities[]=vision; doc/alt-text.md)
  *
  * The answer's message becomes text and tool_use blocks (arguments decoded; arguments that are not valid JSON are
  * reported in invalid_tool_input, and the assistant answers the call with an error asking for valid JSON),
@@ -172,6 +174,11 @@ class expAiOpenAiChatProvider extends expAiProviderBase
             }
             // user: tool results first (they answer the calls of the assistant message before), then the text
             $text = '';
+            // images (alt text, doc/alt-text.md): the canonical base64 image block becomes an image_url part with a data URL
+            $images = array();
+            foreach ( self::blocks( $message ) as $block )
+                if ( isset( $block['type'], $block['source']['data'], $block['source']['media_type'] ) && $block['type'] === 'image' )
+                    $images[] = array( 'type' => 'image_url', 'image_url' => array( 'url' => 'data:' . $block['source']['media_type'] . ';base64,' . $block['source']['data'] ) );
             foreach ( self::blocks( $message ) as $block )
             {
                 $type = isset( $block['type'] ) ? $block['type'] : '';
@@ -198,7 +205,9 @@ class expAiOpenAiChatProvider extends expAiProviderBase
                 elseif ( $type === 'text' && isset( $block['text'] ) )
                     $text .= ( $text !== '' ? "\n\n" : '' ) . $block['text'];
             }
-            if ( $text !== '' )
+            if ( $images )
+                $messages[] = array( 'role' => 'user', 'content' => array_merge( $images, $text !== '' ? array( array( 'type' => 'text', 'text' => $text ) ) : array() ) );
+            elseif ( $text !== '' )
                 $messages[] = array( 'role' => 'user', 'content' => $text );
         }
 

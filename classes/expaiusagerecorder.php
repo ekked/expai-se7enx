@@ -83,7 +83,7 @@ class expAiUsageRecorder implements expAiProvider
         if ( !empty( $this->context['thread_id'] ) )
             $row += array( 'thread_id' => (int) $this->context['thread_id'], 'run_id' => isset( $this->context['run_id'] ) ? (int) $this->context['run_id'] : 0 );
         if ( $config->flag( 'UsageSettings', 'LogRequests', false ) )
-            $row['request_debug'] = expAiText::cut( json_encode( $request, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ), 200000 );
+            $row['request_debug'] = expAiText::cut( json_encode( class_exists( 'expAiImageInput' ) ? expAiImageInput::redact( $request ) : $request, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ), 200000 );
         // the fallback to the default model (expAiModelFallback): the model the request asked for and why another answers
         if ( !empty( $this->context['requested_alias'] ) )
             $row += array( 'requested_model_alias' => expAiText::cut( (string) $this->context['requested_alias'], 100 ),

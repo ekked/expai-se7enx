@@ -151,7 +151,7 @@ class expAiProviderRegistry
                         $this->models['anthropic.' . $id] = $this->model( 'anthropic.' . $id, 'anthropic',
                             array( 'Id' => $id, 'Label' => $label, 'ToolUse' => 'native', 'WriteTools' => 'enabled', 'WriteGate' => 'trusted',
                                    'MaxOutput' => $this->config->get( 'AISettings', 'MaxTokens', '' ), 'Effort' => $this->config->get( 'AISettings', 'Effort', '' ),
-                                   'Capabilities' => array( 'json_schema', 'tool_choice_none', 'prompt_cache' ) ) );
+                                   'Capabilities' => array( 'json_schema', 'tool_choice_none', 'prompt_cache', 'vision' ) ) );
         }
         return $this->models;
     }
