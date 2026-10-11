@@ -53,6 +53,13 @@ class expAiUsageLog extends eZPersistentObject
                 'reasoning_tokens' => $int( 'ReasoningTokens' ),
                 'reported_cost_micros' => $int( 'ReportedCostMicros' ),
                 'tool_mode' => $str( 'ToolMode' ),
+                // lanes and the queue (classes/queue/): the lane, the tier the provider reported, the job and batch, and
+                // the percent of the list price the request is billed at (100 standard, 50 batch and flex, 200 fast)
+                'lane' => $str( 'Lane' ),
+                'service_tier' => $str( 'ServiceTier' ),
+                'job_uuid' => $str( 'JobUUID' ),
+                'batch_id' => $int( 'BatchID' ),
+                'price_factor' => array( 'name' => 'PriceFactor', 'datatype' => 'integer', 'default' => 100, 'required' => true ),
                 'mcp_calls' => $int( 'McpCalls' ),
                 'region' => $str( 'Region' ),
                 'retention' => $str( 'Retention' ),
@@ -85,7 +92,8 @@ class expAiUsageLog extends eZPersistentObject
     {
         return expAiUsage::cost( $this->attribute( 'model' ), $this->attribute( 'input_tokens' ), $this->attribute( 'output_tokens' ),
                                  $this->attribute( 'cache_write_tokens' ), $this->attribute( 'cache_read_tokens' ),
-                                 (string) $this->attribute( 'model_alias' ), (int) $this->attribute( 'reported_cost_micros' ) );
+                                 (string) $this->attribute( 'model_alias' ), (int) $this->attribute( 'reported_cost_micros' ),
+                                 (int) $this->attribute( 'price_factor' ) );
     }
 
     /** @return string reported | alias | table | default: where the cost comes from */

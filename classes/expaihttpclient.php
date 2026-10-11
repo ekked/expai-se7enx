@@ -70,7 +70,8 @@ class expAiHttpClient
 
     /**
      * @param array $options accept (Accept header, default application/json), resolve (curl CURLOPT_RESOLVE list,
-     *                       used to pin a checked address), method (GET; default POST)
+     *                       used to pin a checked address), method (GET, POST, DELETE; default POST),
+     *                       content_type (of the body, default application/json)
      * @return array( int status, string body, array kept headers )
      * @throws expAiException
      */
@@ -88,11 +89,17 @@ class expAiHttpClient
         $client = $this;
         $accept = isset( $options['accept'] ) ? (string) $options['accept'] : 'application/json';
         $ch = curl_init( $url );
-        $get = isset( $options['method'] ) && $options['method'] === 'GET';
+        $method = isset( $options['method'] ) ? strtoupper( (string) $options['method'] ) : 'POST';
+        if ( !in_array( $method, array( 'GET', 'POST', 'DELETE' ), true ) )
+            throw new expAiException( 'Exponential Intelligence is not configured correctly.', 'unsupported HTTP method' );
+        $get = $method === 'GET';
+        // DELETE without a body sends no content type (batch APIs); content_type: e.g. multipart/form-data; boundary=...
+        $noBody = $get || ( $method === 'DELETE' && (string) $body === '' );
+        $contentType = isset( $options['content_type'] ) && !preg_match( '/[\r\n]/', (string) $options['content_type'] ) ? (string) $options['content_type'] : 'application/json';
         curl_setopt_array( $ch, array(
-            CURLOPT_POST => !$get,
+            CURLOPT_POST => $method === 'POST',
             CURLOPT_HTTPGET => $get,
-            CURLOPT_HTTPHEADER => array_merge( $get ? array( 'Accept: ' . $accept ) : array( 'Content-Type: application/json', 'Accept: ' . $accept ), $headers ),
+            CURLOPT_HTTPHEADER => array_merge( $noBody ? array( 'Accept: ' . $accept ) : array( 'Content-Type: ' . $contentType, 'Accept: ' . $accept ), $headers ),
             CURLOPT_FOLLOWLOCATION => false,
             CURLOPT_TIMEOUT => $this->timeout,
             CURLOPT_CONNECTTIMEOUT => $this->connectTimeout,
@@ -118,7 +125,9 @@ class expAiHttpClient
                 return strlen( $chunk );
             },
         ) );
-        if ( !$get )
+        if ( $method === 'DELETE' )
+            curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, 'DELETE' );
+        if ( !$noBody )
             curl_setopt( $ch, CURLOPT_POSTFIELDS, $body );
         if ( !empty( $options['resolve'] ) )
             curl_setopt( $ch, CURLOPT_RESOLVE, (array) $options['resolve'] );

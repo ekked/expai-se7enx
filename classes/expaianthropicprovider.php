@@ -74,6 +74,10 @@ class expAiAnthropicProvider extends expAiProviderBase
             $payload['cache_control'] = array( 'type' => 'ephemeral' );
         if ( $this->extras() && $this->enabled( 'RefusalFallback', 'enabled' ) )
             $payload['fallbacks'] = 'default';
+        // a lane's request parameters ([Lane_<provider>.<lane>] RequestParams[], e.g. speed=fast)
+        foreach ( (array) $this->setting( 'LaneParams', array() ) as $name => $value )
+            if ( is_string( $name ) && !isset( $payload[$name] ) )
+                $payload[$name] = $value;
         return $payload;
     }
 

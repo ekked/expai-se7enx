@@ -391,6 +391,8 @@ class expAiOpenAiChatProvider extends expAiProviderBase
             'tokens' => array( 'input' => max( 0, $prompt - $cacheRead - $cacheWrite ), 'output' => isset( $usage['completion_tokens'] ) ? (int) $usage['completion_tokens'] : 0,
                                'cache_write' => $cacheWrite, 'cache_read' => $cacheRead, 'reasoning' => $reasoning, 'reported_cost' => $cost ),
             'invalid_tool_input' => $invalid,
+            // the tier that served the request (default, flex, priority ...): a lane is billed at the real tier
+            'service_tier' => isset( $data['service_tier'] ) && is_string( $data['service_tier'] ) ? substr( $data['service_tier'], 0, 20 ) : '',
             'provider' => $this->providerId(),
             'http_status' => $status,
             'retries' => 0,

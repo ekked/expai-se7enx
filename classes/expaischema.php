@@ -23,9 +23,15 @@
  */
 class expAiSchema
 {
-    /** @return array generic schema (without _info) */
-    public static function definition()
+    /**
+     * @param bool $withQueue with the tables and columns of lanes, batches, budgets and packages (expAiQueueSchema)
+     * @return array generic schema (without _info)
+     */
+    public static function definition( $withQueue = true )
     {
+        // the batch and package tables and the lane columns of the tables below: expAiQueueSchema (classes/queue/)
+        if ( $withQueue )
+            return expAiQueueSchema::extend( self::definition( false ) );
         $int = array( 'length' => 11, 'type' => 'int', 'not_null' => '1', 'default' => 0 );
         $varchar = function ( $length, $default = '' )
         {

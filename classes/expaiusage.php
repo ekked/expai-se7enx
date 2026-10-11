@@ -46,9 +46,11 @@ class expAiUsage
     /**
      * The estimated cost of tokens from [Pricing] (prices per million tokens), or null when a price that is needed is
      * not configured for the model.
+     * @param int $factorPercent the lane's price factor of the request (100 standard, 50 batch, 200 fast); a cost the
+     *                           provider reported is taken as it is
      * @return float|null
      */
-    public static function cost( $model, $input, $output, $cacheWrite, $cacheRead, $alias = '', $reportedMicros = 0 )
+    public static function cost( $model, $input, $output, $cacheWrite, $cacheRead, $alias = '', $reportedMicros = 0, $factorPercent = 100 )
     {
         if ( !expAiCost::enabled() )
             return null;
@@ -57,6 +59,8 @@ class expAiUsage
             return null;
         if ( $cost['approx'] )
             self::$approx = true;
+        if ( $cost['source'] !== 'reported' && (int) $factorPercent > 0 && (int) $factorPercent !== 100 )
+            return $cost['amount'] * (int) $factorPercent / 100;
         return $cost['amount'];
     }
 
@@ -165,7 +169,8 @@ class expAiUsage
             if ( $row['error_class'] !== '' && $row['error_class'] !== null )
                 $t['errors']++;
             $cost = expAiUsage::cost( $row['model'], $row['input_tokens'], $row['output_tokens'], $row['cache_write_tokens'], $row['cache_read_tokens'],
-                                      isset( $row['model_alias'] ) ? (string) $row['model_alias'] : '', isset( $row['reported_cost_micros'] ) ? (int) $row['reported_cost_micros'] : 0 );
+                                      isset( $row['model_alias'] ) ? (string) $row['model_alias'] : '', isset( $row['reported_cost_micros'] ) ? (int) $row['reported_cost_micros'] : 0,
+                                      isset( $row['price_factor'] ) ? (int) $row['price_factor'] : 100 );
             $t['reasoning'] += isset( $row['reasoning_tokens'] ) ? (int) $row['reasoning_tokens'] : 0;
             if ( $cost === null )
                 $t['cost_known'] = false;
