@@ -74,3 +74,12 @@ $FunctionList['alt_text_model'] = array( 'name' => 'alt_text_model',
                                          'call_method' => array( 'class' => 'expAiAltTextFunctionCollection', 'method' => 'fetchModel' ),
                                          'parameter_type' => 'standard',
                                          'parameters' => array( array( 'name' => 'object', 'type' => 'object', 'required' => true ) ) );
+
+// editor presets and the Improve menu (classes/fieldactions/expaieditpresets.php): fetch( 'expai', 'edit_presets',
+// hash( 'object', $object, 'attributes', $content_attributes ) ) the preset buttons, the Improve menu and the defaults line
+$FunctionList['edit_presets'] = array( 'name' => 'edit_presets',
+                                       'operation_types' => array( 'read' ),
+                                       'call_method' => array( 'class' => 'expAiPresetFunctionCollection', 'method' => 'fetchEditPresets' ),
+                                       'parameter_type' => 'standard',
+                                       'parameters' => array( array( 'name' => 'object', 'type' => 'object', 'required' => true ),
+                                                              array( 'name' => 'attributes', 'type' => 'array', 'required' => false, 'default' => array() ) ) );

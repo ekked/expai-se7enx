@@ -47,6 +47,9 @@
 {if $status.can_manage}
                 <div><dt>{'Models and providers'|i18n( 'extension/expai/models' )}</dt><dd><a href={'expai/models'|ezurl}>{'Providers, regions, probe results and the local model'|i18n( 'extension/expai/models' )}</a></dd></div>
 {/if}
+{if fetch( 'user', 'has_access_to', hash( 'module', 'expai', 'function', 'facts' ) )}
+                <div><dt>{'AI facts'|i18n( 'extension/expai/facts' )}</dt><dd><a href={'expai/facts'|ezurl}>{'What goes where, kept how long, used by whom, at what cost (printable)'|i18n( 'extension/expai/facts' )}</a></dd></div>
+{/if}
 {if $cost_enabled}
                 <div><dt>{'Prices'|i18n( 'extension/expai/dashboard' )}</dt><dd>{$prices_note|wash}</dd></div>
 {/if}

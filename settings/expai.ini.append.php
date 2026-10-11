@@ -1274,4 +1274,152 @@ GroupBudget=0
 EstimateTextTokens=1200
 EstimateOutputTokens=120
 
+# ---- Editor presets and the Improve menu (doc/presets.md) ----------------------------------------------------------
+[EditPresets]
+# enabled: one-click presets next to the mapped fields of the edit form, and an "Improve" menu on every text field.
+# Like every field action they only fill the form; nothing is stored until the editor stores the draft.
+Enabled=true
+# enabled: one line above the fields names the model, its region, the lane and the estimated cost of one click
+DefaultsLine=enabled
+# The estimate of one click: the tokens sent (the field, the other fields, the instructions) and written
+EstimateInputTokens=2500
+EstimateOutputTokens=300
+# The presets, in this order; each is [FieldAction_preset_<name>] (Label, Instruction, Datatypes[])
+Presets[]=title
+Presets[]=summary
+Presets[]=meta_description
+Presets[]=keywords
+# The entries of the Improve menu, in this order; each is [FieldAction_improve_<name>]
+Improve[]=shorten
+Improve[]=expand
+Improve[]=clarify
+Improve[]=grammar
+Improve[]=simplify
+Improve[]=formal
+Improve[]=casual
+# The datatypes that get the Improve menu (also needed in [ToolSettings] WritableDatatypes[])
+ImproveDatatypes[]=ezstring
+ImproveDatatypes[]=eztext
+ImproveDatatypes[]=ezxmltext
+
+[Presets]
+# Which presets a class offers and where each writes: Class_<class identifier>[<preset>]=<target>[,<target>...]
+# A target is an attribute identifier, or <attribute>.<part> for the parts of an xrowmetadata field (title,
+# description, keywords). A preset shows its button next to every target field. Classes without a line get no
+# presets (the Improve menu is still there). Alt text for images is a separate field action.
+Class_article[title]=title
+Class_article[summary]=intro
+Class_blog_post[title]=title
+Class_blog_post[meta_description]=metadata.description
+Class_blog_post[keywords]=tags,metadata.keywords
+Class_folder[title]=name
+Class_folder[summary]=short_description
+Class_folder[keywords]=tags
+Class_ng_article[title]=title,metadata.title
+Class_ng_article[summary]=teaser_intro,full_intro
+Class_ng_article[meta_description]=metadata.description
+Class_ng_article[keywords]=metadata.keywords
+Class_ng_blog_post[title]=title,metadata.title
+Class_ng_blog_post[summary]=teaser_intro,full_intro
+Class_ng_blog_post[meta_description]=metadata.description
+Class_ng_blog_post[keywords]=metadata.keywords
+Class_ng_news[title]=title,metadata.title
+Class_ng_news[summary]=teaser_intro,full_intro
+Class_ng_news[meta_description]=metadata.description
+Class_ng_news[keywords]=metadata.keywords
+Class_ng_landing_page[title]=title,metadata.title
+Class_ng_landing_page[summary]=teaser_intro,full_intro
+Class_ng_landing_page[meta_description]=metadata.description
+Class_ng_landing_page[keywords]=metadata.keywords
+Class_ng_category[title]=title,metadata.title
+Class_ng_category[summary]=teaser_intro,full_intro
+Class_ng_category[meta_description]=metadata.description
+Class_ng_category[keywords]=metadata.keywords
+
+[FieldAction_preset_title]
+Label=Suggest title
+Handler=expAiPromptFieldAction
+Datatypes[]=ezstring
+Datatypes[]=xrowmetadata
+Input=none
+Instruction=Suggest a clear, specific title for this content based on its other fields: at most about 60 characters, no quotation marks, no final period, in the language of the content. For a page title (metadata) write what a search result should show.
+
+[FieldAction_preset_summary]
+Label=Write summary
+Handler=expAiPromptFieldAction
+Datatypes[]=ezstring
+Datatypes[]=eztext
+Datatypes[]=ezxmltext
+Input=none
+Instruction=Write a short summary of this content from its other fields (mainly the body text): two or three sentences that make a reader want to read on, in the language of the content. Do not invent facts.
+
+[FieldAction_preset_meta_description]
+Label=Meta description
+Handler=expAiPromptFieldAction
+Datatypes[]=ezstring
+Datatypes[]=eztext
+Datatypes[]=xrowmetadata
+Input=none
+Instruction=Write the meta description of this page for search results from its other fields: one or two sentences, at most 150 characters, plain text, in the language of the content. Do not invent facts.
+
+[FieldAction_preset_keywords]
+Label=Keywords
+Handler=expAiPromptFieldAction
+Datatypes[]=ezkeyword
+Datatypes[]=ezstring
+Datatypes[]=xrowmetadata
+Input=none
+Instruction=Suggest five to eight keywords for this content based on its other fields, comma separated, in the language of the content.
+
+[FieldAction_improve_shorten]
+Label=Shorten
+Handler=expAiPromptFieldAction
+Input=none
+Instruction=Shorten the current value of this field to about half its length. Keep the key facts, the language and the formatting.
+
+[FieldAction_improve_expand]
+Label=Expand
+Handler=expAiPromptFieldAction
+Input=none
+Instruction=Expand the current value of this field: add detail and explanation from the other fields of the object, about half again as long. Do not invent facts. Keep the language and the tone.
+
+[FieldAction_improve_clarify]
+Label=Clarify
+Handler=expAiPromptFieldAction
+Input=none
+Instruction=Make the current value of this field clearer: plain words, one idea per sentence, the same meaning, the same language, about the same length.
+
+[FieldAction_improve_grammar]
+Label=Fix grammar
+Handler=expAiPromptFieldAction
+Input=none
+Instruction=Correct spelling, grammar and punctuation of the current value of this field. Change nothing else: keep the wording, the style, the language and the formatting.
+
+[FieldAction_improve_simplify]
+Label=Simplify for new readers
+Handler=expAiPromptFieldAction
+Input=none
+Instruction=Rewrite the current value of this field for readers who are new to the subject: short sentences, common words, explain or avoid jargon. Keep the meaning and the language.
+
+[FieldAction_improve_formal]
+Label=More formal
+Handler=expAiPromptFieldAction
+Input=none
+Instruction=Rewrite the current value of this field in a more formal, professional tone. Keep the meaning, the language, the formatting and about the same length.
+
+[FieldAction_improve_casual]
+Label=More casual
+Handler=expAiPromptFieldAction
+Input=none
+Instruction=Rewrite the current value of this field in a more casual, friendly tone. Keep the meaning, the language, the formatting and about the same length.
+
+# ---- The "AI facts" page (doc/ai-facts.md) -------------------------------------------------------------------------
+[FactsSettings]
+# expai/facts: one printable page for a data protection officer (policy expai/facts). Nothing is configured here
+# but the free text below; every fact on the page is read from the settings and the usage log as they are.
+# The contact for questions about the processing (a role or a mailbox, shown on the page; empty: not shown)
+Contact=
+# A note printed under the title (e.g. the reference of the record of processing activities)
+Note=
+
 */ ?>

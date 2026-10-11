@@ -638,3 +638,48 @@ span.exp-ai-fallback-notice { display: inline-block; }
 .exp-ai-chain-table td { vertical-align: top; }
 .exp-ai-sev-high { color: var(--exp-ai-error); }
 .exp-ai-chain-page .exp-ai-notice { padding: 0.5em 0.8em; border-radius: var(--exp-ai-radius); background: var(--exp-ai-surface); }
+
+/* ---- editor presets and the Improve menu (expai_presets.js, doc/presets.md) ---- */
+.exp-ai-defaults { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.2em 0.45em; margin: 0.4em 0 0; font-size: 0.85em; color: var(--exp-ai-muted); }
+.exp-ai-defaults-title { font-weight: 600; }
+.exp-ai-preset-group { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.35em; }
+.exp-ai .exp-ai-preset-chip {
+    padding: 0.15em 0.65em;
+    border: 1px solid var(--exp-ai-accent);
+    border-radius: 999px;
+    background: var(--exp-ai-accent-soft);
+    color: inherit;
+    font: inherit;
+    line-height: 1.5;
+    cursor: pointer;
+}
+.exp-ai .exp-ai-preset-chip:hover, .exp-ai .exp-ai-preset-chip:focus-visible { color: var(--exp-ai-accent); }
+.exp-ai .exp-ai-preset-chip[disabled] { opacity: 0.55; cursor: progress; }
+.exp-ai .exp-ai-improve-button { background: transparent; border-color: var(--exp-ai-line); }
+.exp-ai-improve { position: relative; display: inline-block; }
+.exp-ai-improve-menu {
+    position: absolute;
+    z-index: 50;
+    top: calc(100% + 0.25em);
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    min-width: 14em;
+    padding: 0.3em 0;
+    border: 1px solid var(--exp-ai-line);
+    border-radius: var(--exp-ai-radius);
+    background: var(--a4-card-bg, #fff);
+    color: var(--a4-ink, #1f2328);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+}
+.exp-ai .exp-ai-improve-item {
+    padding: 0.35em 0.9em;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+.exp-ai .exp-ai-improve-item:hover, .exp-ai .exp-ai-improve-item:focus { background: var(--exp-ai-accent-soft); color: var(--exp-ai-accent); outline: none; }
+.exp-ai .exp-ai-improve-item:focus-visible { outline: 2px solid var(--exp-ai-accent); outline-offset: -2px; }

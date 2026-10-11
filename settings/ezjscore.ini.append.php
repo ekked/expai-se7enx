@@ -31,4 +31,10 @@ Functions[]=expai
 Class=expAiAltTextServerFunctions
 Functions[]=expai
 
+# Editor presets and the Improve menu of the edit form: expaipreset::preset
+# (classes/fieldactions/expaipresetserverfunctions.php). The same permission and checks as expai::field.
+[ezjscServer_expaipreset]
+Class=expAiPresetServerFunctions
+Functions[]=expai
+
 */ ?>

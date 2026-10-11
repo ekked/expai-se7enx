@@ -32,6 +32,7 @@
         </div>
         <input type="button" class="button exp-ai-btn exp-ai-toggle" aria-expanded="false" aria-controls="exp-ai-edit-body" value="{'Show'|i18n( 'extension/expai/edit' )}" />
     </header>
+    {include uri='design:expai/edit/presets.tpl' object=$object content_attributes=$content_attributes}
     <div class="exp-ai-edit-body" id="exp-ai-edit-body" hidden="hidden">
 {foreach ezini( 'EditViewSettings', 'Sections', 'expai.ini' ) as $exp_ai_section}
         {include uri=concat( 'design:', ezini( concat( 'EditSection_', $exp_ai_section ), 'Template', 'expai.ini' ) ) section=$exp_ai_section}
