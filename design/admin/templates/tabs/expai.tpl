@@ -1,7 +1,7 @@
 {* The "Exponential Intelligence" panel of the content full view (admininterface.ini [AdditionalTab_expai]).
    The sections come from expai.ini [PanelSettings] Sections[]; the conversation and the drafts are loaded by
    expai.js through ezjscore (expai::load), so nothing personal is part of the cached view. *}
-{if and( array( 'true', 'enabled' )|contains( ezini( 'AISettings', 'Enabled', 'expai.ini' )|downcase ),
+{if and( fetch( 'expai', 'switched_on' ),
          fetch( 'user', 'has_access_to', hash( 'module', 'expai', 'function', 'write' ) ) )}
 <section class="exp-ai exp-ai-panel" id="exp-ai-panel" data-node-id="{$node.node_id}" aria-labelledby="exp-ai-panel-title">
     <header class="exp-ai-head">

@@ -59,3 +59,10 @@ $FunctionList['my_threads'] = array( 'name' => 'my_threads',
                                      'call_method' => array( 'class' => 'expAiThreadFunctionCollection', 'method' => 'fetchMyThreads' ),
                                      'parameter_type' => 'standard',
                                      'parameters' => array( array( 'name' => 'limit', 'type' => 'integer', 'required' => false, 'default' => 6 ) ) );
+// the master switch (#370 M2, doc/switch-and-veto.md): fetch( 'expai', 'switched_on' ) [AISettings] Enabled and
+// DisabledSiteAccesses[] for the current siteaccess
+$FunctionList['switched_on'] = array( 'name' => 'switched_on',
+                                      'operation_types' => array( 'read' ),
+                                      'call_method' => array( 'class' => 'expAiGate', 'method' => 'fetchSwitchedOn' ),
+                                      'parameter_type' => 'standard',
+                                      'parameters' => array() );

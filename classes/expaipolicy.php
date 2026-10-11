@@ -78,4 +78,14 @@ class expAiPolicy
             $out[] = array( 'id' => $id, 'name' => (string) $config->get( 'McpServer_' . $id, 'Label', $id ) . ' (' . $id . ')' );
         return $out;
     }
+
+    /** @return array the domains of the expservices catalogue, for the limitation Domain of expai/services (#370 M1) */
+    public function serviceDomains()
+    {
+        $out = array();
+        if ( class_exists( 'expServicesCatalog' ) )
+            foreach ( expServicesCatalog::domainClasses() as $domain => $class )
+                $out[] = array( 'id' => (string) $domain, 'name' => (string) $domain );
+        return $out;
+    }
 }

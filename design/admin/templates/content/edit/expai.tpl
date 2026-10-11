@@ -2,7 +2,7 @@
    AdditionalTemplates[] (the hook ezautosave uses). The sections come from expai.ini [EditViewSettings] Sections[];
    expai.js adds the field actions next to the fields. Values are only put into the form: nothing is stored until
    the draft is stored or published as usual. *}
-{if and( array( 'true', 'enabled' )|contains( ezini( 'AISettings', 'Enabled', 'expai.ini' )|downcase ),
+{if and( fetch( 'expai', 'switched_on' ),
          array( 'true', 'enabled' )|contains( ezini( 'EditViewSettings', 'Enabled', 'expai.ini' )|downcase ),
          fetch( 'user', 'has_access_to', hash( 'module', 'expai', 'function', 'write' ) ) )}
 {def $exp_ai_attributes = array()

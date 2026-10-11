@@ -87,6 +87,15 @@ class expAiQueue
         $purpose = preg_replace( '/[^a-z0-9_.-]/', '', strtolower( (string) $options['purpose'] ) );
         $class = (string) $options['class'] !== '' ? (string) $options['class'] : self::classFor( $purpose );
 
+        // the master switch and the veto hook (#370 M2): nothing is queued while expai is off, nor a refused request
+        if ( class_exists( 'expAiGate' ) )
+        {
+            $gateModel = $registry->getModel( $resolved );
+            expAiGate::check( array( 'user_id' => $options['user_id'] ? (int) $options['user_id'] : (int) eZUser::currentUserID(),
+                                     'node_id' => (int) $options['node_id'], 'provider' => (string) $gateModel['provider'], 'model' => (string) $gateModel['id'],
+                                     'model_alias' => $resolved, 'purpose' => expAiText::cut( 'queue' . ( $purpose !== '' ? '.' . $purpose : '' ), 40 ) ), $config );
+        }
+
         // the data policy of the content in the request, for the lane choice and again when it runs
         $objects = array_values( array_unique( array_filter( array_map( 'intval', (array) $options['objects'] ) ) ) );
         $requirements = array();
@@ -119,6 +128,9 @@ class expAiQueue
                           'est_input' => $estInput, 'est_output' => $estOutput, 'objects' => $objects, 'node_id' => (int) $options['node_id'],
                           'label' => expAiText::cut( (string) $options['label'], 120 ), 'apply' => $apply, 'apply_params' => (array) $options['apply_params'],
                           'deadline' => (int) $options['deadline'] );
+        // the siteaccess it was queued from: the master switch of that siteaccess holds it ([AISettings] DisabledSiteAccesses[])
+        if ( class_exists( 'expAiGate' ) && expAiGate::siteAccess() !== '' )
+            $payload['siteaccess'] = expAiGate::siteAccess();
         $queueOptions = array( 'class' => $class, 'resource' => $lane->key(), 'lane' => $lane->name(), 'cost_estimate_micros' => $estimate['micros'],
                                'deadline' => (int) $options['deadline'], 'tags' => array_merge( array( 'lane:' . $lane->name(), 'provider:' . $lane->get( 'provider' ) ), (array) $options['tags'] ) );
         foreach ( array( 'priority', 'group', 'idempotency_key', 'user_id' ) as $name )

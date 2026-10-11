@@ -39,6 +39,10 @@ class expAiToolRegistry
             foreach ( expAiMcp::tools( $config ) as $name => $tool )
                 if ( !isset( $this->tools[$name] ) )
                     $this->tools[$name] = $tool;
+        // service tools (#370 M1): the read services of expservices that opted in and the user may call
+        foreach ( expAiServiceTools::tools( $config ) as $name => $tool )
+            if ( !isset( $this->tools[$name] ) )
+                $this->tools[$name] = $tool;
     }
 
     /** Adds a tool (tests, extensions) */

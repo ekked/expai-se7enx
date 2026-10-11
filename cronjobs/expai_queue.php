@@ -20,6 +20,14 @@ $result = ( new expAiBudget() )->resumeHeld();
 if ( !$isQuiet )
     $cli->output( "expai: resumed {$result['resumed']} job(s) held by a budget, {$result['still_held']} still held" );
 
+// the master switch (#370 M2): requests held while expai was switched off run again once it is on
+if ( class_exists( 'expAiGate' ) )
+{
+    $switch = expAiGate::resumeHeld();
+    if ( !$isQuiet && ( $switch['resumed'] || $switch['still_held'] ) )
+        $cli->output( "expai: resumed {$switch['resumed']} job(s) held while switched off, {$switch['still_held']} still held" );
+}
+
 // a request marked by a submit job that is no longer active waits for the next batch again
 $db = eZDB::instance();
 $rows = $db->arrayQuery( "SELECT id, external_ref FROM expqueue_job WHERE type = 'expai.request' AND external_ref LIKE 'expai-submit:%' AND state = 'retry'" );

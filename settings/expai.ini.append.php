@@ -11,7 +11,12 @@
 # Off by default. When enabled, users with the policy expai/write see the
 # "Exponential Intelligence" tab on the content full view and the controls in
 # the content edit form. The browser never talks to the provider.
+# The master switch: off means no tab, no edit form controls, no Vector, nothing queued, queued jobs held and no
+# request to any provider (doc/switch-and-veto.md).
 Enabled=false
+# The siteaccesses on which expai is off although Enabled is on (a queued request: the siteaccess it was queued
+# from). A siteaccess can also set Enabled in its own settings/siteaccess/<siteaccess>/expai.ini.append.php.
+DisabledSiteAccesses[]
 
 # anthropic: the Anthropic Messages API (the only built-in provider)
 # custom:    the class named in ProviderClass (implements expAiProvider)
@@ -867,6 +872,37 @@ ClassRegions[]
 ZeroRetention=disabled
 ZeroRetentionSections[]
 ZeroRetentionClasses[]
+
+# ------------------------------------------------------------------ the veto hook and service tools (#370)
+# doc/switch-and-veto.md, doc/service-tools.md
+
+[RequestVeto]
+# Rules checked before every request to a provider and before a request is queued, in this order; the first rule
+# whose conditions all match refuses the request with its Reason (shown to the editor, logged in the usage log with
+# error_class veto). Then the ezpEvent filter expai/request/veto (site.ini [Event] Listeners[]) may refuse it too.
+# Each rule is a group [RequestVeto_<name>] with any of: Sections[] (section ids), Classes[] (class identifiers),
+# Subtrees[] (node ids), SiteAccesses[], Providers[] (provider ids), Regions[] (us, eu, local), Purposes[] (panel,
+# vector, test, probe, a field action name, queue.<purpose>; a trailing * matches the rest) and Reason=. A rule
+# without conditions refuses every request (maintenance). Example (not active):
+#   Rules[]=no_ai_on_users
+#   [RequestVeto_no_ai_on_users]
+#   Sections[]=2
+#   Reason=Exponential Intelligence is not used for user accounts.
+Rules[]
+
+[ServiceTools]
+# The read services of the extension expservices the assistant may call (tools exp_svc_<domain>_<method>). A service
+# opts in in its declaration ('ai' => true, or 'ai' => array( 'summary' => '...' )); a site can opt in more here
+# without changing code. A service that writes is never offered. Every user also needs the policy expai/services
+# (limitation Domain), ezjscore/call and the access the service declares.
+# disabled: no service is offered
+Enabled=enabled
+# <domain>::<method>, or <domain>::* for every read service of a domain
+Services[]
+# whole domains (every read service of the domain)
+Domains[]
+# never offered (same patterns as Services[]), e.g. node::countByClass
+Exclude[]
 
 [ProbeSettings]
 # The pass rate (percent) of a live probe (bin/php/expaiprobe.php --model=<alias> --live) a model needs before it may

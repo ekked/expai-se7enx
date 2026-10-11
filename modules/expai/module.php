@@ -148,4 +148,9 @@ $FunctionList['web'] = array(
 // Intelligence tab (expaitranslation::check|approve|skip), with expai/write; the drafts need content/edit in the language
 $FunctionList['translation_sync'] = array();
 
+// Service tools (#370 M1, doc/service-tools.md): the read services of expservices the assistant may call, by domain
+// (limitation Domain: the domains of the expservices catalogue); without the limitation every opted-in service
+$FunctionList['services'] = array(
+    'Domain' => array( 'name' => 'Domain', 'values' => array(), 'class' => 'expAiPolicy', 'function' => 'serviceDomains', 'parameter' => array() ) );
+
 ?>

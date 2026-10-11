@@ -76,10 +76,14 @@ class expAiConfig
         return array_values( array_filter( $value, static function ( $v ) { return $v !== '' && $v !== null; } ) );
     }
 
-    /** @return bool the assistant is switched on (it may still lack a key, see isConfigured()) */
+    /**
+     * @return bool the assistant is switched on (it may still lack a key, see isConfigured()): the master switch
+     *              [AISettings] Enabled and, for the current siteaccess, DisabledSiteAccesses[] (expAiGate)
+     */
     public function isEnabled()
     {
-        return $this->flag( 'AISettings', 'Enabled', false );
+        // a long-running worker started before expAiGate was added knows only the flag
+        return class_exists( 'expAiGate' ) ? expAiGate::switchedOff( $this ) === '' : $this->flag( 'AISettings', 'Enabled', false );
     }
 
     /** @return bool a provider can be called: enabled, a default model, and its provider has a key or needs none */

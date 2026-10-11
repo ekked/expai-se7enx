@@ -15,6 +15,14 @@ $http = eZHTTPTool::instance();
 $error = '';
 $max = expAiConfig::instance()->int( 'AssistantSettings', 'MaxMessageLength', 4000, 10 );
 
+// the master switch (#370 M2): while expai is off, "Start writing" opens nothing (the status says "Switched off")
+if ( !expAiConfig::instance()->isEnabled() && ( $Module->isCurrentAction( 'StartWriting' ) || $Module->isCurrentAction( 'ChangeLocation' )
+                                                 || $Module->isCurrentAction( 'ExpAiStartWriting' ) ) )
+{
+    $error = ezpI18n::tr( 'extension/expai/error', 'Exponential Intelligence is switched off.' );
+    $Module->setCurrentAction( 'ExpAiSwitchedOff' );
+}
+
 // "Start writing" at the default location (or the one chosen before): open the panel there with the request
 if ( $Module->isCurrentAction( 'StartWriting' ) )
 {

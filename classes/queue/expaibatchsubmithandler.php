@@ -40,6 +40,9 @@ class expAiBatchSubmitHandler extends expQueueHandlerBase
         $lane = expAiLane::fetch( $model['provider'], (string) $p['lane'], $config );
         if ( !$lane || !$lane->isBatch() || !$lane->usable() )
             throw new expQueuePermanentException( 'the lane ' . $p['lane'] . ' is not a usable batch lane', 'lane' );
+        // the master switch (#370 M2): no batch is sent while expai is off; the job is held with the reason
+        if ( class_exists( 'expAiGate' ) && ( $off = expAiGate::switchedOff( $config ) ) !== '' )
+            return expQueueResult::hold( expAiGate::HELD_PREFIX . $off );
         $mark = 'expai-submit:' . $job->attribute( 'uuid' );
         $db = eZDB::instance();
 

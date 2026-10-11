@@ -67,6 +67,11 @@ class expAiUsageRecorder implements expAiProvider
     {
         $config = expAiConfig::instance();
         $providerID = $this->inner->providerId();
+        // the master switch and the veto hook (#370 M2, doc/switch-and-veto.md): before the limits, before anything is sent
+        if ( class_exists( 'expAiGate' ) )
+            expAiGate::check( array( 'user_id' => (int) $this->context['user_id'], 'node_id' => (int) $this->context['node_id'], 'provider' => $providerID,
+                                     'model' => $this->inner->modelName(), 'model_alias' => $this->modelAlias(), 'purpose' => (string) $this->context['action'] )
+                              + ( !empty( $this->context['siteaccess'] ) ? array( 'siteaccess' => (string) $this->context['siteaccess'] ) : array() ), $config );
         expAiLimits::check( $this->context + array( 'provider' => $providerID ) );
         $provider = $config->registry()->getProvider( $providerID );
         $row = array( 'model_alias' => $this->modelAlias(), 'tool_mode' => $this->toolUse(),

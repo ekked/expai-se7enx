@@ -53,6 +53,10 @@ class expAiRequestHandler extends expQueueHandlerBase
         if ( !$lane || !$lane->usable() )
             throw new expQueuePermanentException( 'the lane ' . $p['lane'] . ' of ' . $p['alias'] . ' is not configured or not enabled', 'lane' );
 
+        // the master switch (#370 M2): held, with the reason, until expai is switched on and the job is released
+        if ( class_exists( 'expAiGate' ) && ( $off = expAiGate::switchedOff( $config, isset( $p['siteaccess'] ) ? (string) $p['siteaccess'] : null ) ) !== '' )
+            return expQueueResult::hold( expAiGate::HELD_PREFIX . $off );
+
         if ( $lane->isBatch() )
             return $this->waitForBatch( $job, $context, $lane, $p );
 
@@ -67,11 +71,17 @@ class expAiRequestHandler extends expQueueHandlerBase
         $recorder = new expAiUsageRecorder( $provider, array(
             'user_id' => (int) $job->attribute( 'user_id' ), 'node_id' => isset( $p['node_id'] ) ? (int) $p['node_id'] : 0,
             'action' => expAiText::cut( 'queue' . ( !empty( $p['purpose'] ) ? '.' . $p['purpose'] : '' ), 40 ),
-            'lane' => $lane->name(), 'job_uuid' => (string) $job->attribute( 'uuid' ), 'price_factor' => $lane->factorPercent() ) );
+            'lane' => $lane->name(), 'job_uuid' => (string) $job->attribute( 'uuid' ), 'price_factor' => $lane->factorPercent() )
+            + ( !empty( $p['siteaccess'] ) ? array( 'siteaccess' => (string) $p['siteaccess'] ) : array() ) );
         $context->heartbeat();
         try
         {
             $answer = $recorder->send( $p['request'] );
+        }
+        catch ( expAiVetoException $e )
+        {
+            // refused by the veto hook (#370 M2): not tried again
+            return expQueueResult::fail( 'refused: ' . strtr( $e->getMessage(), $e->arguments() ), 'veto' );
         }
         catch ( expAiException $e )
         {
