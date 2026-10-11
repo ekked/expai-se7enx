@@ -4090,4 +4090,232 @@
     </message>
 </context>
 <!-- expai translation sync: end -->
+<!-- #370 M5 alt text (doc/alt-text.md) -->
+<context>
+    <name>extension/expai/fieldaction</name>
+    <message>
+        <source>Write alt text</source>
+        <translation>Alternativtext schreiben</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/alttext</name>
+    <message>
+        <source>A model that can look at images suggests the alt text: %model</source>
+        <translation>Ein Modell, das Bilder ansehen kann, schlägt den Alternativtext vor: %model</translation>
+    </message>
+    <message>
+        <source>Decorative (empty alt text)</source>
+        <translation>Dekorativ (leerer Alternativtext)</translation>
+    </message>
+    <message>
+        <source>Only for images that carry no information: screen readers skip an image with an empty alt text.</source>
+        <translation>Nur für Bilder ohne Information: Screenreader überspringen ein Bild mit leerem Alternativtext.</translation>
+    </message>
+    <message>
+        <source>The alt text is empty now: screen readers skip this image. Review it before you store the draft.</source>
+        <translation>Der Alternativtext ist jetzt leer: Screenreader überspringen dieses Bild. Prüfen Sie das, bevor Sie den Entwurf speichern.</translation>
+    </message>
+    <message>
+        <source>The model thinks this image may be decorative. If it carries no information, choose "Decorative (empty alt text)".</source>
+        <translation>Das Modell hält dieses Bild für möglicherweise dekorativ. Wenn es keine Information trägt, wählen Sie „Dekorativ (leerer Alternativtext)“.</translation>
+    </message>
+    <message>
+        <source>Upload the image and store the draft first: the alt text is written from the stored image.</source>
+        <translation>Laden Sie das Bild hoch und speichern Sie zuerst den Entwurf: Der Alternativtext wird aus dem gespeicherten Bild geschrieben.</translation>
+    </message>
+    <message>
+        <source>Not available:</source>
+        <translation>Nicht verfügbar:</translation>
+    </message>
+    <message>
+        <source>%model looked at the image (%width x %height px, about %tokens image tokens), cost %cost.</source>
+        <translation>%model hat das Bild angesehen (%width x %height px, etwa %tokens Bild-Tokens), Kosten %cost.</translation>
+    </message>
+    <message>
+        <source>%model looked at the image (%width x %height px, about %tokens image tokens).</source>
+        <translation>%model hat das Bild angesehen (%width x %height px, etwa %tokens Bild-Tokens).</translation>
+    </message>
+    <message>
+        <source>Alt text suggestions are switched off.</source>
+        <translation>Vorschläge für Alternativtexte sind ausgeschaltet.</translation>
+    </message>
+    <message>
+        <source>Missing alt text</source>
+        <translation>Fehlende Alternativtexte</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation>Exponential Intelligence</translation>
+    </message>
+    <message>
+        <source>Object %id skipped: %why</source>
+        <translation>Objekt %id übersprungen: %why</translation>
+    </message>
+    <message>
+        <source>Held because:</source>
+        <translation>Angehalten, weil:</translation>
+    </message>
+    <message>
+        <source>Where</source>
+        <translation>Wo</translation>
+    </message>
+    <message>
+        <source>Node ID of the subtree</source>
+        <translation>Knoten-ID des Teilbaums</translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation>Anzeigen</translation>
+    </message>
+    <message>
+        <source>Images without alt text under %name (the node included): %count in %checked objects looked at.</source>
+        <translation>Bilder ohne Alternativtext unter %name (der Knoten eingeschlossen): %count in %checked durchgesehenen Objekten.</translation>
+    </message>
+    <message>
+        <source>Only the first %max objects were looked at: choose a smaller subtree.</source>
+        <translation>Nur die ersten %max Objekte wurden durchgesehen: Wählen Sie einen kleineren Teilbaum.</translation>
+    </message>
+    <message>
+        <source>Images</source>
+        <translation>Bilder</translation>
+    </message>
+    <message>
+        <source>Suggestions are written by %model, a model that can look at images. The data policy applies to the images: an image is only sent to a provider its section and class allow.</source>
+        <translation>Die Vorschläge schreibt %model, ein Modell, das Bilder ansehen kann. Die Datenrichtlinie gilt für die Bilder: Ein Bild geht nur an einen Anbieter, den seine Sektion und Klasse erlauben.</translation>
+    </message>
+    <message>
+        <source>Estimated cost of all suggestions: %cost.</source>
+        <translation>Geschätzte Kosten aller Vorschläge: %cost.</translation>
+    </message>
+    <message>
+        <source>The cost of this model is unknown.</source>
+        <translation>Die Kosten dieses Modells sind unbekannt.</translation>
+    </message>
+    <message>
+        <source>Choose all</source>
+        <translation>Alle auswählen</translation>
+    </message>
+    <message>
+        <source>Content</source>
+        <translation>Inhalt</translation>
+    </message>
+    <message>
+        <source>Class</source>
+        <translation>Klasse</translation>
+    </message>
+    <message>
+        <source>Field</source>
+        <translation>Feld</translation>
+    </message>
+    <message>
+        <source>Language</source>
+        <translation>Sprache</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Größe</translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation>Bearbeiten</translation>
+    </message>
+    <message>
+        <source>Budget of this job group (optional, %currency)</source>
+        <translation>Budget dieser Auftragsgruppe (optional, %currency)</translation>
+    </message>
+    <message>
+        <source>Queue suggestions as drafts</source>
+        <translation>Vorschläge als Entwürfe einreihen</translation>
+    </message>
+    <message>
+        <source>Each chosen image gets a job: a vision model writes the alt text into a new draft of the object (never published). Review the drafts and publish them as usual. At most %max per click; jobs are held when the site budget%cap or the group budget is reached.</source>
+        <translation>Jedes gewählte Bild bekommt einen Auftrag: Ein Modell, das Bilder ansehen kann, schreibt den Alternativtext in einen neuen Entwurf des Objekts (nie veröffentlicht). Prüfen Sie die Entwürfe und veröffentlichen Sie sie wie gewohnt. Höchstens %max pro Klick; Aufträge werden angehalten, wenn das Budget der Website%cap oder der Gruppe erreicht ist.</translation>
+    </message>
+    <message>
+        <source>The job queue (extension expqueue) is not active: open each image in the edit form and use "Write alt text" there.</source>
+        <translation>Die Auftragswarteschlange (Erweiterung expqueue) ist nicht aktiv: Öffnen Sie jedes Bild im Bearbeitungsformular und verwenden Sie dort „Alternativtext schreiben“.</translation>
+    </message>
+    <message>
+        <source>Every image here has an alt text.</source>
+        <translation>Jedes Bild hier hat einen Alternativtext.</translation>
+    </message>
+    <message>
+        <source>%queued suggestion(s) queued (estimated %estimate), %held held by a budget, %duplicates already queued, %skipped skipped. The drafts appear in "My drafts" when the jobs are done.</source>
+        <translation>%queued Vorschlag/Vorschläge eingereiht (geschätzt %estimate), %held durch ein Budget angehalten, %duplicates bereits eingereiht, %skipped übersprungen. Die Entwürfe erscheinen unter „Meine Entwürfe“, wenn die Aufträge erledigt sind.</translation>
+    </message>
+    <message>
+        <source>The jobs could not be queued: %error</source>
+        <translation>Die Aufträge konnten nicht eingereiht werden: %error</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>This field is not an image.</source>
+        <translation>Dieses Feld ist kein Bild.</translation>
+    </message>
+    <message>
+        <source>There is no stored image in this field yet. Upload the image and store the draft first.</source>
+        <translation>In diesem Feld ist noch kein gespeichertes Bild. Laden Sie das Bild hoch und speichern Sie zuerst den Entwurf.</translation>
+    </message>
+    <message>
+        <source>The image file could not be read.</source>
+        <translation>Die Bilddatei konnte nicht gelesen werden.</translation>
+    </message>
+    <message>
+        <source>This file is not an image Exponential Intelligence can look at (SVG and damaged files are not supported).</source>
+        <translation>Diese Datei ist kein Bild, das Exponential Intelligence ansehen kann (SVG und beschädigte Dateien werden nicht unterstützt).</translation>
+    </message>
+    <message>
+        <source>The image is too large to be sent and cannot be scaled down here (the PHP extension GD is missing).</source>
+        <translation>Das Bild ist zu groß zum Senden und kann hier nicht verkleinert werden (die PHP-Erweiterung GD fehlt).</translation>
+    </message>
+    <message>
+        <source>The image is too large to be prepared (more than 100 megapixels).</source>
+        <translation>Das Bild ist zu groß zum Aufbereiten (mehr als 100 Megapixel).</translation>
+    </message>
+    <message>
+        <source>This image format cannot be sent to Exponential Intelligence (%type).</source>
+        <translation>Dieses Bildformat kann nicht an Exponential Intelligence gesendet werden (%type).</translation>
+    </message>
+    <message>
+        <source>The image could not be made small enough to be sent.</source>
+        <translation>Das Bild konnte nicht klein genug zum Senden gemacht werden.</translation>
+    </message>
+    <message>
+        <source>No model that can look at images is configured (Capabilities[]=vision). Please tell the administrator.</source>
+        <translation>Es ist kein Modell eingerichtet, das Bilder ansehen kann (Capabilities[]=vision). Bitte informieren Sie den Administrator.</translation>
+    </message>
+    <message>
+        <source>The data policy keeps the image of "%name" away from every model that can look at images: %rule.</source>
+        <translation>Die Datenrichtlinie hält das Bild von „%name“ von jedem Modell fern, das Bilder ansehen kann: %rule.</translation>
+    </message>
+    <message>
+        <source>No model that can look at images is available to you right now.</source>
+        <translation>Im Moment steht Ihnen kein Modell zur Verfügung, das Bilder ansehen kann.</translation>
+    </message>
+    <message>
+        <source>Alt text suggestions are switched off.</source>
+        <translation>Vorschläge für Alternativtexte sind ausgeschaltet.</translation>
+    </message>
+    <message>
+        <source>There is nothing to queue.</source>
+        <translation>Es gibt nichts einzureihen.</translation>
+    </message>
+    <message>
+        <source>The image field was not found in the new draft.</source>
+        <translation>Das Bildfeld wurde im neuen Entwurf nicht gefunden.</translation>
+    </message>
+    <message>
+        <source>This model cannot look at images. Choose a model that can (Capabilities[]=vision).</source>
+        <translation>Dieses Modell kann keine Bilder ansehen. Wählen Sie ein Modell, das es kann (Capabilities[]=vision).</translation>
+    </message>
+    <message>
+        <source>Choose at least one image.</source>
+        <translation>Wählen Sie mindestens ein Bild.</translation>
+    </message>
+</context>
+<!-- /#370 M5 alt text -->
+
 </TS>

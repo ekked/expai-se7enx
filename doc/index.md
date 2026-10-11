@@ -27,6 +27,7 @@
 | [vector.md](vector.md) | Vector (expai/vector): scope, plan and write, review, model and lane, run/stop/queue, polling and streaming, functions |
 | [keyboard.md](keyboard.md) | The command palette (Ctrl/Cmd+K), the shortcuts, your own keys, commands of your own |
 | [edit-view-integration.md](edit-view-integration.md) | The edit form hook, field actions, how values reach Tiptap / the Online Editor |
+| [alt-text.md](alt-text.md) | Alt text for images: the "Write alt text" button, vision models only, the data policy for images, image preparation and limits, the accessibility rules, the "Missing alt text" report and its draft jobs, cost |
 | [dashboard.md](dashboard.md) | expai/dashboard (figures, chart, limits, Start writing, view parameters), the menu entries, the dashboard block, the log page |
 | [usage-tracking.md](usage-tracking.md) | What is recorded per request, turns, the estimated cost and how to check it, limits, retention, privacy |
 | [tools.md](tools.md) | Every tool Claude can call: input, result, permission checks, limits |

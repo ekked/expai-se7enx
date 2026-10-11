@@ -50,3 +50,12 @@ an unknown region meets no region requirement. Without any rule everything may g
 
 The usage log stores the region and retention of the provider with every request; expai/log shows them per request
 and filters by provider and region, and the dashboard shows a table by provider.
+
+## Images (alt text)
+
+The image an alt text suggestion sends ([alt-text.md](alt-text.md)) is content of its object: the section and class
+rules above apply to it, and `[AltTextSettings] ImageRegions[]` and `ImageZeroRetention` can keep images to stricter
+rules than text. The model is chosen among the vision models whose provider meets the requirement; when none does, the
+editor gets the reason ("The data policy keeps the image of ... away from every model that can look at images: ...")
+and nothing is sent. Queued suggestions check it again when the job runs. The image travels inside the request
+(base64), never as a link the provider could fetch later, and the request log never keeps the pixels.

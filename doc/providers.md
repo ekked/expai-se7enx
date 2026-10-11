@@ -45,6 +45,7 @@ message is replaced by `[redacted]`.
 | `tools [{name, description, input_schema}]` | `[{type: function, function: {name, description, parameters}}]` |
 | `tool_choice none / any / auto / tool` | `"none"` / `"required"` (Mistral `"any"`) / `"auto"` / `{type: function, function: {name}}`; a server without tool_choice (Ollama) gets no tools on a call that must answer in words |
 | `output_schema` | `response_format: {type: json_schema, ...}` (`Capabilities[]=json_schema`) or `{type: json_object}` (`json_object`); otherwise the instructions ask for JSON and the answer is read tolerantly (code fences, text around the object) |
+| image blocks (base64, alt text) | user content parts `{type: image_url, image_url: {url: "data:<type>;base64,..."}}` for models with `Capabilities[]=vision` ([alt-text.md](alt-text.md)) |
 | `Effort` | `reasoning_effort` (OpenRouter: `reasoning: {effort}`), with `Capabilities[]=reasoning_effort`; `none` switches thinking off |
 
 The answer: `choices[0].message` becomes text and `tool_use` blocks. Arguments are decoded; arguments that are not a

@@ -4090,4 +4090,232 @@
     </message>
 </context>
 <!-- expai translation sync: end -->
+<!-- #370 M5 alt text (doc/alt-text.md) -->
+<context>
+    <name>extension/expai/fieldaction</name>
+    <message>
+        <source>Write alt text</source>
+        <translation>Write alt text</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/alttext</name>
+    <message>
+        <source>A model that can look at images suggests the alt text: %model</source>
+        <translation>A model that can look at images suggests the alt text: %model</translation>
+    </message>
+    <message>
+        <source>Decorative (empty alt text)</source>
+        <translation>Decorative (empty alt text)</translation>
+    </message>
+    <message>
+        <source>Only for images that carry no information: screen readers skip an image with an empty alt text.</source>
+        <translation>Only for images that carry no information: screen readers skip an image with an empty alt text.</translation>
+    </message>
+    <message>
+        <source>The alt text is empty now: screen readers skip this image. Review it before you store the draft.</source>
+        <translation>The alt text is empty now: screen readers skip this image. Review it before you store the draft.</translation>
+    </message>
+    <message>
+        <source>The model thinks this image may be decorative. If it carries no information, choose "Decorative (empty alt text)".</source>
+        <translation>The model thinks this image may be decorative. If it carries no information, choose "Decorative (empty alt text)".</translation>
+    </message>
+    <message>
+        <source>Upload the image and store the draft first: the alt text is written from the stored image.</source>
+        <translation>Upload the image and store the draft first: the alt text is written from the stored image.</translation>
+    </message>
+    <message>
+        <source>Not available:</source>
+        <translation>Not available:</translation>
+    </message>
+    <message>
+        <source>%model looked at the image (%width x %height px, about %tokens image tokens), cost %cost.</source>
+        <translation>%model looked at the image (%width x %height px, about %tokens image tokens), cost %cost.</translation>
+    </message>
+    <message>
+        <source>%model looked at the image (%width x %height px, about %tokens image tokens).</source>
+        <translation>%model looked at the image (%width x %height px, about %tokens image tokens).</translation>
+    </message>
+    <message>
+        <source>Alt text suggestions are switched off.</source>
+        <translation>Alt text suggestions are switched off.</translation>
+    </message>
+    <message>
+        <source>Missing alt text</source>
+        <translation>Missing alt text</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation>Exponential Intelligence</translation>
+    </message>
+    <message>
+        <source>Object %id skipped: %why</source>
+        <translation>Object %id skipped: %why</translation>
+    </message>
+    <message>
+        <source>Held because:</source>
+        <translation>Held because:</translation>
+    </message>
+    <message>
+        <source>Where</source>
+        <translation>Where</translation>
+    </message>
+    <message>
+        <source>Node ID of the subtree</source>
+        <translation>Node ID of the subtree</translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation>Show</translation>
+    </message>
+    <message>
+        <source>Images without alt text under %name (the node included): %count in %checked objects looked at.</source>
+        <translation>Images without alt text under %name (the node included): %count in %checked objects looked at.</translation>
+    </message>
+    <message>
+        <source>Only the first %max objects were looked at: choose a smaller subtree.</source>
+        <translation>Only the first %max objects were looked at: choose a smaller subtree.</translation>
+    </message>
+    <message>
+        <source>Images</source>
+        <translation>Images</translation>
+    </message>
+    <message>
+        <source>Suggestions are written by %model, a model that can look at images. The data policy applies to the images: an image is only sent to a provider its section and class allow.</source>
+        <translation>Suggestions are written by %model, a model that can look at images. The data policy applies to the images: an image is only sent to a provider its section and class allow.</translation>
+    </message>
+    <message>
+        <source>Estimated cost of all suggestions: %cost.</source>
+        <translation>Estimated cost of all suggestions: %cost.</translation>
+    </message>
+    <message>
+        <source>The cost of this model is unknown.</source>
+        <translation>The cost of this model is unknown.</translation>
+    </message>
+    <message>
+        <source>Choose all</source>
+        <translation>Choose all</translation>
+    </message>
+    <message>
+        <source>Content</source>
+        <translation>Content</translation>
+    </message>
+    <message>
+        <source>Class</source>
+        <translation>Class</translation>
+    </message>
+    <message>
+        <source>Field</source>
+        <translation>Field</translation>
+    </message>
+    <message>
+        <source>Language</source>
+        <translation>Language</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Size</translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation>Edit</translation>
+    </message>
+    <message>
+        <source>Budget of this job group (optional, %currency)</source>
+        <translation>Budget of this job group (optional, %currency)</translation>
+    </message>
+    <message>
+        <source>Queue suggestions as drafts</source>
+        <translation>Queue suggestions as drafts</translation>
+    </message>
+    <message>
+        <source>Each chosen image gets a job: a vision model writes the alt text into a new draft of the object (never published). Review the drafts and publish them as usual. At most %max per click; jobs are held when the site budget%cap or the group budget is reached.</source>
+        <translation>Each chosen image gets a job: a vision model writes the alt text into a new draft of the object (never published). Review the drafts and publish them as usual. At most %max per click; jobs are held when the site budget%cap or the group budget is reached.</translation>
+    </message>
+    <message>
+        <source>The job queue (extension expqueue) is not active: open each image in the edit form and use "Write alt text" there.</source>
+        <translation>The job queue (extension expqueue) is not active: open each image in the edit form and use "Write alt text" there.</translation>
+    </message>
+    <message>
+        <source>Every image here has an alt text.</source>
+        <translation>Every image here has an alt text.</translation>
+    </message>
+    <message>
+        <source>%queued suggestion(s) queued (estimated %estimate), %held held by a budget, %duplicates already queued, %skipped skipped. The drafts appear in "My drafts" when the jobs are done.</source>
+        <translation>%queued suggestion(s) queued (estimated %estimate), %held held by a budget, %duplicates already queued, %skipped skipped. The drafts appear in "My drafts" when the jobs are done.</translation>
+    </message>
+    <message>
+        <source>The jobs could not be queued: %error</source>
+        <translation>The jobs could not be queued: %error</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>This field is not an image.</source>
+        <translation>This field is not an image.</translation>
+    </message>
+    <message>
+        <source>There is no stored image in this field yet. Upload the image and store the draft first.</source>
+        <translation>There is no stored image in this field yet. Upload the image and store the draft first.</translation>
+    </message>
+    <message>
+        <source>The image file could not be read.</source>
+        <translation>The image file could not be read.</translation>
+    </message>
+    <message>
+        <source>This file is not an image Exponential Intelligence can look at (SVG and damaged files are not supported).</source>
+        <translation>This file is not an image Exponential Intelligence can look at (SVG and damaged files are not supported).</translation>
+    </message>
+    <message>
+        <source>The image is too large to be sent and cannot be scaled down here (the PHP extension GD is missing).</source>
+        <translation>The image is too large to be sent and cannot be scaled down here (the PHP extension GD is missing).</translation>
+    </message>
+    <message>
+        <source>The image is too large to be prepared (more than 100 megapixels).</source>
+        <translation>The image is too large to be prepared (more than 100 megapixels).</translation>
+    </message>
+    <message>
+        <source>This image format cannot be sent to Exponential Intelligence (%type).</source>
+        <translation>This image format cannot be sent to Exponential Intelligence (%type).</translation>
+    </message>
+    <message>
+        <source>The image could not be made small enough to be sent.</source>
+        <translation>The image could not be made small enough to be sent.</translation>
+    </message>
+    <message>
+        <source>No model that can look at images is configured (Capabilities[]=vision). Please tell the administrator.</source>
+        <translation>No model that can look at images is configured (Capabilities[]=vision). Please tell the administrator.</translation>
+    </message>
+    <message>
+        <source>The data policy keeps the image of "%name" away from every model that can look at images: %rule.</source>
+        <translation>The data policy keeps the image of "%name" away from every model that can look at images: %rule.</translation>
+    </message>
+    <message>
+        <source>No model that can look at images is available to you right now.</source>
+        <translation>No model that can look at images is available to you right now.</translation>
+    </message>
+    <message>
+        <source>Alt text suggestions are switched off.</source>
+        <translation>Alt text suggestions are switched off.</translation>
+    </message>
+    <message>
+        <source>There is nothing to queue.</source>
+        <translation>There is nothing to queue.</translation>
+    </message>
+    <message>
+        <source>The image field was not found in the new draft.</source>
+        <translation>The image field was not found in the new draft.</translation>
+    </message>
+    <message>
+        <source>This model cannot look at images. Choose a model that can (Capabilities[]=vision).</source>
+        <translation>This model cannot look at images. Choose a model that can (Capabilities[]=vision).</translation>
+    </message>
+    <message>
+        <source>Choose at least one image.</source>
+        <translation>Choose at least one image.</translation>
+    </message>
+</context>
+<!-- /#370 M5 alt text -->
+
 </TS>

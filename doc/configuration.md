@@ -541,3 +541,34 @@ Appliers[translation_sync]=expAiTranslationSyncApplier`.
 Other files: `expqueue.ini [JobType_expai.translation.check]` (the check job, class `system`), `ezjscore.ini
 [ezjscServer_expaitranslation]` (the functions `expaitranslation::status`, `check`, `approve`, `skip`), and
 `workflow.ini [EventSettings]` (the event type `event_expaitranslationsync`).
+
+## [AltTextSettings]: alt text for images
+
+See [alt-text.md](alt-text.md). The button is the field action `[FieldAction_alt_text]` (`Handler=expAiAltTextFieldAction`,
+`Datatypes[]=ezimage`), listed in `[EditViewSettings] FieldActions[]`, and drawn by the edit section
+`[EditSection_alttext]` (`Sections[]=alttext`, `Template=expai/edit/alttext.tpl`).
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `Enabled` | enabled | The "Write alt text" button, the report expai/alttext and its jobs. |
+| `Model` | (empty) | The alias of the vision model to use first. Empty: the user's model, the site default, then any other model with `Capabilities[]=vision`; the first the user may use, that runs and that the data policy allows. |
+| `ImageAlias` | original | The image alias whose file is sent (scaled down here to the limits). |
+| `MaxEdge` | 1568 | The longest edge in pixels of the image sent; per provider `[Provider_<id>] ImageMaxEdge`. |
+| `MaxBytes` | 3750000 | The most bytes of the image sent (before base64); per provider `[Provider_<id>] ImageMaxBytes`. |
+| `JpegQuality` | 85 | The JPEG quality of a scaled-down image (lowered when the bytes do not fit). |
+| `ImageRegions[]` | (empty) | Regions (us, eu, local) images may go to, on top of the object's `[DataPolicy]` rules. |
+| `ImageZeroRetention` | disabled | enabled: images only go to providers with zero retention (none, zdr). |
+| `MaxLength` | 150 | The longest alt text; the answer is cut at a word. |
+| `MaxTokens` | 600 | The most output tokens of one suggestion. |
+| `MaxContextLength` | 4000 | The longest page text sent as context, in characters. |
+| `CompanionAttributes[]` | alternative_text, alt_text | ezstring fields of the same object that repeat the alt text; filled when empty or equal to it. |
+| `ExtraInstructions` | (empty) | House rules added to the prompt. |
+| `ReportMaxObjects` | 500 | The most objects the report looks at below a node. |
+| `MaxQueuePerRequest` | 100 | The most jobs one click on "Queue suggestions as drafts" creates. |
+| `GroupBudget` | 0 | The default budget of the job group of one click, in `[Pricing] Currency` (0: none). |
+| `EstimateTextTokens` | 1200 | The text tokens of one queued suggestion's estimate, besides the image tokens. |
+| `EstimateOutputTokens` | 120 | The output tokens of one queued suggestion's estimate. |
+
+Other files: `ezjscore.ini [ezjscServer_expaialttext]` (the function `expaialttext::suggest`), `expqueue.ini
+[JobType_expai.alttext]` (the job type of the report), and `Capabilities[]=vision` in `[Model_<alias>]` (the models
+that can look at images; the Anthropic models of `[AISettings]` have it).
