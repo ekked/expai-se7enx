@@ -8,26 +8,25 @@
  */
 
 /**
- * The job type expai.package.import: imports objects of a stored package (expai_package) as drafts, as the user who
- * queued the import. A large package is one job group of these jobs (expAiPackageService::queueImport()), each with
- * a slice of the objects (payload indices), so the import shows progress, can be paused and cancelled, and is resumed
- * after a crash: an object whose remote id already has a draft from this package is planned again and not created
- * twice (the plan sees the draft and waits).
+ * The job type expai.package.import: installs a kernel package that expai imported (expai_package) as drafts, as the
+ * user who queued it (expAiPackageService::runImport(), the kernel's install as drafts). One job per package, in a job
+ * group for its progress. A job that runs again does not write a second draft of an object it already wrote: with
+ * the option existing=skip an object of the package that exists is left alone; with existing=update (the default)
+ * a second run gives existing objects one more draft, as a second import would.
  */
 class expAiPackageImportHandler extends expQueueHandlerBase
 {
     public function validate( array $payload )
     {
-        if ( empty( $payload['package_uuid'] ) || !isset( $payload['indices'] ) || !is_array( $payload['indices'] ) )
-            return 'package_uuid and indices are required';
+        if ( empty( $payload['package_uuid'] ) )
+            return 'package_uuid is required';
         return null;
     }
 
     public function describe( expQueueJob $job )
     {
         $p = $job->payloadArray();
-        $indices = isset( $p['indices'] ) ? (array) $p['indices'] : array();
-        return 'Import objects ' . ( $indices ? min( $indices ) + 1 . '-' . ( max( $indices ) + 1 ) : '' ) . ' of package ' . ( isset( $p['package_uuid'] ) ? $p['package_uuid'] : '' );
+        return 'Install package ' . ( isset( $p['package_uuid'] ) ? $p['package_uuid'] : '' ) . ' as drafts';
     }
 
     public function run( expQueueJob $job, expQueueContext $context )
@@ -36,51 +35,28 @@ class expAiPackageImportHandler extends expQueueHandlerBase
         $record = expAiPackageRecord::fetchByUUID( (string) $p['package_uuid'] );
         if ( !$record )
             throw new expQueuePermanentException( 'the package ' . $p['package_uuid'] . ' is gone', 'not_found' );
-        $user = eZUser::currentUser();
-        $access = $user->hasAccessTo( 'expai', 'package_import' );
+        $access = eZUser::currentUser()->hasAccessTo( 'expai', 'package_import' );
         if ( $access['accessWord'] === 'no' )
             throw new expQueuePermanentException( 'the user may not import packages (expai/package_import)', 'access' );
+        $done = $context->checkpoint();
+        if ( is_array( $done ) && isset( $done['report'] ) )
+            return $done['report'];
+        $context->throwIfCancelled();
         try
         {
-            $package = $record->package();
+            $report = expAiPackageService::runImport( $record, isset( $p['options'] ) ? (array) $p['options'] : array(), (string) $job->attribute( 'uuid' ) );
         }
         catch ( expAiPackageException $e )
         {
-            throw new expQueuePermanentException( 'the package cannot be read: ' . $e->text(), 'package' );
+            throw new expQueuePermanentException( 'the package cannot be installed: ' . $e->text(), 'package' );
         }
-        $options = isset( $p['options'] ) ? (array) $p['options'] : array();
-        $options['package_uuid'] = (string) $record->attribute( 'uuid' );
-        $options['job_uuid'] = (string) $job->attribute( 'uuid' );
-        $options['dry_run'] = false;
-        $importer = new expAiPackageImporter( $package, $options );
-        $done = $context->checkpoint();
-        $results = is_array( $done ) && isset( $done['results'] ) ? (array) $done['results'] : array();
-        $indices = array_values( array_map( 'intval', (array) $p['indices'] ) );
-        foreach ( $indices as $n => $i )
-        {
-            if ( isset( $results[$i] ) )
-                continue;
-            $context->throwIfCancelled();
-            $result = $importer->importObject( $i );
-            $results[$i] = self::short( $result );
-            // after every object: a rerun does not import it again
-            $context->saveCheckpoint( array( 'results' => $results ) );
-            $context->progress( $n + 1, count( $indices ), $result['remote_id'] . ': ' . $result['action'] );
-        }
-        $counts = array();
-        foreach ( $results as $r )
-            $counts[$r['action']] = ( isset( $counts[$r['action']] ) ? $counts[$r['action']] : 0 ) + 1;
-        return array( 'package_uuid' => (string) $record->attribute( 'uuid' ), 'counts' => $counts, 'results' => array_values( $results ) );
-    }
-
-    /** @return array a result as the job keeps it */
-    public static function short( array $result )
-    {
-        return array( 'index' => $result['index'], 'remote_id' => $result['remote_id'], 'action' => $result['action'],
-                      'reasons' => array_slice( (array) $result['reasons'], 0, 5 ),
-                      'drafts' => array_map( function ( $d ) { return array( 'object_id' => $d['object_id'], 'version' => $d['version'], 'language' => $d['language'], 'url' => $d['url'] ); },
-                                             isset( $result['drafts'] ) ? (array) $result['drafts'] : array() ),
-                      'errors' => array_slice( isset( $result['errors'] ) ? (array) $result['errors'] : array(), 0, 10 ),
-                      'warnings' => array_slice( isset( $result['warnings'] ) ? (array) $result['warnings'] : array(), 0, 10 ) );
+        $short = array( 'package_uuid' => (string) $record->attribute( 'uuid' ), 'imported' => $report['imported'], 'counts' => $report['counts'],
+                        'results' => array_slice( $report['results'], 0, 2000 ), 'waiting' => array_slice( $report['waiting'], 0, 500 ),
+                        'skipped' => array_slice( $report['skipped'], 0, 200 ), 'error' => $report['error'] );
+        $context->saveCheckpoint( array( 'report' => $short ) );
+        $context->progress( 1, 1, count( $report['results'] ) . ' drafts' );
+        if ( !$report['imported'] )
+            throw new expQueuePermanentException( 'the install as drafts failed: ' . ( $report['error'] !== '' ? $report['error'] : 'see the debug output' ), 'install' );
+        return $short;
     }
 }

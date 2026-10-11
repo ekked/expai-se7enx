@@ -7,7 +7,7 @@
  *   expai/log    the log page with the drafts of every user (with expai/write a user sees their own)
  *   expai/settings  shows administrators where the site default model is set (the dashboard); "Resume held jobs"
  *                   on expai/budgets
- *   expai/package_import  the view expai/packages: upload, validate, dry run, import content packages as drafts
+ *   expai/package_import  the view expai/packages: upload, validate, dry run, install kernel packages as drafts
  *   expai/package_export  ./console ext:expai:package export
  *   expai/lane_fast       queued requests may ask for a fast lane (a price premium)
  *   expai/model_use     choosing models of providers outside [ProviderSettings] ProvidersWithoutPolicy[]
@@ -63,8 +63,9 @@ $ViewList['packages'] = array(
     'params' => array(),
     'single_post_actions' => array( 'ExpAiPackageUploadButton' => 'Upload', 'ExpAiPackageValidateButton' => 'Validate',
                                     'ExpAiPackageDryRunButton' => 'DryRun', 'ExpAiPackageImportButton' => 'Import' ),
-    'post_action_parameters' => array( 'DryRun' => array( 'OnConflict' => 'ExpAiOnConflict', 'Remap' => 'ExpAiRemap', 'Parent' => 'ExpAiParent' ),
-                                      'Import' => array( 'OnConflict' => 'ExpAiOnConflict', 'Remap' => 'ExpAiRemap', 'Parent' => 'ExpAiParent' ) ),
+    // the kernel's packages installed as drafts (doc/packages.md): an existing object gets a new draft or is skipped
+    'post_action_parameters' => array( 'DryRun' => array( 'Existing' => 'ExpAiExisting', 'Parent' => 'ExpAiParent' ),
+                                      'Import' => array( 'Existing' => 'ExpAiExisting', 'Parent' => 'ExpAiParent' ) ),
     'unordered_params' => array( 'package' => 'Package', 'offset' => 'Offset' ) );
 
 $ViewList['dashboard'] = array(

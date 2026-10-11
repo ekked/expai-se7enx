@@ -92,10 +92,11 @@ Index: (model_alias, created). Names fit Oracle's limits; no column is an Oracle
 it was deleted at the provider), `polls`, `submit_job_uuid`, `user_id`, `retention`, `last_error`, `created`,
 `modified`. Index (state, provider). Its requests are the expqueue jobs whose `external_ref` is `expai-batch:<id>`.
 
-**expai_package**: one stored content package ([packages.md](packages.md)): `uuid`, `name`, `checksum`,
-`format_version`, `state` (uploaded, valid, invalid, importing, imported, failed), `object_count`, `file_count`,
-`bytes`, `origin` (upload, cli), `storage` (the directory below var/<vardir>/expai/packages/), `user_id`, `group_uuid`
-(a queued import), `report` (JSON: validation, dry_run, import), `created`, `modified`. Index (uuid).
+**expai_package**: one content package expai imported into the kernel's package repository ([packages.md](packages.md)):
+`uuid`, `name`, `checksum` (the SHA-256 of the archive), `format_version` (the package's format: `xml` or `json`),
+`state` (uploaded, valid, invalid, importing, imported, failed), `object_count`, `file_count`, `bytes`, `origin`
+(upload, cli), `storage` (the kernel package's name, repository `local`), `user_id`, `group_uuid` (a queued import),
+`report` (JSON: validation, dry_run, import), `created`, `modified`. Index (uuid).
 
 Columns of lanes and packages in the other tables: `expai_usage_log.lane`, `service_tier` (what the provider reported),
 `job_uuid`, `batch_id`, `price_factor` (percent of the list price the request is billed at; costs use it; index

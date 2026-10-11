@@ -17,9 +17,8 @@
 | [lanes.md](lanes.md) | Lanes (standard, flex, batch, fast), the lane policy, queued requests, provider batches of five APIs |
 | [budgets.md](budgets.md) | The monthly site budget and job group budgets: reservation, hold, resume, figures |
 | [chains.md](chains.md) | AI chains: write, review, revise, SEO, the human checkpoint; defining a chain (worked example), prompts, pass criteria, budgets, configuration, permissions, database |
-| [packages.md](packages.md) | Content packages: export, validate, diff, import as drafts, conflicts, expai/packages |
-| [package-format.md](package-format.md) | The package format 1.0 and its JSON Schema, attribute values per datatype, the checksum |
-| [package-authoring-for-agents.md](package-authoring-for-agents.md) | How a local CLI agent writes a package (terms, data, the validation loop) |
+| [packages.md](packages.md) | Content packages, a thin layer on the kernel's packages (classic or JSON format): provenance, import as drafts only, the draft log, the job queue, expai/packages |
+| [package-authoring-for-agents.md](package-authoring-for-agents.md) | How a local CLI agent writes a package in the kernel's JSON format (terms, data, the validation loop, a minimal package) |
 | [diff.md](diff.md) | The diff engine: segmenters per datatype, sentences, hunks with stable ids, metrics, compare and apply |
 | [translation-sync.md](translation-sync.md) | Translation sync: no-op / patch / full after a source change, thresholds, the workflow event, the Translations section, the CLI |
 | [permissions.md](permissions.md) | Policies, and how the editor's own permissions limit everything the assistant does |

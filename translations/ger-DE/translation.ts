@@ -954,6 +954,122 @@
         <source>The file is larger than %max bytes; import larger packages with ./console ext:expai:package import.</source>
         <translation>Die Datei ist größer als %max Bytes; importieren Sie größere Pakete mit ./console ext:expai:package import.</translation>
     </message>
+    <message>
+        <source>Format</source>
+        <translation>Format</translation>
+    </message>
+    <message>
+        <source>Classic XML</source>
+        <translation>Klassisches XML</translation>
+    </message>
+    <message>
+        <source>SHA-256</source>
+        <translation>SHA-256</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation>Werkzeuge</translation>
+    </message>
+    <message>
+        <source>The package on Setup &gt; Packages</source>
+        <translation>Das Paket unter Einrichtung &gt; Pakete</translation>
+    </message>
+    <message>
+        <source>Download as JSON</source>
+        <translation>Als JSON herunterladen</translation>
+    </message>
+    <message>
+        <source>An import only writes drafts, as you, with your permissions; classes, settings and design files of the package are not installed. Publishing the drafts is a separate step (approval workflows apply). Make a dry run first.</source>
+        <translation>Ein Import schreibt nur Entwürfe, als Sie und mit Ihren Rechten; Klassen, Einstellungen und Design-Dateien des Pakets werden nicht installiert. Das Veröffentlichen der Entwürfe ist ein eigener Schritt (Freigabe-Workflows gelten). Machen Sie zuerst einen Probelauf.</translation>
+    </message>
+    <message>
+        <source>An object that exists already</source>
+        <translation>Ein bereits vorhandenes Objekt</translation>
+    </message>
+    <message>
+        <source>gets a new draft</source>
+        <translation>erhält einen neuen Entwurf</translation>
+    </message>
+    <message>
+        <source>is left alone</source>
+        <translation>bleibt unverändert</translation>
+    </message>
+    <message>
+        <source>Parent of the package's top objects (node id, node remote id or path; default: the content root)</source>
+        <translation>Übergeordneter Knoten der obersten Objekte des Pakets (Knoten-ID, Knoten-Remote-ID oder Pfad; Standard: die Inhaltswurzel)</translation>
+    </message>
+    <message>
+        <source>Locations</source>
+        <translation>Orte</translation>
+    </message>
+    <message>
+        <source>object %id</source>
+        <translation>Objekt %id</translation>
+    </message>
+    <message>
+        <source>top</source>
+        <translation>oben</translation>
+    </message>
+    <message>
+        <source>the node remote id is another object's</source>
+        <translation>die Knoten-Remote-ID gehört einem anderen Objekt</translation>
+    </message>
+    <message>
+        <source>%count drafts wait for a parent that is a draft of this package too: publish the parent, then import the package again.</source>
+        <translation>%count Entwürfe warten auf ein übergeordnetes Objekt, das ebenfalls ein Entwurf dieses Pakets ist: Veröffentlichen Sie es und importieren Sie das Paket dann erneut.</translation>
+    </message>
+    <message>
+        <source>Not installed (only content is imported as drafts)</source>
+        <translation>Nicht installiert (als Entwürfe wird nur Inhalt importiert)</translation>
+    </message>
+    <message>
+        <source>Draft</source>
+        <translation>Entwurf</translation>
+    </message>
+    <message>
+        <source>A package is an .ezpkg file in the classic or the JSON format, up to %max. It is validated at once and kept on Setup &gt; Packages; nothing is imported until you ask for it, and then only as drafts.</source>
+        <translation>Ein Paket ist eine .ezpkg-Datei im klassischen oder im JSON-Format, bis %max. Es wird sofort geprüft und unter Einrichtung &gt; Pakete aufbewahrt; importiert wird erst, wenn Sie es verlangen, und dann nur als Entwürfe.</translation>
+    </message>
+    <message>
+        <source>The import runs in the job queue. This page shows its progress.</source>
+        <translation>Der Import läuft in der Auftragswarteschlange. Diese Seite zeigt seinen Fortschritt.</translation>
+    </message>
+    <message>
+        <source>The install as drafts failed: %error</source>
+        <translation>Die Installation als Entwürfe ist fehlgeschlagen: %error</translation>
+    </message>
+    <message>
+        <source>The directory %dir does not exist.</source>
+        <translation>Das Verzeichnis %dir existiert nicht.</translation>
+    </message>
+    <message>
+        <source>The package name %name is not valid.</source>
+        <translation>Der Paketname %name ist nicht gültig.</translation>
+    </message>
+    <message>
+        <source>The subtree of node %id could not be packaged.</source>
+        <translation>Der Teilbaum des Knotens %id konnte nicht verpackt werden.</translation>
+    </message>
+    <message>
+        <source>The package could not be written to %file.</source>
+        <translation>Das Paket konnte nicht nach %file geschrieben werden.</translation>
+    </message>
+    <message>
+        <source>The file is not a package that can be imported: %reason</source>
+        <translation>Die Datei ist kein importierbares Paket: %reason</translation>
+    </message>
+    <message>
+        <source>The package cannot be read: %reason</source>
+        <translation>Das Paket kann nicht gelesen werden: %reason</translation>
+    </message>
+    <message>
+        <source>The package is not in the package repository (any more).</source>
+        <translation>Das Paket ist nicht (mehr) im Paket-Repository.</translation>
+    </message>
+    <message>
+        <source>The parent %parent was not found.</source>
+        <translation>Der übergeordnete Knoten %parent wurde nicht gefunden.</translation>
+    </message>
 </context>
 <!-- expai lanes/budgets/packages: end -->
 <context>

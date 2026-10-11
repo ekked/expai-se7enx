@@ -1,9 +1,10 @@
 <?php
 /**
- * expai/packages (policy expai/package_import): content packages. Upload a package (a .exppkg / .zip file or a
- * package.json), see its validation report, make a dry run (what an import would do, and the differences against the
- * published content), import it as drafts (in the request, or as a queue job group for a large package) and follow
- * the links to the drafts. Nothing is published here.
+ * expai/packages (policy expai/package_import): content packages, a thin layer on the kernel's packages. Upload a
+ * package (an .ezpkg in the classic or the JSON format); it is validated by the kernel and imported into the kernel's
+ * package repository (Setup > Packages, repository "local"). The page shows its provenance (written by AI, models,
+ * tools), what an install meets here by remote id (the kernel's report), and installs it as drafts (in the request,
+ * or as a queue job for a large package); every draft is in the draft log with the package. Nothing is published.
  *
  * View parameters: (package)/<uuid> one package, (offset)/<n> the list. POST forms carry the form token (ezformtoken).
  *
@@ -14,7 +15,6 @@
 
 /** @var eZModule $Module */
 $Module = $Params['Module'];
-$http = eZHTTPTool::instance();
 $user = eZUser::currentUser();
 $uuid = isset( $Params['UserParameters']['package'] ) ? (string) $Params['UserParameters']['package'] : '';
 $offset = isset( $Params['UserParameters']['offset'] ) ? max( 0, (int) $Params['UserParameters']['offset'] ) : 0;
@@ -33,11 +33,7 @@ if ( $uuid !== '' )
 
 $options = function () use ( $Module )
 {
-    $out = array( 'on_conflict' => in_array( (string) $Module->actionParameter( 'OnConflict' ), array( 'skip', 'draft', 'fail' ), true )
-                                   ? (string) $Module->actionParameter( 'OnConflict' ) : 'skip' );
-    $remap = trim( (string) $Module->actionParameter( 'Remap' ) );
-    if ( $remap !== '' && preg_match( '/^[A-Za-z0-9_.:-]{1,40}$/', $remap ) )
-        $out['remap'] = $remap;
+    $out = array( 'existing' => (string) $Module->actionParameter( 'Existing' ) === 'skip' ? 'skip' : 'update' );
     $parent = trim( (string) $Module->actionParameter( 'Parent' ) );
     if ( $parent !== '' )
         $out['parent'] = substr( $parent, 0, 200 );
@@ -51,12 +47,13 @@ try
         if ( !eZHTTPFile::canFetch( 'ExpAiPackageFile' ) )
             throw new expAiPackageException( 'Choose a package file to upload.' );
         $file = eZHTTPFile::fetch( 'ExpAiPackageFile' );
-        $max = expAiPackage::limit( 'MaxUploadBytes', 52428800 );
+        $max = expAiPackageService::limit( 'MaxUploadBytes', 52428800 );
         if ( !$file || (int) $file->attribute( 'filesize' ) <= 0 )
             throw new expAiPackageException( 'Choose a package file to upload.' );
         if ( (int) $file->attribute( 'filesize' ) > $max )
             throw new expAiPackageException( 'The file is larger than %max bytes; import larger packages with ./console ext:expai:package import.', array( '%max' => $max ) );
-        $record = expAiPackageService::keep( $file->attribute( 'filename' ), 'upload', (int) $user->attribute( 'contentobject_id' ) );
+        $record = expAiPackageService::keep( $file->attribute( 'filename' ), 'upload', (int) $user->attribute( 'contentobject_id' ),
+                                             (string) $file->attribute( 'original_filename' ) );
         return $Module->redirectTo( '/expai/packages/(package)/' . $record->attribute( 'uuid' ) );
     }
     if ( $record && $Module->isCurrentAction( 'Validate' ) )
@@ -74,11 +71,11 @@ try
     {
         $report = expAiPackageService::import( $record, $options() );
         if ( $report['queued'] )
-            $notice = ezpI18n::tr( 'extension/expai/package', 'The import runs in the job queue (%jobs jobs). This page shows its progress.', null, array( '%jobs' => $report['jobs'] ) );
+            $notice = ezpI18n::tr( 'extension/expai/package', 'The import runs in the job queue. This page shows its progress.' );
         elseif ( $report['imported'] )
             $notice = ezpI18n::tr( 'extension/expai/package', 'Imported as drafts: review them below and send them for publishing.' );
         else
-            $error = ezpI18n::tr( 'extension/expai/package', 'Nothing was imported: the package has conflicts or errors and "on conflict" is "fail".' );
+            $error = ezpI18n::tr( 'extension/expai/package', 'The install as drafts failed: %error', null, array( '%error' => $report['error'] ) );
     }
 }
 catch ( expAiPackageException $e )
@@ -97,19 +94,11 @@ if ( $record )
     $report = $record->reportArray();
     if ( $queued )
         $report['import'] = $queued;
-    $data = array();
-    try
-    {
-        $data = $record->package()->data();
-    }
-    catch ( expAiPackageException $e )
-    {
-        $error = $error !== '' ? $error : $e->translatedText();
-    }
+    $kernelPackage = $record->package();
     $tpl->setVariable( 'package', $record );
+    $tpl->setVariable( 'kernel_package', $kernelPackage ? $kernelPackage : false );
     $tpl->setVariable( 'report', $report );
-    $tpl->setVariable( 'meta', array( 'package' => isset( $data['package'] ) ? (array) $data['package'] : array(),
-                                      'provenance' => isset( $data['provenance'] ) ? (array) $data['provenance'] : array() ) );
+    $tpl->setVariable( 'provenance', $kernelPackage ? expAiPackageService::provenance( $kernelPackage ) : array() );
     $tpl->setVariable( 'queued', $queued );
 }
 else
@@ -120,8 +109,8 @@ else
     $tpl->setVariable( 'offset', $offset );
     $tpl->setVariable( 'limit', $limit );
 }
-$tpl->setVariable( 'max_upload', expAiPackage::limit( 'MaxUploadBytes', 52428800 ) );
-$tpl->setVariable( 'queue_above', expAiPackage::limit( 'QueueAbove', 20 ) );
+$tpl->setVariable( 'max_upload', expAiPackageService::limit( 'MaxUploadBytes', 52428800 ) );
+$tpl->setVariable( 'queue_above', expAiPackageService::limit( 'QueueAbove', 20 ) );
 $tpl->setVariable( 'queue', expAiQueue::available() );
 $tpl->setVariable( 'notice', $notice );
 $tpl->setVariable( 'error', $error );

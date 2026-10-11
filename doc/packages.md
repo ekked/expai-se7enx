@@ -1,127 +1,110 @@
 # Content packages
 
 A content package carries objects from one place to another: from a staging installation to the live one, from a
-local copy where an agent wrote articles, from another site. On import it **always becomes drafts first**: a person
-reviews them and sends them for publishing (approval workflows apply). The format is described in
-[package-format.md](package-format.md), with its JSON Schema `share/package/schema/v1.json`; how an agent on a local
-command line produces one is in [package-authoring-for-agents.md](package-authoring-for-agents.md).
+local copy where an agent wrote articles, from another site. Since 2026-10 expai has no package format of its own:
+a content package **is an Exponential kernel package** (`.ezpkg`, Setup > Packages, `ezpm`), in the classic XML
+format or in the kernel's **JSON format** (`package.json`). The format, its JSON Schema, validation, the report of
+what an install meets and the install as drafts are the kernel's; see
+[the JSON package format](https://github.com/se7enxweb/exponential/blob/main/doc/bc/6.0/package-json-format.md)
+(`doc/bc/6.0/package-json-format.md` of the installation, schema `share/package/schema/package-v1.json`). How an agent
+on a local command line writes one: [package-authoring-for-agents.md](package-authoring-for-agents.md).
+
+What expai adds on top:
+
+| | |
+|---|---|
+| **Drafts only** | An import through expai never publishes: it is the kernel's install as drafts. A person reviews each draft and sends it for publishing (approval workflows apply). |
+| **Provenance** | Whether the content was written by AI, the models and tools, whether a person reviewed it: package metadata (`expai.ai-generated`, `expai.models`, `expai.tools`, `expai.human-reviewed`, `expai.notes`, `expai.generator`), shown on expai/packages and on the package's page on Setup > Packages. |
+| **The label** | Every draft is recorded in `expai_draft_log` with source `package` and the package, so it carries the Exponential Intelligence label in the draft lists. |
+| **The job queue** | A package with more than `QueueAbove` (20) content objects, or any with `--queue`, is installed in an `expai.package.import` job. |
+| **Data policy** | `export` refuses content whose section or class has a region or zero-retention rule ([data-policy.md](data-policy.md)) unless `--allow-restricted` (logged). |
 
 ## Trust
 
-Packages are untrusted input. There is no signing (owner decision): the manifest checksum and the sha256 of every file
-prove that a package arrived as it was written, not who wrote it. That is why an import never publishes.
+Packages are untrusted input. There is no signing: the SHA-256 of every file in `package.json` proves that a JSON
+package arrived as it was written, not who wrote it. That is why an import through expai never publishes.
 
-- A zip may contain only `package.json` and `files/<sha256>.<ext>`: no other names, no directories but `files/`, no
-  `..`, no links; sizes, file counts and the compression ratio are limited (`[PackageSettings]`).
-- `package.json` is read with a size and nesting limit.
-- Rich text in `ezxml` is parsed without network access, entities or a DOCTYPE; script, style, iframe and object
-  elements are refused; `href` values with `javascript:`, `data:` or `vbscript:` are removed. Rich text in `html` goes
-  through the kernel's input parser after the assistant's sanitizer (scripts and event handlers are removed).
-- File types are detected (finfo) and must be in `AllowedMimeTypes[]`; SVG is always refused; an image attribute
-  needs an image.
-- An attribute of a datatype a package cannot carry is refused, never skipped silently.
-- Everything is written as the importing user, with that user's `content/create` and `content/edit` permissions.
+- The archive passes the kernel's upload checks (`eZPackageUploadInspector`): a gzip compressed tar of at most
+  `package.ini [UploadSettings]` size and entries, only plain files and directories with safe relative paths.
+- The kernel validates it before it is kept: JSON documents against the schema, every document as XML (no DOCTYPE, no
+  entities, no network), the definition, the documents the items name, the checksums.
+- Only content objects are written, as drafts. Classes, settings, design files, templates, extensions and install
+  scripts of the package are not installed by expai (install the package on Setup > Packages for those, which needs
+  `package/install`).
+- Everything is written as the importing user (`user_id` of the install), with that user's policies for the parent.
 
 ## The command line
 
 ```
-./console ext:expai:package export   --subtree=<node> [--children-only] | --objects=<remote id,...> --out=<dir|file.exppkg> --login=<user>
-./console ext:expai:package validate <package>
-./console ext:expai:package diff     <package> [--remap=<prefix>]
-./console ext:expai:package import   <package> --login=<user> [--dry-run] [--on-conflict=skip|draft|fail] [--remap=<prefix>] [--parent=<node>] [--queue [--wait]]
-./console ext:expai:package checksum <package dir> [--write]
+./console ext:expai:package export   --subtree=<node> --out=<dir> --login=<user> -s <admin siteaccess> [--name=..] [--summary=..] [--languages=eng-US,ger-DE]
+                                     [--format=json|xml] [--ai-generated] [--models=a,b] [--tools=a,b] [--notes=..] [--allow-restricted]
+./console ext:expai:package validate <archive or directory>
+./console ext:expai:package check    <archive> --login=<user>
+./console ext:expai:package import   <archive> --login=<user> [--dry-run] [--existing=update|skip] [--parent=<node>] [--queue [--wait]]
 ./console ext:expai:package show     <uuid>
 ```
 
-`<package>` is a directory with `package.json`, a `.exppkg` / `.zip` file, or a `package.json` file. `--languages=eng-US,ger-DE`
-limits export, diff and import to some translations; `--json` prints the report as JSON.
+`--json` prints the report as JSON. The kernel's own commands do the same without the expai parts:
+`ezpm export <package> --format=json`, `ezpm validate`, `ezpm check`, `ezpm install <package> --as-drafts`.
 
-### Export
+- **export** (policy `expai/package_export`): the subtree as a kernel package (JSON by default), content only (no
+  classes, no templates), with its provenance as metadata, written as `<name>-1.0-1.json.ezpkg`. The kernel's handler
+  follows the siteaccess's `ShowHiddenNodes`: with `-s <admin siteaccess>` hidden content is included, with a public
+  siteaccess it is not. The command prints how many objects the package holds.
+- **validate**: the kernel's checks; nothing is kept or imported.
+- **check** (policy `expai/package_import`): keeps the package (validated, imported into the package repository
+  `local`) and prints what an install meets here, per object by remote id: `create`, `update` (exists: a new draft),
+  `conflict` (the remote id is an object of another class, or a node remote id belongs to another object), `error`
+  (the class is missing), and where each location goes.
+- **import** (policy `expai/package_import`, `--login` required): keeps the package and installs it as drafts.
+  `--existing=update` (default) gives an existing object a new draft, `skip` leaves it alone. `--parent` names the
+  parent of the package's top objects (node id, node remote id or URL path; default the content root).
+  `--dry-run` reports only.
+- **show**: a kept package and its last reports.
 
-As the user of `--login` (policy `expai/package_export`): only what the user may read. A subtree is written parents
-first. Ids become remote ids: parents (`object_remote_id` of an object in the package, else the parent node's remote id
-and URL path), relations, links and embeds in rich text (links to URLs become `href`). Images and files are copied
-once each under their sha256. Each object carries `expected` (exists, modified, current version, content hash) for
-conflict detection on the same installation. Attributes of datatypes a package cannot carry are left out and listed
-in the package's `warnings`.
+The commands `diff` and `checksum` of the former expai-only format are gone: the kernel writes the checksums of a JSON
+package itself, and `check` reports by remote id.
 
-The data policy applies: content whose section or class has a region or zero-retention rule ([data-policy.md](data-policy.md))
-may end up wherever the package goes, so it is refused unless `--allow-restricted` is given (logged).
+### Drafts and parents
 
-### Validate
-
-The format, the manifest checksum (required unless `RequireChecksum=disabled`), every file (sha256, size, type),
-classes, attributes and their datatypes, languages of the installation, rich text, relations and parents that can be
-resolved. Errors make a package unusable; warnings (a parent that cannot be found, a relation to an object that does
-not exist) are imported anyway.
-
-### Diff and dry run
-
-`diff` compares every attribute of every object with the published content, in the package's own form (rich text as
-canonical XML, files by their sha256, dates as timestamps; rich text given as `html` is compared as text). Nothing is
-written. `import --dry-run` adds the plan: per object `create`, `update`, `conflict`, `error` or `wait_parent`.
-
-### Import
-
-| Object | Draft |
-| --- | --- |
-| remote id new | **create**: one new object (version 1, a draft) with every translation of the package, below the parent of its main location; additional locations as further node assignments |
-| remote id exists, same class | **update**: one draft per translation (a new translation is copied from the main language first) |
-| a parent that is another object of the package and not published yet | **wait_parent**: import again after publishing the parent |
-| remote id of another class, unknown class or attribute | **error** |
-
-Conflicts (only without `--remap`):
-
-- the package expected a new object (`expected.exists: false`) and the remote id exists;
-- the object was modified after the export the package was made from (`expected.modified`);
-- its content changed since (`expected.content_hash`).
-
-`--on-conflict=skip` (default) leaves such an object alone, `draft` writes a draft anyway and reports it as a conflict
-for a person to merge, `fail` imports nothing when any object has a conflict or an error.
-
-`--remap=<prefix>` imports the package as copies: every remote id of the package's own objects becomes
-`md5(<prefix>:<remote id>)` (relations and embeds between them too), and `expected` is ignored. `--parent` names the
-parent (node id, node remote id or URL path) of every object whose parent is not in the package.
-
-Every draft is recorded in `expai_draft_log` with source `package` and the package's uuid (and the job's uuid for a
-queued import), so the drafts appear in the user's draft lists with their label.
-
-A package with more than `QueueAbove` (20) objects, or any package with `--queue`, is imported as a job group of the
-job queue: jobs of `ChunkSize` (5) objects each, in package order, class `bulk`. Each job checkpoints after every
-object, so a job that runs again does not import an object twice. `--wait` waits up to an hour for the queue's
-workers. The group's page shows the progress; it can be paused and cancelled.
+A new object becomes an object with one draft; an existing one gets a new draft version; nothing published changes.
+A draft whose parent is another new object of the package waits for it (a draft parent has no node yet): publish the
+parent, then import the package again with `--existing=update` (the parent is found by its node remote id, and the
+child's new draft gets its place). The import report lists the waiting drafts.
 
 ## Setup > Content packages (`expai/packages`)
 
 Policy `expai/package_import`. View parameters only: `(package)/<uuid>` one package, `(offset)/<n>` the list.
 
-1. **Upload** a `.exppkg` / `.zip` file or a `package.json` (up to `MaxUploadBytes`; larger packages with the command
-   line). It is kept in `var/<vardir>/expai/packages/<uuid>/` (never served) and validated at once.
-2. **Validation** report: errors and warnings.
-3. **Dry run** with the options (on conflict, parent, copies): the plan per object and the differences per language and
-   attribute (live value struck through, package value underlined).
-4. **Import as drafts**: in the request for a small package, as a job group for a large one (the page shows the
-   group's progress and collects the results of its jobs).
+1. **Upload** an `.ezpkg` (classic or JSON, up to `MaxUploadBytes`; larger packages with the command line). It is
+   validated at once and, when valid, imported into the kernel's package repository (`local`), where Setup > Packages
+   shows it too. A package of the same name that expai imported before is replaced; a package of the same name that
+   came another way is not touched (rename yours).
+2. **Validation**: the kernel's report, errors and warnings.
+3. **Dry run**: what an install meets here, per object by remote id, with the options (existing objects, parent).
+4. **Import as drafts**: in the request for a small package, as a queue job for a large one (the page shows the job's
+   progress and collects its result).
 5. The results link to every draft (`content/versionview`), where it is reviewed, edited and sent for publishing.
 
-A user sees the packages they uploaded; with `expai/log` all of them.
+A user sees the packages they uploaded; with `expai/log` all of them. The page links to the package on Setup >
+Packages and to its JSON download.
 
 ## Settings
 
-`[PackageSettings]` ([configuration.md](configuration.md#packagesettings-content-packages)): `MaxObjects`, `MaxFiles`, `MaxBytes`,
-`MaxFileBytes`, `MaxJsonBytes`, `MaxCompressionRatio`, `MaxUploadBytes`, `QueueAbove`, `ChunkSize`, `RequireChecksum`,
-`AllowedMimeTypes[]`, `StringDatatypes[]`.
+`[PackageSettings]` ([configuration.md](configuration.md#packagesettings-content-packages)): `MaxUploadBytes`,
+`QueueAbove`. The format's own settings are the kernel's: `package.ini [PackageFormatSettings]` and `[UploadSettings]`.
 
 ## Tables
 
-`expai_package` (one row per stored package: name, checksum, counts, storage, user, state uploaded / valid / invalid /
-importing / imported / failed, the reports of validation, dry run and import as JSON). See [database.md](database.md).
+`expai_package` (one row per kept package: name, the SHA-256 of the archive, the format (`format_version`: `xml` or
+`json`), counts, the kernel package's name (`storage`), user, state uploaded / valid / invalid / importing / imported /
+failed, the reports of validation, dry run and import as JSON). See [database.md](database.md).
 
 ## Tests
 
-`tests/expaipackage_test.php`: a subtree with a translation, rich text with a link and an embed, an image, a file,
-keywords, a relation and a nested object is exported, validated, imported into another folder as copies (drafts),
-published, imported again for the nested object, published, and the diff shows no difference; conflicts of each kind;
-refused packages (checksum, file hashes, `..` and foreign names in a zip, script, DOCTYPE with an external entity, an
-unsupported datatype, an unknown class); script removed from html rich text; 200 objects imported through the queue
-(40 jobs).
+`tests/expaipackage_test.php`: a test subtree with a translation, rich text with a link and an embed, an image, a
+file, keywords, a relation and a nested object is exported with provenance (JSON), validated, kept (the conflict
+report says update for every object), imported as drafts of the existing objects (nothing published changes, every
+draft in the draft log with the package), removed and imported again as new drafts (the children wait for their
+parent), published parent first; refused archives (a file whose checksum does not match, a path outside the package);
+the data policy refusal; a queued import through the job queue.

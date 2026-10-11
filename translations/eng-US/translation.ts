@@ -954,6 +954,122 @@
         <source>The file is larger than %max bytes; import larger packages with ./console ext:expai:package import.</source>
         <translation>The file is larger than %max bytes; import larger packages with ./console ext:expai:package import.</translation>
     </message>
+    <message>
+        <source>Format</source>
+        <translation>Format</translation>
+    </message>
+    <message>
+        <source>Classic XML</source>
+        <translation>Classic XML</translation>
+    </message>
+    <message>
+        <source>SHA-256</source>
+        <translation>SHA-256</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation>Tools</translation>
+    </message>
+    <message>
+        <source>The package on Setup &gt; Packages</source>
+        <translation>The package on Setup &gt; Packages</translation>
+    </message>
+    <message>
+        <source>Download as JSON</source>
+        <translation>Download as JSON</translation>
+    </message>
+    <message>
+        <source>An import only writes drafts, as you, with your permissions; classes, settings and design files of the package are not installed. Publishing the drafts is a separate step (approval workflows apply). Make a dry run first.</source>
+        <translation>An import only writes drafts, as you, with your permissions; classes, settings and design files of the package are not installed. Publishing the drafts is a separate step (approval workflows apply). Make a dry run first.</translation>
+    </message>
+    <message>
+        <source>An object that exists already</source>
+        <translation>An object that exists already</translation>
+    </message>
+    <message>
+        <source>gets a new draft</source>
+        <translation>gets a new draft</translation>
+    </message>
+    <message>
+        <source>is left alone</source>
+        <translation>is left alone</translation>
+    </message>
+    <message>
+        <source>Parent of the package's top objects (node id, node remote id or path; default: the content root)</source>
+        <translation>Parent of the package's top objects (node id, node remote id or path; default: the content root)</translation>
+    </message>
+    <message>
+        <source>Locations</source>
+        <translation>Locations</translation>
+    </message>
+    <message>
+        <source>object %id</source>
+        <translation>object %id</translation>
+    </message>
+    <message>
+        <source>top</source>
+        <translation>top</translation>
+    </message>
+    <message>
+        <source>the node remote id is another object's</source>
+        <translation>the node remote id is another object's</translation>
+    </message>
+    <message>
+        <source>%count drafts wait for a parent that is a draft of this package too: publish the parent, then import the package again.</source>
+        <translation>%count drafts wait for a parent that is a draft of this package too: publish the parent, then import the package again.</translation>
+    </message>
+    <message>
+        <source>Not installed (only content is imported as drafts)</source>
+        <translation>Not installed (only content is imported as drafts)</translation>
+    </message>
+    <message>
+        <source>Draft</source>
+        <translation>Draft</translation>
+    </message>
+    <message>
+        <source>A package is an .ezpkg file in the classic or the JSON format, up to %max. It is validated at once and kept on Setup &gt; Packages; nothing is imported until you ask for it, and then only as drafts.</source>
+        <translation>A package is an .ezpkg file in the classic or the JSON format, up to %max. It is validated at once and kept on Setup &gt; Packages; nothing is imported until you ask for it, and then only as drafts.</translation>
+    </message>
+    <message>
+        <source>The import runs in the job queue. This page shows its progress.</source>
+        <translation>The import runs in the job queue. This page shows its progress.</translation>
+    </message>
+    <message>
+        <source>The install as drafts failed: %error</source>
+        <translation>The install as drafts failed: %error</translation>
+    </message>
+    <message>
+        <source>The directory %dir does not exist.</source>
+        <translation>The directory %dir does not exist.</translation>
+    </message>
+    <message>
+        <source>The package name %name is not valid.</source>
+        <translation>The package name %name is not valid.</translation>
+    </message>
+    <message>
+        <source>The subtree of node %id could not be packaged.</source>
+        <translation>The subtree of node %id could not be packaged.</translation>
+    </message>
+    <message>
+        <source>The package could not be written to %file.</source>
+        <translation>The package could not be written to %file.</translation>
+    </message>
+    <message>
+        <source>The file is not a package that can be imported: %reason</source>
+        <translation>The file is not a package that can be imported: %reason</translation>
+    </message>
+    <message>
+        <source>The package cannot be read: %reason</source>
+        <translation>The package cannot be read: %reason</translation>
+    </message>
+    <message>
+        <source>The package is not in the package repository (any more).</source>
+        <translation>The package is not in the package repository (any more).</translation>
+    </message>
+    <message>
+        <source>The parent %parent was not found.</source>
+        <translation>The parent %parent was not found.</translation>
+    </message>
 </context>
 <!-- expai lanes/budgets/packages: end -->
 <context>

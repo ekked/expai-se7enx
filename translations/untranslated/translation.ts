@@ -954,6 +954,122 @@
         <source>The file is larger than %max bytes; import larger packages with ./console ext:expai:package import.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Classic XML</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SHA-256</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The package on Setup &gt; Packages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download as JSON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An import only writes drafts, as you, with your permissions; classes, settings and design files of the package are not installed. Publishing the drafts is a separate step (approval workflows apply). Make a dry run first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An object that exists already</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>gets a new draft</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>is left alone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parent of the package's top objects (node id, node remote id or path; default: the content root)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Locations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>object %id</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>the node remote id is another object's</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count drafts wait for a parent that is a draft of this package too: publish the parent, then import the package again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not installed (only content is imported as drafts)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draft</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A package is an .ezpkg file in the classic or the JSON format, up to %max. It is validated at once and kept on Setup &gt; Packages; nothing is imported until you ask for it, and then only as drafts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The import runs in the job queue. This page shows its progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The install as drafts failed: %error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The directory %dir does not exist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The package name %name is not valid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The subtree of node %id could not be packaged.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The package could not be written to %file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The file is not a package that can be imported: %reason</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The package cannot be read: %reason</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The package is not in the package repository (any more).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The parent %parent was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <!-- expai lanes/budgets/packages: end -->
 <context>

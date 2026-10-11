@@ -1,5 +1,6 @@
-{* expai/packages: content packages (upload, validate, dry run, import as drafts). Variables: package (expAiPackageRecord)
-   with report, meta, queued; or packages, count, offset, limit. Never publishes. *}
+{* expai/packages: content packages, a thin layer on the kernel's packages (upload, validation, what an install meets
+   here, install as drafts). Variables: package (expAiPackageRecord) with kernel_package (eZPackage or false), report,
+   provenance, queued; or packages, count, offset, limit. Never publishes. Format: doc/bc/6.0/package-json-format.md *}
 <div class="exp-ai exp-ai-packages-page">
     <header class="exp-ai-head">
         <span class="exp-ai-mark" aria-hidden="true"></span>
@@ -19,14 +20,24 @@
         <h2 id="exp-ai-pkg-facts">{'Package'|i18n( 'extension/expai/package' )}</h2>
         <dl class="exp-ai-figures">
             <div><dt>{'State'|i18n( 'extension/expai/package' )}</dt><dd><span class="exp-ai-pill exp-ai-pkg-{$package.state|wash}">{$package.state|wash}</span></dd></div>
+            <div><dt>{'Format'|i18n( 'extension/expai/package' )}</dt><dd>{if eq( $package.format_version, 'json' )}JSON{else}{'Classic XML'|i18n( 'extension/expai/package' )}{/if}</dd></div>
             <div><dt>{'Objects'|i18n( 'extension/expai/package' )}</dt><dd>{$package.object_count|wash}</dd></div>
             <div><dt>{'Files'|i18n( 'extension/expai/package' )}</dt><dd>{$package.file_count|wash} ({$package.bytes|si( byte )})</dd></div>
-            <div><dt>{'Checksum'|i18n( 'extension/expai/package' )}</dt><dd><code title="{$package.checksum|wash}">{$package.checksum|shorten( 16 )|wash}</code></dd></div>
+            <div><dt>{'SHA-256'|i18n( 'extension/expai/package' )}</dt><dd><code title="{$package.checksum|wash}">{$package.checksum|shorten( 16 )|wash}</code></dd></div>
             <div><dt>{'Uploaded'|i18n( 'extension/expai/package' )}</dt><dd>{$package.created|l10n( 'shortdatetime' )}{if $package.user} &middot; {$package.user.login|wash}{/if}</dd></div>
-            <div><dt>{'Made by'|i18n( 'extension/expai/package' )}</dt><dd>{first_set( $meta.package.generator.tool, '?' )|wash} {first_set( $meta.package.generator.version, '' )|wash}{if first_set( $meta.package.source_site, '' )} &middot; {$meta.package.source_site|wash}{/if}</dd></div>
-            <div><dt>{'Written by AI'|i18n( 'extension/expai/package' )}</dt><dd>{if first_set( $meta.provenance.ai_generated, false() )}{'yes'|i18n( 'extension/expai/package' )}{if first_set( $meta.provenance.models, array() )|count} ({$meta.provenance.models|implode( ', ' )|wash}){/if}{else}{'no'|i18n( 'extension/expai/package' )}{/if}</dd></div>
+            <div><dt>{'Written by AI'|i18n( 'extension/expai/package' )}</dt><dd>{if first_set( $provenance.ai_generated, false() )}{'yes'|i18n( 'extension/expai/package' )}{if first_set( $provenance.models, array() )|count} ({$provenance.models|implode( ', ' )|wash}){/if}{else}{'no'|i18n( 'extension/expai/package' )}{/if}</dd></div>
+{if first_set( $provenance.tools, array() )|count}
+            <div><dt>{'Tools'|i18n( 'extension/expai/package' )}</dt><dd>{$provenance.tools|implode( ', ' )|wash}</dd></div>
+{/if}
+{if first_set( $provenance.generator, '' )}
+            <div><dt>{'Made by'|i18n( 'extension/expai/package' )}</dt><dd>{$provenance.generator|wash}</dd></div>
+{/if}
         </dl>
-{if first_set( $meta.package.description, '' )}<p>{$meta.package.description|wash}</p>{/if}
+{if first_set( $provenance.notes, '' )}<p>{$provenance.notes|wash}</p>{/if}
+{if $kernel_package}
+        <p><a href={concat( 'package/view/full/', $kernel_package.name, '/local' )|ezurl}>{'The package on Setup > Packages'|i18n( 'extension/expai/package' )}</a>
+           &middot; <a href={concat( 'package/export/', $kernel_package.name, '/local/(format)/json' )|ezurl}>{'Download as JSON'|i18n( 'extension/expai/package' )}</a></p>
+{/if}
     </section>
 
     <section class="exp-ai-card" aria-labelledby="exp-ai-pkg-validation">
@@ -39,21 +50,19 @@
 {/if}
     </section>
 
+{if $kernel_package}
     <section class="exp-ai-card" aria-labelledby="exp-ai-pkg-actions">
         <h2 id="exp-ai-pkg-actions">{'Import as drafts'|i18n( 'extension/expai/package' )}</h2>
-        <p class="exp-ai-muted">{'An import only writes drafts, as you, with your permissions. Publishing them is a separate step (approval workflows apply). Make a dry run first.'|i18n( 'extension/expai/package' )}{if gt( $package.object_count, $queue_above )} {'This package is imported in the job queue.'|i18n( 'extension/expai/package' )}{/if}</p>
+        <p class="exp-ai-muted">{'An import only writes drafts, as you, with your permissions; classes, settings and design files of the package are not installed. Publishing the drafts is a separate step (approval workflows apply). Make a dry run first.'|i18n( 'extension/expai/package' )}{if gt( $package.object_count, $queue_above )} {'This package is imported in the job queue.'|i18n( 'extension/expai/package' )}{/if}</p>
         <form method="post" action={concat( 'expai/packages/(package)/', $package.uuid )|ezurl} class="exp-ai-pkg-form">
             <style>.exp-ai-pkg-form label {ldelim} display: block; margin: 0 0 .5em; {rdelim} .exp-ai-pkg-form input[type=text], .exp-ai-pkg-form select {ldelim} display: block; max-width: 100%; box-sizing: border-box; {rdelim}</style>
-            <label>{'On conflict'|i18n( 'extension/expai/package' )}
-                <select name="ExpAiOnConflict">
-                    <option value="skip">{'skip the object'|i18n( 'extension/expai/package' )}</option>
-                    <option value="draft">{'make a draft anyway (marked as a conflict)'|i18n( 'extension/expai/package' )}</option>
-                    <option value="fail">{'import nothing'|i18n( 'extension/expai/package' )}</option>
+            <label>{'An object that exists already'|i18n( 'extension/expai/package' )}
+                <select name="ExpAiExisting">
+                    <option value="update">{'gets a new draft'|i18n( 'extension/expai/package' )}</option>
+                    <option value="skip">{'is left alone'|i18n( 'extension/expai/package' )}</option>
                 </select></label>
-            <label>{'Parent (node id, node remote id or path; for objects whose parent is not in the package)'|i18n( 'extension/expai/package' )}
+            <label>{'Parent of the package\'s top objects (node id, node remote id or path; default: the content root)'|i18n( 'extension/expai/package' )}
                 <input type="text" name="ExpAiParent" size="30" value="" /></label>
-            <label>{'Import as copies (remap the remote ids with this prefix)'|i18n( 'extension/expai/package' )}
-                <input type="text" name="ExpAiRemap" size="20" value="" pattern="[A-Za-z0-9_.:-]{ldelim}1,40{rdelim}" /></label>
             <div class="exp-ai-pkg-buttons">
                 <input type="submit" class="button exp-ai-btn" name="ExpAiPackageValidateButton" value="{'Validate again'|i18n( 'extension/expai/package' )}" />
                 <input type="submit" class="button exp-ai-btn" name="ExpAiPackageDryRunButton" value="{'Dry run'|i18n( 'extension/expai/package' )}" {if and( $v, $v.valid|not )}disabled="disabled"{/if} />
@@ -61,24 +70,22 @@
             </div>
         </form>
     </section>
+{/if}
 
 {if $dry}
     <section class="exp-ai-card" aria-labelledby="exp-ai-pkg-dry">
         <h2 id="exp-ai-pkg-dry">{'Dry run'|i18n( 'extension/expai/package' )} <small>{$dry.at|l10n( 'shortdatetime' )}</small></h2>
-        <p>{foreach $dry.counts as $action => $n}<span class="exp-ai-pill">{$action|wash}: {$n|wash}</span> {/foreach}
-           <span class="exp-ai-pill">{'differences: %n'|i18n( 'extension/expai/package',, hash( '%n', $dry.diff.totals.differences ) )}</span></p>
+        <p>{foreach $dry.counts as $action => $n}<span class="exp-ai-pill">{$action|wash}: {$n|wash}</span> {/foreach}</p>
         <table class="list exp-ai-draft-table" cellspacing="0">
-            <thead><tr><th>{'Object'|i18n( 'extension/expai/package' )}</th><th>{'Class'|i18n( 'extension/expai/package' )}</th><th>{'Action'|i18n( 'extension/expai/package' )}</th><th>{'Differences'|i18n( 'extension/expai/package' )}</th></tr></thead>
+            <thead><tr><th>{'Object'|i18n( 'extension/expai/package' )}</th><th>{'Class'|i18n( 'extension/expai/package' )}</th><th>{'Action'|i18n( 'extension/expai/package' )}</th><th>{'Locations'|i18n( 'extension/expai/package' )}</th></tr></thead>
             <tbody>
-{foreach $dry.plan as $i => $row max 200}
-{def $d = first_set( $dry.diff.objects[$i], false() )}
+{foreach $dry.objects as $row max 500}
                 <tr>
-                    <td><code>{$row.remote_id|shorten( 40 )|wash}</code>{if ne( $row.target, $row.remote_id )}<br /><small>&rarr; {$row.target|wash}</small>{/if}</td>
-                    <td>{$row.class|wash}</td>
-                    <td>{$row.action|wash}{if $row.reasons|count}<br /><small>{$row.reasons|implode( '; ' )|wash}</small>{/if}</td>
-                    <td>{if $d}{$d.status|wash}{foreach $d.languages as $lang => $l}{if $l.differences|count}<details><summary>{$lang|wash}: {$l.differences|count}</summary><ul>{foreach $l.differences as $x max 20}<li><code>{$x.attribute|wash}</code>: <del>{$x.live|wash}</del> <ins>{$x.package|wash}</ins></li>{/foreach}</ul></details>{/if}{/foreach}{/if}</td>
+                    <td><code>{$row.remote_id|shorten( 40 )|wash}</code><br /><small>{$row.name|wash}</small></td>
+                    <td>{$row.class_identifier|wash}{if ne( $row.class, 'installed' )} <small>({$row.class|wash})</small>{/if}</td>
+                    <td>{$row.action|wash}{if $row.exists}<br /><small>{'object %id'|i18n( 'extension/expai/package',, hash( '%id', $row.object_id ) )}</small>{/if}</td>
+                    <td><small>{foreach $row.locations as $l}{if $l.parent_remote_id}{$l.parent_remote_id|shorten( 30 )|wash}{else}{'top'|i18n( 'extension/expai/package' )}{/if}: {$l.parent|wash}{if $l.node_of_other_object} &ndash; {'the node remote id is another object\'s'|i18n( 'extension/expai/package' )}{/if}<br />{/foreach}</small></td>
                 </tr>
-{undef $d}
 {/foreach}
             </tbody>
         </table>
@@ -96,16 +103,17 @@
 {undef $pr}
 {/if}
         <p>{foreach $imp.counts as $action => $n}<span class="exp-ai-pill">{$action|wash}: {$n|wash}</span> {/foreach}</p>
+{if first_set( $imp.waiting, array() )|count}<p class="exp-ai-muted">{'%count drafts wait for a parent that is a draft of this package too: publish the parent, then import the package again.'|i18n( 'extension/expai/package',, hash( '%count', $imp.waiting|count ) )}</p>{/if}
+{if first_set( $imp.skipped, array() )|count}<p class="exp-ai-muted">{'Not installed (only content is imported as drafts)'|i18n( 'extension/expai/package' )}: {foreach $imp.skipped as $s}{$s.type|wash} {$s.name|wash}{delimiter}, {/delimiter}{/foreach}</p>{/if}
 {if $imp.results|count}
         <table class="list exp-ai-draft-table" cellspacing="0">
-            <thead><tr><th>{'Object'|i18n( 'extension/expai/package' )}</th><th>{'Action'|i18n( 'extension/expai/package' )}</th><th>{'Drafts'|i18n( 'extension/expai/package' )}</th><th>{'Messages'|i18n( 'extension/expai/package' )}</th></tr></thead>
+            <thead><tr><th>{'Object'|i18n( 'extension/expai/package' )}</th><th>{'Action'|i18n( 'extension/expai/package' )}</th><th>{'Draft'|i18n( 'extension/expai/package' )}</th></tr></thead>
             <tbody>
 {foreach $imp.results as $r max 500}
                 <tr>
-                    <td><code>{$r.remote_id|shorten( 40 )|wash}</code></td>
+                    <td><code>{$r.remote_id|shorten( 40 )|wash}</code><br /><small>{$r.name|wash}</small></td>
                     <td>{$r.action|wash}</td>
-                    <td>{foreach $r.drafts as $d}{if $d.version}<a href={$d.url|ezurl}>{$d.object_id|wash}/{$d.version|wash} {$d.language|wash}</a><br />{/if}{/foreach}</td>
-                    <td><small>{foreach $r.errors as $m}<span class="exp-ai-step-failed">{$m|wash}</span><br />{/foreach}{foreach $r.warnings as $m}{$m|wash}<br />{/foreach}{foreach $r.reasons as $m}{$m|wash}<br />{/foreach}</small></td>
+                    <td>{if $r.version}<a href={$r.url|ezurl}>{$r.object_id|wash}/{$r.version|wash}</a>{/if}</td>
                 </tr>
 {/foreach}
             </tbody>
@@ -119,10 +127,10 @@
 {else}
     <section class="exp-ai-card" aria-labelledby="exp-ai-pkg-upload">
         <h2 id="exp-ai-pkg-upload">{'Upload a package'|i18n( 'extension/expai/package' )}</h2>
-        <p class="exp-ai-muted">{'A package is a .exppkg or .zip file (package.json and its files) or a package.json alone, up to %max. It is validated at once; nothing is imported until you ask for it.'|i18n( 'extension/expai/package',, hash( '%max', $max_upload|si( byte ) ) )}
+        <p class="exp-ai-muted">{'A package is an .ezpkg file in the classic or the JSON format, up to %max. It is validated at once and kept on Setup > Packages; nothing is imported until you ask for it, and then only as drafts.'|i18n( 'extension/expai/package',, hash( '%max', $max_upload|si( byte ) ) )}
            <a href="https://github.com/se7enxweb/expai/blob/main/doc/packages.md">{'How packages work'|i18n( 'extension/expai/package' )}</a></p>
         <form method="post" action={'expai/packages'|ezurl} enctype="multipart/form-data">
-            <input type="file" name="ExpAiPackageFile" accept=".exppkg,.zip,.json,application/zip,application/json" required="required" />
+            <input type="file" name="ExpAiPackageFile" accept=".ezpkg,.tgz,.gz,application/gzip,application/x-gzip" required="required" />
             <input type="submit" class="button exp-ai-btn exp-ai-btn-primary" name="ExpAiPackageUploadButton" value="{'Upload and validate'|i18n( 'extension/expai/package' )}" />
         </form>
     </section>

@@ -34,15 +34,15 @@ RetryBase=60
 MaxBackoff=3600
 Description=Polls a provider batch and hands its results to the waiting requests
 
-# Imports a slice of the objects of a content package as drafts.
+# Installs a kernel package as drafts (expai/packages, ext:expai:package import --queue).
 [JobType_expai.package.import]
 Handler=expAiPackageImportHandler
 Class=bulk
-MaxAttempts=3
-Timeout=600
-RetryBase=30
+MaxAttempts=2
+Timeout=3600
+RetryBase=60
 MaxBackoff=600
-Description=Imports objects of a content package as drafts
+Description=Installs a content package as drafts
 
 # The concurrency of each lane: jobs of the resource <provider>:<lane> at once across all workers. A 429 or a
 # retry-after halves it for a while (Adaptive); the remaining-requests headers lower it (LowWater).

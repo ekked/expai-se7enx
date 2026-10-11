@@ -352,14 +352,11 @@ See [packages.md](packages.md).
 
 | Setting | Default | Effect |
 | --- | --- | --- |
-| `MaxObjects` | `2000` | Objects in one package (and in one subtree export). |
-| `MaxFiles`, `MaxBytes`, `MaxFileBytes`, `MaxJsonBytes` | 5000, 500 MB, 50 MB, 50 MB | Files, total size, size of one file, size of package.json. |
-| `MaxCompressionRatio` | `200` | A zip entry above 1 MB compressed better than this is refused. |
 | `MaxUploadBytes` | 50 MB | The largest upload on expai/packages. |
-| `QueueAbove`, `ChunkSize` | `20`, `5` | A package with more objects is imported as a job group, `ChunkSize` objects per job. |
-| `RequireChecksum` | `enabled` | A package without a manifest checksum is refused. |
-| `AllowedMimeTypes[]` | images, PDF, text, CSV, zip, Office, mp3, mp4 | File types a package may carry (SVG never). |
-| `StringDatatypes[]` | `ezisbn`, `ezselection`, `ezcountry` | Datatypes beyond the built-in ones carried as their toString() text. |
+| `QueueAbove` | `20` | A package with more content objects is installed as drafts in the job queue (one `expai.package.import` job). |
+
+The packages are the kernel's: their format, size and upload limits are `package.ini` `[PackageFormatSettings]` and
+`[UploadSettings]` (doc/bc/6.0/package-json-format.md of Exponential).
 
 ## [McpBridge], [McpSettings], [McpServer_<id>]: MCP tools
 

@@ -8,9 +8,9 @@
  */
 
 /**
- * A package the server keeps (table expai_package): name, manifest checksum, counts, where it is stored
- * (var/<vardir>/expai/packages/<storage>/), who uploaded it, its state and the report of its last validation, dry
- * run or import (JSON).
+ * A package expai imported into the kernel's package repository (table expai_package): name, the SHA-256 of the
+ * archive (checksum), its format (format_version: xml or json), counts, the kernel package's name (storage; repository
+ * "local"), who uploaded it, its state and the report of its last validation, dry run or import (JSON).
  *
  * States: uploaded, valid, invalid, importing, imported, failed.
  */
@@ -69,16 +69,14 @@ class expAiPackageRecord extends eZPersistentObject
         return (int) eZPersistentObject::count( self::definition(), $userID ? array( 'user_id' => (int) $userID ) : null );
     }
 
-    /** @return string the directory of the package */
-    public function directory()
-    {
-        return expAiPackage::storageRoot() . '/' . preg_replace( '/[^0-9a-f-]/', '', (string) $this->attribute( 'storage' ) );
-    }
-
-    /** @return expAiPackage */
+    /** @return eZPackage|null the kernel package (repository "local", named by storage) */
     public function package()
     {
-        return expAiPackage::fromDirectory( $this->directory() );
+        $name = (string) $this->attribute( 'storage' );
+        if ( $name === '' || !eZPackageRequestGuard::isSafeName( $name ) )
+            return null;
+        $package = eZPackage::fetch( $name, false, expAiPackageService::REPOSITORY );
+        return $package instanceof eZPackage ? $package : null;
     }
 
     /** @return array */

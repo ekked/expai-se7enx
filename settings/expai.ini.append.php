@@ -438,39 +438,11 @@ Appliers[]
 MaxStoredAnswerBytes=200000
 
 [PackageSettings]
-# Content packages (doc/packages.md). Limits of one package:
-MaxObjects=2000
-MaxFiles=5000
-MaxBytes=524288000
-MaxFileBytes=52428800
-MaxJsonBytes=52428800
-MaxCompressionRatio=200
+# Content packages (doc/packages.md): the kernel's packages (classic XML or JSON format), imported as drafts.
 # The largest upload in expai/packages (larger packages: ./console ext:expai:package import)
 MaxUploadBytes=52428800
-# A package with more objects is imported as a queue job group, ChunkSize objects per job
+# A package with more content objects is installed as drafts in the job queue (one expai.package.import job)
 QueueAbove=20
-ChunkSize=5
-# enabled: a package without a manifest checksum is refused
-RequireChecksum=enabled
-# The file types a package may carry (finfo); SVG is always refused
-AllowedMimeTypes[]
-AllowedMimeTypes[]=image/jpeg
-AllowedMimeTypes[]=image/png
-AllowedMimeTypes[]=image/gif
-AllowedMimeTypes[]=image/webp
-AllowedMimeTypes[]=application/pdf
-AllowedMimeTypes[]=text/plain
-AllowedMimeTypes[]=text/csv
-AllowedMimeTypes[]=application/zip
-AllowedMimeTypes[]=application/vnd.openxmlformats-officedocument.wordprocessingml.document
-AllowedMimeTypes[]=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-AllowedMimeTypes[]=audio/mpeg
-AllowedMimeTypes[]=video/mp4
-# Datatypes beyond the built-in ones whose value travels as their toString() text (and is written with fromString())
-StringDatatypes[]
-StringDatatypes[]=ezisbn
-StringDatatypes[]=ezselection
-StringDatatypes[]=ezcountry
 
 [AssistantSettings]
 # The most provider calls one message of the editor may lead to (each tool round is one call).
