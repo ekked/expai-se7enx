@@ -84,7 +84,6 @@ A working loop:
     "root": ["package",{"version":"3.5.2","development":"false","install_type":"install"},
         ["name","autumn_articles"],
         ["summary","Autumn articles"],
-        ["ezpublish",["version","6.0.15"],["named-version","6.0"]],
         ["packaging",["timestamp","1791763200"],["host","localhost"]],
         ["version",["number","1.0"],["release","1"]],
         ["licence","GPL-2.0-or-later"],
@@ -115,7 +114,7 @@ A working loop:
                         ["ezobject:object-translation",{"language":"eng-US","object_name":"Leaves and light"},
                             ["ezobject:attribute",{"ezremote:identifier":"name","type":"ezstring"},["text","Leaves and light"]],
                             ["ezobject:attribute",{"ezremote:identifier":"short_description","type":"ezxmltext"},
-                                ["#xml","<section xmlns:image=\"http://ez.no/namespaces/ezpublish3/image/\" xmlns:xhtml=\"http://ez.no/namespaces/ezpublish3/xhtml/\" xmlns:custom=\"http://ez.no/namespaces/ezpublish3/custom/\"><paragraph>The first cold <strong>morning</strong>.</paragraph></section>"]
+                                ["#xml","<section><paragraph>The first cold <strong>morning</strong>.</paragraph></section>"]
                             ]
                         ],
                         ["ezobject:node-assignment-list",
@@ -129,7 +128,8 @@ A working loop:
 }
 ```
 
-`ezpublish` and `packaging` are required by the upload check (any values). Attributes the package leaves out keep
+`packaging` and the element that names the Exponential version and named version are required by the upload check
+(any values; copy the version element from an exported package.json, it is left out above). Attributes the package leaves out keep
 their class defaults; an attribute is written by its `ezremote:identifier`. Pack the directory with
 `php ezpm.php convert <dir> autumn_articles-1.0-1.json.ezpkg --to=json` (which also writes the checksums).
 `ezpm validate` and `ext:expai:package check` say what is wrong before anything is written.
