@@ -29,6 +29,12 @@ $FunctionList['waiting_for_my_approval'] = array( 'name' => 'waiting_for_my_appr
                                                   'call_method' => array( 'class' => 'expAiFunctionCollection', 'method' => 'fetchWaitingForMyApproval' ),
                                                   'parameter_type' => 'standard',
                                                   'parameters' => array() );
+// budgets (classes/budget/): fetch( 'expai', 'budget_status' ) the monthly site budget of queued requests (users with expai/log)
+$FunctionList['budget_status'] = array( 'name' => 'budget_status',
+                                        'operation_types' => array( 'read' ),
+                                        'call_method' => array( 'class' => 'expAiBudgetFunctionCollection', 'method' => 'fetchStatus' ),
+                                        'parameter_type' => 'standard',
+                                        'parameters' => array() );
 $FunctionList['models'] = array( 'name' => 'models',
                                  'operation_types' => array( 'read' ),
                                  'call_method' => array( 'class' => 'expAiFunctionCollection', 'method' => 'fetchModels' ),

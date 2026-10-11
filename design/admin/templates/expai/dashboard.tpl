@@ -187,6 +187,13 @@
 {/if}
             </section>
 
+{* the monthly budget of queued requests (users with expai/log; doc/budgets.md) *}
+{def $budget_status = fetch( 'expai', 'budget_status' )}
+{if $budget_status}
+            {include uri='design:expai/parts/budget_summary.tpl' status=$budget_status}
+{/if}
+{undef $budget_status}
+
 {if $waiting|count}
             <section class="exp-ai-card" aria-labelledby="exp-ai-waiting-title">
                 <h2 id="exp-ai-waiting-title">{'Waiting for my approval'|i18n( 'extension/expai/dashboard' )}</h2>

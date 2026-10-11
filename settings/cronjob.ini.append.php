@@ -7,6 +7,8 @@
 ExtensionDirectories[]=expai
 
 [CronjobPart-expai]
+# queued requests: resumes the jobs a budget held once they fit, releases requests of a lost batch submit
+Scripts[]=expai_queue.php
 Scripts[]=expai_prune.php
 
 */ ?>

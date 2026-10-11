@@ -194,6 +194,269 @@ InputPerMTok=0
 OutputPerMTok=0
 Slow=true
 
+# Examples of providers with lanes (not active until listed in [ProviderSettings] Providers[] and given a key).
+[Provider_openai]
+Type=openai_chat
+Flavor=openai
+Label=OpenAI
+BaseURL=https://api.openai.com/v1
+ApiKey=
+Region=us
+Retention=30d
+TermsCheckedAt=
+Timeout=115
+
+# Gemini through its OpenAI-compatible endpoint; its batch lane uses the native API ([Lane_gemini.batch] BatchURL).
+[Provider_gemini]
+Type=openai_chat
+Flavor=generic
+Label=Google Gemini
+BaseURL=https://generativelanguage.googleapis.com/v1beta/openai
+ApiKey=
+Region=us
+Retention=unknown
+TermsCheckedAt=
+Timeout=115
+
+# Lanes: [Lane_<provider>.<lane>] (doc/lanes.md). Every provider has the lane standard; the others are defined here.
+# Type sync | batch; Enabled; PriceMultiplier (the factor on the list price; empty: not confirmed, the lane is not
+# used); ExpectedLatency and MaxLatency (seconds); Retention inherit | none | zdr | 30d | 29d | 6w | unknown;
+# RequestParams[<name>]=<value> merged into the request; Headers[]; FallbackLane; OnUnavailable retry | escalate;
+# Timeout; Models[] (only these aliases); batch lanes: BatchApi anthropic | openai | gemini | mistral | openrouter,
+# BatchURL, MaxRequestsPerBatch, BatchCollectSeconds, PollSeconds, DeleteAfterFetch, ExpiredLane. Verified and Source
+# say when and where the offer was read. The concurrency of a lane is expqueue.ini [QueueResource_<provider>:<lane>].
+[Lane_anthropic.standard]
+Type=sync
+PriceMultiplier=1.0
+ExpectedLatency=60
+
+# Message Batches: 50% of the standard prices; most batches end within an hour, unfinished requests expire after 24
+# hours (not billed); requests and results are kept up to 29 days unless the batch is deleted, which expai does after
+# fetching the results.
+[Lane_anthropic.batch]
+Type=batch
+BatchApi=anthropic
+Enabled=true
+PriceMultiplier=0.5
+ExpectedLatency=3600
+MaxLatency=86400
+MaxRequestsPerBatch=2000
+BatchCollectSeconds=300
+PollSeconds=300
+Retention=29d
+DeleteAfterFetch=enabled
+ExpiredLane=standard
+Verified=2026-10-11
+Source=https://platform.claude.com/docs/en/build-with-claude/batch-processing
+
+# Fast mode (research preview, needs access): Opus 5.5 at 2x ($8/$40 instead of $4/$20); falls back to standard when
+# busy. Never chosen by the lane policy on its own: a request asks for it, and the user needs expai/lane_fast.
+[Lane_anthropic.fast]
+Type=sync
+Enabled=false
+PriceMultiplier=2.0
+ExpectedLatency=20
+RequestParams[]
+RequestParams[speed]=fast
+Headers[]
+Headers[]=anthropic-beta: fast-mode-2026-02-01
+FallbackLane=standard
+Models[]
+Models[]=anthropic.claude-opus-5-5
+Verified=2026-10-11
+Source=https://platform.claude.com/docs/en/build-with-claude/fast-mode
+
+# Flex processing: batch prices (0.5x) for synchronous requests, slower; "429 Resource Unavailable" is not charged.
+[Lane_openai.flex]
+Type=sync
+Enabled=true
+PriceMultiplier=0.5
+RequestParams[]
+RequestParams[service_tier]=flex
+Timeout=900
+ExpectedLatency=300
+OnUnavailable=escalate
+FallbackLane=standard
+Verified=2026-10-11
+Source=https://developers.openai.com/api/docs/guides/flex-processing
+
+[Lane_openai.batch]
+Type=batch
+BatchApi=openai
+Enabled=true
+PriceMultiplier=0.5
+ExpectedLatency=3600
+MaxLatency=86400
+MaxRequestsPerBatch=2000
+BatchCollectSeconds=300
+PollSeconds=300
+Retention=30d
+DeleteAfterFetch=enabled
+ExpiredLane=standard
+Verified=2026-10-11
+Source=https://developers.openai.com/api/docs/guides/batch
+
+[Lane_gemini.batch]
+Type=batch
+BatchApi=gemini
+BatchURL=https://generativelanguage.googleapis.com/v1beta
+Enabled=true
+PriceMultiplier=0.5
+ExpectedLatency=3600
+MaxLatency=86400
+MaxRequestsPerBatch=500
+BatchCollectSeconds=300
+PollSeconds=300
+Retention=6w
+DeleteAfterFetch=enabled
+ExpiredLane=standard
+Verified=2026-10-11
+Source=https://ai.google.dev/gemini-api/docs/batch-api
+
+# Flex inference (50%, 1-15 minutes, sheddable with 429/503) is documented for the native API; whether the
+# OpenAI-compatible endpoint takes service_tier was not shown: disabled until it is tested.
+[Lane_gemini.flex]
+Type=sync
+Enabled=false
+PriceMultiplier=0.5
+RequestParams[]
+RequestParams[service_tier]=flex
+Timeout=900
+ExpectedLatency=900
+OnUnavailable=escalate
+FallbackLane=standard
+Verified=2026-10-11
+Source=https://ai.google.dev/gemini-api/docs/flex-inference
+
+[Lane_mistral.batch]
+Type=batch
+BatchApi=mistral
+Enabled=true
+PriceMultiplier=0.5
+ExpectedLatency=3600
+MaxLatency=86400
+MaxRequestsPerBatch=2000
+BatchCollectSeconds=300
+PollSeconds=300
+Retention=30d
+DeleteAfterFetch=enabled
+ExpiredLane=standard
+Verified=2026-10-11
+Source=https://docs.mistral.ai/studio/batch-processing
+
+# OpenRouter: "typically billed at 50%"; the :batch model variants carry their own prices. Confirm the price of the
+# model you use, then enable.
+[Lane_openrouter.batch]
+Type=batch
+BatchApi=openrouter
+Enabled=false
+PriceMultiplier=0.5
+ExpectedLatency=3600
+MaxLatency=86400
+MaxRequestsPerBatch=2000
+BatchCollectSeconds=300
+PollSeconds=300
+Retention=30d
+DeleteAfterFetch=enabled
+ExpiredLane=standard
+Verified=2026-10-11
+Source=https://openrouter.ai/docs/batch-quickstart
+
+# service_tier flex (OpenAI and Google endpoints only; never falls back); the price depends on the endpoint.
+[Lane_openrouter.flex]
+Type=sync
+Enabled=false
+PriceMultiplier=
+RequestParams[]
+RequestParams[service_tier]=flex
+Timeout=900
+ExpectedLatency=300
+OnUnavailable=escalate
+FallbackLane=standard
+Verified=2026-10-11
+Source=https://openrouter.ai/docs/guides/features/service-tiers
+
+[LanePolicy]
+# The lanes a queued request tries, in order, by its purpose (expAiQueue::request() option purpose), else by its
+# queue class, else Order[default]. Lanes separated by ";". standard is always the last resort; fast is never taken
+# from an order (only when a request asks for it).
+Order[]
+Order[default]=standard
+Order[bulk]=batch;flex;standard
+Order[translate]=flex;batch;standard
+Order[translate_full]=batch;flex;standard
+ClassOrder[]
+ClassOrder[interactive]=standard
+ClassOrder[editorial]=standard;flex
+ClassOrder[chain]=standard;flex
+ClassOrder[translation_patch]=flex;batch;standard
+ClassOrder[translation_full]=batch;flex;standard
+ClassOrder[bulk]=batch;flex;standard
+# The queue class of a purpose (default: editorial)
+PurposeClass[]
+PurposeClass[default]=editorial
+PurposeClass[bulk]=bulk
+PurposeClass[translate]=translation_patch
+PurposeClass[translate_full]=translation_full
+# A request of this priority or higher skips flex and batch lanes (0: never)
+UrgentPriority=80
+# enabled: a deadline is checked against a batch lane's MaxLatency instead of its ExpectedLatency
+StrictDeadline=disabled
+
+[Budgets]
+# The monthly budget of the whole site (in [Pricing] Currency) for queued requests: what every request of the month
+# cost plus what queued requests reserved must stay below it, or new and waiting requests are held. Empty: [Limits]
+# MaxCostPerSitePerMonth, else none.
+SiteMonthly=
+# The budget of a new job group when its producer names none (empty: none)
+DefaultGroupBudget=
+# A queued request reserves its estimate times this factor
+ReserveFactor=1.25
+# Estimates: characters per token of the request text, and the share of max_tokens expected as output
+CharsPerToken=3.5
+OutputShareOfMax=0.5
+
+[QueueSettings]
+# Classes that apply the answer of a queued request: Appliers[<name>]=<class implementing expAiRequestApplier>
+Appliers[]
+# The longest answer kept in a job's checkpoint, in bytes
+MaxStoredAnswerBytes=200000
+
+[PackageSettings]
+# Content packages (doc/packages.md). Limits of one package:
+MaxObjects=2000
+MaxFiles=5000
+MaxBytes=524288000
+MaxFileBytes=52428800
+MaxJsonBytes=52428800
+MaxCompressionRatio=200
+# The largest upload in expai/packages (larger packages: ./console ext:expai:package import)
+MaxUploadBytes=52428800
+# A package with more objects is imported as a queue job group, ChunkSize objects per job
+QueueAbove=20
+ChunkSize=5
+# enabled: a package without a manifest checksum is refused
+RequireChecksum=enabled
+# The file types a package may carry (finfo); SVG is always refused
+AllowedMimeTypes[]
+AllowedMimeTypes[]=image/jpeg
+AllowedMimeTypes[]=image/png
+AllowedMimeTypes[]=image/gif
+AllowedMimeTypes[]=image/webp
+AllowedMimeTypes[]=application/pdf
+AllowedMimeTypes[]=text/plain
+AllowedMimeTypes[]=text/csv
+AllowedMimeTypes[]=application/zip
+AllowedMimeTypes[]=application/vnd.openxmlformats-officedocument.wordprocessingml.document
+AllowedMimeTypes[]=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+AllowedMimeTypes[]=audio/mpeg
+AllowedMimeTypes[]=video/mp4
+# Datatypes beyond the built-in ones whose value travels as their toString() text (and is written with fromString())
+StringDatatypes[]
+StringDatatypes[]=ezisbn
+StringDatatypes[]=ezselection
+StringDatatypes[]=ezcountry
+
 [AssistantSettings]
 # The most provider calls one message of the editor may lead to (each tool round is one call).
 # The last allowed call is made without tools, so the assistant always answers in words.
