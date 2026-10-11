@@ -520,6 +520,13 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
             $assistant = ( new expAiAssistant( $config ) )->useConversation( $conversation, $options );
             $result = $assistant->step( $nodeID, self::post( 'continue' ) === '1' ? null : self::post( 'message' ) );
             $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) );
+            // an approved plan run in the browser: done when its last item (a queued follow-up) has had its turn
+            if ( $fresh && ( !isset( $result['status'] ) || $result['status'] !== 'continue' ) && !expAiFollowup::waiting( (int) $fresh->attribute( 'id' ) ) )
+            {
+                $plan = expAiPlan::fetchByID( (int) $fresh->attribute( 'plan_id' ) );
+                if ( $plan && $plan->attribute( 'state' ) === 'running' )
+                    expAiPlanner::complete( $fresh );
+            }
             $result['thread'] = expAiVector::detail( $fresh ?: $thread, self::userID(), $config );
             $result['drafts'] = expAiVector::drafts( $fresh ?: $thread );
             $result['read_only'] = $readOnly;
@@ -775,6 +782,104 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
             return self::changesAnswer( $thread, array( 'result' => $result ) );
         } );
     }
+
+    /* ----------------------------------------------- plan mode (doc/plan-mode.md) */
+
+    /** @return expAiPlan the thread's plan named by POST "plan" */
+    protected static function loadPlan( expAiThread $thread )
+    {
+        $plan = expAiPlan::fetchByID( (int) self::post( 'plan' ) );
+        if ( !$plan || (int) $plan->attribute( 'thread_id' ) !== (int) $thread->attribute( 'id' ) )
+            throw new expAiException( 'This plan does not exist any more.' );
+        return $plan;
+    }
+
+    /** @return array the Plan tab: the plan with its estimate, the limits it touches, money texts */
+    protected static function planAnswer( expAiThread $thread, ?expAiPlan $plan, ?expAiConfig $config = null, array $extra = array() )
+    {
+        $config = $config ?: expAiConfig::instance();
+        if ( !$plan )
+            return $extra + array( 'plan' => null, 'can_decide' => false );
+        $out = $plan->present();
+        $e = $out['estimate'];
+        $money = function ( $micros ) { return expAiCost::enabled() ? expAiBudget::money( (int) $micros ) : ''; };
+        $out['money'] = array( 'low' => $money( isset( $e['low_micros'] ) ? $e['low_micros'] : 0 ), 'expected' => $money( isset( $e['expected_micros'] ) ? $e['expected_micros'] : 0 ),
+                               'high' => $money( isset( $e['high_micros'] ) ? $e['high_micros'] : 0 ),
+                               'actual' => isset( $e['actual_micros'] ) ? $money( $e['actual_micros'] ) : '' );
+        $out['lane_money'] = array();
+        foreach ( isset( $e['lanes'] ) ? (array) $e['lanes'] : array() as $lane )
+            $out['lane_money'][] = array( 'name' => $lane['name'], 'label' => $lane['label'], 'batch' => !empty( $lane['batch'] ),
+                                          'low' => $money( $lane['low'] ), 'expected' => $money( $lane['expected'] ), 'high' => $money( $lane['high'] ) );
+        $out['item_money'] = array();
+        foreach ( isset( $e['items'] ) ? (array) $e['items'] : array() as $row )
+            $out['item_money'][(int) $row['index']] = $money( $row['micros'] );
+        $out['tokens'] = isset( $e['tokens'] ) ? expAiCost::tokens( (int) $e['tokens'] ) : '';
+        $out['cost_enabled'] = expAiCost::enabled();
+        $out['limits'] = $plan->attribute( 'state' ) === 'proposed'
+            ? ( new expAiPlanEstimate( $config ) )->limits( isset( $e['expected_micros'] ) ? (int) $e['expected_micros'] : 0, (int) $thread->attribute( 'user_id' ) )
+            : array( 'rows' => array(), 'ok' => true, 'message' => '' );
+        return $extra + array( 'plan' => $out, 'can_decide' => $plan->attribute( 'state' ) === 'proposed' && expAiThreadAccess::canWrite( $thread ) && expAiVector::allowed() );
+    }
+
+    /** plan: the current plan of a thread (thread) */
+    public static function plan( $args )
+    {
+        $config = self::guard();
+        self::releaseSession();
+        return self::run( function () use ( $config )
+        {
+            $thread = self::loadThread();
+            return self::planAnswer( $thread, expAiPlan::fetchCurrent( (int) $thread->attribute( 'id' ) ), $config );
+        } );
+    }
+
+    /** plan_estimate: the estimate of a proposed plan with the editor's selection (thread, plan, selected=[indexes], summaries={index: text}); not stored */
+    public static function plan_estimate( $args )
+    {
+        $config = self::guard( true );
+        self::releaseSession();
+        return self::run( function () use ( $config )
+        {
+            $thread = self::loadThread( true );
+            $plan = self::loadPlan( $thread );
+            if ( $plan->attribute( 'state' ) === 'proposed' )
+                expAiPlanner::edit( $plan, $thread, isset( $_POST['selected'] ) ? self::postJson( 'selected' ) : null, self::postJson( 'summaries' ), $config );
+            return self::planAnswer( $thread, $plan, $config );
+        } );
+    }
+
+    /**
+     * plan_decide: op=approve (selected, summaries: the editor's edits; limits and budgets are checked; the items run
+     * in the queue, or in the browser as queued follow-ups when there is no queue) | reject.
+     */
+    public static function plan_decide( $args )
+    {
+        $config = self::guard( true, true );
+        self::releaseSession();
+        return self::run( function () use ( $config )
+        {
+            $thread = self::loadThread( true );
+            $plan = self::loadPlan( $thread );
+            if ( self::post( 'op' ) === 'reject' )
+            {
+                expAiPlanner::reject( $thread, $plan );
+                return self::planAnswer( $thread, $plan, $config, array( 'thread' => expAiVector::detail( expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ) ?: $thread, self::userID(), $config ) ) );
+            }
+            if ( self::post( 'op' ) !== 'approve' )
+                throw new expAiException( 'Unknown decision.' );
+            $reason = expAiThreadAccess::check( $thread->scope(), 'staged' );
+            if ( $reason !== '' )
+                throw new expAiException( $reason );
+            $run = expAiPlanner::approve( $thread, $plan, isset( $_POST['selected'] ) ? self::postJson( 'selected' ) : null, self::postJson( 'summaries' ), $config );
+            $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ) ?: $thread;
+            $followups = array();
+            foreach ( expAiFollowup::waiting( (int) $fresh->attribute( 'id' ) ) as $followup )
+                $followups[] = $followup->present();
+            return self::planAnswer( $fresh, expAiPlan::fetchByID( (int) $plan->attribute( 'id' ) ), $config,
+                                     array( 'run' => $run, 'thread' => expAiVector::detail( $fresh, self::userID(), $config ), 'followups' => $followups ) );
+        } );
+    }
+
     /** No caching */
     public static function getCacheTime( $functionName )
     {

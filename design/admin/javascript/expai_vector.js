@@ -501,10 +501,160 @@
                 if ( h ) { review.active = { change: h.getAttribute( 'data-change' ), hunk: h.getAttribute( 'data-hunk' ) }; hunkEls().forEach( function ( x ) { x.classList.toggle( 'exp-ai-v-hunk-active', x === h ); } ); }
             } );
         }
+
+        /* ------------------------------------------------ plan mode (doc/plan-mode.md) */
+
+        var plan = { data: null, selected: null, summaries: {}, seen: '', timer: null };
+
+        function planBox() { return q( '.exp-ai-v-plan' ); }
+        function planKey( t ) { return t && t.plan ? t.plan.id + ':' + t.plan.state : ''; }
+        function renderPlan() {
+            var box = planBox();
+            if ( !box ) { return; }
+            var d = plan.data, p = d && d.plan;
+            box.hidden = !p;
+            q( '[data-placeholder="plan"]' ).hidden = !!p;
+            var count = q( '[data-tab-count="plan"]' );
+            if ( count ) { count.textContent = p && p.state === 'proposed' ? '1' : ''; }
+            if ( !p ) { return; }
+            var proposed = p.state === 'proposed' && d.can_decide;
+            var items = p.items || [];
+            if ( plan.selected === null ) { plan.selected = items.filter( function ( i ) { return i.selected && !i.refused; } ).map( function ( i ) { return i.index; } ); }
+            q( '.exp-ai-v-plan-title', box ).textContent = T( 'pl_title', { '%count': items.length } );
+            q( '.exp-ai-v-plan-state', box ).textContent = T( 'pl_state_' + p.state );
+            q( '.exp-ai-v-plan-items', box ).innerHTML = '<table class="exp-ai-v-plan-table"><thead><tr><th scope="col">' + esc( T( 'pl_run' ) ) + '</th><th scope="col">#</th><th scope="col">' + esc( T( 'pl_action' ) )
+                + '</th><th scope="col">' + esc( T( 'pl_target' ) ) + '</th><th scope="col">' + esc( T( 'pl_languages' ) ) + '</th><th scope="col">' + esc( T( 'pl_fields' ) ) + '</th>'
+                + ( p.cost_enabled ? '<th scope="col">' + esc( T( 'pl_estimate_col' ) ) + '</th>' : '' ) + '</tr></thead><tbody>'
+                + items.map( function ( i ) {
+                    var on = plan.selected.indexOf( i.index ) >= 0 && !i.refused;
+                    var money = p.item_money && p.item_money[i.index] !== undefined ? p.item_money[i.index] : '';
+                    return '<tr class="' + ( i.refused ? 'exp-ai-v-plan-refused' : '' ) + ( on ? '' : ' exp-ai-v-plan-off' ) + '" data-index="' + i.index + '">'
+                         + '<td><input type="checkbox" data-plan-item="' + i.index + '" aria-label="' + esc( T( 'pl_run' ) + ' ' + ( i.index + 1 ) ) + '"' + ( on ? ' checked' : '' ) + ( proposed && !i.refused ? '' : ' disabled' ) + ' /></td>'
+                         + '<td>' + ( i.index + 1 ) + '</td><td>' + esc( T( 'pl_action_' + i.action ) ) + ( i.action === 'create' && i.class ? ' <span class="exp-ai-v-muted">' + esc( i.class ) + '</span>' : '' ) + '</td>'
+                         + '<td>' + esc( i.target_name ) + '</td><td>' + esc( ( i.languages || [] ).join( ', ' ) ) + '</td><td>' + esc( ( i.fields || [] ).join( ', ' ) ) + '</td>'
+                         + ( p.cost_enabled ? '<td>' + ( on ? esc( money ) : '' ) + '</td>' : '' ) + '</tr>'
+                         + '<tr class="exp-ai-v-plan-sub' + ( on ? '' : ' exp-ai-v-plan-off' ) + '"><td></td><td colspan="' + ( p.cost_enabled ? 6 : 5 ) + '">'
+                         + ( i.refused ? '<span class="exp-ai-v-plan-why">' + esc( T( 'pl_refused', { '%reason': i.refused } ) ) + '</span>'
+                           : ( proposed ? '<label class="exp-ai-sr" for="exp-ai-v-plan-s' + i.index + '">' + esc( T( 'pl_instruction', { '%n': i.index + 1 } ) ) + '</label>'
+                                          + '<input type="text" id="exp-ai-v-plan-s' + i.index + '" class="exp-ai-v-plan-summary" data-plan-summary="' + i.index + '" maxlength="500" value="'
+                                          + esc( plan.summaries[i.index] !== undefined ? plan.summaries[i.index] : i.summary ) + '" />'
+                                        : esc( i.summary ) ) )
+                         + '</td></tr>';
+                } ).join( '' ) + '</tbody></table>';
+            var e = p.estimate || {}, m = p.money || {}, rows = [];
+            if ( p.cost_enabled ) {
+                rows.push( [ T( 'pl_estimate' ), e.known === false || !e.expected_micros ? T( 'pl_free' ) : T( 'pl_range', { '%expected': m.expected, '%low': m.low, '%high': m.high } )
+                             + ( e.calibration && e.calibration.from >= 3 ? ' · ' + T( 'pl_calibrated', { '%count': e.calibration.from } ) : '' ) ] );
+                ( p.lane_money || [] ).forEach( function ( l ) {
+                    if ( e.expected_micros ) { rows.push( [ l.batch ? T( 'pl_lane_batch', { '%lane': l.label } ) : l.label, l.expected ] ); }
+                } );
+                if ( m.actual ) { rows.push( [ T( 'pl_actual' ), m.actual ] ); }
+                if ( app.current && app.current.reserved && p.state === 'running' ) { rows.push( [ T( 'pl_reserved' ), app.current.reserved ] ); }
+            }
+            rows.push( [ T( 'pl_tokens' ), p.tokens || '' ], [ T( 'pl_duration' ), T( 'pl_minutes', { '%count': Math.max( 1, Math.round( ( e.duration_s || 0 ) / 60 ) ) } ) ] );
+            q( '.exp-ai-v-plan-estimate', box ).innerHTML = rows.map( function ( r ) { return '<div><dt>' + esc( r[0] ) + '</dt><dd>' + esc( r[1] ) + '</dd></div>'; } ).join( '' );
+            var limits = ( p.limits && p.limits.rows ) || [];
+            q( '.exp-ai-v-plan-limits', box ).innerHTML = limits.map( function ( l ) {
+                return '<li class="' + ( l.fits ? '' : 'exp-ai-v-plan-over' ) + '">' + esc( T( 'pl_limit', { '%label': l.label, '%percent': l.percent, '%after': l.after } ) ) + '</li>';
+            } ).join( '' );
+            var meta = p.meta || {};
+            q( '.exp-ai-v-plan-meta', box ).innerHTML = [ 'assumptions', 'questions', 'risks' ].filter( function ( k ) { return meta[k] && meta[k].length; } ).map( function ( k ) {
+                return '<h4>' + esc( T( 'pl_' + k ) ) + '</h4><ul>' + meta[k].map( function ( x ) { return '<li>' + esc( x ) + '</li>'; } ).join( '' ) + '</ul>';
+            } ).join( '' );
+            showError( q( '.exp-ai-v-error', box ), p.limits && p.limits.message ? { message: p.limits.message } : null );
+            q( '.exp-ai-v-plan-actions', box ).hidden = !proposed;
+            var approve = q( '[data-plan="approve"]', box );
+            if ( approve ) { approve.disabled = !plan.selected.length || !!( p.limits && !p.limits.ok ); }
+        }
+        function takePlan( data ) {
+            var id = data && data.plan ? data.plan.id : 0;
+            if ( !plan.data || !plan.data.plan || plan.data.plan.id !== id ) {
+                plan.selected = null;
+                plan.summaries = {};
+                // a new plan that waits for the editor comes to the front
+                if ( data.plan && data.plan.state === 'proposed' && data.can_decide ) { showTab( 'plan' ); }
+            }
+            plan.data = data;
+            if ( data.thread && app.current && data.thread.uuid === app.current.uuid ) {
+                plan.seen = planKey( data.thread );
+                setHeader( data.thread );
+            } else if ( app.current ) {
+                plan.seen = planKey( app.current );
+            }
+            renderPlan();
+            return data;
+        }
+        function loadPlan() {
+            if ( !app.current ) { return Promise.resolve(); }
+            var uuid = app.current.uuid;
+            return api( 'plan', { thread: uuid } ).then( function ( data ) {
+                if ( app.current && app.current.uuid === uuid ) { takePlan( data ); }
+            } ).catch( function () {} );
+        }
+        function planEdits() {
+            return { plan: plan.data.plan.id, selected: JSON.stringify( plan.selected ), summaries: JSON.stringify( plan.summaries ) };
+        }
+        function reestimate() {
+            window.clearTimeout( plan.timer );
+            plan.timer = window.setTimeout( function () {
+                if ( !plan.data || !plan.data.plan || !app.current ) { return; }
+                api( 'plan_estimate', $.extend( { thread: app.current.uuid }, planEdits() ) ).then( function ( data ) {
+                    plan.data = data;
+                    renderPlan();
+                } ).catch( function ( err ) { showError( q( '.exp-ai-v-error', planBox() ), err ); } );
+            }, 300 );
+        }
+        function bindPlan() {
+            var box = planBox();
+            if ( !box ) { return; }
+            box.addEventListener( 'change', function ( e ) {
+                var idx = e.target.getAttribute( 'data-plan-item' );
+                if ( idx === null ) { return; }
+                idx = parseInt( idx, 10 );
+                plan.selected = plan.selected.filter( function ( i ) { return i !== idx; } );
+                if ( e.target.checked ) { plan.selected.push( idx ); }
+                reestimate();
+            } );
+            box.addEventListener( 'input', function ( e ) {
+                var idx = e.target.getAttribute( 'data-plan-summary' );
+                if ( idx !== null ) { plan.summaries[idx] = e.target.value; }
+            } );
+            box.addEventListener( 'click', function ( e ) {
+                var b = e.target.closest( '[data-plan]' );
+                if ( !b || b.disabled || !app.current || !plan.data || !plan.data.plan ) { return; }
+                var op = b.getAttribute( 'data-plan' );
+                if ( op === 'ask' ) {
+                    el.input.value = T( 'pl_ask' ) + ' ';
+                    el.input.focus();
+                    return;
+                }
+                if ( op === 'approve' && !plan.selected.length ) { toast( T( 'pl_none_selected' ) ); return; }
+                b.disabled = true;
+                showError( q( '.exp-ai-v-error', box ), null );
+                api( 'plan_decide', $.extend( { thread: app.current.uuid, op: op }, planEdits() ) ).then( function ( data ) {
+                    takePlan( data );
+                    if ( op === 'reject' ) { toast( T( 'pl_rejected' ) ); return; }
+                    var r = data.run || {};
+                    toast( T( r.mode === 'background' ? 'pl_approved_bg' : 'pl_approved_fg', { '%count': r.items || 0 } ) );
+                    loadList();
+                    if ( r.mode === 'background' ) {
+                        el.workingText.textContent = T( 'queued_background' );
+                        setBusy( true );
+                        follow( app.current.uuid ).then( function () { setBusy( false ); loadReview(); loadPlan(); loadList(); } );
+                    } else {
+                        app.followups = data.followups || [];
+                        renderFollowups();
+                        nextFollowup();
+                    }
+                } ).catch( function ( err ) { showError( q( '.exp-ai-v-error', box ), err ); } ).then( function () { b.disabled = false; } );
+            } );
+        }
+
         /** The side panes follow the thread: changes and plan reload when the thread's counts or plan changed */
         function syncSide( t ) {
             if ( !t ) { return; }
             if ( reviewKey( t ) !== review.seen ) { review.seen = reviewKey( t ); loadReview(); }
+            if ( planKey( t ) !== plan.seen ) { plan.seen = planKey( t ); loadPlan(); }
         }
 
         function stepsHtml( steps ) {
@@ -578,6 +728,7 @@
                 if ( switching ) {
                     // another thread: its own changes and plan
                     review.seen = null; review.active = null; review.editing = null;
+                    plan.seen = null; plan.data = null; plan.selected = null; plan.summaries = {};
                 }
                 setHeader( data.thread );
                 el.log.innerHTML = '';
@@ -1238,6 +1389,7 @@
         } );
         bindScopeDialog();
         bindReview();
+        bindPlan();
         window.addEventListener( 'popstate', function () {
             var m = window.location.pathname.match( /\(thread\)\/([0-9a-f-]{36})/ );
             if ( m ) { open( m[1], false ); }
