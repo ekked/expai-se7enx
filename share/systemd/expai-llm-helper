@@ -106,7 +106,7 @@ def write_status(last=''):
     os.replace(tmp, STATUS)
 
 
-def handle(request, allowed):
+def carry_out(request, allowed):
     action = request.get('action')
     model = request.get('model') or ''
     if action not in ACTIONS:
@@ -167,7 +167,7 @@ def run():
                 request = json.load(handle)
             if not isinstance(request, dict) or time.time() - float(request.get('ts', 0)) > MAX_AGE:
                 raise ValueError('malformed or older than %d s' % MAX_AGE)
-            result = handle(request, allowed)
+            result = carry_out(request, allowed)
             log('request %s by user %s: %s %s -> %s' % (str(request.get('id', ''))[:32], int(request.get('requested_by_user_id', 0)),
                                                          request.get('action'), request.get('model', ''), result))
             last = '%s %s: %s' % (request.get('action'), request.get('model', ''), result)
