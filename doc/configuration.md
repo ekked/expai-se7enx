@@ -393,3 +393,59 @@ See [mcp.md](mcp.md).
 Other settings files: `menu.ini` `Links[expai_vector]=expai/vector` (with `expai/write` and `expai/vector`),
 `ezjscore.ini` `[ezjscServer_expaivector] Class=expAiVectorServerFunctions` (`Functions[]=expai`), `cronjob.ini`
 `Scripts[]=expai_thread_prune.php` in the part `expai`.
+
+## [WebSettings], [SearchSettings], [SearchProvider_<id>], [HistorySettings], [HistoryRepository_<id>]: web and history tools
+
+See [tools.md](tools.md#web-and-history-tools) and [security.md](security.md#web-content). The tools are listed in
+`[ToolSettings] Tools[]` (`web_fetch`, `web_search`, `project_history`) and offered to users with `expai/web` once
+configured.
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `[WebSettings] AllowedDomains[]` | (none) | The sites web_fetch may read: an exact host or `*.domain` (subdomains only). Empty: web_fetch is not offered. |
+| `[WebSettings] PrivateHosts[]` | (none) | Hosts that may resolve to private, loopback or link-local addresses (an intranet documentation server). |
+| `[WebSettings] AllowedPorts[]` | (none) | Ports allowed besides 80 and 443. |
+| `[WebSettings] MaxBytes` | `524288` | The most bytes read of a page; the rest is cut. |
+| `[WebSettings] Timeout` | `10` | Seconds for the whole fetch, redirects included. |
+| `[WebSettings] MaxRedirects` | `3` | Same-host redirects followed. |
+| `[WebSettings] MaxResultChars` | `12000` | The most characters of page text returned to the model. |
+| `[WebSettings] MaxFetchesPerTurn` | `5` | web_fetch calls per turn. |
+| `[WebSettings] RespectRobots` | `enabled` | Obey robots.txt (product token `ExponentialIntelligence`). |
+| `[WebSettings] RobotsCacheTTL` | `3600` | Seconds a robots.txt is cached (var cache `expai/web`). |
+| `[WebSettings] WritesAfterWebResults` | `disabled` | `enabled`: drafts may be written in the same turn after a web_fetch or web_search result. |
+| `[SearchSettings] Provider` | `brave` | The `[SearchProvider_<id>]` used by web_search. |
+| `[SearchSettings] MaxResults` | `8` | Results per search (at most 20). |
+| `[SearchSettings] MaxSearchesPerTurn` | `3` | web_search calls per turn. |
+| `[SearchSettings] SearchResultsFetchable` | `disabled` | `enabled`: a result URL of the conversation may be fetched although its host is not allowlisted. |
+| `[HistorySettings] Repositories[]` | (none) | Repository ids, each `[HistoryRepository_<id>]`. Empty: project_history is not offered. |
+| `[HistorySettings] Roots[]` | (none) | Local clones must lie under one of these (absolute or relative to the installation root). |
+| `[HistorySettings] ExcludePaths[]` | `ai/*` | Paths never named or read; titles and note lines naming such a directory are left out. |
+| `[HistorySettings] HideUntrackedRootMarkdown` | `enabled` | Leave out titles naming a `*.md` in a clone's root that git does not track. |
+| `[HistorySettings] ShowAuthors` | `disabled` | `enabled`: commits carry the author's name. |
+| `[HistorySettings] GitBinary` | `/usr/bin/git` | The absolute path of git. |
+| `[HistorySettings] Timeout` | `10` | Seconds per git command or GitHub request. |
+| `[HistorySettings] MaxCommits` | `30` | The most commits per repository and call. |
+| `[HistorySettings] MaxCallsPerTurn` | `5` | project_history calls per turn. |
+| `[HistorySettings] MaxReleaseNotesChars` | `1500` | Release notes are cut to this length. |
+| `[HistorySettings] GitHubApi` | `https://api.github.com` | The GitHub API base (https). |
+| `[HistorySettings] ReleasesCacheTTL` | `3600` | Seconds a release list is cached (var cache `expai/history`). |
+
+| `[SearchProvider_<id>]` setting | Effect |
+| --- | --- |
+| `Label` | The name in results and the data policy. |
+| `Class` | A class extending `expAiWebSearchProvider` (`expAiWebSearchBrave` for `[SearchProvider_brave]`). |
+| `Endpoint` | The API address (https). |
+| `ApiKey` | ONLY in settings/override; without it web_search is not offered. |
+| `Region`, `Retention` | Checked against the panel node's data policy before every search (the query leaves the site). |
+| `Timeout` | Seconds per search (default 10). |
+| `SafeSearch`, `Country`, `SearchLang` | Brave's `safesearch`, `country` and `search_lang` parameters (optional). |
+
+| `[HistoryRepository_<id>]` setting | Effect |
+| --- | --- |
+| `Label` | The name shown to the model. |
+| `Path` | The local clone (relative to the installation root or absolute), under `Roots[]`; empty: releases only. |
+| `GitHub` | `owner/name` of the public repository for release notes; empty: commits only. |
+| `Branch` | The branch read (default: the checked-out HEAD). |
+
+The shipped `[SearchProvider_brave]` and the example `[HistoryRepository_example]` (not listed in `Repositories[]`)
+show the settings.

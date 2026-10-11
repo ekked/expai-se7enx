@@ -111,3 +111,81 @@ through the datatype's `fromString()` (or the rich text parser) and the attribut
 
 Non-translatable fields are skipped in another language than the object's main one. After writing, the version's
 name is computed from the class's name pattern.
+
+## Web and history tools
+
+Three read-only tools look outside the content tree. Each is offered only to a user with the policy `expai/web`
+(limitation **Tool**: `web_fetch`, `web_search`, `project_history`; without it, all three) and only once it is
+configured; a conversation keeps the tools it started with. Every result says it is data, not instructions, and the
+page text of `web_fetch` is wrapped in "Begin/End of outside data" markers. The usage log adds the host to the tool's
+entry (`host`: the fetched host, `search:<provider>`, or `history:<repositories>`), never the URL or the query.
+
+A `web_fetch` or `web_search` result counts as outside data: like an external MCP result, the rest of that turn may
+not write drafts. The model tells the editor what it found and the editor asks again ("now write the draft"); the
+next turn may write. `[WebSettings] WritesAfterWebResults=enabled` lifts this; `project_history` (the team's own
+committed work) does not stop writing.
+
+## web_fetch
+
+Fetches one page of an allowlisted site and returns it as Markdown.
+
+| Input | Type | Default |
+| --- | --- | --- |
+| `url` | string | required: an absolute http(s) address |
+| `max_chars` | integer | `[WebSettings] MaxResultChars` (12000), which is also the maximum |
+
+Result: `url`, `final_url` (after same-host redirects), `title`, `content_type`, `links` (count), `truncated`,
+`content` (Markdown: headings, paragraphs, lists, code, tables as rows, links as `[text](absolute URL)`; only `<main>`
+or a single `<article>` when the page has one; scripts, styles, forms, frames, images and hidden elements are
+dropped).
+
+Checks, in order: http or https only, no user name or password, ports 80 and 443 (plus `AllowedPorts[]`); the host
+must be on `[WebSettings] AllowedDomains[]` (an exact host, or `*.domain` for its subdomains, matched on label
+boundaries after lower-casing and punycode; IP literals only when listed exactly); the SSRF guard (below); the cap
+`MaxFetchesPerTurn` (5); robots.txt (product token `ExponentialIntelligence`; a missing robots.txt allows, an
+unreadable one refuses); at most `MaxRedirects` (3) redirects, only to the same host (a redirect elsewhere is an error
+naming the target, which the model may fetch itself if it is allowed); `Timeout` (10 s) for the whole fetch;
+`MaxBytes` (512 KB) read, the rest cut; text types only (HTML, plain text, Markdown, JSON, XML, CSV).
+
+The SSRF guard resolves the host once, refuses it if any address is loopback, private, link-local (169.254.0.0/16,
+the cloud metadata address), carrier-grade NAT, unspecified, multicast or an IPv4-mapped form of those (unless the
+host is listed in `PrivateHosts[]`), and pins the connection to the checked address, so a second DNS answer (DNS
+rebinding) cannot redirect it. Nothing but the URL is sent: no cookies, credentials, referrer or body.
+
+## web_search
+
+| Input | Type | Default |
+| --- | --- | --- |
+| `query` | string | required, 1 to 200 characters |
+| `count` | integer | `[SearchSettings] MaxResults` (8), which is also the maximum |
+
+Result: `query` and `results` (title, url, snippet, `fetchable`: whether web_fetch may read it). The service is
+`[SearchSettings] Provider` (`brave`: the Brave Search API); the tool is offered only when its `ApiKey` is set in
+settings/override. The query leaves the site, so the data policy of the panel's node is checked against the
+provider's `Region` and `Retention` first, and the tool description tells the model never to put site content into a
+query. Cap: `MaxSearchesPerTurn` (3). A result is fetchable when its host is allowlisted, or always with
+`SearchResultsFetchable=enabled` (the SSRF guard still applies). Another service is one class extending
+`expAiWebSearchProvider` (see [extending.md](extending.md)) and a `[SearchProvider_<id>]` group.
+
+## project_history
+
+| Input | Type | Default |
+| --- | --- | --- |
+| `repository` | string | all of `[HistorySettings] Repositories[]` |
+| `since` | string | YYYY-MM-DD |
+| `path` | string | a path inside the repository (commits that touch it) |
+| `search` | string | text in commit titles / messages and release notes (at most 100 characters) |
+| `limit` | integer | 10 commits per repository (at most `MaxCommits`, 30) |
+| `include` | string | `commits`, `releases` or `both` (default) |
+
+Result: per repository `commits` (short `hash`, `date`, `title`; `author` only with `ShowAuthors=enabled`) and
+`releases` (tag, name, date, url, notes cut to `MaxReleaseNotesChars`); a repository that fails has `commits_error`
+or `releases_error`. Commits come from the local clone (`[HistoryRepository_<id>] Path`, which must lie under
+`[HistorySettings] Roots[]`), read with `git log` through a runner that uses no shell (an argument list, a fixed
+format, `--literal-pathspecs`, `--end-of-options`, the search as `--fixed-strings --grep=`, a clean environment, a
+time and size limit). Releases come from the public GitHub API without a token, cached `ReleasesCacheTTL` seconds.
+
+Never shown: a path filter that matches `ExcludePaths[]` (default `ai/*`) or that git does not track (an untracked
+file is never named, read or confirmed); commit titles and release note lines that name an excluded directory or an
+untracked `*.md` in the clone's root (`HideUntrackedRootMarkdown`); author names by default. git log reads committed
+history only, never the working tree. Cap: `MaxCallsPerTurn` (5).

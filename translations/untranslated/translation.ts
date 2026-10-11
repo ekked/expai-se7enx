@@ -199,6 +199,134 @@
         <source>The job queue is not available.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>This is not a web address that can be fetched: only http and https, without user name or password, on the standard ports.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The host %host is not on the list of sites that may be fetched.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The site %host does not allow automated reading of this page (robots.txt).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The page %host did not answer in time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The page %host redirects too often.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The page %host redirects to an address that cannot be fetched.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The page redirects to another site: %target. Fetch that address instead if it is allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The page %url answered with HTTP status %status.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The address %url is not a text page (%type).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The page %host could not be reached.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The address %host could not be found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The address %host is not allowed: it points into a private network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You may not use the tool %tool.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The tool %tool may be used at most %max times per request. Work with what you have.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web search is not configured correctly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web search refused the request: the key is not valid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web search is busy or its monthly allowance is used up. Please try again later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web search did not answer properly (HTTP %status).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web search is not configured.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Give a search query of 1 to 200 characters.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The project history is not available on this server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The project history could not be read.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The project history took too long to read.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The project history is not available for this repository.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The path filter %path is not valid: give a path relative to the repository, without wildcards.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The path %path is not part of the public project history.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The release notes could not be read.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The releases of %repository are not public.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GitHub limits requests without an account; the release notes are not available right now.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is no repository %repository. Available: %list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Give the date as YYYY-MM-DD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The search text may have at most 100 characters.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/package</name>
@@ -2244,6 +2372,18 @@
     </message>
     <message>
         <source>Asked the external tool %tool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Read the web page %host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searched the web for "%query"</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Read the project history</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

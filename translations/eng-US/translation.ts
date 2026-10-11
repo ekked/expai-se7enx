@@ -199,6 +199,134 @@
         <source>The job queue is not available.</source>
         <translation>The job queue is not available.</translation>
     </message>
+    <message>
+        <source>This is not a web address that can be fetched: only http and https, without user name or password, on the standard ports.</source>
+        <translation>This is not a web address that can be fetched: only http and https, without user name or password, on the standard ports.</translation>
+    </message>
+    <message>
+        <source>The host %host is not on the list of sites that may be fetched.</source>
+        <translation>The host %host is not on the list of sites that may be fetched.</translation>
+    </message>
+    <message>
+        <source>The site %host does not allow automated reading of this page (robots.txt).</source>
+        <translation>The site %host does not allow automated reading of this page (robots.txt).</translation>
+    </message>
+    <message>
+        <source>The page %host did not answer in time.</source>
+        <translation>The page %host did not answer in time.</translation>
+    </message>
+    <message>
+        <source>The page %host redirects too often.</source>
+        <translation>The page %host redirects too often.</translation>
+    </message>
+    <message>
+        <source>The page %host redirects to an address that cannot be fetched.</source>
+        <translation>The page %host redirects to an address that cannot be fetched.</translation>
+    </message>
+    <message>
+        <source>The page redirects to another site: %target. Fetch that address instead if it is allowed.</source>
+        <translation>The page redirects to another site: %target. Fetch that address instead if it is allowed.</translation>
+    </message>
+    <message>
+        <source>The page %url answered with HTTP status %status.</source>
+        <translation>The page %url answered with HTTP status %status.</translation>
+    </message>
+    <message>
+        <source>The address %url is not a text page (%type).</source>
+        <translation>The address %url is not a text page (%type).</translation>
+    </message>
+    <message>
+        <source>The page %host could not be reached.</source>
+        <translation>The page %host could not be reached.</translation>
+    </message>
+    <message>
+        <source>The address %host could not be found.</source>
+        <translation>The address %host could not be found.</translation>
+    </message>
+    <message>
+        <source>The address %host is not allowed: it points into a private network.</source>
+        <translation>The address %host is not allowed: it points into a private network.</translation>
+    </message>
+    <message>
+        <source>You may not use the tool %tool.</source>
+        <translation>You may not use the tool %tool.</translation>
+    </message>
+    <message>
+        <source>The tool %tool may be used at most %max times per request. Work with what you have.</source>
+        <translation>The tool %tool may be used at most %max times per request. Work with what you have.</translation>
+    </message>
+    <message>
+        <source>Web search is not configured correctly.</source>
+        <translation>Web search is not configured correctly.</translation>
+    </message>
+    <message>
+        <source>Web search refused the request: the key is not valid.</source>
+        <translation>Web search refused the request: the key is not valid.</translation>
+    </message>
+    <message>
+        <source>Web search is busy or its monthly allowance is used up. Please try again later.</source>
+        <translation>Web search is busy or its monthly allowance is used up. Please try again later.</translation>
+    </message>
+    <message>
+        <source>Web search did not answer properly (HTTP %status).</source>
+        <translation>Web search did not answer properly (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>Web search is not configured.</source>
+        <translation>Web search is not configured.</translation>
+    </message>
+    <message>
+        <source>Give a search query of 1 to 200 characters.</source>
+        <translation>Give a search query of 1 to 200 characters.</translation>
+    </message>
+    <message>
+        <source>The project history is not available on this server.</source>
+        <translation>The project history is not available on this server.</translation>
+    </message>
+    <message>
+        <source>The project history could not be read.</source>
+        <translation>The project history could not be read.</translation>
+    </message>
+    <message>
+        <source>The project history took too long to read.</source>
+        <translation>The project history took too long to read.</translation>
+    </message>
+    <message>
+        <source>The project history is not available for this repository.</source>
+        <translation>The project history is not available for this repository.</translation>
+    </message>
+    <message>
+        <source>The path filter %path is not valid: give a path relative to the repository, without wildcards.</source>
+        <translation>The path filter %path is not valid: give a path relative to the repository, without wildcards.</translation>
+    </message>
+    <message>
+        <source>The path %path is not part of the public project history.</source>
+        <translation>The path %path is not part of the public project history.</translation>
+    </message>
+    <message>
+        <source>The release notes could not be read.</source>
+        <translation>The release notes could not be read.</translation>
+    </message>
+    <message>
+        <source>The releases of %repository are not public.</source>
+        <translation>The releases of %repository are not public.</translation>
+    </message>
+    <message>
+        <source>GitHub limits requests without an account; the release notes are not available right now.</source>
+        <translation>GitHub limits requests without an account; the release notes are not available right now.</translation>
+    </message>
+    <message>
+        <source>There is no repository %repository. Available: %list.</source>
+        <translation>There is no repository %repository. Available: %list.</translation>
+    </message>
+    <message>
+        <source>Give the date as YYYY-MM-DD.</source>
+        <translation>Give the date as YYYY-MM-DD.</translation>
+    </message>
+    <message>
+        <source>The search text may have at most 100 characters.</source>
+        <translation>The search text may have at most 100 characters.</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/package</name>
@@ -2245,6 +2373,18 @@
     <message>
         <source>Asked the external tool %tool</source>
         <translation>Asked the external tool %tool</translation>
+    </message>
+    <message>
+        <source>Read the web page %host</source>
+        <translation>Read the web page %host</translation>
+    </message>
+    <message>
+        <source>Searched the web for "%query"</source>
+        <translation>Searched the web for "%query"</translation>
+    </message>
+    <message>
+        <source>Read the project history</source>
+        <translation>Read the project history</translation>
     </message>
 </context>
 <context>

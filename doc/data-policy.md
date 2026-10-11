@@ -42,5 +42,11 @@ an unknown region meets no region requirement. Without any rule everything may g
 - **MCP**: the in-process bridge leaves withheld nodes out of its results; an external server has its own `Region`
   and `Retention`, checked against the panel node before every call ([mcp.md](mcp.md)).
 
+- **Web tools**: web_fetch sends nothing but the URL to an allowlisted site, so it has no data policy of its own; the
+  page it returns is outside data, never site content. web_search sends its query to the search service, so the
+  panel node is checked against `[SearchProvider_<id>] Region` and `Retention` (Brave: `us`, `unknown`) before every
+  search; a refused node is a tool error. project_history reads the team's own repositories (commits and public
+  release notes) and sends nothing about the content ([tools.md](tools.md#web-and-history-tools)).
+
 The usage log stores the region and retention of the provider with every request; expai/log shows them per request
 and filters by provider and region, and the dashboard shows a table by provider.

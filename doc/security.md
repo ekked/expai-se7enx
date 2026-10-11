@@ -65,6 +65,35 @@ such text can achieve:
 
 Review drafts written from untrusted content (for example user-submitted text) as you would any contributor's draft.
 
+## Web content
+
+`web_fetch`, `web_search` and `project_history` ([tools.md](tools.md#web-and-history-tools)) bring outside text into
+the conversation. The rules:
+
+- **SSRF**: web_fetch reads only hosts on `[WebSettings] AllowedDomains[]` (exact host or `*.domain`, compared after
+  lower-casing and punycode, so `github.com.evil.example`, `evilgithub.com` and look-alike Unicode hosts do not
+  match; numeric host forms such as `2130706433` or `0x7f.1` are refused). The host is resolved once and refused if
+  any address is loopback, private, link-local (including 169.254.169.254, the cloud metadata address),
+  carrier-grade NAT, unspecified, multicast or an IPv4-mapped form of those, unless it is named in `PrivateHosts[]`.
+  The connection is pinned to the checked address (no DNS rebinding), redirects stay on the same host and are
+  checked again, only ports 80 and 443 (plus `AllowedPorts[]`) and only http(s). Size, time and the number of calls
+  per turn are capped. The same guard pins the Brave Search and GitHub API requests.
+- **Nothing leaves through web_fetch but the URL.** No cookies, credentials or body are sent. A URL can still carry
+  text (a query string), so keep `AllowedDomains[]` to sites you trust with what an editor might ask about. A web
+  search sends its query to the search service, so the data policy checks the panel node against the service's
+  `Region` and `Retention`, and the tool tells the model never to put site content into a query.
+- **Prompt injection from web content**: a page can contain text written to steer the model. Page text is wrapped in
+  "Begin/End of outside data" markers and every result says it is data, not instructions. After a web_fetch or
+  web_search result, the rest of the turn may not write drafts (as after an external MCP tool); the editor reads
+  what was found and asks again. Even then the model can only write drafts the editor may write, which wait for
+  review. Check links in drafts written from web results before publishing.
+- **Project history**: git runs without a shell (an argument list, fixed format, literal pathspecs,
+  `--end-of-options`, the search text as a fixed string), in a clean environment, only `log`, `ls-files` and
+  `rev-parse`, only in clones under `Roots[]`. Excluded paths (`ai/*`) and untracked files are never named or read;
+  author names are off by default.
+- **Who**: the policy `expai/web` (limitation Tool) decides who gets each tool; the usage log records the tool and
+  the host it read.
+
 ## Logging and privacy
 
 - `expai_draft_log` keeps, per version written: object, version, user id, node, language, action, source, state,

@@ -199,6 +199,134 @@
         <source>The job queue is not available.</source>
         <translation>Die Auftragswarteschlange ist nicht verfügbar.</translation>
     </message>
+    <message>
+        <source>This is not a web address that can be fetched: only http and https, without user name or password, on the standard ports.</source>
+        <translation>Diese Webadresse kann nicht abgerufen werden: nur http und https, ohne Benutzername oder Passwort, auf den Standardports.</translation>
+    </message>
+    <message>
+        <source>The host %host is not on the list of sites that may be fetched.</source>
+        <translation>Der Host %host steht nicht auf der Liste der Websites, die abgerufen werden dürfen.</translation>
+    </message>
+    <message>
+        <source>The site %host does not allow automated reading of this page (robots.txt).</source>
+        <translation>Die Website %host erlaubt das automatische Lesen dieser Seite nicht (robots.txt).</translation>
+    </message>
+    <message>
+        <source>The page %host did not answer in time.</source>
+        <translation>Die Seite %host hat nicht rechtzeitig geantwortet.</translation>
+    </message>
+    <message>
+        <source>The page %host redirects too often.</source>
+        <translation>Die Seite %host leitet zu oft weiter.</translation>
+    </message>
+    <message>
+        <source>The page %host redirects to an address that cannot be fetched.</source>
+        <translation>Die Seite %host leitet auf eine Adresse weiter, die nicht abgerufen werden kann.</translation>
+    </message>
+    <message>
+        <source>The page redirects to another site: %target. Fetch that address instead if it is allowed.</source>
+        <translation>Die Seite leitet auf eine andere Website weiter: %target. Rufen Sie stattdessen diese Adresse ab, wenn sie erlaubt ist.</translation>
+    </message>
+    <message>
+        <source>The page %url answered with HTTP status %status.</source>
+        <translation>Die Seite %url hat mit dem HTTP-Status %status geantwortet.</translation>
+    </message>
+    <message>
+        <source>The address %url is not a text page (%type).</source>
+        <translation>Die Adresse %url ist keine Textseite (%type).</translation>
+    </message>
+    <message>
+        <source>The page %host could not be reached.</source>
+        <translation>Die Seite %host war nicht erreichbar.</translation>
+    </message>
+    <message>
+        <source>The address %host could not be found.</source>
+        <translation>Die Adresse %host wurde nicht gefunden.</translation>
+    </message>
+    <message>
+        <source>The address %host is not allowed: it points into a private network.</source>
+        <translation>Die Adresse %host ist nicht erlaubt: Sie zeigt in ein privates Netz.</translation>
+    </message>
+    <message>
+        <source>You may not use the tool %tool.</source>
+        <translation>Sie dürfen das Werkzeug %tool nicht verwenden.</translation>
+    </message>
+    <message>
+        <source>The tool %tool may be used at most %max times per request. Work with what you have.</source>
+        <translation>Das Werkzeug %tool darf höchstens %max-mal pro Anfrage verwendet werden. Arbeiten Sie mit dem, was vorliegt.</translation>
+    </message>
+    <message>
+        <source>Web search is not configured correctly.</source>
+        <translation>Die Websuche ist nicht richtig konfiguriert.</translation>
+    </message>
+    <message>
+        <source>Web search refused the request: the key is not valid.</source>
+        <translation>Die Websuche hat die Anfrage abgelehnt: Der Schlüssel ist ungültig.</translation>
+    </message>
+    <message>
+        <source>Web search is busy or its monthly allowance is used up. Please try again later.</source>
+        <translation>Die Websuche ist ausgelastet oder ihr Monatskontingent ist aufgebraucht. Bitte versuchen Sie es später erneut.</translation>
+    </message>
+    <message>
+        <source>Web search did not answer properly (HTTP %status).</source>
+        <translation>Die Websuche hat nicht korrekt geantwortet (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>Web search is not configured.</source>
+        <translation>Die Websuche ist nicht konfiguriert.</translation>
+    </message>
+    <message>
+        <source>Give a search query of 1 to 200 characters.</source>
+        <translation>Geben Sie eine Suchanfrage mit 1 bis 200 Zeichen an.</translation>
+    </message>
+    <message>
+        <source>The project history is not available on this server.</source>
+        <translation>Der Projektverlauf ist auf diesem Server nicht verfügbar.</translation>
+    </message>
+    <message>
+        <source>The project history could not be read.</source>
+        <translation>Der Projektverlauf konnte nicht gelesen werden.</translation>
+    </message>
+    <message>
+        <source>The project history took too long to read.</source>
+        <translation>Das Lesen des Projektverlaufs hat zu lange gedauert.</translation>
+    </message>
+    <message>
+        <source>The project history is not available for this repository.</source>
+        <translation>Für dieses Repository ist kein Projektverlauf verfügbar.</translation>
+    </message>
+    <message>
+        <source>The path filter %path is not valid: give a path relative to the repository, without wildcards.</source>
+        <translation>Der Pfadfilter %path ist ungültig: Geben Sie einen Pfad relativ zum Repository an, ohne Platzhalter.</translation>
+    </message>
+    <message>
+        <source>The path %path is not part of the public project history.</source>
+        <translation>Der Pfad %path gehört nicht zum öffentlichen Projektverlauf.</translation>
+    </message>
+    <message>
+        <source>The release notes could not be read.</source>
+        <translation>Die Versionshinweise konnten nicht gelesen werden.</translation>
+    </message>
+    <message>
+        <source>The releases of %repository are not public.</source>
+        <translation>Die Releases von %repository sind nicht öffentlich.</translation>
+    </message>
+    <message>
+        <source>GitHub limits requests without an account; the release notes are not available right now.</source>
+        <translation>GitHub begrenzt Anfragen ohne Konto; die Versionshinweise sind gerade nicht verfügbar.</translation>
+    </message>
+    <message>
+        <source>There is no repository %repository. Available: %list.</source>
+        <translation>Es gibt kein Repository %repository. Verfügbar: %list.</translation>
+    </message>
+    <message>
+        <source>Give the date as YYYY-MM-DD.</source>
+        <translation>Geben Sie das Datum als JJJJ-MM-TT an.</translation>
+    </message>
+    <message>
+        <source>The search text may have at most 100 characters.</source>
+        <translation>Der Suchtext darf höchstens 100 Zeichen lang sein.</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/package</name>
@@ -2245,6 +2373,18 @@
     <message>
         <source>Asked the external tool %tool</source>
         <translation>Das externe Werkzeug %tool gefragt</translation>
+    </message>
+    <message>
+        <source>Read the web page %host</source>
+        <translation>Webseite %host gelesen</translation>
+    </message>
+    <message>
+        <source>Searched the web for "%query"</source>
+        <translation>Im Web nach „%query“ gesucht</translation>
+    </message>
+    <message>
+        <source>Read the project history</source>
+        <translation>Projektverlauf gelesen</translation>
     </message>
 </context>
 <context>

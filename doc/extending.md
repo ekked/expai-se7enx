@@ -143,6 +143,29 @@ Rules for tools:
 showed the step "Counted the children of node 32303" and the answer "... 2 children in this folder, both of class
 article".
 
+A tool may also implement `available( expAiConfig $config )` (the registry leaves it out when it returns false),
+`external()` (true: the rest of the turn may not write drafts) and `logFields()` (extra fields for the usage log's
+tool entry). The web tools get all three from `expAiWebTool`.
+
+**Another web search service** (Bing, SerpAPI, Tavily ...): a class extending `expAiWebSearchProvider` with
+`search( $query, $count )` returning a list of `title`, `url`, `snippet` (throw `expAiException` on failure; use
+`expAiWebGuard` to resolve, check and pin the endpoint as `expAiWebSearchBrave` does), and a settings group:
+
+```ini
+[SearchSettings]
+Provider=tavily
+
+[SearchProvider_tavily]
+Label=Tavily
+Class=myTavilySearchProvider
+Endpoint=https://api.tavily.com/search
+ApiKey=            # settings/override only
+Region=us
+Retention=unknown
+```
+
+`isConfigured()` decides whether web_search is offered (default: an `ApiKey` is set).
+
 ## 3. A panel section
 
 ```ini

@@ -13,11 +13,12 @@
 | `expai/package_import` | Setup > Content packages (`expai/packages`): upload, validate, dry run, import as drafts; `./console ext:expai:package import`. Imports write drafts with the user's own content permissions ([packages.md](packages.md)) |
 | `expai/package_export` | `./console ext:expai:package export` (only what the user may read) |
 | `expai/lane_fast` | a queued request may ask for a fast lane (a price premium; [lanes.md](lanes.md)) |
+| `expai/web` | the web and history tools in the panel ([tools.md](tools.md#web-and-history-tools)). Limitation **Tool**: `web_fetch`, `web_search`, `project_history`; without it all three (each is still offered only once configured) |
 
 `expai/log` also opens `expai/budgets` (the site budget, job groups, lanes, batches); with `expai/settings` its
 "Resume held jobs" button ([budgets.md](budgets.md)).
 
-`expai/model_use` and `expai/mcp` have one limitation each; the others none. What the assistant may do in the content
+`expai/model_use`, `expai/mcp` and `expai/web` have one limitation each; the others none. What the assistant may do in the content
 tree is decided by the editor's content policies (below). The tab, the menu entry and the dashboard block are not shown at all without `expai/write`.
 
 ## ezjscore
