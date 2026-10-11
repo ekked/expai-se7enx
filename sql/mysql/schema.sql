@@ -13,14 +13,18 @@ CREATE TABLE expai_conversation (
   modified int(11) NOT NULL DEFAULT '0',
   node_id int(11) NOT NULL DEFAULT '0',
   provider varchar(40) NOT NULL DEFAULT 'anthropic',
+  run_id int(11) NOT NULL DEFAULT '0',
+  thread_id int(11) NOT NULL DEFAULT '0',
   turn_count int(11) NOT NULL DEFAULT '0',
   user_id int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY ( id ),
-  KEY expai_conversation_user_node ( user_id, node_id )
+  KEY expai_conversation_user_node ( user_id, node_id ),
+  KEY expai_conversation_thread ( thread_id )
 ) ENGINE=InnoDB;
 
 CREATE TABLE expai_usage_log (
   action varchar(40) NOT NULL DEFAULT '',
+  batch_id int(11) NOT NULL DEFAULT '0',
   cache_read_tokens int(11) NOT NULL DEFAULT '0',
   cache_write_tokens int(11) NOT NULL DEFAULT '0',
   conversation_id int(11) NOT NULL DEFAULT '0',
@@ -33,12 +37,15 @@ CREATE TABLE expai_usage_log (
   id int(11) NOT NULL AUTO_INCREMENT,
   input_tokens int(11) NOT NULL DEFAULT '0',
   iteration int(11) NOT NULL DEFAULT '0',
+  job_uuid varchar(36) NOT NULL DEFAULT '',
+  lane varchar(16) NOT NULL DEFAULT '',
   latency_ms int(11) NOT NULL DEFAULT '0',
   mcp_calls int(11) NOT NULL DEFAULT '0',
   model varchar(100) NOT NULL DEFAULT '',
   model_alias varchar(100) NOT NULL DEFAULT '',
   node_id int(11) NOT NULL DEFAULT '0',
   output_tokens int(11) NOT NULL DEFAULT '0',
+  price_factor int(11) NOT NULL DEFAULT '100',
   provider varchar(40) NOT NULL DEFAULT 'anthropic',
   rate_limits longtext,
   reasoning_tokens int(11) NOT NULL DEFAULT '0',
@@ -48,8 +55,11 @@ CREATE TABLE expai_usage_log (
   requested_model_alias varchar(100) NOT NULL DEFAULT '',
   retention varchar(10) NOT NULL DEFAULT '',
   retries int(11) NOT NULL DEFAULT '0',
+  run_id int(11) NOT NULL DEFAULT '0',
+  service_tier varchar(20) NOT NULL DEFAULT '',
   session_key varchar(40) NOT NULL DEFAULT '',
   stop_reason varchar(30) NOT NULL DEFAULT '',
+  thread_id int(11) NOT NULL DEFAULT '0',
   tool_calls longtext,
   tool_count int(11) NOT NULL DEFAULT '0',
   tool_mode varchar(10) NOT NULL DEFAULT '',
@@ -60,30 +70,38 @@ CREATE TABLE expai_usage_log (
   KEY expai_usage_log_created ( created ),
   KEY expai_usage_log_provider ( provider, created ),
   KEY expai_usage_log_user ( user_id, created ),
-  KEY expai_usage_log_turn ( conversation_id, turn )
+  KEY expai_usage_log_turn ( conversation_id, turn ),
+  KEY expai_usage_log_thread ( thread_id ),
+  KEY expai_usage_log_job ( job_uuid )
 ) ENGINE=InnoDB;
 
 CREATE TABLE expai_draft_log (
   action varchar(20) NOT NULL DEFAULT '',
+  change_id int(11) NOT NULL DEFAULT '0',
   contentobject_id int(11) NOT NULL DEFAULT '0',
   conversation_id int(11) NOT NULL DEFAULT '0',
   created int(11) NOT NULL DEFAULT '0',
   id int(11) NOT NULL AUTO_INCREMENT,
+  job_uuid varchar(36) NOT NULL DEFAULT '',
   language_code varchar(20) NOT NULL DEFAULT '',
   model varchar(100) NOT NULL DEFAULT '',
   modified int(11) NOT NULL DEFAULT '0',
   node_id int(11) NOT NULL DEFAULT '0',
+  package_uuid varchar(36) NOT NULL DEFAULT '',
   parent_node_id int(11) NOT NULL DEFAULT '0',
   prompt_summary varchar(255) NOT NULL DEFAULT '',
   provider varchar(40) NOT NULL DEFAULT 'anthropic',
   source varchar(20) NOT NULL DEFAULT '',
   status varchar(20) NOT NULL DEFAULT 'draft',
+  thread_id int(11) NOT NULL DEFAULT '0',
   user_id int(11) NOT NULL DEFAULT '0',
   version int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY ( id ),
   KEY expai_draft_log_object ( contentobject_id, version ),
   KEY expai_draft_log_user ( user_id, status ),
-  KEY expai_draft_log_node ( node_id )
+  KEY expai_draft_log_node ( node_id ),
+  KEY expai_draft_log_thread ( thread_id ),
+  KEY expai_draft_log_package ( package_uuid )
 ) ENGINE=InnoDB;
 
 CREATE TABLE expai_probe_result (
@@ -101,5 +119,197 @@ CREATE TABLE expai_probe_result (
   user_id int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY ( id ),
   KEY expai_probe_result_alias ( model_alias, created )
+) ENGINE=InnoDB;
+
+CREATE TABLE expai_thread (
+  cost_micros int(11) NOT NULL DEFAULT '0',
+  created int(11) NOT NULL DEFAULT '0',
+  id int(11) NOT NULL AUTO_INCREMENT,
+  lane varchar(16) NOT NULL DEFAULT 'auto',
+  last_event_id int(11) NOT NULL DEFAULT '0',
+  lead_run_id int(11) NOT NULL DEFAULT '0',
+  model_alias varchar(100) NOT NULL DEFAULT '',
+  modified int(11) NOT NULL DEFAULT '0',
+  node_id int(11) NOT NULL DEFAULT '0',
+  origin varchar(16) NOT NULL DEFAULT 'vector',
+  plan_id int(11) NOT NULL DEFAULT '0',
+  position int(11) NOT NULL DEFAULT '0',
+  provider varchar(40) NOT NULL DEFAULT '',
+  requests int(11) NOT NULL DEFAULT '0',
+  reserved_micros int(11) NOT NULL DEFAULT '0',
+  review_policy varchar(12) NOT NULL DEFAULT 'staged',
+  run_mode varchar(10) NOT NULL DEFAULT 'write',
+  scope_json longtext,
+  seen_event_id int(11) NOT NULL DEFAULT '0',
+  shelf varchar(10) NOT NULL DEFAULT 'active',
+  state varchar(16) NOT NULL DEFAULT 'idle',
+  title varchar(255) NOT NULL DEFAULT '',
+  tokens int(11) NOT NULL DEFAULT '0',
+  user_id int(11) NOT NULL DEFAULT '0',
+  uuid varchar(36) NOT NULL DEFAULT '',
+  PRIMARY KEY ( id ),
+  KEY expai_thread_user_shelf ( user_id, shelf, modified ),
+  KEY expai_thread_user_state ( user_id, state ),
+  KEY expai_thread_uuid ( uuid ),
+  KEY expai_thread_node ( node_id )
+) ENGINE=InnoDB;
+
+CREATE TABLE expai_thread_run (
+  conversation_id int(11) NOT NULL DEFAULT '0',
+  cost_micros int(11) NOT NULL DEFAULT '0',
+  created int(11) NOT NULL DEFAULT '0',
+  finished int(11) NOT NULL DEFAULT '0',
+  id int(11) NOT NULL AUTO_INCREMENT,
+  job_uuid varchar(36) NOT NULL DEFAULT '',
+  kind varchar(12) NOT NULL DEFAULT 'turn',
+  label varchar(255) NOT NULL DEFAULT '',
+  lane varchar(16) NOT NULL DEFAULT '',
+  model_alias varchar(100) NOT NULL DEFAULT '',
+  modified int(11) NOT NULL DEFAULT '0',
+  parent_run_id int(11) NOT NULL DEFAULT '0',
+  plan_item int(11) NOT NULL DEFAULT '-1',
+  progress_done int(11) NOT NULL DEFAULT '0',
+  progress_total int(11) NOT NULL DEFAULT '0',
+  started int(11) NOT NULL DEFAULT '0',
+  state varchar(16) NOT NULL DEFAULT 'idle',
+  thread_id int(11) NOT NULL DEFAULT '0',
+  tokens int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY ( id ),
+  KEY expai_thread_run_thread ( thread_id, id ),
+  KEY expai_thread_run_conv ( conversation_id )
+) ENGINE=InnoDB;
+
+CREATE TABLE expai_thread_event (
+  created int(11) NOT NULL DEFAULT '0',
+  id int(11) NOT NULL AUTO_INCREMENT,
+  kind varchar(20) NOT NULL DEFAULT '',
+  payload longtext,
+  run_id int(11) NOT NULL DEFAULT '0',
+  thread_id int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY ( id ),
+  KEY expai_thread_event_thread ( thread_id, id ),
+  KEY expai_thread_event_created ( created )
+) ENGINE=InnoDB;
+
+CREATE TABLE expai_followup (
+  body longtext,
+  created int(11) NOT NULL DEFAULT '0',
+  delivery varchar(8) NOT NULL DEFAULT 'queue',
+  id int(11) NOT NULL AUTO_INCREMENT,
+  modified int(11) NOT NULL DEFAULT '0',
+  position int(11) NOT NULL DEFAULT '0',
+  state varchar(10) NOT NULL DEFAULT 'waiting',
+  thread_id int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY ( id ),
+  KEY expai_followup_thread ( thread_id, state )
+) ENGINE=InnoDB;
+
+CREATE TABLE expai_checkpoint (
+  changes_json longtext,
+  conversation_len int(11) NOT NULL DEFAULT '0',
+  created int(11) NOT NULL DEFAULT '0',
+  drafts_json longtext,
+  id int(11) NOT NULL AUTO_INCREMENT,
+  label varchar(255) NOT NULL DEFAULT '',
+  thread_id int(11) NOT NULL DEFAULT '0',
+  turn int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY ( id ),
+  KEY expai_checkpoint_thread ( thread_id, turn ),
+  KEY expai_checkpoint_created ( created )
+) ENGINE=InnoDB;
+
+CREATE TABLE expai_plan (
+  approved int(11) NOT NULL DEFAULT '0',
+  approved_by int(11) NOT NULL DEFAULT '0',
+  created int(11) NOT NULL DEFAULT '0',
+  estimate_json longtext,
+  id int(11) NOT NULL AUTO_INCREMENT,
+  items_json longtext,
+  modified int(11) NOT NULL DEFAULT '0',
+  state varchar(12) NOT NULL DEFAULT 'proposed',
+  thread_id int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY ( id ),
+  KEY expai_plan_thread ( thread_id )
+) ENGINE=InnoDB;
+
+CREATE TABLE expai_change (
+  applied_version int(11) NOT NULL DEFAULT '0',
+  attribute_identifier varchar(100) NOT NULL DEFAULT '',
+  base_hash varchar(64) NOT NULL DEFAULT '',
+  base_version int(11) NOT NULL DEFAULT '0',
+  class_identifier varchar(100) NOT NULL DEFAULT '',
+  contentobject_id int(11) NOT NULL DEFAULT '0',
+  created int(11) NOT NULL DEFAULT '0',
+  datatype varchar(40) NOT NULL DEFAULT '',
+  decided int(11) NOT NULL DEFAULT '0',
+  decided_by int(11) NOT NULL DEFAULT '0',
+  decision varchar(10) NOT NULL DEFAULT 'pending',
+  hunks_json longtext,
+  id int(11) NOT NULL AUTO_INCREMENT,
+  language_code varchar(20) NOT NULL DEFAULT '',
+  modified int(11) NOT NULL DEFAULT '0',
+  new_key varchar(40) NOT NULL DEFAULT '',
+  parent_node_id int(11) NOT NULL DEFAULT '0',
+  proposed longtext,
+  run_id int(11) NOT NULL DEFAULT '0',
+  thread_id int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY ( id ),
+  KEY expai_change_thread ( thread_id, decision ),
+  KEY expai_change_object ( contentobject_id, language_code ),
+  KEY expai_change_created ( created )
+) ENGINE=InnoDB;
+
+CREATE TABLE expai_batch (
+  batch_api varchar(20) NOT NULL DEFAULT '',
+  canceled int(11) NOT NULL DEFAULT '0',
+  created int(11) NOT NULL DEFAULT '0',
+  deleted int(11) NOT NULL DEFAULT '0',
+  ended int(11) NOT NULL DEFAULT '0',
+  errored int(11) NOT NULL DEFAULT '0',
+  expired int(11) NOT NULL DEFAULT '0',
+  expires_at int(11) NOT NULL DEFAULT '0',
+  id int(11) NOT NULL AUTO_INCREMENT,
+  input_ref varchar(120) NOT NULL DEFAULT '',
+  lane varchar(16) NOT NULL DEFAULT '',
+  last_error varchar(255) NOT NULL DEFAULT '',
+  model varchar(100) NOT NULL DEFAULT '',
+  model_alias varchar(100) NOT NULL DEFAULT '',
+  modified int(11) NOT NULL DEFAULT '0',
+  output_ref varchar(120) NOT NULL DEFAULT '',
+  polls int(11) NOT NULL DEFAULT '0',
+  provider varchar(40) NOT NULL DEFAULT '',
+  remote_id varchar(120) NOT NULL DEFAULT '',
+  remote_status varchar(40) NOT NULL DEFAULT '',
+  request_count int(11) NOT NULL DEFAULT '0',
+  results_fetched int(11) NOT NULL DEFAULT '0',
+  retention varchar(10) NOT NULL DEFAULT '',
+  state varchar(20) NOT NULL DEFAULT 'submitted',
+  submit_job_uuid varchar(36) NOT NULL DEFAULT '',
+  submitted int(11) NOT NULL DEFAULT '0',
+  succeeded int(11) NOT NULL DEFAULT '0',
+  user_id int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY ( id ),
+  KEY expai_batch_state ( state, provider )
+) ENGINE=InnoDB;
+
+CREATE TABLE expai_package (
+  bytes int(11) NOT NULL DEFAULT '0',
+  checksum varchar(64) NOT NULL DEFAULT '',
+  created int(11) NOT NULL DEFAULT '0',
+  file_count int(11) NOT NULL DEFAULT '0',
+  format_version varchar(10) NOT NULL DEFAULT '',
+  group_uuid varchar(36) NOT NULL DEFAULT '',
+  id int(11) NOT NULL AUTO_INCREMENT,
+  modified int(11) NOT NULL DEFAULT '0',
+  name varchar(150) NOT NULL DEFAULT '',
+  object_count int(11) NOT NULL DEFAULT '0',
+  origin varchar(20) NOT NULL DEFAULT '',
+  report longtext,
+  state varchar(20) NOT NULL DEFAULT 'uploaded',
+  storage varchar(255) NOT NULL DEFAULT '',
+  user_id int(11) NOT NULL DEFAULT '0',
+  uuid varchar(36) NOT NULL DEFAULT '',
+  PRIMARY KEY ( id ),
+  KEY expai_package_uuid ( uuid )
 ) ENGINE=InnoDB;
 

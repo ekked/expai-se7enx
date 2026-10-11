@@ -103,7 +103,20 @@ else
         foreach ( $errors as $error )
             $cli->error( "error: $error" );
         $failed = (bool) $errors;
+        // threads: the panel conversations of an earlier expai become threads (idempotent; bin/php/expaithreads.php)
+        if ( !$errors && expAiThread::available() )
+        {
+            do
+            {
+                $report = expAiThreadMigration::run( false );
+                if ( $report['created'] || $report['linked'] )
+                    $cli->output( "threads: {$report['created']} created, {$report['linked']} linked from panel conversations" );
+            }
+            while ( $report['created'] + $report['linked'] > 0 && $report['candidates'] >= 500 );
+        }
     }
+    elseif ( expAiThread::available() && ( $pendingThreads = expAiThreadMigration::pending() ) )
+        $cli->output( "threads: $pendingThreads panel conversation(s) are not threads yet (--install migrates them)" );
     $missing = array_merge( expAiSchema::missingTables( $db ), expAiSchema::missingColumns( $db ) );
     if ( $missing )
     {

@@ -50,6 +50,9 @@ class expAiDraftLog extends eZPersistentObject
                 'prompt_summary' => $str( 'PromptSummary' ),
                 'created' => $int( 'Created' ),
                 'modified' => $int( 'Modified' ),
+                // threads (classes/vector/): the thread that wrote the version, the staged change it came from
+                'thread_id' => $int( 'ThreadID' ),
+                'change_id' => $int( 'ChangeID' ),
             ),
             'keys' => array( 'id' ),
             'increment_key' => 'id',
@@ -71,6 +74,18 @@ class expAiDraftLog extends eZPersistentObject
         $summaryMax = expAiConfig::instance()->int( 'LogSettings', 'MaxPromptSummaryLength', 200, 20, 255 );
         $row['prompt_summary'] = expAiText::cut( isset( $row['prompt_summary'] ) ? $row['prompt_summary'] : '', $summaryMax );
         $row['model'] = expAiText::cut( isset( $row['model'] ) ? $row['model'] : '', 100 );
+        // the thread of the conversation; a Vector thread's drafts are logged with source "vector"
+        if ( empty( $row['thread_id'] ) && !empty( $row['conversation_id'] ) && expAiThread::available() )
+        {
+            $conversation = eZPersistentObject::fetchObject( expAiConversation::definition(), array( 'thread_id' ), array( 'id' => (int) $row['conversation_id'] ), false );
+            $thread = is_array( $conversation ) && (int) $conversation['thread_id'] ? expAiThread::fetchByID( (int) $conversation['thread_id'] ) : null;
+            if ( $thread )
+            {
+                $row['thread_id'] = (int) $thread->attribute( 'id' );
+                if ( $thread->attribute( 'origin' ) === expAiThread::ORIGIN_VECTOR && ( !isset( $row['source'] ) || $row['source'] === 'panel' ) )
+                    $row['source'] = 'vector';
+            }
+        }
         $log = new self( $row );
         $log->store();
         return $log;

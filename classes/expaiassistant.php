@@ -36,12 +36,60 @@ class expAiAssistant
     /** @var int the turn of the current step (for the MCP taint) */
     protected $turn = 0;
 
+    /** @var expAiConversation|null threads: the conversation of a thread's run (else the panel's by user and node) */
+    protected $bound = null;
+
+    /** @var array threads: alias (the thread's model), read_only (plan mode, staged review), scope_note, action */
+    protected $threadOptions = array();
+
+    /** @var expAiConversation|null the conversation of the step under way (for the thread hook on failure) */
+    protected $current = null;
+
     public function __construct( ?expAiConfig $config = null, ?expAiProvider $provider = null, ?expAiToolRegistry $tools = null )
     {
         $this->config = $config ?: expAiConfig::instance();
         $this->given = $provider;
         $this->tools = $tools;
     }
+
+    /**
+     * Threads: the next steps run in the conversation of a thread's run instead of the panel's conversation of the
+     * user on the node (Vector, doc/vector.md).
+     * @param array $options alias (a model the user may use, '' for the user's choice), read_only (no write tools:
+     *                       plan mode or staged review), scope_note (told to the model once per change), action
+     *                       (usage log action, default "vector")
+     */
+    public function useConversation( expAiConversation $conversation, array $options = array() )
+    {
+        $this->bound = $conversation;
+        $this->threadOptions = $options + array( 'alias' => '', 'read_only' => false, 'scope_note' => '', 'action' => 'vector' );
+        return $this;
+    }
+
+    /**
+     * One step (see stepInner()); a step of a conversation that belongs to a thread updates the thread (state, cost,
+     * events), also when it fails.
+     */
+    public function step( $nodeID, $message = null )
+    {
+        $this->current = null;
+        try
+        {
+            $result = $this->stepInner( $nodeID, $message );
+        }
+        catch ( expAiException $e )
+        {
+            if ( $this->current )
+                expAiThread::afterStep( $this->current, array( 'status' => 'failed', 'error' => $e->translatedMessage() ) );
+            throw $e;
+        }
+        if ( $this->current )
+            expAiThread::afterStep( $this->current, $result, $this->lastWritten );
+        return $result;
+    }
+
+    /** @var expAiDraftLog[] the drafts written in the last step */
+    protected $lastWritten = array();
 
     /** @return expAiToolRegistry */
     protected function tools()
@@ -82,11 +130,13 @@ class expAiAssistant
      * @return array status (continue | done), text, steps (list of { text, ok }), drafts, conversation_id
      * @throws expAiException
      */
-    public function step( $nodeID, $message = null )
+    protected function stepInner( $nodeID, $message = null )
     {
         $user = eZUser::currentUser();
-        // the model: the given provider's, else the user's choice (allowed by expai/model_use), else the default
-        $alias = $this->given && method_exists( $this->given, 'modelAlias' ) && $this->given->modelAlias() !== '' ? $this->given->modelAlias() : $this->config->effectiveModel();
+        $this->lastWritten = array();
+        // the model: the given provider's, else the thread's, else the user's choice (allowed by expai/model_use), else the default
+        $alias = $this->given && method_exists( $this->given, 'modelAlias' ) && $this->given->modelAlias() !== '' ? $this->given->modelAlias()
+               : ( $this->bound && !empty( $this->threadOptions['alias'] ) ? (string) $this->threadOptions['alias'] : $this->config->effectiveModel() );
         $this->alias = $alias;
         // the fallback to the site default: a model that cannot take the request (stopped, unreachable, not allowed,
         // removed, kept away by the data policy) hands it on (expAiModelFallback; tests that give a provider: never)
@@ -96,11 +146,17 @@ class expAiAssistant
         $providerID = $this->provider->providerId();
         $model = $this->config->registry()->getModel( $alias );
         $this->writeAllowed = $this->given && !$model ? true : expAiProbe::writeAllowed( $alias, $this->config );
+        // a thread in plan mode or with staged review gets read tools only
+        $readOnly = $this->bound && !empty( $this->threadOptions['read_only'] );
+        if ( $readOnly )
+            $this->writeAllowed = false;
+        $frameMode = $readOnly ? 'read' : 'write';
         // the data policy of that provider: the panel's node first (a refusal names the rule)
         $policy = expAiDataPolicy::forProvider( $this->config, $providerID );
         $reader = new expAiContentReader( $this->config, $policy );
         $node = $reader->readableNode( $nodeID );
-        $conversation = expAiConversation::fetchCurrent( $user->attribute( 'contentobject_id' ), $nodeID );
+        $conversation = $this->bound ?: expAiConversation::fetchCurrent( $user->attribute( 'contentobject_id' ), $nodeID );
+        $this->current = $conversation;
         $messages = $conversation ? $conversation->messages() : array();
         $request = '';
         $addedText = false;
@@ -111,6 +167,9 @@ class expAiAssistant
         {
             $bound = $conversation->boundAlias();
             $switched = $bound !== '' ? $bound !== $alias : $providerID !== 'anthropic';
+            // a thread that changed between plan/staged (read tools) and write mode needs other tools: the same
+            if ( !$switched && $this->bound && ( $conversation->frameMode() ?: 'write' ) !== $frameMode )
+                $switched = true;
             if ( $switched )
             {
                 $history = $this->historyOf( $conversation );
@@ -140,6 +199,9 @@ class expAiAssistant
             {
                 $conversation = expAiConversation::start( $user->attribute( 'contentobject_id' ), $nodeID );
                 $messages = array();
+                // the panel's conversation is a thread too (origin panel)
+                expAiThread::forPanelConversation( $conversation, $nodeID, $alias );
+                $this->current = $conversation;
             }
             if ( $conversation->size() > $this->config->int( 'AssistantSettings', 'MaxConversationBytes', 400000, 10000 ) )
                 throw new expAiException( 'This conversation is too long. Please start a new conversation.' );
@@ -158,7 +220,16 @@ class expAiAssistant
                     $messages = self::compact( $history, $keep );
                     $conversation->setWindowTurns( $keep );
                 }
-                $messages[] = array( 'role' => 'user', 'content' => array( array( 'type' => 'text', 'text' => $message ) ) );
+                $content = array();
+                // a thread tells the model its scope (nodes, subtrees, classes, languages) when it is new or changed
+                $note = $this->bound ? (string) $this->threadOptions['scope_note'] : '';
+                if ( $note !== '' && ( $note !== $conversation->scopeNote() || !$messages ) )
+                {
+                    $content[] = array( 'type' => 'text', 'text' => $note );
+                    $conversation->setScopeNote( $note );
+                }
+                $content[] = array( 'type' => 'text', 'text' => $message );
+                $messages[] = array( 'role' => 'user', 'content' => $content );
             }
             $conversation->setWindowTurns( $conversation->windowTurns() + 1 );
             $history[] = array( 'id' => count( $history ) ? (int) $history[count( $history ) - 1]['id'] + 1 : 1, 'time' => time(),
@@ -190,8 +261,12 @@ class expAiAssistant
             $system = expAiPrompts::panelSystem( $node, $user, $this->config, $this->writeAllowed, $mode );
             if ( $mode === 'none' )
                 $system .= "\n\n" . self::snapshot( $reader, $node );
+            if ( $readOnly )
+                $system .= "\n\n" . expAiThreadPrompts::readOnlyNote( $this->threadOptions );
             $frame = array( 'system' => $system, 'tools' => $mode === 'none' ? array() : $this->tools()->definitions( $this->writeAllowed ) );
             $conversation->setFrame( $frame['system'], $frame['tools'] );
+            if ( $this->bound )
+                $conversation->setFrameMode( $frameMode );
         }
         $call = array( 'system' => $frame['system'], 'messages' => $messages, 'tools' => $frame['tools'] );
         if ( $iterations >= $maxIterations && $frame['tools'] )
@@ -208,7 +283,8 @@ class expAiAssistant
         {
             $this->provider->setContext( array( 'node_id' => (int) $nodeID, 'conversation_id' => (int) $conversation->attribute( 'id' ),
                                                 'turn' => $turnHistory ? (int) $turnHistory[count( $turnHistory ) - 1]['id'] : 0,
-                                                'action' => 'panel', 'iteration' => $iterations ) );
+                                                'action' => $this->bound ? (string) $this->threadOptions['action'] : 'panel', 'iteration' => $iterations,
+                                                'thread_id' => (int) $conversation->attribute( 'thread_id' ), 'run_id' => (int) $conversation->attribute( 'run_id' ) ) );
         }
         // the fallback: the usage log names the model the request asked for and why another one answers
         if ( $this->fallback && $this->provider instanceof expAiUsageRecorder )
@@ -343,6 +419,7 @@ class expAiAssistant
         }
         $conversation->setMessages( $messages );
         $conversation->store();
+        $this->lastWritten = isset( $context ) ? $context->written : array();
         return $this->result( $status, $text, $steps, $user, $nodeID, $conversation );
     }
 
@@ -569,7 +646,7 @@ class expAiAssistant
      */
     public function history( eZUser $user, $nodeID, $before = null, $limit = 20 )
     {
-        $conversation = expAiConversation::fetchCurrent( $user->attribute( 'contentobject_id' ), $nodeID );
+        $conversation = $this->bound ?: expAiConversation::fetchCurrent( $user->attribute( 'contentobject_id' ), $nodeID );
         $history = $conversation ? $this->historyOf( $conversation ) : array();
         if ( $before !== null )
             $history = array_values( array_filter( $history, function ( $e ) use ( $before ) { return (int) $e['id'] < (int) $before; } ) );

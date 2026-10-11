@@ -2,6 +2,490 @@
 // The database schema of expai (Exponential Intelligence): generated from expAiSchema::definition() by
 // extension/expai/bin/php/expaischema.php --write-files. Do not edit by hand.
 $schema = array (
+  'expai_batch' => 
+  array (
+    'name' => 'expai_batch',
+    'fields' => 
+    array (
+      'batch_api' => 
+      array (
+        'length' => 20,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'canceled' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'created' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'deleted' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'ended' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'errored' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'expired' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'expires_at' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'id' => 
+      array (
+        'type' => 'auto_increment',
+        'default' => false,
+      ),
+      'input_ref' => 
+      array (
+        'length' => 120,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'lane' => 
+      array (
+        'length' => 16,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'last_error' => 
+      array (
+        'length' => 255,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'model' => 
+      array (
+        'length' => 100,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'model_alias' => 
+      array (
+        'length' => 100,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'modified' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'output_ref' => 
+      array (
+        'length' => 120,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'polls' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'provider' => 
+      array (
+        'length' => 40,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'remote_id' => 
+      array (
+        'length' => 120,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'remote_status' => 
+      array (
+        'length' => 40,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'request_count' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'results_fetched' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'retention' => 
+      array (
+        'length' => 10,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'state' => 
+      array (
+        'length' => 20,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => 'submitted',
+      ),
+      'submit_job_uuid' => 
+      array (
+        'length' => 36,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'submitted' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'succeeded' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'user_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+    ),
+    'indexes' => 
+    array (
+      'PRIMARY' => 
+      array (
+        'type' => 'primary',
+        'fields' => 
+        array (
+          0 => 'id',
+        ),
+      ),
+      'expai_batch_state' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'state',
+          1 => 'provider',
+        ),
+      ),
+    ),
+  ),
+  'expai_change' => 
+  array (
+    'name' => 'expai_change',
+    'fields' => 
+    array (
+      'applied_version' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'attribute_identifier' => 
+      array (
+        'length' => 100,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'base_hash' => 
+      array (
+        'length' => 64,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'base_version' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'class_identifier' => 
+      array (
+        'length' => 100,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'contentobject_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'created' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'datatype' => 
+      array (
+        'length' => 40,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'decided' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'decided_by' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'decision' => 
+      array (
+        'length' => 10,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => 'pending',
+      ),
+      'hunks_json' => 
+      array (
+        'type' => 'longtext',
+        'default' => false,
+      ),
+      'id' => 
+      array (
+        'type' => 'auto_increment',
+        'default' => false,
+      ),
+      'language_code' => 
+      array (
+        'length' => 20,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'modified' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'new_key' => 
+      array (
+        'length' => 40,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'parent_node_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'proposed' => 
+      array (
+        'type' => 'longtext',
+        'default' => false,
+      ),
+      'run_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'thread_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+    ),
+    'indexes' => 
+    array (
+      'PRIMARY' => 
+      array (
+        'type' => 'primary',
+        'fields' => 
+        array (
+          0 => 'id',
+        ),
+      ),
+      'expai_change_thread' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'thread_id',
+          1 => 'decision',
+        ),
+      ),
+      'expai_change_object' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'contentobject_id',
+          1 => 'language_code',
+        ),
+      ),
+      'expai_change_created' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'created',
+        ),
+      ),
+    ),
+  ),
+  'expai_checkpoint' => 
+  array (
+    'name' => 'expai_checkpoint',
+    'fields' => 
+    array (
+      'changes_json' => 
+      array (
+        'type' => 'longtext',
+        'default' => false,
+      ),
+      'conversation_len' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'created' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'drafts_json' => 
+      array (
+        'type' => 'longtext',
+        'default' => false,
+      ),
+      'id' => 
+      array (
+        'type' => 'auto_increment',
+        'default' => false,
+      ),
+      'label' => 
+      array (
+        'length' => 255,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'thread_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'turn' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+    ),
+    'indexes' => 
+    array (
+      'PRIMARY' => 
+      array (
+        'type' => 'primary',
+        'fields' => 
+        array (
+          0 => 'id',
+        ),
+      ),
+      'expai_checkpoint_thread' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'thread_id',
+          1 => 'turn',
+        ),
+      ),
+      'expai_checkpoint_created' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'created',
+        ),
+      ),
+    ),
+  ),
   'expai_conversation' => 
   array (
     'name' => 'expai_conversation',
@@ -73,6 +557,20 @@ $schema = array (
         'not_null' => '1',
         'default' => 'anthropic',
       ),
+      'run_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'thread_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
       'turn_count' => 
       array (
         'length' => 11,
@@ -107,6 +605,14 @@ $schema = array (
           1 => 'node_id',
         ),
       ),
+      'expai_conversation_thread' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'thread_id',
+        ),
+      ),
     ),
   ),
   'expai_draft_log' => 
@@ -120,6 +626,13 @@ $schema = array (
         'type' => 'varchar',
         'not_null' => '1',
         'default' => '',
+      ),
+      'change_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
       ),
       'contentobject_id' => 
       array (
@@ -146,6 +659,13 @@ $schema = array (
       array (
         'type' => 'auto_increment',
         'default' => false,
+      ),
+      'job_uuid' => 
+      array (
+        'length' => 36,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
       ),
       'language_code' => 
       array (
@@ -174,6 +694,13 @@ $schema = array (
         'type' => 'int',
         'not_null' => '1',
         'default' => 0,
+      ),
+      'package_uuid' => 
+      array (
+        'length' => 36,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
       ),
       'parent_node_id' => 
       array (
@@ -209,6 +736,13 @@ $schema = array (
         'type' => 'varchar',
         'not_null' => '1',
         'default' => 'draft',
+      ),
+      'thread_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
       ),
       'user_id' => 
       array (
@@ -259,6 +793,318 @@ $schema = array (
         'fields' => 
         array (
           0 => 'node_id',
+        ),
+      ),
+      'expai_draft_log_thread' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'thread_id',
+        ),
+      ),
+      'expai_draft_log_package' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'package_uuid',
+        ),
+      ),
+    ),
+  ),
+  'expai_followup' => 
+  array (
+    'name' => 'expai_followup',
+    'fields' => 
+    array (
+      'body' => 
+      array (
+        'type' => 'longtext',
+        'default' => false,
+      ),
+      'created' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'delivery' => 
+      array (
+        'length' => 8,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => 'queue',
+      ),
+      'id' => 
+      array (
+        'type' => 'auto_increment',
+        'default' => false,
+      ),
+      'modified' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'position' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'state' => 
+      array (
+        'length' => 10,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => 'waiting',
+      ),
+      'thread_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+    ),
+    'indexes' => 
+    array (
+      'PRIMARY' => 
+      array (
+        'type' => 'primary',
+        'fields' => 
+        array (
+          0 => 'id',
+        ),
+      ),
+      'expai_followup_thread' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'thread_id',
+          1 => 'state',
+        ),
+      ),
+    ),
+  ),
+  'expai_package' => 
+  array (
+    'name' => 'expai_package',
+    'fields' => 
+    array (
+      'bytes' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'checksum' => 
+      array (
+        'length' => 64,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'created' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'file_count' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'format_version' => 
+      array (
+        'length' => 10,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'group_uuid' => 
+      array (
+        'length' => 36,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'id' => 
+      array (
+        'type' => 'auto_increment',
+        'default' => false,
+      ),
+      'modified' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'name' => 
+      array (
+        'length' => 150,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'object_count' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'origin' => 
+      array (
+        'length' => 20,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'report' => 
+      array (
+        'type' => 'longtext',
+        'default' => false,
+      ),
+      'state' => 
+      array (
+        'length' => 20,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => 'uploaded',
+      ),
+      'storage' => 
+      array (
+        'length' => 255,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'user_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'uuid' => 
+      array (
+        'length' => 36,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+    ),
+    'indexes' => 
+    array (
+      'PRIMARY' => 
+      array (
+        'type' => 'primary',
+        'fields' => 
+        array (
+          0 => 'id',
+        ),
+      ),
+      'expai_package_uuid' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'uuid',
+        ),
+      ),
+    ),
+  ),
+  'expai_plan' => 
+  array (
+    'name' => 'expai_plan',
+    'fields' => 
+    array (
+      'approved' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'approved_by' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'created' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'estimate_json' => 
+      array (
+        'type' => 'longtext',
+        'default' => false,
+      ),
+      'id' => 
+      array (
+        'type' => 'auto_increment',
+        'default' => false,
+      ),
+      'items_json' => 
+      array (
+        'type' => 'longtext',
+        'default' => false,
+      ),
+      'modified' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'state' => 
+      array (
+        'length' => 12,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => 'proposed',
+      ),
+      'thread_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+    ),
+    'indexes' => 
+    array (
+      'PRIMARY' => 
+      array (
+        'type' => 'primary',
+        'fields' => 
+        array (
+          0 => 'id',
+        ),
+      ),
+      'expai_plan_thread' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'thread_id',
         ),
       ),
     ),
@@ -370,6 +1216,469 @@ $schema = array (
       ),
     ),
   ),
+  'expai_thread' => 
+  array (
+    'name' => 'expai_thread',
+    'fields' => 
+    array (
+      'cost_micros' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'created' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'id' => 
+      array (
+        'type' => 'auto_increment',
+        'default' => false,
+      ),
+      'lane' => 
+      array (
+        'length' => 16,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => 'auto',
+      ),
+      'last_event_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'lead_run_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'model_alias' => 
+      array (
+        'length' => 100,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'modified' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'node_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'origin' => 
+      array (
+        'length' => 16,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => 'vector',
+      ),
+      'plan_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'position' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'provider' => 
+      array (
+        'length' => 40,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'requests' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'reserved_micros' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'review_policy' => 
+      array (
+        'length' => 12,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => 'staged',
+      ),
+      'run_mode' => 
+      array (
+        'length' => 10,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => 'write',
+      ),
+      'scope_json' => 
+      array (
+        'type' => 'longtext',
+        'default' => false,
+      ),
+      'seen_event_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'shelf' => 
+      array (
+        'length' => 10,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => 'active',
+      ),
+      'state' => 
+      array (
+        'length' => 16,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => 'idle',
+      ),
+      'title' => 
+      array (
+        'length' => 255,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'tokens' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'user_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'uuid' => 
+      array (
+        'length' => 36,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+    ),
+    'indexes' => 
+    array (
+      'PRIMARY' => 
+      array (
+        'type' => 'primary',
+        'fields' => 
+        array (
+          0 => 'id',
+        ),
+      ),
+      'expai_thread_user_shelf' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'user_id',
+          1 => 'shelf',
+          2 => 'modified',
+        ),
+      ),
+      'expai_thread_user_state' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'user_id',
+          1 => 'state',
+        ),
+      ),
+      'expai_thread_uuid' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'uuid',
+        ),
+      ),
+      'expai_thread_node' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'node_id',
+        ),
+      ),
+    ),
+  ),
+  'expai_thread_event' => 
+  array (
+    'name' => 'expai_thread_event',
+    'fields' => 
+    array (
+      'created' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'id' => 
+      array (
+        'type' => 'auto_increment',
+        'default' => false,
+      ),
+      'kind' => 
+      array (
+        'length' => 20,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'payload' => 
+      array (
+        'type' => 'longtext',
+        'default' => false,
+      ),
+      'run_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'thread_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+    ),
+    'indexes' => 
+    array (
+      'PRIMARY' => 
+      array (
+        'type' => 'primary',
+        'fields' => 
+        array (
+          0 => 'id',
+        ),
+      ),
+      'expai_thread_event_thread' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'thread_id',
+          1 => 'id',
+        ),
+      ),
+      'expai_thread_event_created' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'created',
+        ),
+      ),
+    ),
+  ),
+  'expai_thread_run' => 
+  array (
+    'name' => 'expai_thread_run',
+    'fields' => 
+    array (
+      'conversation_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'cost_micros' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'created' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'finished' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'id' => 
+      array (
+        'type' => 'auto_increment',
+        'default' => false,
+      ),
+      'job_uuid' => 
+      array (
+        'length' => 36,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'kind' => 
+      array (
+        'length' => 12,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => 'turn',
+      ),
+      'label' => 
+      array (
+        'length' => 255,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'lane' => 
+      array (
+        'length' => 16,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'model_alias' => 
+      array (
+        'length' => 100,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'modified' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'parent_run_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'plan_item' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => -1,
+      ),
+      'progress_done' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'progress_total' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'started' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'state' => 
+      array (
+        'length' => 16,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => 'idle',
+      ),
+      'thread_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'tokens' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+    ),
+    'indexes' => 
+    array (
+      'PRIMARY' => 
+      array (
+        'type' => 'primary',
+        'fields' => 
+        array (
+          0 => 'id',
+        ),
+      ),
+      'expai_thread_run_thread' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'thread_id',
+          1 => 'id',
+        ),
+      ),
+      'expai_thread_run_conv' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'conversation_id',
+        ),
+      ),
+    ),
+  ),
   'expai_usage_log' => 
   array (
     'name' => 'expai_usage_log',
@@ -381,6 +1690,13 @@ $schema = array (
         'type' => 'varchar',
         'not_null' => '1',
         'default' => '',
+      ),
+      'batch_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
       ),
       'cache_read_tokens' => 
       array (
@@ -464,6 +1780,20 @@ $schema = array (
         'not_null' => '1',
         'default' => 0,
       ),
+      'job_uuid' => 
+      array (
+        'length' => 36,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'lane' => 
+      array (
+        'length' => 16,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
       'latency_ms' => 
       array (
         'length' => 11,
@@ -505,6 +1835,13 @@ $schema = array (
         'type' => 'int',
         'not_null' => '1',
         'default' => 0,
+      ),
+      'price_factor' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 100,
       ),
       'provider' => 
       array (
@@ -565,6 +1902,20 @@ $schema = array (
         'not_null' => '1',
         'default' => 0,
       ),
+      'run_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'service_tier' => 
+      array (
+        'length' => 20,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
       'session_key' => 
       array (
         'length' => 40,
@@ -578,6 +1929,13 @@ $schema = array (
         'type' => 'varchar',
         'not_null' => '1',
         'default' => '',
+      ),
+      'thread_id' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
       ),
       'tool_calls' => 
       array (
@@ -663,6 +2021,22 @@ $schema = array (
         array (
           0 => 'conversation_id',
           1 => 'turn',
+        ),
+      ),
+      'expai_usage_log_thread' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'thread_id',
+        ),
+      ),
+      'expai_usage_log_job' => 
+      array (
+        'type' => 'non-unique',
+        'fields' => 
+        array (
+          0 => 'job_uuid',
         ),
       ),
     ),

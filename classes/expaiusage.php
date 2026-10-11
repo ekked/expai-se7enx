@@ -114,7 +114,7 @@ class expAiUsage
         $to = isset( $filters['to'] ) && (int) $filters['to'] > 0 ? (int) $filters['to'] : 2147483647;
         if ( $from > 0 || $to < 2147483647 )
             $conds['created'] = array( false, array( $from, $to ) );
-        foreach ( array( 'user_id', 'node_id', 'conversation_id' ) as $field )
+        foreach ( array( 'user_id', 'node_id', 'conversation_id', 'thread_id' ) as $field )
             if ( !empty( $filters[$field] ) )
                 $conds[$field] = (int) $filters[$field];
         foreach ( array( 'action', 'model', 'session_key', 'provider', 'region' ) as $field )

@@ -66,6 +66,9 @@ class expAiUsageLog extends eZPersistentObject
                 'mcp_calls' => $int( 'McpCalls' ),
                 'region' => $str( 'Region' ),
                 'retention' => $str( 'Retention' ),
+                // threads (classes/vector/): the thread and run of the request, 0 outside threads
+                'thread_id' => $int( 'ThreadID' ),
+                'run_id' => $int( 'RunID' ),
             ),
             'keys' => array( 'id' ),
             'increment_key' => 'id',

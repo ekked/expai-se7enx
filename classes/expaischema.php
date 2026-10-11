@@ -38,7 +38,8 @@ class expAiSchema
             return array( 'length' => $length, 'type' => 'varchar', 'not_null' => '1', 'default' => $default );
         };
         $primary = array( 'type' => 'primary', 'fields' => array( 'id' ) );
-        return array(
+        // the thread tables and the thread columns of the tables below: expAiThreadSchema (classes/vector/)
+        return expAiThreadSchema::extend( array(
             'expai_conversation' => array(
                 'name' => 'expai_conversation',
                 'fields' => array(
@@ -157,7 +158,7 @@ class expAiSchema
                     'expai_probe_result_alias' => array( 'type' => 'non-unique', 'fields' => array( 'model_alias', 'created' ) ),
                 ),
             ),
-        );
+        ) );
     }
 
     /** @return string[] table names */

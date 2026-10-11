@@ -32,6 +32,9 @@ class expAiConversation extends eZPersistentObject
                 'provider' => array( 'name' => 'Provider', 'datatype' => 'string', 'default' => 'anthropic', 'required' => true ),
                 'created' => $int( 'Created' ),
                 'modified' => $int( 'Modified' ),
+                // threads (classes/vector/): the thread and run the conversation belongs to
+                'thread_id' => $int( 'ThreadID' ),
+                'run_id' => $int( 'RunID' ),
             ),
             'keys' => array( 'id' ),
             'increment_key' => 'id',
@@ -67,7 +70,42 @@ class expAiConversation extends eZPersistentObject
     /** Removes every conversation of the user on the node ("New conversation"); the draft log stays */
     public static function removeFor( $userID, $nodeID )
     {
+        // the panel threads of these conversations (with their events) go with them
+        expAiThread::removeForPanel( $userID, $nodeID );
         eZPersistentObject::removeObject( self::definition(), array( 'user_id' => (int) $userID, 'node_id' => (int) $nodeID ) );
+    }
+
+    /**
+     * The mode the instructions and tools of the conversation were made for: write (write tools) or read (a Vector
+     * thread in plan mode or with staged review: read tools only). A change of mode starts a fresh window, as a
+     * change of model does (expAiAssistant::step()).
+     * @return string '' for a conversation that never recorded it (the panel's: write)
+     */
+    public function frameMode()
+    {
+        $document = $this->document();
+        return isset( $document['frame_mode'] ) ? (string) $document['frame_mode'] : '';
+    }
+
+    public function setFrameMode( $mode )
+    {
+        $document = $this->document();
+        $document['frame_mode'] = (string) $mode;
+        $this->storeDocument( $document );
+    }
+
+    /** @return string the scope note the conversation last received (a Vector thread tells the model its scope once) */
+    public function scopeNote()
+    {
+        $document = $this->document();
+        return isset( $document['scope_note'] ) ? (string) $document['scope_note'] : '';
+    }
+
+    public function setScopeNote( $note )
+    {
+        $document = $this->document();
+        $document['scope_note'] = (string) $note;
+        $this->storeDocument( $document );
     }
 
     /**
