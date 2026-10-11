@@ -182,9 +182,45 @@ class expAiConfig
             }
             $groups[$id]['models'][] = array( 'alias' => $alias, 'label' => $model['label'], 'tool_use' => $model['tool_use'],
                                               'cost' => expAiCost::costClass( $alias ), 'slow' => $model['slow'],
-                                              'writes' => expAiProbe::writeAllowed( $alias, $this ) );
+                                              'writes' => expAiProbe::writeAllowed( $alias, $this ),
+                                              // stopped (a local server that does not run) or unreachable: shown, not selectable
+                                              // (the site default always is); expAiProviderHealth, kept briefly per process
+                                              'state' => $state = $this->modelState( $alias, $model ),
+                                              'disabled' => $state !== '' && $alias !== $registry->defaultAlias() );
         }
         return array_values( $groups );
+    }
+
+    /**
+     * The state of a model for the pickers: '' (usable), stopped (its local server does not run) or unreachable.
+     * @return string
+     */
+    public function modelState( $alias, ?array $model = null )
+    {
+        $model = $model ?: $this->registry()->getModel( (string) $alias );
+        return $model ? expAiProviderHealth::state( $this, $model['provider'] ) : '';
+    }
+
+    /**
+     * The state of every model the current user may choose that is not usable now, with the text of the pickers.
+     * @return array alias => { state, text, disabled }
+     */
+    public function modelStates()
+    {
+        $default = $this->model();
+        $manage = expAiServerFunctions::hasPolicy( 'model_manage' );
+        $out = array();
+        foreach ( $this->allowedModelRows() as $alias => $model )
+        {
+            $state = $this->modelState( $alias, $model );
+            if ( $state === '' )
+                continue;
+            $out[$alias] = array( 'state' => $state, 'disabled' => $alias !== $default,
+                                  'text' => $state === expAiProviderHealth::STOPPED
+                                          ? ( $manage ? ezpI18n::tr( 'extension/expai/model', 'stopped — start it under Models' ) : ezpI18n::tr( 'extension/expai/model', 'stopped' ) )
+                                          : ezpI18n::tr( 'extension/expai/model', 'unreachable' ) );
+        }
+        return $out;
     }
 
     /** @return string the model the current user chose (preference expai_model, an alias), '' when none */

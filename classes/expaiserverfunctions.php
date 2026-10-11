@@ -111,7 +111,9 @@ class expAiServerFunctions extends ezjscServerFunctions
             return array( 'prefill' => $prefill, 'history' => ( new expAiAssistant( $config ) )->history( $user, $nodeID ),
                           'model' => array( 'current' => $config->effectiveModel(),
                                             'refused' => $config->preferredModelRefused() ? ezpI18n::tr( 'extension/expai/model', 'The model you chose is no longer available; the default is used.' ) : '',
-                                            'slow' => expAiUsage::slowNotice( $config->effectiveModel(), $config ) ),
+                                            'slow' => expAiUsage::slowNotice( $config->effectiveModel(), $config ),
+                                            // the panel's select is in the view cache: expai.js marks stopped models from this
+                                            'states' => $config->modelStates(), 'manage' => self::hasPolicy( 'model_manage' ) ),
                           'drafts' => expAiAssistant::drafts( $user, $nodeID ),
                           'pending' => $conversation ? $conversation->awaitsAnswer() : false );
         } );
@@ -148,6 +150,19 @@ class expAiServerFunctions extends ezjscServerFunctions
             $fresh = expAiConfig::instance();
             return array( 'model' => $fresh->effectiveModel(), 'label' => $fresh->allowedModels()[$fresh->effectiveModel()],
                           'default' => $fresh->model(), 'slow' => expAiUsage::slowNotice( $fresh->effectiveModel(), $fresh ) );
+        } );
+    }
+
+    /**
+     * states: the models of the user's pickers that are stopped or unreachable now (alias => { state, text,
+     * disabled }), for pickers built in the browser (Vector). Read only; kept briefly (expAiProviderHealth).
+     */
+    public static function states( $args )
+    {
+        $config = self::guard( true, false );
+        return self::run( function () use ( $config )
+        {
+            return array( 'states' => $config->modelStates(), 'manage' => self::hasPolicy( 'model_manage' ) );
         } );
     }
 

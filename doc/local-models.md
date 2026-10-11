@@ -81,6 +81,15 @@ journal (`journalctl -u expai-llm-helper`). The helper writes `/var/lib/expai-ll
 `expai-llm-idle.timer` runs every 5 minutes and stops Ollama after 30 minutes without a loaded model (Ollama itself
 unloads a model after `OLLAMA_KEEP_ALIVE`).
 
+## When the server is stopped
+
+The provider can stay in `Providers[]` while Ollama is stopped. The model pickers then show the local model as
+"stopped — start it under Models" and do not let it be chosen; users with `expai/model_manage` get a link to this view.
+An editor whose choice (or conversation, or thread) is the local model is not stuck with "Exponential Intelligence
+could not be reached.": the request goes to the site default model and the panel says so in one line
+([providers.md](providers.md), "When a model cannot answer"). Once the server runs again, the next request uses the
+local model. The state comes from `/api/version` on the loopback address, kept `[AISettings] HealthCacheSeconds`.
+
 ## Probe before writing
 
 A local model reads only until it passes the probe ([probe.md](probe.md)):

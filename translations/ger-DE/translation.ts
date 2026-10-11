@@ -552,6 +552,30 @@
         <source>No local model server is configured.</source>
         <translation>Es ist kein lokaler Modellserver eingerichtet.</translation>
     </message>
+    <message>
+        <source>%requested is stopped, and no other model you may use can answer for this content.</source>
+        <translation>%requested ist gestoppt, und kein anderes Modell, das Sie verwenden dürfen, kann für diesen Inhalt antworten.</translation>
+    </message>
+    <message>
+        <source>%requested did not answer in time, and no other model you may use can answer for this content.</source>
+        <translation>%requested hat nicht rechtzeitig geantwortet, und kein anderes Modell, das Sie verwenden dürfen, kann für diesen Inhalt antworten.</translation>
+    </message>
+    <message>
+        <source>%requested is not allowed, and no other model you may use can answer for this content.</source>
+        <translation>%requested ist nicht erlaubt, und kein anderes Modell, das Sie verwenden dürfen, kann für diesen Inhalt antworten.</translation>
+    </message>
+    <message>
+        <source>%requested is no longer available, and no other model you may use can answer for this content.</source>
+        <translation>%requested ist nicht mehr verfügbar, und kein anderes Modell, das Sie verwenden dürfen, kann für diesen Inhalt antworten.</translation>
+    </message>
+    <message>
+        <source>The data policy keeps this content away from %requested, and no other model you may use can answer for it.</source>
+        <translation>Die Datenrichtlinie hält diesen Inhalt von %requested fern, und kein anderes Modell, das Sie verwenden dürfen, kann dafür antworten.</translation>
+    </message>
+    <message>
+        <source>%requested could not be reached, and no other model you may use can answer for this content.</source>
+        <translation>%requested war nicht erreichbar, und kein anderes Modell, das Sie verwenden dürfen, kann für diesen Inhalt antworten.</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/fieldaction</name>
@@ -1141,6 +1165,46 @@
     <message>
         <source>Reset to default</source>
         <translation>Auf Voreinstellung zurücksetzen</translation>
+    </message>
+    <message>
+        <source>%used answered instead: %requested is stopped.</source>
+        <translation>%used hat stattdessen geantwortet: %requested ist gestoppt.</translation>
+    </message>
+    <message>
+        <source>%used answered instead: %requested did not answer in time.</source>
+        <translation>%used hat stattdessen geantwortet: %requested hat nicht rechtzeitig geantwortet.</translation>
+    </message>
+    <message>
+        <source>%used answered instead: %requested is not allowed.</source>
+        <translation>%used hat stattdessen geantwortet: %requested ist nicht erlaubt.</translation>
+    </message>
+    <message>
+        <source>%used answered instead: %requested is no longer available.</source>
+        <translation>%used hat stattdessen geantwortet: %requested ist nicht mehr verfügbar.</translation>
+    </message>
+    <message>
+        <source>%used answered instead: the data policy keeps this content away from %requested.</source>
+        <translation>%used hat stattdessen geantwortet: Die Datenrichtlinie hält diesen Inhalt von %requested fern.</translation>
+    </message>
+    <message>
+        <source>%used answered instead: %requested could not be reached.</source>
+        <translation>%used hat stattdessen geantwortet: %requested war nicht erreichbar.</translation>
+    </message>
+    <message>
+        <source>stopped — start it under Models</source>
+        <translation>gestoppt — unter Modelle starten</translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation>gestoppt</translation>
+    </message>
+    <message>
+        <source>unreachable</source>
+        <translation>nicht erreichbar</translation>
+    </message>
+    <message>
+        <source>Start it under Models</source>
+        <translation>Unter Modelle starten</translation>
     </message>
 </context>
 <context>

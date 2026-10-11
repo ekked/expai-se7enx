@@ -552,6 +552,30 @@
         <source>No local model server is configured.</source>
         <translation>No local model server is configured.</translation>
     </message>
+    <message>
+        <source>%requested is stopped, and no other model you may use can answer for this content.</source>
+        <translation>%requested is stopped, and no other model you may use can answer for this content.</translation>
+    </message>
+    <message>
+        <source>%requested did not answer in time, and no other model you may use can answer for this content.</source>
+        <translation>%requested did not answer in time, and no other model you may use can answer for this content.</translation>
+    </message>
+    <message>
+        <source>%requested is not allowed, and no other model you may use can answer for this content.</source>
+        <translation>%requested is not allowed, and no other model you may use can answer for this content.</translation>
+    </message>
+    <message>
+        <source>%requested is no longer available, and no other model you may use can answer for this content.</source>
+        <translation>%requested is no longer available, and no other model you may use can answer for this content.</translation>
+    </message>
+    <message>
+        <source>The data policy keeps this content away from %requested, and no other model you may use can answer for it.</source>
+        <translation>The data policy keeps this content away from %requested, and no other model you may use can answer for it.</translation>
+    </message>
+    <message>
+        <source>%requested could not be reached, and no other model you may use can answer for this content.</source>
+        <translation>%requested could not be reached, and no other model you may use can answer for this content.</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/fieldaction</name>
@@ -1141,6 +1165,46 @@
     <message>
         <source>Reset to default</source>
         <translation>Reset to default</translation>
+    </message>
+    <message>
+        <source>%used answered instead: %requested is stopped.</source>
+        <translation>%used answered instead: %requested is stopped.</translation>
+    </message>
+    <message>
+        <source>%used answered instead: %requested did not answer in time.</source>
+        <translation>%used answered instead: %requested did not answer in time.</translation>
+    </message>
+    <message>
+        <source>%used answered instead: %requested is not allowed.</source>
+        <translation>%used answered instead: %requested is not allowed.</translation>
+    </message>
+    <message>
+        <source>%used answered instead: %requested is no longer available.</source>
+        <translation>%used answered instead: %requested is no longer available.</translation>
+    </message>
+    <message>
+        <source>%used answered instead: the data policy keeps this content away from %requested.</source>
+        <translation>%used answered instead: the data policy keeps this content away from %requested.</translation>
+    </message>
+    <message>
+        <source>%used answered instead: %requested could not be reached.</source>
+        <translation>%used answered instead: %requested could not be reached.</translation>
+    </message>
+    <message>
+        <source>stopped — start it under Models</source>
+        <translation>stopped — start it under Models</translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation>stopped</translation>
+    </message>
+    <message>
+        <source>unreachable</source>
+        <translation>unreachable</translation>
+    </message>
+    <message>
+        <source>Start it under Models</source>
+        <translation>Start it under Models</translation>
     </message>
 </context>
 <context>

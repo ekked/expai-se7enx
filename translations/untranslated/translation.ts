@@ -552,6 +552,30 @@
         <source>No local model server is configured.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>%requested is stopped, and no other model you may use can answer for this content.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%requested did not answer in time, and no other model you may use can answer for this content.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%requested is not allowed, and no other model you may use can answer for this content.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%requested is no longer available, and no other model you may use can answer for this content.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The data policy keeps this content away from %requested, and no other model you may use can answer for it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%requested could not be reached, and no other model you may use can answer for this content.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/fieldaction</name>
@@ -1140,6 +1164,46 @@
     </message>
     <message>
         <source>Reset to default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%used answered instead: %requested is stopped.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%used answered instead: %requested did not answer in time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%used answered instead: %requested is not allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%used answered instead: %requested is no longer available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%used answered instead: the data policy keeps this content away from %requested.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%used answered instead: %requested could not be reached.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopped — start it under Models</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unreachable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start it under Models</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

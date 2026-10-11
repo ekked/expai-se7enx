@@ -71,6 +71,8 @@ class expAiSchema
                     'drafts_written' => $int,
                     'error_class' => $varchar( 60 ),
                     'error_message' => $varchar( 255 ),
+                    // the fallback to the default model: why another model answered (requested_model_alias: the one asked for)
+                    'fallback_reason' => $varchar( 20 ),
                     'http_status' => $int,
                     'id' => array( 'type' => 'auto_increment', 'default' => false ),
                     'input_tokens' => $int,
@@ -87,6 +89,7 @@ class expAiSchema
                     'region' => $varchar( 10 ),
                     'reported_cost_micros' => $int,
                     'request_debug' => array( 'type' => 'longtext', 'default' => false ),
+                    'requested_model_alias' => $varchar( 100 ),
                     'retention' => $varchar( 10 ),
                     'retries' => $int,
                     'session_key' => $varchar( 40 ),

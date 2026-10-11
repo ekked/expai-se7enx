@@ -58,6 +58,16 @@ PromptCaching=enabled
 Timeout=115
 ConnectTimeout=10
 
+# When the model a request asked for (the user's choice, a thread's model, the model a conversation is bound to)
+# cannot answer - stopped (a local server that does not run), unreachable (connection refused, name or TLS failure,
+# no byte within the time limit), not allowed any more, removed, or kept away by the data policy - the request goes to
+# the site default model instead (or the first allowed model that may take the content), and the editor sees one
+# line saying so. Never for failures that would repeat on any model. disabled: the failure is shown as before.
+FallbackToDefaultModel=enabled
+# Seconds a provider's state (running, stopped, unreachable) is kept per process for the model pickers and the
+# fallback (0: checked on every use). A local server is asked on the loopback address, never by running a command.
+HealthCacheSeconds=30
+
 # The longest answer accepted from the provider, in bytes.
 MaxResponseBytes=4194304
 

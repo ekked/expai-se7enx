@@ -77,6 +77,43 @@ model that may not write. It offers the site default, the models of `[ProviderSe
 (default `anthropic`), and the models of the providers the policy `expai/model_use` allows (limitation Provider).
 A model posted that is not on that list is refused ([permissions.md](permissions.md)).
 
+A model whose provider cannot be reached right now is shown with its state and cannot be chosen (the site default
+always can): "stopped — start it under Models" for a local server (`Managed=ollama`) that does not run, with a link to
+expai/models for users with `expai/model_manage` ("stopped" for everyone else), and "unreachable" for a provider on
+the loopback address that refuses connections or a provider whose last request failed at the connection. The state is
+read the way expai/models reads it (Ollama's `/api/version` on the loopback address; never by running a command) and
+kept `[AISettings] HealthCacheSeconds` (default 30) per process, so the picker adds no noticeable time. The panel's
+select is part of the cached full view: expai.js marks it from `expai::load`; Vector's select from `expai::states`.
+
+## When a model cannot answer
+
+With `[AISettings] FallbackToDefaultModel=enabled` (the default), a request whose model (the editor's choice, a
+thread's model, the model a conversation is bound to) cannot answer goes to the site default model instead:
+
+| Reason | When |
+| --- | --- |
+| stopped | a local server (`Managed=ollama`) does not run: seen before the request, or its connection is refused |
+| unreachable | connection refused, host not resolved, TLS failure (curl errors), or the provider was marked unreachable |
+| timeout | not a single byte came back within the provider's `Timeout` |
+| not allowed | the user may not use the model any more (`expai/model_use`, `AllowUserModelChoice`, `AllowedModels[]`) |
+| removed | the model is not in the registry any more |
+| data policy | the data policy keeps the content away from the model's provider |
+
+When the default may not take the content either (the user's permissions, the data policy), the first of the user's
+allowed models that may answers; when none can, the editor gets a message naming the model and why ("Qwen3.5 4B
+(local) is stopped, and no other model you may use can answer for this content."). A request that asked for the site
+default itself never moves to another provider. Failures that would repeat on any model (the default's own provider
+refusing access, a request or answer that is too long, a refusal, any HTTP error of a reachable provider) are shown as
+before.
+
+The conversation goes on with the default as after a change of model (the earlier exchanges compacted into a fresh
+window, see above). The panel, the field actions, "Fill the fields", Vector and a request started from the dashboard
+("Start writing") show one line: "Claude Sonnet 5.5 answered instead: Qwen3.5 4B (local) is stopped." The exchange keeps
+it in the history. The usage log row of the answer names the model asked for (`requested_model_alias`) and the reason
+(`fallback_reason`); a request that failed at the connection keeps its own row with the error
+([usage-tracking.md](usage-tracking.md)). The choice of model stays as it was: once the local server runs again, the
+next request goes to it.
+
 ## Tool modes and the write gate
 
 | `ToolUse` | The panel | Drafts |

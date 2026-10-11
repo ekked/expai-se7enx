@@ -36,6 +36,8 @@ a list, empty it where you set it: a line with only `FieldActions[]`, then the e
 | `Timeout` | `115` | Seconds for one call. Keep it below the web server's and PHP's request limits (architecture.md, "Long turns"). |
 | `ConnectTimeout` | `10` | Seconds to connect. |
 | `MaxResponseBytes` | `4194304` | The largest answer accepted, in bytes. |
+| `FallbackToDefaultModel` | `enabled` | When the model a request asked for cannot answer (stopped, unreachable, not allowed, removed, kept away by the data policy), the site default answers instead (or the first allowed model that may take the content) and the editor sees one line saying so. `disabled`: the failure is shown as before. See [providers.md](providers.md), "When a model cannot answer". |
+| `HealthCacheSeconds` | `30` | Seconds a provider's state (running, stopped, unreachable) is kept per process for the model pickers and the fallback; `0` checks on every use. |
 | `Region` | `us` | Where Anthropic processes the requests (`us`, `eu`, `local`), for the data policy and the region the log shows per request. |
 | `Retention` | `30d` | How long Anthropic keeps API data: `none`, `zdr` (zero data retention agreed), `30d`, `unknown`. Check your contract. |
 | `TermsCheckedAt` | (empty) | The day you checked the terms (YYYY-MM-DD); expai/models shows "not checked" while empty. |

@@ -76,6 +76,10 @@ class expAiUsageRecorder implements expAiProvider
                       'model' => $this->inner->modelName(), 'provider' => $this->inner->providerId(), 'session_key' => expAiLimits::sessionKey() );
         if ( $config->flag( 'UsageSettings', 'LogRequests', false ) )
             $row['request_debug'] = expAiText::cut( json_encode( $request, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ), 200000 );
+        // the fallback to the default model (expAiModelFallback): the model the request asked for and why another answers
+        if ( !empty( $this->context['requested_alias'] ) )
+            $row += array( 'requested_model_alias' => expAiText::cut( (string) $this->context['requested_alias'], 100 ),
+                           'fallback_reason' => expAiText::cut( isset( $this->context['fallback_reason'] ) ? (string) $this->context['fallback_reason'] : '', 20 ) );
         $start = microtime( true );
         try
         {

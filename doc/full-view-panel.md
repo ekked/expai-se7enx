@@ -34,7 +34,10 @@ Two notes:
 ## What the panel loads
 
 The template contains no personal data, so the cached full view is safe; the conversation, the history and the
-drafts are loaded by `expai::load` when the page opens.
+drafts are loaded by `expai::load` when the page opens. `expai::load` also says which models of the cached select are
+stopped or unreachable, and expai.js marks them (not selectable); `expai::states` (read only) gives the same for
+selects built in the browser, such as Vector's. When another model answered because the chosen one could not, the
+exchange shows one line saying so ([providers.md](providers.md), "When a model cannot answer").
 
 ## Sections
 

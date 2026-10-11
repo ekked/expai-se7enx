@@ -431,6 +431,13 @@ $schema = array (
         'not_null' => '1',
         'default' => '',
       ),
+      'fallback_reason' => 
+      array (
+        'length' => 20,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
       'http_status' => 
       array (
         'length' => 11,
@@ -536,6 +543,13 @@ $schema = array (
       array (
         'type' => 'longtext',
         'default' => false,
+      ),
+      'requested_model_alias' => 
+      array (
+        'length' => 100,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
       ),
       'retention' => 
       array (

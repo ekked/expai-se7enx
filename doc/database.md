@@ -38,6 +38,8 @@ Indexes: (contentobject_id, version), (user_id, status), (node_id).
 | model_alias | varchar(100) | the model alias of the registry (empty for rows before it) |
 | model | varchar(100) | the model that answered (as the API reported it) |
 | region, retention | varchar(10) | the provider's `Region` and `Retention` at the time of the request |
+| requested_model_alias | varchar(100) | the model the request asked for when another one answered (the fallback to the default model), else empty |
+| fallback_reason | varchar(20) | why it did not: `stopped`, `unreachable`, `timeout`, `not_allowed`, `removed`, `data_policy` (empty otherwise) |
 | tool_mode | varchar(10) | `native`, `prompted` or `none` |
 | reasoning_tokens | int | reasoning tokens the provider reported (part of the output tokens) |
 | reported_cost_micros | int | the cost the provider reported (OpenRouter), in millionths of the currency; 0: none |

@@ -401,6 +401,7 @@
                 + '<span class="exp-ai-x-chips">' + chips( x ) + '</span></div>'
                 + '<div class="exp-ai-x-body" id="' + bodyId + '" hidden="hidden">'
                 + '<div class="exp-ai-msg exp-ai-msg-user"><span class="exp-ai-who">' + esc( S.you ) + '</span><div class="exp-ai-body">' + renderText( x.user ) + '</div></div>'
+                + ( x.notice ? '<p class="exp-ai-fallback-notice" role="status">' + esc( x.notice ) + '</p>' : '' )
                 + ( steps ? '<ul class="exp-ai-steps">' + steps + '</ul>' : '' )
                 + ( x.reply ? '<div class="exp-ai-msg exp-ai-msg-assistant"><span class="exp-ai-who">' + esc( S.assistant ) + '</span><div class="exp-ai-body">' + renderText( x.reply ) + '</div></div>' : '' )
                 + '</div>';
@@ -721,6 +722,8 @@
             if ( data.model ) {
                 Array.prototype.forEach.call( root.querySelectorAll( '.exp-ai-model-select' ), function ( select ) { select.value = data.model.current; } );
                 Array.prototype.forEach.call( root.querySelectorAll( '.exp-ai-model-note' ), function ( n ) { n.textContent = data.model.refused || data.model.slow || ''; } );
+                // the fallback: the select of the cached page learns which models are stopped
+                applyModelStates( root, data.model.states, data.model.manage );
             }
             if ( data.prefill && input ) {
                 input.value = data.prefill;
@@ -846,6 +849,7 @@
                     var done = fill( ctx, result.value );
                     undo = done.previous;
                     note.innerHTML = esc( S.filled ) + ( result.note ? ' <em>' + esc( result.note ) + '</em>' : '' )
+                        + ( result.fallback ? ' <span class="exp-ai-fallback-notice">' + esc( result.fallback.notice ) + '</span>' : '' )
                         + ' <button type="button" class="exp-ai-link exp-ai-undo">' + esc( S.undo ) + '</button>';
                 } ).catch( function ( err ) {
                     note.textContent = err.kind === 'timeout' ? S.timeout : ( S.error + ' ' + ( err.message || '' ) ).trim();
@@ -945,7 +949,8 @@
                         }
                     } );
                     if ( fillNote ) {
-                        fillNote.innerHTML = esc( count ? fmt( S.filled_count, { '%count': count } ) : S.nothing ) + ( data.note ? ' <em>' + esc( data.note ) + '</em>' : '' );
+                        fillNote.innerHTML = esc( count ? fmt( S.filled_count, { '%count': count } ) : S.nothing ) + ( data.note ? ' <em>' + esc( data.note ) + '</em>' : '' )
+                            + ( data.fallback ? ' <span class="exp-ai-fallback-notice">' + esc( data.fallback.notice ) + '</span>' : '' );
                     }
                     if ( undoButton ) { undoButton.hidden = !count; }
                     emit( 'fill:done', { root: root, data: data, count: count } );
@@ -995,6 +1000,60 @@
             select.addEventListener( 'change', function () { save( select.value ); } );
             if ( reset ) {
                 reset.addEventListener( 'click', function () { save( '' ); } );
+            }
+        } );
+    }
+
+    /* -------------------------------------------- model states and fallback */
+
+    /**
+     * Marks the stopped or unreachable models of the model selects below root (states: alias => { state, text,
+     * disabled }, from expai::load or expai::states): the state after the label, not selectable; the link to
+     * expai/models for users with expai/model_manage.
+     */
+    function applyModelStates( root, states, manage, selector ) {
+        states = states || {};
+        Array.prototype.forEach.call( root.querySelectorAll( selector || '.exp-ai-model-select' ), function ( select ) {
+            Array.prototype.forEach.call( select.options, function ( option ) {
+                // the text as built (without a state), kept once; the state goes after the model's name
+                var base = option.getAttribute( 'data-text' );
+                if ( base === null ) {
+                    base = option.textContent;
+                    option.setAttribute( 'data-text', base );
+                }
+                var label = option.getAttribute( 'data-label' ) || base;
+                var rest = base.indexOf( label ) === 0 ? base.slice( label.length ) : '';
+                var st = states[option.value];
+                option.textContent = ( base.indexOf( label ) === 0 ? label : base ) + ( st ? ' · ' + st.text : '' ) + rest;
+                option.disabled = !!( st && st.disabled );
+            } );
+        } );
+        var any = Object.keys( states ).some( function ( alias ) { return states[alias].state === 'stopped'; } );
+        Array.prototype.forEach.call( root.querySelectorAll( '.exp-ai-model-manage' ), function ( link ) { link.hidden = !( manage && any ); } );
+    }
+
+    /** Vector: its model select is built in the browser; the states come from expai::states, the notice from the step */
+    function modelStatesHook() {
+        var known = null;
+        on( 'vector:open', function () {
+            ( known ? Promise.resolve( known ) : api( 'states', {} ) ).then( function ( data ) {
+                known = data;
+                window.setTimeout( function () { known = null; }, 30000 );
+                applyModelStates( document, data.states, data.manage, '.exp-ai-v-model' );
+            } ).catch( function () { /* the select stays as built */ } );
+        } );
+        on( 'vector:step', function ( payload ) {
+            var data = payload && payload.data;
+            if ( !data || !data.fallback || !data.exchange ) {
+                return;
+            }
+            var li = document.querySelector( '.exp-ai-v-x[data-id="' + data.exchange.id + '"]' );
+            if ( li && !li.querySelector( '.exp-ai-fallback-notice' ) ) {
+                var p = document.createElement( 'p' );
+                p.className = 'exp-ai-fallback-notice';
+                p.setAttribute( 'role', 'status' );
+                p.textContent = data.fallback.notice;
+                li.insertBefore( p, li.firstChild );
             }
         } );
     }
@@ -1088,6 +1147,7 @@
             window.setTimeout( function () { edit( editRoot ); }, 0 );
         }
         models();
+        modelStatesHook();
         surfaces();
         labels();
     }

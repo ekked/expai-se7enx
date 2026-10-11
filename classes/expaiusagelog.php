@@ -45,6 +45,9 @@ class expAiUsageLog extends eZPersistentObject
                 'retries' => $int( 'Retries' ),
                 'error_class' => $str( 'ErrorClass' ),
                 'error_message' => $str( 'ErrorMessage' ),
+                // the fallback to the default model: the model the request asked for (empty: it answered) and why not
+                'requested_model_alias' => $str( 'RequestedModelAlias' ),
+                'fallback_reason' => $str( 'FallbackReason' ),
                 'drafts_written' => $int( 'DraftsWritten' ),
                 'session_key' => $str( 'SessionKey' ),
                 'rate_limits' => $str( 'RateLimits' ),

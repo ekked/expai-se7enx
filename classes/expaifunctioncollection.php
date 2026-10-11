@@ -42,6 +42,8 @@ class expAiFunctionCollection
                                          'refused' => $config->preferredModelRefused(),
                                          'slow' => expAiUsage::slowNotice( $config->effectiveModel(), $config ),
                                          'placement' => expAiServerFunctions::hasPolicy( 'settings' ) ? $config->modelPlacement() : false,
-                                         'pricing' => expAiUsage::pricingInfo() ) );
+                                         'pricing' => expAiUsage::pricingInfo(),
+                                         // stopped or unreachable models (alias => { state, text, disabled }) and the link to expai/models
+                                         'states' => $config->modelStates(), 'manage' => expAiServerFunctions::hasPolicy( 'model_manage' ) ) );
     }
 }

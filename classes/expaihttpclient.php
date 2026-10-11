@@ -147,8 +147,10 @@ class expAiHttpClient
             throw new expAiException( 'The answer of Exponential Intelligence was too long.', 'response larger than ' . $limit . ' bytes', $status );
         if ( $ok === false || $errno )
         {
+            // "no answer": not a single byte came back (expAiModelFallback may hand the request to the default model)
             if ( $errno === 28 )
-                throw new expAiException( 'Exponential Intelligence did not answer in time. Please try again with a smaller request.', 'timeout after ' . $this->timeout . ' s' );
+                throw new expAiException( 'Exponential Intelligence did not answer in time. Please try again with a smaller request.',
+                                          'timeout after ' . $this->timeout . ' s' . ( $received === '' && $status === 0 ? ', no answer' : '' ) );
             throw new expAiException( 'Exponential Intelligence could not be reached.', 'curl error ' . $errno );
         }
         return array( $status, $received, $responseHeaders );

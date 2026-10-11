@@ -88,6 +88,10 @@ class expAiAssistant
         // the model: the given provider's, else the user's choice (allowed by expai/model_use), else the default
         $alias = $this->given && method_exists( $this->given, 'modelAlias' ) && $this->given->modelAlias() !== '' ? $this->given->modelAlias() : $this->config->effectiveModel();
         $this->alias = $alias;
+        // the fallback to the site default: a model that cannot take the request (stopped, unreachable, not allowed,
+        // removed, kept away by the data policy) hands it on (expAiModelFallback; tests that give a provider: never)
+        if ( !$this->given )
+            $alias = $this->alias = $this->fallbackAlias( $alias, $nodeID );
         $this->provider = $this->providerFor( $alias );
         $providerID = $this->provider->providerId();
         $model = $this->config->registry()->getModel( $alias );
@@ -206,7 +210,30 @@ class expAiAssistant
                                                 'turn' => $turnHistory ? (int) $turnHistory[count( $turnHistory ) - 1]['id'] : 0,
                                                 'action' => 'panel', 'iteration' => $iterations ) );
         }
-        $answer = $this->provider->send( $call );
+        // the fallback: the usage log names the model the request asked for and why another one answers
+        if ( $this->fallback && $this->provider instanceof expAiUsageRecorder )
+            $this->provider->setContext( array( 'requested_alias' => $this->fallback['requested'], 'fallback_reason' => $this->fallback['reason'] ) );
+        try
+        {
+            $answer = $this->provider->send( $call );
+        }
+        catch ( expAiException $e )
+        {
+            // the fallback: a model that cannot be reached hands the step to the site default, which goes on from
+            // the conversation so far (the change of model compacts it, see above), once per step
+            if ( $this->fallbackAfterFailure( $e, $alias, $nodeID ) === '' )
+                throw $e;
+            try
+            {
+                return $this->stepInner( $nodeID, null );
+            }
+            finally
+            {
+                $this->fallbackTo = '';
+            }
+        }
+        if ( !$this->given )
+            expAiModelFallback::rememberUp( $this->config, $alias );
 
         if ( $answer['stop_reason'] === 'refusal' )
         {
@@ -293,6 +320,9 @@ class expAiAssistant
         if ( $history )
         {
             $i = count( $history ) - 1;
+            // the fallback: the exchange keeps the line saying which model answered instead
+            if ( $this->fallback )
+                $history[$i]['notice'] = $this->fallback['notice'];
             foreach ( $steps as $step )
                 $history[$i]['steps'][] = $step;
             if ( trim( $text ) !== '' )
@@ -395,7 +425,66 @@ class expAiAssistant
         return array( 'status' => $status, 'text' => (string) $text, 'steps' => $steps,
                       'exchange' => $history ? self::presentExchange( end( $history ) ) : null,
                       'drafts' => self::drafts( $user, $nodeID ),
+                      // the fallback: requested, used (aliases and labels), reason, notice; null when the requested model answered
+                      'fallback' => $this->fallback,
                       'conversation_id' => $conversation ? (int) $conversation->attribute( 'id' ) : 0 );
+    }
+
+    /** @var array|null the fallback of the current step (expAiModelFallback::describe()) */
+    protected $fallback = null;
+
+    /** @var string the model a failed request of the current step handed on to */
+    protected $fallbackTo = '';
+
+    /**
+     * The fallback before a request: the model the request asked for (the thread's, else the user's choice, else the
+     * site default) or the one that answers instead (expAiModelFallback::resolve()).
+     * @return string alias
+     * @throws expAiException when no model the user may use can answer for the node
+     */
+    protected function fallbackAlias( $alias, $nodeID )
+    {
+        if ( $this->fallbackTo !== '' )
+            return $this->fallbackTo;
+        $this->fallback = null;
+        list( $used, $fallback ) = expAiModelFallback::resolve( $this->config, $this->requestedAlias(), expAiModelFallback::nodeAllows( $this->config, $nodeID ) );
+        $this->fallback = $fallback;
+        return $used;
+    }
+
+    /** @return string the model the step asks for: a thread's model, else the user's choice, else the site default */
+    protected function requestedAlias()
+    {
+        if ( !empty( $this->bound ) && !empty( $this->threadOptions['alias'] ) )
+            return (string) $this->threadOptions['alias'];
+        return expAiModelFallback::requestedByUser( $this->config );
+    }
+
+    /**
+     * The fallback after a failed request: the model that answers instead, when the failure is one of the connection.
+     * @return string the alias of the next try, '' to show the failure as it is
+     * @throws expAiException when no model the user may use can answer for the node
+     */
+    protected function fallbackAfterFailure( expAiException $e, $alias, $nodeID )
+    {
+        if ( $this->given || $this->fallbackTo !== '' || $this->fallback || !expAiModelFallback::enabled( $this->config ) )
+            return '';
+        $reason = expAiModelFallback::reason( $e, $this->config, $alias );
+        if ( $reason === '' )
+            return '';
+        expAiModelFallback::rememberDown( $this->config, $alias );
+        if ( $alias === $this->config->model() )
+            return '';
+        $used = expAiModelFallback::choose( $this->config, $alias, expAiModelFallback::nodeAllows( $this->config, $nodeID ) );
+        if ( $used === '' )
+            throw expAiModelFallback::noneLeft( $this->config, $alias, $reason );
+        $this->fallback = expAiModelFallback::describe( $this->config, $alias, $used, $reason );
+        $this->fallbackTo = $used;
+        // the next model gets its own time
+        $settings = $this->config->registry()->settingsFor( $used );
+        if ( function_exists( 'set_time_limit' ) )
+            @set_time_limit( max( 1, min( 600, (int) ( !empty( $settings['Timeout'] ) ? $settings['Timeout'] : $this->config->int( 'AISettings', 'Timeout', 115, 1, 600 ) ) ) ) + 30 );
+        return $used;
     }
 
     /**

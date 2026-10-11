@@ -49,6 +49,20 @@ The API binds the model's reasoning to the exact start of a conversation. expai 
 and tools for that reason, and for conversations stored before that it retries once letting the API drop the old
 blocks. If it still happens, **New conversation** helps; the drafts stay.
 
+## "Exponential Intelligence could not be reached." / "... answered instead: ... is stopped."
+
+The model's provider did not take the connection: a local server (`Managed=ollama`) that is stopped, a wrong
+`BaseURL`, a host that does not resolve, a TLS problem, a firewall. The usage log row (expai/log) has the curl error
+(`curl error 7`: connection refused, `6`: host not resolved, `35`/`60`: TLS). With
+`[AISettings] FallbackToDefaultModel=enabled` (the default) the editor does not see this error when another model can
+answer: the site default answers and the panel says "<default> answered instead: <model> could not be reached / is
+stopped" ([providers.md](providers.md), "When a model cannot answer"); the log row of the answer names the requested
+model. The error remains when the failing model is the site default itself, when fallback is disabled, and when no
+other allowed model may take the content ("... and no other model you may use can answer for this content.").
+
+For a stopped local model: start it under expai/models (or choose another model; the pickers show it as "stopped").
+A conversation that was bound to it goes on with the default and returns to the local model once it runs again.
+
 ## "Exponential Intelligence did not answer in time" / "The server did not answer in time"
 
 One model call took longer than `[AISettings] Timeout`, or the web server cut the request. Keep Timeout below the

@@ -35,6 +35,12 @@ taken out of the input and counted as cache reads, as Anthropic reports them), p
 reported. The row stores the provider id, the model alias, the provider's region and retention, and the tool mode, so
 every provider's rows are counted the same way ([providers.md](providers.md), extending.md).
 
+When another model answered because the one asked for could not ([providers.md](providers.md), "When a model cannot
+answer"), the row of the answer has `requested_model_alias` (the model asked for) and `fallback_reason` (`stopped`,
+`unreachable`, `timeout`, `not_allowed`, `removed` or `data_policy`); `model_alias` is the model that answered. Both are
+empty when the requested model answered. A request that failed at the connection first keeps its own row with the
+error.
+
 The cost of a row is, in this order: the cost the provider reported (OpenRouter, shown "reported"), the prices of its
 model alias (`[Model_<alias>] InputPerMTok` ...; a local model is free), the `[Pricing]` table by model id; a model of
 another provider without prices has an unknown cost rather than a Claude price. The limits use the same cost.
