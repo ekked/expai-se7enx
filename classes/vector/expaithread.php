@@ -300,6 +300,24 @@ class expAiThread extends eZPersistentObject
         return expAiCost::enabled() ? expAiCost::money( (int) $this->attribute( 'cost_micros' ) / 1000000 ) : '';
     }
 
+    /** @var bool set by the job of an approved plan while it has more turns to run: the thread stays "running" between them */
+    public static $holdRunning = false;
+
+    /**
+     * The state of a thread that does not work: "review" while staged changes wait (pending, accepted, conflict) or a
+     * plan waits for approval, else "idle".
+     * @return string
+     */
+    public function restingState()
+    {
+        $id = (int) $this->attribute( 'id' );
+        $open = eZPersistentObject::count( expAiChange::definition(), array( 'thread_id' => $id, 'decision' => array( array( 'pending', 'accepted', 'partial', 'conflict' ) ) ) );
+        if ( $open )
+            return 'review';
+        $plan = class_exists( 'expAiPlan' ) ? expAiPlan::fetchCurrent( $id ) : null;
+        return $plan && $plan->attribute( 'state' ) === 'proposed' ? 'review' : 'idle';
+    }
+
     /** Marks the thread as touched now */
     public function touch()
     {
@@ -451,9 +469,12 @@ class expAiThread extends eZPersistentObject
         }
         elseif ( $status === 'stopped' )
             $state = 'stopped';
+        elseif ( self::$holdRunning )
+            // a job with more turns to go (the items of an approved plan)
+            $state = 'running';
         else
-            // the exchange of the turn wrote drafts: they wait for the editor (Save as drafts, Send for approval)
-            $state = $written || !empty( $result['exchange']['drafts'] ) ? 'review' : 'idle';
+            // the exchange of the turn wrote drafts, staged changes or a plan: they wait for the editor
+            $state = $written || !empty( $result['exchange']['drafts'] ) ? 'review' : $thread->restingState();
         $thread->setState( $state );
         $run = expAiThreadRun::fetchByID( $runID );
         if ( $run )

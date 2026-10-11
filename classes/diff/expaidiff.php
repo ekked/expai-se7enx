@@ -486,7 +486,8 @@ class expAiDiff
      * @param string[] $acceptedHunkIds
      * @param array $options diff (expAiDiffResult, with an object), write (bool: write a draft of the object),
      *                       language (of the draft; default the base language), reuse_version, source (draft log, default "diff"),
-     *                       prompt_summary, model, job_uuid, thread_id, change_id
+     *                       prompt_summary, model, job_uuid, thread_id, change_id, action (draft log: update, or create
+     *                       for a new object written by writeDraft())
      * @return array values (identifier => merged value of each attribute with an accepted hunk), applied (ids),
      *               unknown (ids not in the diff); with write also version, language, written, skipped, errors
      * @throws expAiException
@@ -604,7 +605,7 @@ class expAiDiff
             'contentobject_id' => (int) $object->attribute( 'id' ), 'version' => $versionNo,
             'user_id' => (int) eZUser::currentUserID(), 'node_id' => $node ? (int) $node->attribute( 'node_id' ) : 0,
             'parent_node_id' => $node ? (int) $node->attribute( 'parent_node_id' ) : 0, 'language_code' => $language,
-            'action' => 'update', 'source' => isset( $options['source'] ) ? (string) $options['source'] : 'diff',
+            'action' => isset( $options['action'] ) && $options['action'] === 'create' ? 'create' : 'update', 'source' => isset( $options['source'] ) ? (string) $options['source'] : 'diff',
             'model' => isset( $options['model'] ) ? (string) $options['model'] : '', 'provider' => isset( $options['provider'] ) ? (string) $options['provider'] : 'anthropic',
             'job_uuid' => isset( $options['job_uuid'] ) ? (string) $options['job_uuid'] : '',
             'thread_id' => isset( $options['thread_id'] ) ? (int) $options['thread_id'] : 0, 'change_id' => isset( $options['change_id'] ) ? (int) $options['change_id'] : 0,

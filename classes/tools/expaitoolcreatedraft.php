@@ -21,7 +21,9 @@ class expAiToolCreateDraft extends expAiTool
         return 'Creates a NEW content object as an unpublished draft owned by the editor, under parent_node_id (default: the open node). '
              . 'fields maps field identifiers (see get_class_definition) to values in the format of their datatype; rich text '
              . '(ezxmltext) is HTML using only p, h2, h3, h4, strong, em, ul, ol, li and a href. Fields you cannot write are '
-             . 'reported as skipped. Nothing is published: the editor reviews the drafts and decides. Call it once per object.';
+             . 'reported as skipped. Nothing is published: the editor reviews the drafts and decides. Call it once per object. '
+             . 'In a thread with staged review it stages a proposal for the editor\'s review instead (no draft yet); call it again '
+             . 'with the returned new_key to revise that proposal.';
     }
 
     public function inputSchema()
@@ -32,14 +34,29 @@ class expAiToolCreateDraft extends expAiTool
             'fields' => array( 'type' => 'object', 'description' => 'field identifier => value',
                                'additionalProperties' => array( 'type' => array( 'string', 'number', 'boolean', 'array' ) ) ),
             'language' => array( 'type' => 'string', 'description' => 'Language code, e.g. eng-GB (default: the default content language)' ),
+            'new_key' => array( 'type' => 'string', 'description' => 'Staged review only: the new_key of an earlier proposal of this new object, to revise it' ),
         ), 'required' => array( 'class_identifier', 'fields' ), 'additionalProperties' => false );
     }
 
     public function execute( array $input, expAiToolContext $context )
     {
-        $context->checkDraftLimit();
         if ( !isset( $input['fields'] ) || !is_array( $input['fields'] ) || !$input['fields'] )
             throw new expAiException( 'Give the fields to write.' );
+        // staged review (Vector): a proposal per field for the editor's review instead of a draft
+        $stager = expAiChangeStager::forContext( $context );
+        $this->staged = (bool) $stager;
+        if ( $stager )
+        {
+            $parent = $context->reader->readableNode( $this->nodeID( $input, $context, 'parent_node_id' ) );
+            if ( $context->reader->policy() )
+                $context->reader->policy()->assertClass( isset( $input['class_identifier'] ) ? (string) $input['class_identifier'] : '',
+                                                         (int) $parent->object()->attribute( 'section_id' ) );
+            $result = $stager->stageCreate( $parent, isset( $input['class_identifier'] ) ? (string) $input['class_identifier'] : '', $input['fields'],
+                                            isset( $input['language'] ) ? (string) $input['language'] : '', isset( $input['new_key'] ) ? (string) $input['new_key'] : '' );
+            $result['name'] = isset( $input['fields'] ) ? expAiChangeStager::nameOf( $input['fields'] ) : '';
+            return $result;
+        }
+        $context->checkDraftLimit();
         $parent = $context->reader->readableNode( $this->nodeID( $input, $context, 'parent_node_id' ) );
         if ( $context->reader->policy() )
             $context->reader->policy()->assertClass( isset( $input['class_identifier'] ) ? (string) $input['class_identifier'] : '',
@@ -61,9 +78,12 @@ class expAiToolCreateDraft extends expAiTool
                       'written' => $written['written'], 'skipped' => $written['skipped'], 'errors' => $written['errors'] );
     }
 
+    /** @var bool the last call staged a proposal (staged review) */
+    protected $staged = false;
+
     public function stepText( array $input )
     {
-        return 'Created the draft "%name"';
+        return $this->staged ? 'Proposed the new object "%name" for review' : 'Created the draft "%name"';
     }
 
     public function stepArguments( array $input, $result )

@@ -45,8 +45,11 @@ always **staged**; Write is only offered once a plan is approved.
 
 | | Plan | Write |
 | --- | --- | --- |
-| Staged | reads, answers with a plan; writes nothing | changes are proposed for review field by field before they are written; until staged changes are available the thread reads only and describes the exact changes |
+| Staged | reads and proposes a plan (`propose_plan`, [plan-mode.md](plan-mode.md)); writes nothing | `create_draft` and `update_draft` stage proposals (new objects too) that the editor accepts or rejects per field and per part in the *Changes* tab, then writes into drafts ([review.md](review.md)) |
 | Direct | (as plan) | drafts are written at once, never published; one object in one language only, and only where the role allows `Review=direct` |
+
+Without an approved plan a staged thread works on one object in one language; a second object or language is bulk
+work, and the write tools ask the model to propose a plan first.
 
 A thread of the Intelligence tab keeps the panel's behavior (direct drafts for small edits). Changing mode, like
 changing the model, starts a fresh window for the model with the earlier exchanges as a short summary.
@@ -69,8 +72,9 @@ the chosen lane applies to background runs.
 - **Queue** (Alt+Enter, or Enter on the Queue button while a turn runs) keeps the message in the thread's queue
   (`expai_followup`); when the turn ends the first one is sent automatically. A queued message can be removed (x).
 
-Parallel runs of an approved plan and steering a running turn come with the
-next steps; the thread data, events and the stream are ready for them.
+An approved plan runs its items one after the other as turns of the thread ([plan-mode.md](plan-mode.md)).
+Parallel runs per item and steering a running turn come with the next steps; the thread data, events and the
+stream are ready for them.
 
 ## How events reach the browser
 
@@ -102,6 +106,15 @@ same permission as `expai::*`: `ezjscore/call` with the function list `expai`):
 | `turn` | expai/vector | one step of the thread (message, or continue=1) |
 | `stop` | expai/vector | stops the thread |
 | `followup` | expai/vector | the queue: add, drop, take, list |
+| `changes` | expai/write | the staged changes of a thread, grouped by object and language ([review.md](review.md)); the approvers may read them |
+| `change_decide` | expai/vector | accept, reject or undecide parts (hunks) or whole fields; `all=accepted\|rejected` |
+| `change_edit` | expai/vector | rewrite the proposed side of a part (plain text fields) |
+| `change_restage` | expai/vector | compare a change whose base changed with the current version |
+| `rebase` | expai/vector | set conflicting changes aside and return the message that asks the model to stage them again |
+| `apply` | expai/vector | write the accepted parts into drafts (never published); conflicts are reported, not written |
+| `plan` | expai/write | the current plan with its estimate and the limits it touches ([plan-mode.md](plan-mode.md)) |
+| `plan_estimate` | expai/vector | the estimate of a proposed plan with the editor's selection (not stored) |
+| `plan_decide` | expai/vector | approve (with the editor's selection and instructions) or reject a proposed plan |
 
 Every function checks POST, the form token and the policies itself, and what the thread allows
 ([threads.md](threads.md#who-sees-a-thread)).
@@ -109,7 +122,8 @@ Every function checks POST, the form token and the policies itself, and what the
 ## Settings
 
 `[VectorSettings]` (Enabled, Panes[], DefaultMode, DefaultReview, BulkObjectThreshold, BulkLanguageThreshold,
-PollActiveMs, PollWorkingMs, PollIdleMs, Transport, MaxStreams, StreamSeconds), `[VectorPane_<name>] Template=`,
+PollActiveMs, PollWorkingMs, PollIdleMs, Transport, MaxStreams, StreamSeconds; staged review: MaxStagedChanges,
+MaxEditLength; plan mode: MaxPlanItems and the estimate), `[VectorPane_<name>] Template=`,
 `[ThreadSettings]` and `[KeyBindings]`: [configuration.md](configuration.md#threads-vector-and-the-keyboard).
 
 ## Extending
@@ -132,7 +146,13 @@ expqueue, class `interactive`) instead:
   policy, write gate and fallback model), and checks again that the owner may still use the thread;
 - Stop cancels the job; a running turn stops after its current step;
 - a crash of the worker repeats the turn once without sending the message twice; a model error ends the turn
-  (state failed, the reason as an event).
+  (state failed, the reason as an event);
+- while Exponential Intelligence is switched off (the master switch, [switch-and-veto.md](switch-and-veto.md)) the
+  job is **held** with "switched off: <reason>" and the thread stays queued with that reason; the cron part `expai`
+  resumes it once expai is on again for the siteaccess the turn was queued from. A **veto** fails the turn for good,
+  with the veto's reason in the thread;
+- an approved plan is one job with one turn per item ([plan-mode.md](plan-mode.md)); the thread stays running
+  until the last item is done.
 
 Without a running worker, the request that queues the turn starts one detached worker for interactive jobs
 (`ext:expqueue:work --until-empty --max-seconds=60 --class=interactive -s <siteaccess>`, at most one start per 15

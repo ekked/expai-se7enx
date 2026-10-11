@@ -53,47 +53,132 @@ class expAiThreadTurnHandler extends expQueueHandlerBase
         if ( !$conversation )
             throw new expQueuePermanentException( 'the thread has no conversation', 'thread' );
         $config = expAiConfig::instance();
+        // the master switch (#370 M2): held with the reason until expai is on again (the cron part expai resumes it)
+        if ( class_exists( 'expAiGate' ) && ( $off = expAiGate::switchedOff( $config, isset( $p['siteaccess'] ) ? (string) $p['siteaccess'] : null ) ) !== '' )
+            return self::hold( $thread, $off );
         $options = isset( $p['options'] ) && is_array( $p['options'] ) ? $p['options'] : array();
-        $message = isset( $p['message'] ) ? (string) $p['message'] : '';
+        // an approved plan (doc/plan-mode.md): one message per item, each a turn of its own, in this one job
+        $messages = isset( $options['messages'] ) && is_array( $options['messages'] ) ? array_values( array_filter( array_map( 'strval', $options['messages'] ), 'strlen' ) ) : array();
+        $planID = isset( $options['plan_id'] ) ? (int) $options['plan_id'] : 0;
+        unset( $options['messages'], $options['plan_id'] );
+        if ( !$messages )
+            $messages = array( isset( $p['message'] ) ? (string) $p['message'] : '' );
         $checkpoint = $context->checkpoint();
-        // a rerun: the message is in the conversation already
-        if ( is_array( $checkpoint ) && !empty( $checkpoint['sent'] ) )
-            $message = '';
+        $first = is_array( $checkpoint ) && isset( $checkpoint['index'] ) ? (int) $checkpoint['index'] : 0;
+        // between the turns of a plan the thread stays "running" (the browser follows it until the last item ends)
+        expAiThread::$holdRunning = count( $messages ) > 1;
+        try
+        {
+            $out = $this->turns( $job, $context, $thread, $conversation, $config, $options, $messages, $first, $checkpoint, $planID, $p );
+            if ( $out instanceof expQueueResult )
+                return $out;
+        }
+        finally
+        {
+            expAiThread::$holdRunning = false;
+        }
+        if ( count( $messages ) > 1 && ( $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ) ) )
+        {
+            $fresh->setState( $fresh->restingState() );
+            $fresh->touch();
+            $fresh->store();
+        }
+        return $out;
+    }
+
+    /** The turns of the job: one per message */
+    protected function turns( expQueueJob $job, expQueueContext $context, expAiThread $thread, $conversation, expAiConfig $config, array $options,
+                              array $messages, $first, $checkpoint, $planID, array $p )
+    {
         $max = $config->int( 'AssistantSettings', 'MaxToolIterations', 10, 1, 50 ) + 2;
         $steps = 0;
-        $status = 'continue';
-        while ( $status === 'continue' && $steps < $max )
+        $status = 'done';
+        for ( $i = $first; $i < count( $messages ); $i++ )
         {
-            if ( $context->isCancelled() )
+            $message = $messages[$i];
+            // a rerun: the message is in the conversation already
+            if ( $i === $first && is_array( $checkpoint ) && !empty( $checkpoint['sent'] ) )
+                $message = '';
+            $status = 'continue';
+            $turnSteps = 0;
+            while ( $status === 'continue' && $turnSteps < $max )
             {
-                self::finish( expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ), 'stopped' );
-                throw new expQueueCancelledException( 'stopped by the editor' );
-            }
-            $assistant = ( new expAiAssistant( $config ) )->useConversation( $conversation, $options );
-            try
-            {
-                if ( $message !== '' )
+                if ( $context->isCancelled() )
                 {
-                    $context->saveCheckpoint( array( 'sent' => 1 ) );
-                    $result = $assistant->step( (int) $p['node_id'], $message );
-                    $message = '';
+                    $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) );
+                    self::finish( $fresh, 'stopped' );
+                    if ( $planID && $fresh )
+                        expAiPlanner::complete( $fresh );
+                    throw new expQueueCancelledException( 'stopped by the editor' );
                 }
-                else
-                    $result = $assistant->step( (int) $p['node_id'], null );
+                $assistant = ( new expAiAssistant( $config ) )->useConversation( $conversation, $options );
+                try
+                {
+                    if ( $message !== '' )
+                    {
+                        $context->saveCheckpoint( array( 'index' => $i, 'sent' => 1 ) );
+                        $result = $assistant->step( (int) $p['node_id'], $message );
+                        $message = '';
+                    }
+                    else
+                        $result = $assistant->step( (int) $p['node_id'], null );
+                }
+                catch ( expAiVetoException $e )
+                {
+                    // refused by the veto hook (#370 M2): the step showed the reason in the thread; not tried again
+                    if ( $planID && ( $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ) ) )
+                        expAiPlanner::complete( $fresh );
+                    return expQueueResult::fail( 'refused: ' . strtr( $e->getMessage(), $e->arguments() ), 'veto' );
+                }
+                catch ( expAiException $e )
+                {
+                    // switched off while the turn ran: held, the thread waits again (the conversation keeps its place)
+                    if ( strpos( (string) $e->detail(), 'master switch' ) === 0 )
+                        return self::hold( expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ), strtr( $e->getMessage(), $e->arguments() ) );
+                    // the step marked the thread failed with the reason; the editor decides whether to try again
+                    if ( $planID && ( $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ) ) )
+                        expAiPlanner::complete( $fresh );
+                    throw new expQueuePermanentException( strtr( $e->getMessage(), $e->arguments() ), 'model' );
+                }
+                $steps++;
+                $turnSteps++;
+                $status = isset( $result['status'] ) ? (string) $result['status'] : 'done';
+                $last = $result['steps'] ? end( $result['steps'] ) : null;
+                $context->progress( $steps, null, ( count( $messages ) > 1 ? ( $i + 1 ) . '/' . count( $messages ) . ' ' : '' )
+                                                  . ( $last && isset( $last['text'] ) ? (string) $last['text'] : '' ) );
+                // the conversation was stored by the step: read it fresh for the next one
+                $conversation = $thread->conversation();
             }
-            catch ( expAiException $e )
-            {
-                // the step marked the thread failed with the reason; the editor decides whether to try again
-                throw new expQueuePermanentException( strtr( $e->getMessage(), $e->arguments() ), 'model' );
-            }
-            $steps++;
-            $status = isset( $result['status'] ) ? (string) $result['status'] : 'done';
-            $last = $result['steps'] ? end( $result['steps'] ) : null;
-            $context->progress( $steps, null, $last && isset( $last['text'] ) ? (string) $last['text'] : '' );
-            // the conversation was stored by the step: read it fresh for the next one
-            $conversation = $thread->conversation();
+            if ( $i + 1 < count( $messages ) )
+                $context->saveCheckpoint( array( 'index' => $i + 1, 'sent' => 0 ) );
         }
-        return array( 'steps' => $steps, 'status' => $status );
+        if ( $planID && ( $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ) ) )
+            expAiPlanner::complete( $fresh );
+        return array( 'steps' => $steps, 'status' => $status, 'turns' => count( $messages ) - $first );
+    }
+
+    /**
+     * The job waits while Exponential Intelligence is switched off: held with "switched off: <reason>" (expAiGate
+     * resumes such jobs), the thread queued again with a status event that says why.
+     * @return expQueueResult
+     */
+    public static function hold( $thread, $reason )
+    {
+        if ( $thread instanceof expAiThread )
+        {
+            $thread->setState( 'queued' );
+            $thread->addEvent( 'status', array( 'state' => 'queued', 'held' => ezpI18n::tr( 'extension/expai/error', (string) $reason ) ) );
+            $run = $thread->leadRun();
+            if ( $run )
+            {
+                $run->setAttribute( 'state', 'queued' );
+                $run->setAttribute( 'modified', time() );
+                $run->store();
+            }
+            $thread->touch();
+            $thread->store();
+        }
+        return expQueueResult::hold( expAiGate::HELD_PREFIX . $reason );
     }
 
     /** The thread and its lead run end in a state (stopped, failed) with an optional error event */

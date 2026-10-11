@@ -8,9 +8,9 @@
  */
 
 /**
- * The texts a Vector thread adds for the model (English, as the rest of the instructions): the scope of the thread
- * and, in plan mode or with staged review, that it may only read. Kept short; the scope note is sent once per change
- * of scope (expAiConversation::scopeNote()).
+ * The texts a Vector thread adds for the model (English, as the rest of the instructions): the scope of the thread,
+ * plan mode (read tools and propose_plan only) and staged review (the write tools stage proposals). Kept short; the
+ * scope note is sent once per change of scope (expAiConversation::scopeNote()).
  */
 class expAiThreadPrompts
 {
@@ -18,11 +18,22 @@ class expAiThreadPrompts
     public static function readOnlyNote( array $options )
     {
         if ( isset( $options['mode'] ) && $options['mode'] === 'plan' )
-            return "Plan mode: this thread is in plan mode. Read what you need with the tools, then answer with a numbered plan: "
-                 . "for each step the object (or new object and its location), the language, the fields to change and a one-line summary, "
-                 . "and an estimate of how many objects and languages it touches. Do not write anything; the editor approves the plan first.";
-        return "Review mode: changes in this thread are reviewed before they are written, and writing tools are not available here yet. "
-             . "Read what you need, then describe the exact changes per field (old text, new text) so the editor can apply them.";
+            return "Plan mode: this thread is in plan mode. Read what you need with the tools, then call propose_plan with one item per "
+                 . "object and action (create, update or translate), the languages, the fields to change and a one-sentence instruction per item, "
+                 . "plus your assumptions, open questions and risks. Do not write anything: the editor approves, edits or rejects the plan first. "
+                 . "After propose_plan, summarize the plan in two sentences and stop.";
+        return "Read-only: writing tools are not available in this thread. Read what you need, then describe the exact changes per field "
+             . "(old text, new text) so the editor can apply them.";
+    }
+
+    /** @return string the instruction for staged review (doc/review.md) */
+    public static function stagedNote()
+    {
+        return "Staged review: in this thread create_draft and update_draft do not write drafts. They stage proposals that the editor reviews "
+             . "field by field and part by part (accept, reject, edit) and then writes into drafts. Stage each object and language once with all "
+             . "the fields you change; to revise a proposal, call the tool again for the same object (create_draft: with the new_key you got). "
+             . "Work on one object in one language unless the thread has an approved plan; for bulk work call propose_plan first. "
+             . "When you are done, tell the editor in one or two sentences what you staged.";
     }
 
     /**

@@ -59,7 +59,9 @@ class expAiThreadRunner
     {
         $run = $thread->leadRun();
         $job = expQueue::enqueue( self::JOB_TYPE, array( 'thread_id' => (int) $thread->attribute( 'id' ), 'run_id' => $run ? (int) $run->attribute( 'id' ) : 0,
-                                                         'node_id' => (int) $nodeID, 'message' => (string) $message, 'options' => $options ),
+                                                         'node_id' => (int) $nodeID, 'message' => (string) $message, 'options' => $options,
+                                                         // the master switch is checked for the siteaccess the turn was queued from
+                                                         'siteaccess' => class_exists( 'expAiGate' ) ? expAiGate::siteAccess() : '' ),
                                   array( 'class' => 'interactive', 'user_id' => (int) $thread->attribute( 'user_id' ),
                                          'tags' => array( 'thread:' . $thread->attribute( 'uuid' ) ) ) );
         if ( $run )

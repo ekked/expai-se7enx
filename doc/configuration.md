@@ -433,6 +433,17 @@ See [mcp.md](mcp.md).
 | `Background` | auto | turns of slow models run as queue jobs (`auto`), every turn (`always`), none (`never`); [vector.md](vector.md#background-runs) |
 | `KickWorker` | enabled | without a running worker, start one detached worker for interactive jobs after queueing |
 | `PhpCli` | (empty) | the PHP command line binary of that worker (empty: the one of this PHP) |
+| `MaxStagedChanges` | 500 | staged changes one thread may hold open ([review.md](review.md)); over it the write tools ask for a review first |
+| `MaxEditLength` | 20000 | the longest text of an edited part in the Changes tab (characters) |
+| `MaxPlanItems` | 50 | the most items of one plan ([plan-mode.md](plan-mode.md)) |
+| `ExpectedRounds[<action>]` | create 3, update 3, translate 2 | tool rounds an item of a plan is expected to take (the estimate; low = one less) |
+| `HighExtraRounds` | 2 | rounds added for the high end of the estimate |
+| `PlanFrameTokens` | 6000 | the size of the instructions and tool definitions when the thread has none stored yet |
+| `PlanHistoryTokens` | 1500 | the bounded history sent with each round |
+| `PlanNewObjectTokens` | 300 | the context of an item that creates a new object |
+| `OutputPerField` | 250 | output tokens per field of a new object |
+| `CharsPerToken` | 3.5 | characters per token for text whose tokens are not counted |
+| `SecondsPerRound` | 8 | the duration shown with the estimate |
 
 **[VectorPane_<name>]** `Template=`: the template of a right-pane tab (`expai/vector/pane_plan.tpl`, ...).
 

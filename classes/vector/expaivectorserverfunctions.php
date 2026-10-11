@@ -477,7 +477,12 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
                 throw new expAiException( 'The model of this thread is no longer available to you. Choose another model.' );
             $bulk = $thread->isBulk( $config );
             $mode = (string) $thread->attribute( 'run_mode' );
-            $readOnly = $mode === 'plan' || ( $review === 'staged' && $thread->attribute( 'origin' ) !== expAiThread::ORIGIN_PANEL ) || $bulk;
+            // bulk work without an approved plan runs in plan mode (read tools and propose_plan); staged review: the
+            // write tools stage proposals for the Changes tab (doc/review.md)
+            if ( $bulk && !expAiChangeStager::approvedPlan( $thread ) && $thread->attribute( 'origin' ) !== expAiThread::ORIGIN_PANEL )
+                $mode = 'plan';
+            $readOnly = $mode === 'plan';
+            $staged = !$readOnly && $review === 'staged' && $thread->attribute( 'origin' ) !== expAiThread::ORIGIN_PANEL;
             $conversation = $thread->conversation();
             if ( !$conversation )
                 throw new expAiException( 'This thread has no conversation any more.' );
@@ -492,7 +497,7 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
                 $thread->setAttribute( 'shelf', 'active' );
                 $thread->store();
             }
-            $options = array( 'alias' => $alias, 'read_only' => $readOnly, 'mode' => $mode,
+            $options = array( 'alias' => $alias, 'read_only' => $readOnly, 'staged' => $staged, 'mode' => $mode,
                 'scope_note' => $thread->attribute( 'origin' ) === expAiThread::ORIGIN_PANEL ? '' : expAiThreadPrompts::scopeNote( $scope ),
                 'action' => $thread->attribute( 'origin' ) === expAiThread::ORIGIN_PANEL ? 'panel' : 'vector' );
             // a slow model: the turn runs in the queue; the browser follows its events
@@ -604,6 +609,172 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
         } );
     }
 
+    /* -------------------------------------------- staged review (doc/review.md) */
+
+    /** @return array the Changes tab: groups, counts, whether the user may decide and apply */
+    protected static function changesAnswer( expAiThread $thread, array $extra = array() )
+    {
+        $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ) ?: $thread;
+        return $extra + array( 'groups' => expAiVector::changeGroups( $fresh ), 'counts' => expAiChange::counts( (int) $fresh->attribute( 'id' ) ),
+                               'can_decide' => expAiThreadAccess::canWrite( $fresh ) && expAiVector::allowed(),
+                               'thread' => expAiVector::detail( $fresh, self::userID() ), 'drafts' => expAiVector::drafts( $fresh ) );
+    }
+
+    /** @return expAiChange a change of the thread named by POST "change" */
+    protected static function loadChange( expAiThread $thread, $id = null )
+    {
+        $change = expAiChange::fetchByID( $id === null ? (int) self::post( 'change' ) : (int) $id );
+        if ( !$change || (int) $change->attribute( 'thread_id' ) !== (int) $thread->attribute( 'id' ) )
+            throw new expAiException( 'This change does not exist any more.' );
+        return $change;
+    }
+
+    /** changes: the staged changes of a thread (thread), grouped by object and language; readable by the approvers too */
+    public static function changes( $args )
+    {
+        self::guard();
+        self::releaseSession();
+        return self::run( function ()
+        {
+            return self::changesAnswer( self::loadThread() );
+        } );
+    }
+
+    /**
+     * change_decide: decisions={"list": [{change, hunk ('' = the whole field), decision (accepted|rejected|pending)}]}
+     * or all=accepted|rejected (every open hunk of the thread). Applied, stale and conflicting changes keep their state
+     * (a conflict is resolved with change_restage, rebase or "keep current" = rejected for the field).
+     */
+    public static function change_decide( $args )
+    {
+        self::guard( true );
+        self::releaseSession();
+        return self::run( function ()
+        {
+            $thread = self::loadThread( true );
+            $userID = self::userID();
+            $n = 0;
+            $db = eZDB::instance();
+            $db->begin();
+            $all = self::post( 'all' );
+            if ( in_array( $all, array( 'accepted', 'rejected' ), true ) )
+            {
+                foreach ( expAiChange::fetchForThread( (int) $thread->attribute( 'id' ), array( 'pending', 'accepted', 'rejected', 'partial' ) ) as $change )
+                {
+                    $n += $change->decide( '', $all, $userID );
+                    $change->store();
+                }
+            }
+            else
+            {
+                $list = self::postJson( 'decisions' );
+                foreach ( array_slice( isset( $list['list'] ) && is_array( $list['list'] ) ? $list['list'] : array(), 0, 500 ) as $d )
+                {
+                    if ( !is_array( $d ) || !isset( $d['change'], $d['decision'] ) )
+                        continue;
+                    $change = self::loadChange( $thread, (int) $d['change'] );
+                    if ( in_array( $change->attribute( 'decision' ), array( 'applied', 'stale' ), true ) )
+                        continue;
+                    $n += $change->decide( isset( $d['hunk'] ) ? (string) $d['hunk'] : '', (string) $d['decision'], $userID );
+                    $change->store();
+                }
+            }
+            // the editor's own decisions are no event: the answer carries them, and an event would make every open
+            // browser of the thread reload it
+            if ( $n )
+            {
+                $thread->touch();
+                $thread->store();
+            }
+            $db->commit();
+            return self::changesAnswer( $thread, array( 'decided' => $n ) );
+        } );
+    }
+
+    /** change_edit: the editor rewrites the proposed side of a hunk (change, hunk, text; plain text fields only) */
+    public static function change_edit( $args )
+    {
+        $config = self::guard( true );
+        self::releaseSession();
+        return self::run( function () use ( $config )
+        {
+            $thread = self::loadThread( true );
+            $text = self::post( 'text' );
+            if ( mb_strlen( $text, 'UTF-8' ) > $config->int( 'VectorSettings', 'MaxEditLength', 20000, 100 ) )
+                throw new expAiException( 'The text is too long.' );
+            expAiChangeStager::editHunk( self::loadChange( $thread ), self::post( 'hunk' ), $text );
+            return self::changesAnswer( $thread );
+        } );
+    }
+
+    /** change_restage: a change whose base changed is compared again with the current version (change) */
+    public static function change_restage( $args )
+    {
+        self::guard( true );
+        self::releaseSession();
+        return self::run( function ()
+        {
+            $thread = self::loadThread( true );
+            expAiChangeStager::restage( self::loadChange( $thread ) );
+            return self::changesAnswer( $thread );
+        } );
+    }
+
+    /**
+     * rebase: changes whose base changed (changes=[ids], default all conflicts) are set aside (stale) and the answer
+     * holds the message that asks the model to stage them again against the current version; the browser sends it as
+     * the next turn.
+     */
+    public static function rebase( $args )
+    {
+        self::guard( true );
+        self::releaseSession();
+        return self::run( function ()
+        {
+            $thread = self::loadThread( true );
+            $ids = array_map( 'intval', self::postJson( 'changes' ) );
+            $lines = array();
+            $db = eZDB::instance();
+            $db->begin();
+            foreach ( expAiChange::fetchForThread( (int) $thread->attribute( 'id' ), array( 'pending', 'accepted', 'partial', 'conflict' ) ) as $change )
+            {
+                if ( $ids ? !in_array( (int) $change->attribute( 'id' ), $ids, true ) : $change->attribute( 'decision' ) !== 'conflict' && !$change->baseChanged() )
+                    continue;
+                if ( $change->isNew() )
+                    continue;
+                $key = (int) $change->attribute( 'contentobject_id' ) . ' (' . $change->attribute( 'language_code' ) . ')';
+                $lines[$key][] = (string) $change->attribute( 'attribute_identifier' );
+                $change->setAttribute( 'decision', 'stale' );
+                $change->setAttribute( 'modified', time() );
+                $change->store();
+            }
+            $db->commit();
+            if ( !$lines )
+                throw new expAiException( 'There is nothing to rebase.' );
+            $parts = array();
+            foreach ( $lines as $key => $fields )
+                $parts[] = 'object ' . $key . ': ' . implode( ', ', array_unique( $fields ) );
+            $message = 'The content changed since you staged these changes: ' . implode( '; ', $parts ) . '. Read the current version of each object again '
+                     . 'and stage your changes once more with update_draft, keeping what the editor changed meanwhile. Then answer in one sentence.';
+            return self::changesAnswer( $thread, array( 'message' => $message ) );
+        } );
+    }
+
+    /**
+     * apply: writes the accepted parts of the thread's changes into drafts (changes=[ids], default every change with
+     * accepted hunks). Never publishes. Conflicts are reported, not written.
+     */
+    public static function apply( $args )
+    {
+        self::guard( true );
+        self::releaseSession();
+        return self::run( function ()
+        {
+            $thread = self::loadThread( true );
+            $result = ( new expAiChangeApplier( $thread ) )->apply( array_map( 'intval', self::postJson( 'changes' ) ) );
+            return self::changesAnswer( $thread, array( 'result' => $result ) );
+        } );
+    }
     /** No caching */
     public static function getCacheTime( $functionName )
     {

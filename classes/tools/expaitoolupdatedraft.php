@@ -20,7 +20,8 @@ class expAiToolUpdateDraft extends expAiTool
     {
         return 'Changes an existing object by writing fields into a DRAFT: the draft you created or changed earlier in this '
              . 'conversation, or else a new draft version (the published version stays as it is until the editor publishes). '
-             . 'Only the fields you give are changed. Same value formats as create_draft.';
+             . 'Only the fields you give are changed. Same value formats as create_draft. In a thread with staged review it stages '
+             . 'a proposal for the editor\'s review instead (no draft yet); calling it again for the same object replaces the proposal.';
     }
 
     public function inputSchema()
@@ -41,6 +42,11 @@ class expAiToolUpdateDraft extends expAiTool
         if ( !$object instanceof eZContentObject || !$object->canRead() )
             throw new expAiException( 'Object %id does not exist or you may not read it.', '', 0, array( '%id' => isset( $input['object_id'] ) ? (int) $input['object_id'] : 0 ) );
         $context->reader->assertAllowed( $object );
+        // staged review (Vector): a proposal per field for the editor's review instead of a draft
+        $stager = expAiChangeStager::forContext( $context );
+        $this->staged = (bool) $stager;
+        if ( $stager )
+            return $stager->stageUpdate( $object, isset( $input['language'] ) ? (string) $input['language'] : '', $input['fields'] );
         $reuse = 0;
         foreach ( expAiDraftLog::fetchForUserNode( $context->user->attribute( 'contentobject_id' ), $context->nodeID ) as $log )
         {
@@ -80,9 +86,12 @@ class expAiToolUpdateDraft extends expAiTool
                       'written' => $written['written'], 'skipped' => $written['skipped'], 'errors' => $written['errors'] );
     }
 
+    /** @var bool the last call staged a proposal (staged review) */
+    protected $staged = false;
+
     public function stepText( array $input )
     {
-        return 'Wrote the draft "%name"';
+        return $this->staged ? 'Proposed changes to "%name" for review' : 'Wrote the draft "%name"';
     }
 
     public function stepArguments( array $input, $result )

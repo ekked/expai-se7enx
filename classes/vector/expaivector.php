@@ -249,8 +249,88 @@ class expAiVector
             'url' => 'expai/vector/(thread)/' . $thread->attribute( 'uuid' ),
             'panel_url' => $thread->attribute( 'origin' ) === expAiThread::ORIGIN_PANEL && (int) $thread->attribute( 'node_id' ) ? 'content/view/full/' . (int) $thread->attribute( 'node_id' ) : '',
             'can_write' => expAiThreadAccess::canWrite( $thread ),
+            // staged review and plan mode (doc/review.md, doc/plan-mode.md)
+            'changes' => expAiChange::counts( (int) $thread->attribute( 'id' ) ),
+            'plan' => self::planSummary( $thread ),
+            'reserved' => (int) $thread->attribute( 'reserved_micros' ) > 0 && expAiCost::enabled() ? expAiBudget::money( (int) $thread->attribute( 'reserved_micros' ) ) : '',
         );
         return $row;
+    }
+
+    /** @return array|null the current plan of a thread in short: id, state, items, expected (money) */
+    public static function planSummary( expAiThread $thread )
+    {
+        $plan = class_exists( 'expAiPlan' ) ? expAiPlan::fetchCurrent( (int) $thread->attribute( 'id' ) ) : null;
+        if ( !$plan )
+            return null;
+        $estimate = $plan->estimate();
+        return array( 'id' => (int) $plan->attribute( 'id' ), 'state' => (string) $plan->attribute( 'state' ), 'items' => count( $plan->runnableItems() ),
+                      'expected' => isset( $estimate['expected_micros'] ) && expAiCost::enabled() ? expAiBudget::money( (int) $estimate['expected_micros'] ) : '' );
+    }
+
+    /**
+     * The staged changes of a thread for the Changes tab: grouped by object (or proposed new object) and language,
+     * fields in class order, each with its hunks (texts only) and whether its base changed since staging.
+     * @return array list of { key, object_id, new_key, is_new, language, language_name, name, class_name, parent_name,
+     *               base_version, conflict, fields: list of change rows + name, base_changed }
+     */
+    public static function changeGroups( expAiThread $thread )
+    {
+        $groups = array();
+        $languages = array();
+        foreach ( expAiChange::fetchForThread( (int) $thread->attribute( 'id' ) ) as $change )
+        {
+            $key = $change->targetKey();
+            if ( !isset( $groups[$key] ) )
+            {
+                $code = (string) $change->attribute( 'language_code' );
+                if ( !isset( $languages[$code] ) )
+                {
+                    $language = eZContentLanguage::fetchByLocale( $code );
+                    $languages[$code] = $language ? (string) $language->attribute( 'name' ) : $code;
+                }
+                $class = eZContentClass::fetchByIdentifier( (string) $change->attribute( 'class_identifier' ) );
+                $object = $change->isNew() ? null : eZContentObject::fetch( (int) $change->attribute( 'contentobject_id' ) );
+                if ( $object && !$class )
+                    $class = $object->contentClass();
+                $parent = $change->isNew() ? eZContentObjectTreeNode::fetch( (int) $change->attribute( 'parent_node_id' ) ) : ( $object ? $object->mainNode() : null );
+                if ( $parent && !$change->isNew() )
+                    $parent = $parent->fetchParent();
+                $values = $object && in_array( $code, array_keys( $object->allLanguages() ), true )
+                        ? expAiDiff::values( $object, (int) $object->attribute( 'current_version' ), $code ) : array();
+                $groups[$key] = array( 'key' => $key, 'object_id' => (int) $change->attribute( 'contentobject_id' ), 'new_key' => (string) $change->attribute( 'new_key' ),
+                                       'is_new' => $change->isNew(), 'language' => $code, 'language_name' => $languages[$code],
+                                       'name' => $object ? ( $object->canRead() ? (string) $object->attribute( 'name' ) : '#' . (int) $object->attribute( 'id' ) ) : '',
+                                       'class_name' => $class ? (string) $class->attribute( 'name' ) : (string) $change->attribute( 'class_identifier' ),
+                                       'parent_name' => $parent && $parent->canRead() ? (string) $parent->attribute( 'name' ) : '',
+                                       'url' => $object && $object->mainNodeID() ? 'content/view/full/' . (int) $object->mainNodeID() : '',
+                                       'conflict' => false, 'fields' => array(), '_values' => $values, '_class' => $class, '_exists' => $change->isNew() || (bool) $object );
+            }
+            $row = $change->present();
+            $identifier = (string) $change->attribute( 'attribute_identifier' );
+            $classAttribute = $groups[$key]['_class'] ? $groups[$key]['_class']->fetchAttributeByIdentifier( $identifier ) : null;
+            $row['name'] = $classAttribute ? (string) $classAttribute->attribute( 'name' ) : $identifier;
+            $row['position'] = $classAttribute ? (int) $classAttribute->attribute( 'placement' ) : 999;
+            $row['base_changed'] = false;
+            if ( !$change->isNew() && in_array( $row['decision'], array( 'pending', 'accepted', 'partial', 'conflict' ), true ) )
+            {
+                $current = isset( $groups[$key]['_values'][$identifier] ) ? (string) $groups[$key]['_values'][$identifier]['value'] : '';
+                $row['base_changed'] = !$groups[$key]['_exists'] || expAiChange::hash( $current ) !== (string) $change->attribute( 'base_hash' );
+            }
+            if ( $row['decision'] === 'conflict' || $row['base_changed'] )
+                $groups[$key]['conflict'] = true;
+            if ( $change->isNew() && $groups[$key]['name'] === '' && in_array( $identifier, array( 'title', 'name', 'short_title', 'headline' ), true ) )
+                $groups[$key]['name'] = expAiText::cut( strip_tags( (string) $change->attribute( 'proposed' ) ), 80 );
+            $groups[$key]['fields'][] = $row;
+        }
+        $out = array();
+        foreach ( $groups as $group )
+        {
+            unset( $group['_values'], $group['_class'], $group['_exists'] );
+            usort( $group['fields'], function ( $a, $b ) { return $a['position'] - $b['position'] ?: $a['id'] - $b['id']; } );
+            $out[] = $group;
+        }
+        return $out;
     }
 
     /** @return array the drafts the thread wrote, as the panel lists them (newest first) */

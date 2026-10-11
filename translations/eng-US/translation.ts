@@ -4856,4 +4856,490 @@
         <translation>No role has a policy of Exponential Intelligence.</translation>
     </message>
 </context>
+<!-- expai vector review/plan: begin -->
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>Unknown decision.</source>
+        <translation>Unknown decision.</translation>
+    </message>
+    <message>
+        <source>The draft could not be written: %errors</source>
+        <translation>The draft could not be written: %errors</translation>
+    </message>
+    <message>
+        <source>This is bulk work (more than one object or language): propose a plan first with propose_plan; the editor approves it before anything more is staged.</source>
+        <translation>This is bulk work (more than one object or language): propose a plan first with propose_plan; the editor approves it before anything more is staged.</translation>
+    </message>
+    <message>
+        <source>Object %id lies outside the scope of this thread.</source>
+        <translation>Object %id lies outside the scope of this thread.</translation>
+    </message>
+    <message>
+        <source>The language %language is not in the scope of this thread.</source>
+        <translation>The language %language is not in the scope of this thread.</translation>
+    </message>
+    <message>
+        <source>Node %id lies outside the scope of this thread.</source>
+        <translation>Node %id lies outside the scope of this thread.</translation>
+    </message>
+    <message>
+        <source>The class "%identifier" is not in the scope of this thread.</source>
+        <translation>The class "%identifier" is not in the scope of this thread.</translation>
+    </message>
+    <message>
+        <source>This thread has %max staged changes waiting. Ask the editor to review them first.</source>
+        <translation>This thread has %max staged changes waiting. Ask the editor to review them first.</translation>
+    </message>
+    <message>
+        <source>Nothing was staged: %errors</source>
+        <translation>Nothing was staged: %errors</translation>
+    </message>
+    <message>
+        <source>The object of this change no longer exists.</source>
+        <translation>The object of this change no longer exists.</translation>
+    </message>
+    <message>
+        <source>This field cannot be edited here; accept it and edit the draft in the edit form.</source>
+        <translation>This field cannot be edited here; accept it and edit the draft in the edit form.</translation>
+    </message>
+    <message>
+        <source>This change can no longer be edited.</source>
+        <translation>This change can no longer be edited.</translation>
+    </message>
+    <message>
+        <source>The content changed since this was proposed. Review it against the current version first.</source>
+        <translation>The content changed since this was proposed. Review it against the current version first.</translation>
+    </message>
+    <message>
+        <source>This part of the change cannot be edited.</source>
+        <translation>This part of the change cannot be edited.</translation>
+    </message>
+    <message>
+        <source>A plan needs at least one item.</source>
+        <translation>A plan needs at least one item.</translation>
+    </message>
+    <message>
+        <source>This plan can no longer be approved.</source>
+        <translation>This plan can no longer be approved.</translation>
+    </message>
+    <message>
+        <source>Choose at least one item that can run.</source>
+        <translation>Choose at least one item that can run.</translation>
+    </message>
+    <message>
+        <source>This plan can no longer be rejected.</source>
+        <translation>This plan can no longer be rejected.</translation>
+    </message>
+    <message>
+        <source>This change does not exist any more.</source>
+        <translation>This change does not exist any more.</translation>
+    </message>
+    <message>
+        <source>The text is too long.</source>
+        <translation>The text is too long.</translation>
+    </message>
+    <message>
+        <source>There is nothing to rebase.</source>
+        <translation>There is nothing to rebase.</translation>
+    </message>
+    <message>
+        <source>This plan does not exist any more.</source>
+        <translation>This plan does not exist any more.</translation>
+    </message>
+    <message>
+        <source>Plans can only be proposed in a Vector thread.</source>
+        <translation>Plans can only be proposed in a Vector thread.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/keyboard</name>
+    <message>
+        <source>Accept the whole field</source>
+        <translation>Accept the whole field</translation>
+    </message>
+    <message>
+        <source>Reject the whole field</source>
+        <translation>Reject the whole field</translation>
+    </message>
+    <message>
+        <source>Edit the proposed text</source>
+        <translation>Edit the proposed text</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/step</name>
+    <message>
+        <source>Proposed the new object "%name" for review</source>
+        <translation>Proposed the new object "%name" for review</translation>
+    </message>
+    <message>
+        <source>Proposed changes to "%name" for review</source>
+        <translation>Proposed changes to "%name" for review</translation>
+    </message>
+    <message>
+        <source>Proposed a plan with %count item(s)</source>
+        <translation>Proposed a plan with %count item(s)</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/vector</name>
+    <message>
+        <source>Staged review: what Vector proposes waits in the Changes tab; nothing is written until you accept it and write it to drafts.</source>
+        <translation>Staged review: what Vector proposes waits in the Changes tab; nothing is written until you accept it and write it to drafts.</translation>
+    </message>
+    <message>
+        <source>Nothing to decide here: open the Changes tab.</source>
+        <translation>Nothing to decide here: open the Changes tab.</translation>
+    </message>
+    <message>
+        <source>%objects object(s), %fields field(s), %pending part(s) to review</source>
+        <translation>%objects object(s), %fields field(s), %pending part(s) to review</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <translation>New</translation>
+    </message>
+    <message>
+        <source>under %name</source>
+        <translation>under %name</translation>
+    </message>
+    <message>
+        <source>Part %n of %count</source>
+        <translation>Part %n of %count</translation>
+    </message>
+    <message>
+        <source>Accept</source>
+        <translation>Accept</translation>
+    </message>
+    <message>
+        <source>Reject</source>
+        <translation>Reject</translation>
+    </message>
+    <message>
+        <source>Undecide</source>
+        <translation>Undecide</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Save</translation>
+    </message>
+    <message>
+        <source>Accept field</source>
+        <translation>Accept field</translation>
+    </message>
+    <message>
+        <source>Reject field</source>
+        <translation>Reject field</translation>
+    </message>
+    <message>
+        <source>edited by you</source>
+        <translation>edited by you</translation>
+    </message>
+    <message>
+        <source>This part can only be accepted together with the rest of its table.</source>
+        <translation>This part can only be accepted together with the rest of its table.</translation>
+    </message>
+    <message>
+        <source>To review</source>
+        <translation>To review</translation>
+    </message>
+    <message>
+        <source>Accepted</source>
+        <translation>Accepted</translation>
+    </message>
+    <message>
+        <source>Rejected</source>
+        <translation>Rejected</translation>
+    </message>
+    <message>
+        <source>Partly accepted</source>
+        <translation>Partly accepted</translation>
+    </message>
+    <message>
+        <source>Written to draft %version</source>
+        <translation>Written to draft %version</translation>
+    </message>
+    <message>
+        <source>Conflict</source>
+        <translation>Conflict</translation>
+    </message>
+    <message>
+        <source>Replaced</source>
+        <translation>Replaced</translation>
+    </message>
+    <message>
+        <source>The content changed since Vector proposed this. Writing it now could undo a colleague's work.</source>
+        <translation>The content changed since Vector proposed this. Writing it now could undo a colleague's work.</translation>
+    </message>
+    <message>
+        <source>Keep current</source>
+        <translation>Keep current</translation>
+    </message>
+    <message>
+        <source>Compare with the current version</source>
+        <translation>Compare with the current version</translation>
+    </message>
+    <message>
+        <source>Ask the AI to rebase</source>
+        <translation>Ask the AI to rebase</translation>
+    </message>
+    <message>
+        <source>Vector stages the changes again against the current version...</source>
+        <translation>Vector stages the changes again against the current version...</translation>
+    </message>
+    <message>
+        <source>All open parts rejected.</source>
+        <translation>All open parts rejected.</translation>
+    </message>
+    <message>
+        <source>%count change(s) written to %drafts draft(s).</source>
+        <translation>%count change(s) written to %drafts draft(s).</translation>
+    </message>
+    <message>
+        <source>%count change(s) not written: the content changed meanwhile.</source>
+        <translation>%count change(s) not written: the content changed meanwhile.</translation>
+    </message>
+    <message>
+        <source>Required fields still empty: %fields</source>
+        <translation>Required fields still empty: %fields</translation>
+    </message>
+    <message>
+        <source>Accept at least one part first.</source>
+        <translation>Accept at least one part first.</translation>
+    </message>
+    <message>
+        <source>Rich text is shown as text; links and formatting are kept.</source>
+        <translation>Rich text is shown as text; links and formatting are kept.</translation>
+    </message>
+    <message>
+        <source>Plan · %count item(s)</source>
+        <translation>Plan · %count item(s)</translation>
+    </message>
+    <message>
+        <source>proposed, waiting for you</source>
+        <translation>proposed, waiting for you</translation>
+    </message>
+    <message>
+        <source>approved, running</source>
+        <translation>approved, running</translation>
+    </message>
+    <message>
+        <source>done</source>
+        <translation>done</translation>
+    </message>
+    <message>
+        <source>rejected</source>
+        <translation>rejected</translation>
+    </message>
+    <message>
+        <source>approved</source>
+        <translation>approved</translation>
+    </message>
+    <message>
+        <source>Create</source>
+        <translation>Create</translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation>Update</translation>
+    </message>
+    <message>
+        <source>Translate</source>
+        <translation>Translate</translation>
+    </message>
+    <message>
+        <source>Action</source>
+        <translation>Action</translation>
+    </message>
+    <message>
+        <source>Target</source>
+        <translation>Target</translation>
+    </message>
+    <message>
+        <source>Fields</source>
+        <translation>Fields</translation>
+    </message>
+    <message>
+        <source>Est.</source>
+        <translation>Est.</translation>
+    </message>
+    <message>
+        <source>Instruction for item %n</source>
+        <translation>Instruction for item %n</translation>
+    </message>
+    <message>
+        <source>Cannot run: %reason</source>
+        <translation>Cannot run: %reason</translation>
+    </message>
+    <message>
+        <source>Estimate</source>
+        <translation>Estimate</translation>
+    </message>
+    <message>
+        <source>%expected expected (%low to %high)</source>
+        <translation>%expected expected (%low to %high)</translation>
+    </message>
+    <message>
+        <source>Duration</source>
+        <translation>Duration</translation>
+    </message>
+    <message>
+        <source>about %count min</source>
+        <translation>about %count min</translation>
+    </message>
+    <message>
+        <source>By lane</source>
+        <translation>By lane</translation>
+    </message>
+    <message>
+        <source>%lane (batch, for approved plans)</source>
+        <translation>%lane (batch, for approved plans)</translation>
+    </message>
+    <message>
+        <source>Actual cost</source>
+        <translation>Actual cost</translation>
+    </message>
+    <message>
+        <source>calibrated from %count finished plan(s)</source>
+        <translation>calibrated from %count finished plan(s)</translation>
+    </message>
+    <message>
+        <source>no price (local or free model)</source>
+        <translation>no price (local or free model)</translation>
+    </message>
+    <message>
+        <source>%label: %percent% used, %after% after this plan</source>
+        <translation>%label: %percent% used, %after% after this plan</translation>
+    </message>
+    <message>
+        <source>Assumptions</source>
+        <translation>Assumptions</translation>
+    </message>
+    <message>
+        <source>Questions</source>
+        <translation>Questions</translation>
+    </message>
+    <message>
+        <source>Risks</source>
+        <translation>Risks</translation>
+    </message>
+    <message>
+        <source>Plan approved: %count item(s) run in the background. Their changes appear in the Changes tab.</source>
+        <translation>Plan approved: %count item(s) run in the background. Their changes appear in the Changes tab.</translation>
+    </message>
+    <message>
+        <source>Plan approved: %count item(s) run in this window, one after the other.</source>
+        <translation>Plan approved: %count item(s) run in this window, one after the other.</translation>
+    </message>
+    <message>
+        <source>Plan rejected.</source>
+        <translation>Plan rejected.</translation>
+    </message>
+    <message>
+        <source>Say what to change in the plan:</source>
+        <translation>Say what to change in the plan:</translation>
+    </message>
+    <message>
+        <source>Choose at least one item.</source>
+        <translation>Choose at least one item.</translation>
+    </message>
+    <message>
+        <source>Reserved</source>
+        <translation>Reserved</translation>
+    </message>
+    <message>
+        <source>Accept all</source>
+        <translation>Accept all</translation>
+    </message>
+    <message>
+        <source>Reject all</source>
+        <translation>Reject all</translation>
+    </message>
+    <message>
+        <source>No staged changes. With staged review, what Vector proposes appears here to accept or reject, field by field.</source>
+        <translation>No staged changes. With staged review, what Vector proposes appears here to accept or reject, field by field.</translation>
+    </message>
+    <message>
+        <source>Write accepted changes to drafts</source>
+        <translation>Write accepted changes to drafts</translation>
+    </message>
+    <message>
+        <source>Drafts are never published: you publish or send them for approval.</source>
+        <translation>Drafts are never published: you publish or send them for approval.</translation>
+    </message>
+    <message>
+        <source>Approve and run</source>
+        <translation>Approve and run</translation>
+    </message>
+    <message>
+        <source>Ask for changes</source>
+        <translation>Ask for changes</translation>
+    </message>
+    <message>
+        <source>Approved items run one after the other; every change is staged for your review in the Changes tab, new objects too.</source>
+        <translation>Approved items run one after the other; every change is staged for your review in the Changes tab, new objects too.</translation>
+    </message>
+    <message>
+        <source>No plan yet. In plan mode Vector reads first and proposes a plan with an estimate; bulk work always starts here.</source>
+        <translation>No plan yet. In plan mode Vector reads first and proposes a plan with an estimate; bulk work always starts here.</translation>
+    </message>
+    <message>
+        <source>This plan needs about %needed; %left is left of the limit "%limit".</source>
+        <translation>This plan needs about %needed; %left is left of the limit "%limit".</translation>
+    </message>
+    <message>
+        <source>Site budget this month</source>
+        <translation>Site budget this month</translation>
+    </message>
+    <message>
+        <source>This plan needs about %needed; the site budget has %left left this month.</source>
+        <translation>This plan needs about %needed; the site budget has %left left this month.</translation>
+    </message>
+    <message>
+        <source>No language given.</source>
+        <translation>No language given.</translation>
+    </message>
+    <message>
+        <source>The language %language is not used on this site.</source>
+        <translation>The language %language is not used on this site.</translation>
+    </message>
+    <message>
+        <source>The language %language is not in the scope of this thread.</source>
+        <translation>The language %language is not in the scope of this thread.</translation>
+    </message>
+    <message>
+        <source>The location does not exist or you may not read it.</source>
+        <translation>The location does not exist or you may not read it.</translation>
+    </message>
+    <message>
+        <source>The location lies outside the scope of this thread.</source>
+        <translation>The location lies outside the scope of this thread.</translation>
+    </message>
+    <message>
+        <source>There is no content class "%class".</source>
+        <translation>There is no content class "%class".</translation>
+    </message>
+    <message>
+        <source>The class "%class" is not in the scope of this thread.</source>
+        <translation>The class "%class" is not in the scope of this thread.</translation>
+    </message>
+    <message>
+        <source>You may not create %class objects in %language here.</source>
+        <translation>You may not create %class objects in %language here.</translation>
+    </message>
+    <message>
+        <source>The object does not exist or you may not read it.</source>
+        <translation>The object does not exist or you may not read it.</translation>
+    </message>
+    <message>
+        <source>The object lies outside the scope of this thread.</source>
+        <translation>The object lies outside the scope of this thread.</translation>
+    </message>
+    <message>
+        <source>You may not edit this object in %language.</source>
+        <translation>You may not edit this object in %language.</translation>
+    </message>
+</context>
+<!-- expai vector review/plan: end -->
 </TS>

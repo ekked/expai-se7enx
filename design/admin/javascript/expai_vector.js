@@ -175,6 +175,7 @@
             renderChips( t );
             renderSettings( t );
             renderCost( t );
+            syncSide( t );
         }
 
         function chip( node, kind ) {
@@ -260,9 +261,250 @@
             } ).join( '' );
             var none = q( '[data-placeholder="drafts"]' );
             if ( none ) { none.hidden = !!( drafts && drafts.length ); }
+        }
+
+        /* ------------------------------------------- staged review (doc/review.md) */
+
+        var review = { groups: [], counts: null, canDecide: false, active: null, seen: '', editing: null };
+
+        function reviewBox() { return q( '.exp-ai-v-changes' ); }
+        function wordDiff( a, b ) {
+            // word level marks inside a replaced part; long texts are shown whole
+            var x = String( a ).split( /(\s+)/ ), y = String( b ).split( /(\s+)/ );
+            if ( x.length * y.length > 250000 ) { return [ '<del>' + esc( a ) + '</del>', '<ins>' + esc( b ) + '</ins>' ]; }
+            var n = x.length, m = y.length, i, j, L = [];
+            for ( i = 0; i <= n; i++ ) { L.push( new Array( m + 1 ).fill( 0 ) ); }
+            for ( i = n - 1; i >= 0; i-- ) { for ( j = m - 1; j >= 0; j-- ) { L[i][j] = x[i] === y[j] ? L[i + 1][j + 1] + 1 : Math.max( L[i + 1][j], L[i][j + 1] ); } }
+            var left = '', right = '';
+            i = 0; j = 0;
+            while ( i < n || j < m ) {
+                if ( i < n && j < m && x[i] === y[j] ) { left += esc( x[i] ); right += esc( y[j] ); i++; j++; }
+                else if ( j < m && ( i >= n || L[i][j + 1] >= L[i + 1][j] ) ) { right += '<ins>' + esc( y[j] ) + '</ins>'; j++; }
+                else { left += '<del>' + esc( x[i] ) + '</del>'; i++; }
+            }
+            return [ left, right ];
+        }
+        function linesHtml( text, cls, sign ) {
+            return String( text ).split( '\n' ).map( function ( line ) {
+                return '<div class="exp-ai-v-hl ' + cls + '"><span class="exp-ai-v-sign" aria-hidden="true">' + sign + '</span><span>' + line + '</span></div>';
+            } ).join( '' );
+        }
+        function hunkHtml( c, h, n, count ) {
+            var base = h.base_text, prop = h.prop_text, body = '';
+            if ( h.context_before ) { body += linesHtml( esc( h.context_before ), 'exp-ai-v-hl-ctx', ' ' ); }
+            if ( base && prop && base.split( '\n' ).length === prop.split( '\n' ).length ) {
+                var bl = base.split( '\n' ), pl = prop.split( '\n' ), dl = '', il = '';
+                bl.forEach( function ( line, k ) { var d = wordDiff( line, pl[k] ); dl += linesHtml( d[0], 'exp-ai-v-hl-del', '-' ); il += linesHtml( d[1], 'exp-ai-v-hl-ins', '+' ); } );
+                body += dl + il;
+            } else {
+                if ( base ) { body += linesHtml( esc( base ).split( '\n' ).map( function ( l ) { return '<del>' + l + '</del>'; } ).join( '\n' ), 'exp-ai-v-hl-del', '-' ); }
+                if ( prop ) { body += linesHtml( esc( prop ).split( '\n' ).map( function ( l ) { return '<ins>' + l + '</ins>'; } ).join( '\n' ), 'exp-ai-v-hl-ins', '+' ); }
+            }
+            if ( h.context_after ) { body += linesHtml( esc( h.context_after ), 'exp-ai-v-hl-ctx', ' ' ); }
+            var open = [ 'pending', 'accepted', 'rejected', 'partial' ].indexOf( c.decision ) >= 0 && review.canDecide;
+            var label = T( 'rv_part', { '%n': n, '%count': count } );
+            var editing = review.editing && review.editing.change === c.id && review.editing.hunk === h.id;
+            return '<div class="exp-ai-v-hunk exp-ai-v-hunk-' + esc( h.decision ) + '" tabindex="-1" role="group" aria-label="' + esc( c.name + ': ' + label + ', ' + T( 'rv_decision_' + h.decision ) ) + '"'
+                 + ' data-change="' + c.id + '" data-hunk="' + esc( h.id ) + '">'
+                 + '<div class="exp-ai-v-hunk-head"><span>' + esc( label ) + ( h.edited ? ' · ' + esc( T( 'rv_edited' ) ) : '' ) + '</span>'
+                 + '<span class="exp-ai-v-badge exp-ai-v-badge-' + esc( h.decision ) + '">' + esc( T( 'rv_decision_' + h.decision ) ) + '</span></div>'
+                 + ( editing ? '<label class="exp-ai-sr" for="exp-ai-v-hunk-edit">' + esc( T( 'rv_edit' ) ) + '</label><textarea id="exp-ai-v-hunk-edit" class="exp-ai-v-hunk-edit" rows="4">' + esc( prop ) + '</textarea>'
+                             + '<div class="exp-ai-v-hunk-actions"><button type="button" class="exp-ai-v-btn exp-ai-v-btn-small exp-ai-v-btn-primary" data-rv="save">' + esc( T( 'rv_save' ) ) + '</button>'
+                             + '<button type="button" class="exp-ai-v-btn exp-ai-v-btn-small" data-rv="cancel">' + esc( T( 'rv_cancel' ) ) + '</button></div>'
+                           : '<div class="exp-ai-v-hunk-body">' + body + '</div>' )
+                 + ( !h.mergeable ? '<p class="exp-ai-v-hint">' + esc( T( 'rv_not_alone' ) ) + '</p>' : '' )
+                 + ( open && !editing ? '<div class="exp-ai-v-hunk-actions">'
+                     + '<button type="button" class="exp-ai-v-btn exp-ai-v-btn-small" data-rv="accepted" aria-pressed="' + ( h.decision === 'accepted' ) + '">' + esc( T( 'rv_accept' ) ) + ' <kbd class="exp-ai-v-kbd" data-keys="accept"></kbd></button>'
+                     + '<button type="button" class="exp-ai-v-btn exp-ai-v-btn-small" data-rv="rejected" aria-pressed="' + ( h.decision === 'rejected' ) + '">' + esc( T( 'rv_reject' ) ) + ' <kbd class="exp-ai-v-kbd" data-keys="reject"></kbd></button>'
+                     + ( h.editable ? '<button type="button" class="exp-ai-v-btn exp-ai-v-btn-small" data-rv="edit">' + esc( T( 'rv_edit' ) ) + ' <kbd class="exp-ai-v-kbd" data-keys="edit_hunk"></kbd></button>' : '' )
+                     + ( h.decision !== 'pending' ? '<button type="button" class="exp-ai-v-link" data-rv="pending">' + esc( T( 'rv_undo' ) ) + '</button>' : '' )
+                     + '</div>' : '' )
+                 + '</div>';
+        }
+        function fieldHtml( g, c ) {
+            var decision = c.decision === 'applied' ? T( 'rv_decision_applied', { '%version': c.applied_version } ) : T( 'rv_decision_' + c.decision );
+            var open = [ 'pending', 'accepted', 'rejected', 'partial' ].indexOf( c.decision ) >= 0 && review.canDecide;
+            var conflict = ( c.decision === 'conflict' || c.base_changed ) && c.decision !== 'applied';
+            var hunks = c.decision === 'applied' || c.decision === 'stale' ? '' : c.hunks.map( function ( h, i ) { return hunkHtml( c, h, i + 1, c.hunks.length ); } ).join( '' );
+            return '<div class="exp-ai-v-cf" data-change="' + c.id + '">'
+                 + '<div class="exp-ai-v-cf-head"><strong>' + esc( c.name ) + '</strong> <span class="exp-ai-v-badge exp-ai-v-badge-' + esc( c.decision ) + '">' + esc( decision ) + '</span>'
+                 + ( open ? '<span class="exp-ai-v-cf-actions"><button type="button" class="exp-ai-v-link" data-rv-field="accepted">' + esc( T( 'rv_accept_field' ) ) + '</button>'
+                          + '<button type="button" class="exp-ai-v-link" data-rv-field="rejected">' + esc( T( 'rv_reject_field' ) ) + '</button></span>' : '' ) + '</div>'
+                 + ( conflict ? '<div class="exp-ai-v-conflict" role="alert"><p>' + esc( T( 'rv_conflict' ) ) + '</p>' + ( review.canDecide ? '<p class="exp-ai-v-conflict-actions">'
+                     + '<button type="button" class="exp-ai-v-btn exp-ai-v-btn-small" data-rv-conflict="keep">' + esc( T( 'rv_keep' ) ) + '</button>'
+                     + '<button type="button" class="exp-ai-v-btn exp-ai-v-btn-small" data-rv-conflict="restage">' + esc( T( 'rv_restage' ) ) + '</button>'
+                     + ( g.is_new ? '' : '<button type="button" class="exp-ai-v-btn exp-ai-v-btn-small" data-rv-conflict="rebase">' + esc( T( 'rv_rebase' ) ) + '</button>' ) + '</p>' : '' ) + '</div>' : '' )
+                 + ( c.datatype === 'ezxmltext' && hunks ? '<p class="exp-ai-v-hint">' + esc( T( 'rv_markup' ) ) + '</p>' : '' )
+                 + hunks + '</div>';
+        }
+        function renderReview() {
+            var box = reviewBox();
+            if ( !box ) { return; }
+            var list = q( '.exp-ai-v-review-list', box );
+            var c = review.counts || { pending_hunks: 0, open: 0, accepted: 0, total: 0 };
+            var active = review.groups.filter( function ( g ) { return g.fields.some( function ( f ) { return f.decision !== 'stale'; } ); } );
+            list.innerHTML = active.map( function ( g ) {
+                var fields = g.fields.filter( function ( f ) { return f.decision !== 'stale'; } );
+                return '<section class="exp-ai-v-cg' + ( g.conflict ? ' exp-ai-v-cg-conflict' : '' ) + '" data-key="' + esc( g.key ) + '">'
+                     + '<header class="exp-ai-v-cg-head"><span class="exp-ai-mark" aria-hidden="true"></span> '
+                     + ( g.is_new ? '<span class="exp-ai-v-badge exp-ai-v-badge-new">' + esc( T( 'rv_new' ) ) + '</span> ' : '' )
+                     + ( g.url ? '<a href="' + esc( url( g.url ) ) + '">' + esc( g.name || g.class_name ) + '</a>' : '<strong>' + esc( g.name || g.class_name ) + '</strong>' )
+                     + '<span class="exp-ai-v-cg-meta">' + esc( [ g.class_name, g.language_name, g.is_new && g.parent_name ? T( 'rv_under', { '%name': g.parent_name } ) : '' ].filter( Boolean ).join( ' · ' ) ) + '</span></header>'
+                     + fields.map( function ( f ) { return fieldHtml( g, f ); } ).join( '' ) + '</section>';
+            } ).join( '' );
+            paintKeys();
+            var none = q( '[data-placeholder="review"]', box );
+            none.hidden = active.length > 0;
+            var fieldsCount = active.reduce( function ( n, g ) { return n + g.fields.filter( function ( f ) { return f.decision !== 'stale' && f.decision !== 'applied'; } ).length; }, 0 );
+            q( '.exp-ai-v-review-bar', box ).hidden = !c.open;
+            q( '.exp-ai-v-review-summary', box ).textContent = T( 'rv_summary', { '%objects': active.length, '%fields': fieldsCount, '%pending': c.pending_hunks } );
+            q( '.exp-ai-v-review-all', box ).hidden = !review.canDecide;
+            q( '.exp-ai-v-review-foot', box ).hidden = !review.canDecide || !c.accepted;
             var count = q( '[data-tab-count="diff"]' );
-            var open = ( drafts || [] ).filter( function ( d ) { return d.is_draft; } ).length;
-            if ( count ) { count.textContent = open ? String( open ) : ''; }
+            if ( count ) { count.textContent = c.pending_hunks ? String( c.pending_hunks ) : ''; }
+            if ( review.active ) { focusHunk( review.active.change, review.active.hunk, false ); }
+        }
+        function takeReview( data ) {
+            review.groups = data.groups || [];
+            review.counts = data.counts || null;
+            review.canDecide = !!data.can_decide;
+            if ( data.thread && app.current && data.thread.uuid === app.current.uuid ) {
+                review.seen = reviewKey( data.thread );
+                setHeader( data.thread );
+            }
+            if ( data.drafts ) { renderDrafts( data.drafts ); }
+            renderReview();
+            return data;
+        }
+        function reviewKey( t ) { return t && t.changes ? [ t.changes.total, t.changes.open, t.changes.pending_hunks, t.changes.applied, t.changes.conflict, t.changes.accepted ].join( ':' ) : ''; }
+        function loadReview() {
+            if ( !app.current ) { return Promise.resolve(); }
+            var uuid = app.current.uuid;
+            return api( 'changes', { thread: uuid } ).then( function ( data ) {
+                if ( app.current && app.current.uuid === uuid ) { takeReview( data ); }
+            } ).catch( function ( err ) { showError( q( '.exp-ai-v-error', reviewBox() ), err ); } );
+        }
+        function reviewCall( fn, data ) {
+            showError( q( '.exp-ai-v-error', reviewBox() ), null );
+            return api( fn, $.extend( { thread: app.current.uuid }, data ) ).then( takeReview ).catch( function ( err ) {
+                showError( q( '.exp-ai-v-error', reviewBox() ), err );
+                throw err;
+            } );
+        }
+        function hunkEls() { return qa( '.exp-ai-v-hunk', reviewBox() ); }
+        function focusHunk( change, hunk, scroll ) {
+            var el2 = hunkEls().filter( function ( h ) { return h.getAttribute( 'data-change' ) === String( change ) && h.getAttribute( 'data-hunk' ) === hunk; } )[0];
+            hunkEls().forEach( function ( h ) { h.classList.toggle( 'exp-ai-v-hunk-active', h === el2 ); } );
+            if ( el2 ) {
+                review.active = { change: change, hunk: hunk };
+                if ( scroll !== false ) { el2.focus(); el2.scrollIntoView( { block: 'nearest' } ); }
+            }
+            return el2;
+        }
+        function activeHunk() {
+            var list = hunkEls();
+            var cur = review.active ? list.filter( function ( h ) { return h.getAttribute( 'data-change' ) === String( review.active.change ) && h.getAttribute( 'data-hunk' ) === review.active.hunk; } )[0] : null;
+            return cur || list.filter( function ( h ) { return h.classList.contains( 'exp-ai-v-hunk-pending' ); } )[0] || list[0] || null;
+        }
+        function moveHunk( delta ) {
+            var list = hunkEls();
+            if ( !list.length ) { return false; }
+            var cur = activeHunk();
+            var i = review.active && cur ? list.indexOf( cur ) + delta : 0;
+            var next = list[Math.max( 0, Math.min( list.length - 1, i ) )];
+            focusHunk( next.getAttribute( 'data-change' ), next.getAttribute( 'data-hunk' ) );
+            return true;
+        }
+        function reviewVisible() {
+            var pane = q( '[data-pane="diff"]' );
+            return pane && !pane.hidden && hunkEls().length > 0;
+        }
+        function decideHunk( decision, h ) {
+            h = h || activeHunk();
+            if ( !h || !review.canDecide ) { toast( T( 'item_placeholder' ) ); return; }
+            var change = h.getAttribute( 'data-change' ), hunk = h.getAttribute( 'data-hunk' );
+            var list = hunkEls(), idx = list.indexOf( h );
+            reviewCall( 'change_decide', { decisions: JSON.stringify( { list: [ { change: parseInt( change, 10 ), hunk: hunk, decision: decision } ] } ) } ).then( function () {
+                // on to the next part that waits
+                var after = hunkEls();
+                var next = after.slice( idx + 1 ).concat( after.slice( 0, idx + 1 ) ).filter( function ( x ) { return x.classList.contains( 'exp-ai-v-hunk-pending' ); } )[0];
+                if ( next ) { focusHunk( next.getAttribute( 'data-change' ), next.getAttribute( 'data-hunk' ) ); } else { focusHunk( change, hunk ); }
+            } ).catch( function () {} );
+        }
+        function decideField( decision, changeID ) {
+            if ( !changeID ) { var h = activeHunk(); changeID = h ? h.getAttribute( 'data-change' ) : 0; }
+            if ( !changeID || !review.canDecide ) { return; }
+            reviewCall( 'change_decide', { decisions: JSON.stringify( { list: [ { change: parseInt( changeID, 10 ), hunk: '', decision: decision } ] } ) } ).catch( function () {} );
+        }
+        function editHunk( h ) {
+            h = h || activeHunk();
+            if ( !h || !q( '[data-rv="edit"]', h ) ) { return; }
+            review.editing = { change: parseInt( h.getAttribute( 'data-change' ), 10 ), hunk: h.getAttribute( 'data-hunk' ) };
+            review.active = { change: h.getAttribute( 'data-change' ), hunk: h.getAttribute( 'data-hunk' ) };
+            renderReview();
+            var ta = q( '.exp-ai-v-hunk-edit', reviewBox() );
+            if ( ta ) { ta.focus(); }
+        }
+        function bindReview() {
+            var box = reviewBox();
+            if ( !box ) { return; }
+            box.addEventListener( 'click', function ( e ) {
+                var b = e.target.closest( 'button' );
+                if ( !b || b.disabled || !app.current ) { return; }
+                var hunk = b.closest( '.exp-ai-v-hunk' ), field = b.closest( '.exp-ai-v-cf' );
+                if ( hunk ) { review.active = { change: hunk.getAttribute( 'data-change' ), hunk: hunk.getAttribute( 'data-hunk' ) }; }
+                var rv = b.getAttribute( 'data-rv' );
+                if ( rv === 'accepted' || rv === 'rejected' || rv === 'pending' ) { decideHunk( rv, hunk ); return; }
+                if ( rv === 'edit' ) { editHunk( hunk ); return; }
+                if ( rv === 'cancel' ) { review.editing = null; renderReview(); return; }
+                if ( rv === 'save' && review.editing ) {
+                    var ed = review.editing;
+                    reviewCall( 'change_edit', { change: ed.change, hunk: ed.hunk, text: q( '.exp-ai-v-hunk-edit', box ).value } ).then( function () { review.editing = null; renderReview(); } ).catch( function () {} );
+                    return;
+                }
+                if ( b.getAttribute( 'data-rv-field' ) && field ) { decideField( b.getAttribute( 'data-rv-field' ), field.getAttribute( 'data-change' ) ); return; }
+                var conflict = b.getAttribute( 'data-rv-conflict' );
+                if ( conflict && field ) {
+                    var id = parseInt( field.getAttribute( 'data-change' ), 10 );
+                    if ( conflict === 'keep' ) { decideField( 'rejected', id ); }
+                    else if ( conflict === 'restage' ) { reviewCall( 'change_restage', { change: id } ).catch( function () {} ); }
+                    else if ( conflict === 'rebase' ) {
+                        reviewCall( 'rebase', { changes: JSON.stringify( [ id ] ) } ).then( function ( data ) {
+                            if ( data.message ) { toast( T( 'rv_rebasing' ) ); run( data.message ); }
+                        } ).catch( function () {} );
+                    }
+                    return;
+                }
+                var action = b.getAttribute( 'data-review' );
+                if ( action === 'accept_all' ) { reviewCall( 'change_decide', { all: 'accepted' } ).catch( function () {} ); }
+                else if ( action === 'reject_all' ) {
+                    // a five second undo before the decision is sent
+                    var timer = window.setTimeout( function () { reviewCall( 'change_decide', { all: 'rejected' } ).catch( function () {} ); }, 5000 );
+                    toast( T( 'rv_rejected_all' ), function () { window.clearTimeout( timer ); } );
+                }
+                else if ( action === 'apply' ) {
+                    if ( !review.counts || !review.counts.accepted ) { toast( T( 'rv_nothing' ) ); return; }
+                    b.disabled = true;
+                    reviewCall( 'apply', {} ).then( function ( data ) {
+                        var r = data.result || {};
+                        var msg = T( 'rv_applied', { '%count': ( r.applied || [] ).length, '%drafts': ( r.drafts || [] ).length } );
+                        if ( ( r.conflicts || [] ).length ) { msg += ' ' + T( 'rv_conflicts', { '%count': r.conflicts.length } ); }
+                        ( r.drafts || [] ).forEach( function ( d ) { if ( d.missing && d.missing.length ) { msg += ' ' + T( 'rv_missing', { '%fields': d.missing.join( ', ' ) } ); } } );
+                        ( r.errors || [] ).forEach( function ( x ) { msg += ' ' + x.message; } );
+                        toast( msg );
+                        announce( msg );
+                    } ).catch( function () {} ).then( function () { b.disabled = false; } );
+                }
+            } );
+            box.addEventListener( 'focusin', function ( e ) {
+                var h = e.target.closest && e.target.closest( '.exp-ai-v-hunk' );
+                if ( h ) { review.active = { change: h.getAttribute( 'data-change' ), hunk: h.getAttribute( 'data-hunk' ) }; hunkEls().forEach( function ( x ) { x.classList.toggle( 'exp-ai-v-hunk-active', x === h ); } ); }
+            } );
+        }
+        /** The side panes follow the thread: changes and plan reload when the thread's counts or plan changed */
+        function syncSide( t ) {
+            if ( !t ) { return; }
+            if ( reviewKey( t ) !== review.seen ) { review.seen = reviewKey( t ); loadReview(); }
         }
 
         function stepsHtml( steps ) {
@@ -332,6 +574,11 @@
             return api( 'thread', { thread: uuid } ).then( function ( data ) {
                 if ( seq !== openSeq ) { return; }
                 app.lanes = data.lanes || [];
+                var switching = !app.current || app.current.uuid !== uuid;
+                if ( switching ) {
+                    // another thread: its own changes and plan
+                    review.seen = null; review.active = null; review.editing = null;
+                }
                 setHeader( data.thread );
                 el.log.innerHTML = '';
                 app.oldest = null;
@@ -356,7 +603,7 @@
                 if ( row ) { row.unread = false; }
                 renderList();
                 scrollDown();
-                closeDrawers();
+                if ( switching ) { closeDrawers(); }
                 ExpAi.emit( 'vector:open', { thread: data.thread } );
                 schedulePoll( 0 );
                 connectStream();
@@ -465,6 +712,7 @@
                             seen = Math.max( seen, ev.id );
                             app.cursor[uuid] = Math.max( app.cursor[uuid] || 0, ev.id );
                             if ( ev.kind === 'error' && ev.payload ) { lastError = ev.payload.message || ''; }
+                            if ( ev.kind === 'status' && ev.payload && ev.payload.held ) { el.workingText.textContent = ev.payload.held; announce( ev.payload.held ); }
                             if ( ev.kind === 'step_end' && ev.payload && ev.payload.text ) {
                                 steps++;
                                 el.workingText.textContent = T( 'working_background', { '%count': steps } ) + ' ' + ev.payload.text;
@@ -859,6 +1107,9 @@
             closeDrawers();
             root.classList.toggle( cls, on );
             if ( button ) { button.setAttribute( 'aria-expanded', on ? 'true' : 'false' ); }
+            // an opened drawer is brought into the window (the page may be scrolled down)
+            var drawer = on && q( cls === 'exp-ai-v-side-open' ? '.exp-ai-v-side' : '.exp-ai-v-threads' );
+            if ( drawer && drawer.getBoundingClientRect().bottom > window.innerHeight ) { drawer.scrollIntoView( { block: 'nearest' } ); }
         }
         function placeholder() { toast( T( 'item_placeholder' ) ); }
 
@@ -868,10 +1119,14 @@
             run: function () { if ( app.busy ) { queue(); } else { submit(); } },
             queue: function () { if ( app.busy ) { queue(); } else { submit(); } },
             stop: stop,
-            next: function () { moveItem( 1 ); },
-            previous: function () { moveItem( -1 ); },
-            accept: placeholder,
-            reject: placeholder,
+            // j/k move through the parts of the Changes tab while it is shown, else through the exchanges
+            next: function () { if ( !reviewVisible() || !moveHunk( 1 ) ) { moveItem( 1 ); } },
+            previous: function () { if ( !reviewVisible() || !moveHunk( -1 ) ) { moveItem( -1 ); } },
+            accept: function () { if ( hunkEls().length ) { showTab( 'diff' ); decideHunk( 'accepted' ); } else { placeholder(); } },
+            reject: function () { if ( hunkEls().length ) { showTab( 'diff' ); decideHunk( 'rejected' ); } else { placeholder(); } },
+            accept_field: function () { if ( hunkEls().length ) { showTab( 'diff' ); decideField( 'accepted' ); } else { placeholder(); } },
+            reject_field: function () { if ( hunkEls().length ) { showTab( 'diff' ); decideField( 'rejected' ); } else { placeholder(); } },
+            edit_hunk: function () { if ( reviewVisible() ) { editHunk(); } },
             thread_next: function () { switchThread( 1 ); },
             thread_previous: function () { switchThread( -1 ); },
             new_thread: function () { newThread( 0 ); },
@@ -982,6 +1237,7 @@
             filterTimer = window.setTimeout( loadList, 250 );
         } );
         bindScopeDialog();
+        bindReview();
         window.addEventListener( 'popstate', function () {
             var m = window.location.pathname.match( /\(thread\)\/([0-9a-f-]{36})/ );
             if ( m ) { open( m[1], false ); }

@@ -1046,6 +1046,39 @@ When[tab_cost]=list
 Binding[help]=?
 When[help]=list
 
+# ------------------------------------------------------------------ staged review and plan mode (#360 V4, V6)
+# doc/review.md, doc/plan-mode.md
+
+[VectorSettings]
+# Staged review: the most open staged changes one thread may hold; the longest text of an edited part (characters)
+MaxStagedChanges=500
+MaxEditLength=20000
+# Plan mode: the most items of one plan
+MaxPlanItems=50
+# The estimate of a plan: expected tool rounds per item and action (low = one less, high = HighExtraRounds more),
+# the size of the instructions and tools when the thread has none yet (PlanFrameTokens), the history sent with each
+# round, a new object's context, the output per field of a new object, characters per token, seconds per round.
+# The result is calibrated with the actual cost of the last finished plans.
+ExpectedRounds[create]=3
+ExpectedRounds[update]=3
+ExpectedRounds[translate]=2
+HighExtraRounds=2
+PlanFrameTokens=6000
+PlanHistoryTokens=1500
+PlanNewObjectTokens=300
+OutputPerField=250
+CharsPerToken=3.5
+SecondsPerRound=8
+
+[KeyBindings]
+# The Changes tab: Shift+A / Shift+X decide the whole field of the current part, E edits it (plain text fields)
+Binding[accept_field]=Shift+KeyA
+When[accept_field]=list
+Binding[reject_field]=Shift+KeyX
+When[reject_field]=list
+Binding[edit_hunk]=KeyE
+When[edit_hunk]=list
+
 # ------------------------------------------------------------------ web and history tools (#369)
 # doc/tools.md (web_fetch, web_search, project_history), doc/security.md. Each tool is offered only to users with
 # the policy expai/web (limitation Tool) and only once it is configured below.

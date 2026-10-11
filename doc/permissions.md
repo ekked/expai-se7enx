@@ -76,7 +76,10 @@ them allows):
 | `Review` | `staged`, `direct` | the review policies the user may choose; without `direct` every Vector thread is staged |
 
 The scope is checked when it is saved and again at every run, together with the user's read access to every node.
-Writing still goes through the editor's own content/edit and content/create, as everywhere in expai.
+Writing still goes through the editor's own content/edit and content/create, as everywhere in expai: staging a change
+checks them ([review.md](review.md)), and applying staged changes checks them again per object and language, so an
+editor who lost the edit permission meanwhile cannot write them. Only the owner of a thread decides on its staged
+changes and approves its plans ([plan-mode.md](plan-mode.md)); approvers who may open the thread see them read-only.
 
 **Threads are private** to their owner; the approvers of a version a thread wrote may open it read only
 ([threads.md](threads.md#who-sees-a-thread)). No policy shows another editor's threads.

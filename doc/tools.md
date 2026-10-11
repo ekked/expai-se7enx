@@ -92,6 +92,26 @@ Checks: the object is readable; reusing a draft only if it is still a draft crea
 `content/edit` in that language and the object must be published (a never published object is changed in the edit
 form). A new version counts against `MaxDraftsPerConversation`. Result as create_draft, plus `new_version`.
 
+## Staged review: create_draft and update_draft in Vector
+
+In a Vector thread with staged review both tools **stage proposals** instead of writing drafts ([review.md](review.md)):
+one `expai_change` per field, compared with the published version, checked against the thread's scope and the
+editor's edit (or create) permission. The result is `status` ("staged for the editor's review"), `change_ids`,
+`staged`, `unchanged`, `skipped`, `errors`, and `new_key` for a new object; `create_draft` takes `new_key` to revise
+that proposal. Without an approved plan only one object in one language can be staged.
+
+## propose_plan (Vector threads)
+
+Stores a plan for bulk work for the editor to approve ([plan-mode.md](plan-mode.md)); it reads and writes no content.
+
+| Input | Type | Required / default |
+| --- | --- | --- |
+| `items` | array of { `action` (create, update, translate), `object_id`, `node_id`, `parent_node_id`, `class`, `languages[]`, `fields[]`, `summary` } | yes |
+| `assumptions`, `questions`, `risks` | arrays of strings | no |
+
+Checks: a Vector thread; each item against the scope and the editor's permissions (refused items are kept with the
+reason). Result: `plan_id`, `items`, `runnable`, `refused` (item and reason), `estimate` (expected cost, tokens).
+
 ## Writing values
 
 Only datatypes in `[ToolSettings] WritableDatatypes[]` are written; others are skipped with a reason. Each value goes

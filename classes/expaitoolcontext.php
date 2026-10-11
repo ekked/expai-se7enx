@@ -46,6 +46,9 @@ class expAiToolContext
     /** @var array drafts written in this step: list of expAiDraftLog */
     public $written = array();
 
+    /** @var bool a Vector thread with staged review: the write tools stage proposals (expAiChangeStager), never versions */
+    public $staged = false;
+
     public function __construct( expAiConfig $config, $nodeID, $conversation = null, ?expAiDataPolicy $policy = null )
     {
         $this->config = $config;

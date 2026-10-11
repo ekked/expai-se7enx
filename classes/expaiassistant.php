@@ -56,13 +56,13 @@ class expAiAssistant
      * Threads: the next steps run in the conversation of a thread's run instead of the panel's conversation of the
      * user on the node (Vector, doc/vector.md).
      * @param array $options alias (a model the user may use, '' for the user's choice), read_only (no write tools:
-     *                       plan mode or staged review), scope_note (told to the model once per change), action
-     *                       (usage log action, default "vector")
+     *                       plan mode), staged (the write tools stage proposals for review, doc/review.md), mode,
+     *                       scope_note (told to the model once per change), action (usage log action, default "vector")
      */
     public function useConversation( expAiConversation $conversation, array $options = array() )
     {
         $this->bound = $conversation;
-        $this->threadOptions = $options + array( 'alias' => '', 'read_only' => false, 'scope_note' => '', 'action' => 'vector' );
+        $this->threadOptions = $options + array( 'alias' => '', 'read_only' => false, 'staged' => false, 'scope_note' => '', 'action' => 'vector' );
         return $this;
     }
 
@@ -150,7 +150,12 @@ class expAiAssistant
         $readOnly = $this->bound && !empty( $this->threadOptions['read_only'] );
         if ( $readOnly )
             $this->writeAllowed = false;
-        $frameMode = $readOnly ? 'read' : 'write';
+        // Vector (doc/review.md, doc/plan-mode.md): staged review makes the write tools stage proposals; a Vector
+        // thread can always propose a plan (propose_plan reads and writes no content)
+        $staged = $this->bound && !$readOnly && !empty( $this->threadOptions['staged'] );
+        if ( $this->bound && $this->threadOptions['action'] === 'vector' && class_exists( 'expAiToolProposePlan' ) && !$this->tools()->get( 'propose_plan' ) )
+            $this->tools()->add( new expAiToolProposePlan( 'propose_plan' ) );
+        $frameMode = $readOnly ? ( isset( $this->threadOptions['mode'] ) && $this->threadOptions['mode'] === 'plan' ? 'plan' : 'read' ) : ( $staged ? 'staged' : 'write' );
         // the data policy of that provider: the panel's node first (a refusal names the rule)
         $policy = expAiDataPolicy::forProvider( $this->config, $providerID );
         $reader = new expAiContentReader( $this->config, $policy );
@@ -263,6 +268,8 @@ class expAiAssistant
                 $system .= "\n\n" . self::snapshot( $reader, $node );
             if ( $readOnly )
                 $system .= "\n\n" . expAiThreadPrompts::readOnlyNote( $this->threadOptions );
+            elseif ( $staged )
+                $system .= "\n\n" . expAiThreadPrompts::stagedNote();
             $frame = array( 'system' => $system, 'tools' => $mode === 'none' ? array() : $this->tools()->definitions( $this->writeAllowed ) );
             $conversation->setFrame( $frame['system'], $frame['tools'] );
             if ( $this->bound )
@@ -361,7 +368,8 @@ class expAiAssistant
             $context->model = (string) $answer['model'];
             $context->provider = $providerID;
             $context->modelAlias = $alias;
-            $invalid = isset( $answer['invalid_tool_input'] ) && is_array( $answer['invalid_tool_input'] ) ? $answer['invalid_tool_input'] : array();
+            $context->staged = $staged;
+            $invalid =isset( $answer['invalid_tool_input'] ) && is_array( $answer['invalid_tool_input'] ) ? $answer['invalid_tool_input'] : array();
             $mcpCalls = 0;
             $context->request = $request;
             $results = array();
