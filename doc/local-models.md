@@ -50,7 +50,7 @@ systemctl reload <the PHP-FPM of the site>     # the web user's new group
 `OLLAMA_NUM_PARALLEL=1`, `OLLAMA_MAX_LOADED_MODELS=1`, `OLLAMA_CONTEXT_LENGTH=16384`, and the limits `CPUQuota=400%`,
 `CPUWeight=20`, `Nice=15`, `IOWeight=20`, `MemoryHigh=8G`, `MemoryMax=10G`, `MemorySwapMax=0`, `TasksMax=256`, with
 `ProtectSystem=strict`, `ProtectHome`, `PrivateTmp`, `NoNewPrivileges` and `RestrictAddressFamilies`. The Modelfile
-sets 4 threads and the context length (`ollama create exp-qwen3.5:4b -f ...`, done by the helper after a pull).
+sets 4 threads and the context length; after a pull the helper creates `exp-qwen3.5:4b` from it through Ollama's `/api/create` (no command is run).
 
 Then in `settings/override/expai.ini.append.php`:
 

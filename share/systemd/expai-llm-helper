@@ -138,11 +138,21 @@ def carry_out(request, allowed):
         if target:
             modelfile = os.path.join(MODELFILES, target.replace(':', '-') + '.Modelfile')
             if os.path.isfile(modelfile) and os.stat(modelfile).st_uid == 0:
-                created = subprocess.run(['runuser', '-u', 'ollama', '--', '/usr/local/bin/ollama', 'create', target, '-f', modelfile],
-                                         capture_output=True, text=True, timeout=600, env={'OLLAMA_HOST': '127.0.0.1:11434', 'HOME': '/var/lib/ollama', 'PATH': '/usr/bin:/bin'})
-                if created.returncode != 0:
-                    return 'pulled %s, create %s failed: %s' % (model, target, (created.stderr or created.stdout)[-200:])
-                return 'pulled %s, created %s' % (model, target)
+                # through Ollama's own API (no command is run): FROM and PARAMETER lines of the root-owned Modelfile
+                parameters = {}
+                source = model
+                with open(modelfile, encoding='utf-8') as handle:
+                    for line in handle:
+                        parts = line.split('#', 1)[0].split()
+                        if len(parts) == 2 and parts[0].upper() == 'FROM' and NAME.match(parts[1]):
+                            source = parts[1]
+                        elif len(parts) == 3 and parts[0].upper() == 'PARAMETER' and re.match(r'^[a-z_]{1,30}$', parts[1]):
+                            value = parts[2]
+                            parameters[parts[1]] = float(value) if re.match(r'^\d+\.\d+$', value) else int(value) if value.isdigit() else value
+                created = api('/api/create', {'model': target, 'from': source, 'parameters': parameters, 'stream': False}, timeout=600)
+                if created.get('status') != 'success':
+                    return 'pulled %s, create %s failed: %s' % (model, target, json.dumps(created)[:200])
+                return 'pulled %s, created %s %s' % (model, target, json.dumps(parameters))
         return 'pulled ' + model
     if action == 'remove':
         names = [model] + ([allowed[model]] if allowed.get(model) else [])
