@@ -6,7 +6,7 @@
  *   expai/stream/(thread)/<uuid>/(after)/<event id>     (Last-Event-ID wins over (after) on a reconnect)
  *
  * Used only where [VectorSettings] Transport resolves to sse: "auto" means SSE under PHP-FPM/Apache (the proxy flushes
- * each packet) and polling under Velocity (its pool workers do not stream yet). The stream closes the session lock
+ * each packet) and under Velocity (its pool workers stream; past its cap they answer 503). The stream closes the session lock
  * first, sends a first line at once, holds at most [VectorSettings] StreamSeconds (25), checks for new events every
  * second, stops when the client leaves, and answers 204 when [VectorSettings] MaxStreams streams are open (the
  * browser then polls). Read only: a replayed GET is harmless. Never wrapped in catch (Exception): cleanExit() throws

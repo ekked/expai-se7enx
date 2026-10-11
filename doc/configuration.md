@@ -375,9 +375,12 @@ See [mcp.md](mcp.md).
 | `PollActiveMs` | 1000 | poll interval while the open thread runs |
 | `PollWorkingMs` | 3000 | poll interval while another thread works |
 | `PollIdleMs` | 15000 | poll interval otherwise (doubled while the host is busy; no polling while the tab is hidden) |
-| `Transport` | auto | `auto` (Server-Sent Events under PHP-FPM/Apache, polling under Velocity), `poll`, `sse` |
+| `Transport` | auto | `auto` (Server-Sent Events under PHP-FPM/Apache and Velocity, with a fallback to polling), `poll`, `sse` |
 | `MaxStreams` | 4 | streams open at once (one PHP process each: at most 25 % of PHP-FPM `pm.max_children`) |
 | `StreamSeconds` | 25 | how long one stream is held before the browser reconnects |
+| `Background` | auto | turns of slow models run as queue jobs (`auto`), every turn (`always`), none (`never`); [vector.md](vector.md#background-runs) |
+| `KickWorker` | enabled | without a running worker, start one detached worker for interactive jobs after queueing |
+| `PhpCli` | (empty) | the PHP command line binary of that worker (empty: the one of this PHP) |
 
 **[VectorPane_<name>]** `Template=`: the template of a right-pane tab (`expai/vector/pane_plan.tpl`, ...).
 

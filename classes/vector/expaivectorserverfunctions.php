@@ -233,6 +233,9 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
                 $thread = expAiThread::fetchByUuid( $uuid );
                 if ( !$thread || !expAiThreadAccess::canRead( $thread ) )
                     continue;
+                // a background turn whose job ended without an answer: the thread says so
+                if ( expAiThreadRunner::reconcile( $thread ) )
+                    $thread = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) );
                 $cursor = isset( $after[$uuid] ) ? (int) $after[$uuid] : 0;
                 $out['threads'][] = array( 'uuid' => $uuid, 'state' => (string) $thread->attribute( 'state' ), 'last_event_id' => (int) $thread->attribute( 'last_event_id' ),
                                            'cost' => $thread->costText(), 'modified' => (int) $thread->attribute( 'modified' ) );
@@ -489,16 +492,27 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
                 $thread->setAttribute( 'shelf', 'active' );
                 $thread->store();
             }
+            $options = array( 'alias' => $alias, 'read_only' => $readOnly, 'mode' => $mode,
+                'scope_note' => $thread->attribute( 'origin' ) === expAiThread::ORIGIN_PANEL ? '' : expAiThreadPrompts::scopeNote( $scope ),
+                'action' => $thread->attribute( 'origin' ) === expAiThread::ORIGIN_PANEL ? 'panel' : 'vector' );
+            // a slow model: the turn runs in the queue; the browser follows its events
+            if ( expAiThreadRunner::inBackground( $alias, $config ) )
+            {
+                $message = self::post( 'continue' ) === '1' ? '' : trim( self::post( 'message' ) );
+                if ( $message === '' && !$conversation->awaitsAnswer() )
+                    throw new expAiException( 'Please write a message.' );
+                $job = expAiThreadRunner::enqueue( $thread, $nodeID, $message, $options );
+                $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ) ?: $thread;
+                return array( 'status' => 'queued', 'job' => (string) $job->attribute( 'uuid' ), 'steps' => array(), 'text' => '',
+                              'thread' => expAiVector::detail( $fresh, self::userID(), $config ), 'read_only' => $readOnly );
+            }
             if ( self::post( 'continue' ) !== '1' )
             {
                 $thread->setState( 'running' );
                 $thread->touch();
                 $thread->store();
             }
-            $assistant = ( new expAiAssistant( $config ) )->useConversation( $conversation, array(
-                'alias' => $alias, 'read_only' => $readOnly, 'mode' => $mode,
-                'scope_note' => $thread->attribute( 'origin' ) === expAiThread::ORIGIN_PANEL ? '' : expAiThreadPrompts::scopeNote( $scope ),
-                'action' => $thread->attribute( 'origin' ) === expAiThread::ORIGIN_PANEL ? 'panel' : 'vector' ) );
+            $assistant = ( new expAiAssistant( $config ) )->useConversation( $conversation, $options );
             $result = $assistant->step( $nodeID, self::post( 'continue' ) === '1' ? null : self::post( 'message' ) );
             $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) );
             $result['thread'] = expAiVector::detail( $fresh ?: $thread, self::userID(), $config );
@@ -521,6 +535,8 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
             $thread = self::loadThread( true );
             if ( in_array( $thread->attribute( 'state' ), array( 'queued', 'running', 'waiting_input' ), true ) )
             {
+                // a background turn: its job is cancelled (a running one stops after the current step)
+                expAiThreadRunner::cancel( $thread );
                 $thread->setState( 'stopped' );
                 $run = $thread->leadRun();
                 if ( $run )

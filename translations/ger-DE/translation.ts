@@ -3337,6 +3337,18 @@
         <translation>Annehmen und Ablehnen gelten für vorgemerkte Änderungen, die mit der vorgemerkten Prüfung kommen.</translation>
     </message>
     <message>
+        <source>This model is slow: the turn runs in the background. You may leave this page; the thread keeps working.</source>
+        <translation>Dieses Modell ist langsam: Der Durchgang läuft im Hintergrund. Sie können die Seite verlassen; der Thread arbeitet weiter.</translation>
+    </message>
+    <message>
+        <source>Working in the background, step %count:</source>
+        <translation>Arbeitet im Hintergrund, Schritt %count:</translation>
+    </message>
+    <message>
+        <source>The turn in the background failed.</source>
+        <translation>Der Durchgang im Hintergrund ist fehlgeschlagen.</translation>
+    </message>
+    <message>
         <source>Estimated from the request log at list prices; the provider's invoice is authoritative.</source>
         <translation>Aus dem Anfrageprotokoll zu Listenpreisen geschätzt; maßgeblich ist die Rechnung des Anbieters.</translation>
     </message>
@@ -3391,6 +3403,14 @@
     <message>
         <source>Part of the scope lies in a section your role does not allow for Vector.</source>
         <translation>Ein Teil des Bereichs liegt in einer Sektion, die Ihre Rolle für Vector nicht erlaubt.</translation>
+    </message>
+    <message>
+        <source>The background job of this turn ended without an answer: %error</source>
+        <translation>Der Hintergrundauftrag dieses Durchgangs endete ohne Antwort: %error</translation>
+    </message>
+    <message>
+        <source>The owner of this thread no longer has access to it.</source>
+        <translation>Der Eigentümer dieses Threads hat keinen Zugriff mehr darauf.</translation>
     </message>
     <message>
         <source>Automatic</source>

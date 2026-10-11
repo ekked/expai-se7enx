@@ -66,6 +66,18 @@ MaxConcurrent=4
 [QueueResource_openrouter:flex]
 MaxConcurrent=4
 
+# Threads (doc/vector.md "Background runs"): one turn of a thread (every step until the model answers) run by the
+# worker as the thread's owner. One attempt more after a crash (the message is never sent twice); a model error
+# ends the turn (the editor decides). Timeout per lease: each step extends it.
+[JobType_expai.thread.turn]
+Handler=expAiThreadTurnHandler
+Class=interactive
+MaxAttempts=2
+Timeout=900
+RetryBase=10
+MaxBackoff=60
+Description=One turn of a thread of Exponential Intelligence (Vector, the Intelligence tab) in the background
+
 # The translation sync: after a publish in the source language, decides for each translation and queues the small
 # patches (no model call; the patches themselves are expai.request jobs of the class translation_patch).
 [JobType_expai.translation.check]

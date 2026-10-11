@@ -3337,6 +3337,18 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>This model is slow: the turn runs in the background. You may leave this page; the thread keeps working.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Working in the background, step %count:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The turn in the background failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Estimated from the request log at list prices; the provider's invoice is authoritative.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3390,6 +3402,14 @@
     </message>
     <message>
         <source>Part of the scope lies in a section your role does not allow for Vector.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The background job of this turn ended without an answer: %error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The owner of this thread no longer has access to it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

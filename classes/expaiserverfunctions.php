@@ -178,6 +178,10 @@ class expAiServerFunctions extends ezjscServerFunctions
             if ( function_exists( 'set_time_limit' ) )
                 @set_time_limit( $timeout + 30 );
             ignore_user_abort( true );
+            // a slow model: the turn runs in the queue (threads, doc/vector.md "Background runs")
+            $queued = expAiThreadRunner::panelTurn( $nodeID, self::post( 'continue' ) === '1' ? null : self::post( 'message' ), $config );
+            if ( $queued )
+                return $queued;
             $assistant = new expAiAssistant( $config );
             return $assistant->step( $nodeID, self::post( 'continue' ) === '1' ? null : self::post( 'message' ) );
         } );

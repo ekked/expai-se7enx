@@ -582,8 +582,78 @@
             emit( 'drafts:changed', { panel: root, drafts: drafts } );
         }
 
+        /**
+         * A slow model: the turn runs in the background (doc/vector.md "Background runs"). The panel follows the
+         * thread's events and shows the exchange as its steps arrive, until the thread is no longer queued or running.
+         */
+        function followQueued( data ) {
+            var uuid = data.thread;
+            var cursor = 0;
+            var text = working ? working.querySelector( '.exp-ai-working-text' ) : null;
+            if ( text && data.notice ) {
+                text.textContent = data.notice;
+            }
+            return new Promise( function ( resolve, reject ) {
+                function tick() {
+                    var after = {};
+                    after[uuid] = cursor;
+                    api( 'expaivector::events', { threads: uuid, after: JSON.stringify( after ), open: uuid } ).then( function ( ev ) {
+                        var news = ( ev.events || [] ).filter( function ( e ) { return e.thread === uuid; } );
+                        var failed = '';
+                        news.forEach( function ( e ) {
+                            cursor = Math.max( cursor, e.id );
+                            if ( e.kind === 'step_end' && e.payload && e.payload.text && text ) {
+                                text.textContent = e.payload.text;
+                            }
+                            if ( e.kind === 'error' && e.payload ) {
+                                failed = e.payload.message || '';
+                            }
+                        } );
+                        var st = ( ev.threads || [] )[0];
+                        var done = !st || ( st.state !== 'queued' && st.state !== 'running' );
+                        var refresh = news.length ? api( 'history', { node_id: nodeID } ).then( function ( page ) {
+                            var list = page.exchanges || [];
+                            if ( list.length ) {
+                                var x = list[list.length - 1];
+                                var li = showExchange( x, true, false );
+                                collapseOthers( x.id );
+                                if ( li ) {
+                                    li.scrollIntoView( { block: 'nearest' } );
+                                }
+                            }
+                        } ) : Promise.resolve();
+                        return refresh.then( function () {
+                            if ( !done ) {
+                                window.setTimeout( tick, Math.max( 1000, Math.min( ev.next_ms || 2000, 3000 ) ) );
+                                return;
+                            }
+                            api( 'drafts', { node_id: nodeID } ).then( function ( d ) { setDrafts( d.drafts || [] ); } ).catch( function () {} );
+                            if ( text && S.working ) {
+                                text.textContent = S.working;
+                            }
+                            if ( st && st.state === 'failed' ) {
+                                reject( { message: failed, kind: 'server' } );
+                            } else {
+                                resolve( { status: 'done' } );
+                            }
+                        } );
+                    } ).catch( function () { window.setTimeout( tick, 3000 ); } );
+                }
+                window.setTimeout( tick, 1000 );
+            } );
+        }
+
         function step( params ) {
             return api( 'chat', $.extend( { node_id: nodeID }, params ) ).then( function ( data ) {
+                if ( data.status === 'queued' && data.thread ) {
+                    if ( data.drafts ) {
+                        setDrafts( data.drafts );
+                    }
+                    return followQueued( data ).then( function ( r ) {
+                        emit( 'panel:done', { panel: root, data: r } );
+                        return r;
+                    } );
+                }
                 if ( data.exchange ) {
                     var li = showExchange( data.exchange, true, false );
                     collapseOthers( data.exchange.id );

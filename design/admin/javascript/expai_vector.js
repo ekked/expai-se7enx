@@ -417,6 +417,11 @@
                 ( data.steps || [] ).forEach( function ( s ) { announce( s.text ); } );
                 if ( data.thread ) { setHeader( data.thread ); }
                 if ( data.drafts ) { renderDrafts( data.drafts ); }
+                if ( data.status === 'queued' ) {
+                    // a slow model: the turn runs in the background; follow its events
+                    el.workingText.textContent = T( 'queued_background' );
+                    return follow( app.current.uuid );
+                }
                 ExpAi.emit( 'vector:step', { data: data } );
                 stepCount++;
                 el.workingText.textContent = T( 'working' ) + ' ' + T( 'working_step', { '%count': stepCount + 1 } );
@@ -431,6 +436,58 @@
                 }
                 ExpAi.emit( 'vector:done', { data: data } );
                 return data;
+            } );
+        }
+
+        /**
+         * Follows a background turn until the thread is no longer queued or running: its events (polled; the stream
+         * handles other threads), the exchange reloaded when steps arrive, the last step as the working text. Stop
+         * cancels the job (expaivector::stop); the worker honors it after the current step.
+         */
+        function follow( uuid ) {
+            var stopSent = false;
+            var lastError = '';
+            var steps = 0;
+            return new Promise( function ( resolve ) {
+                function tick() {
+                    if ( !app.current || app.current.uuid !== uuid ) { resolve( null ); return; }
+                    var after = {};
+                    after[uuid] = app.cursor[uuid] || 0;
+                    var ask = app.stopRequested && !stopSent ? api( 'stop', { thread: uuid } ).then( function () { stopSent = true; } ) : Promise.resolve();
+                    ask.then( function () {
+                        return api( 'events', { threads: uuid, after: JSON.stringify( after ), open: uuid } );
+                    } ).then( function ( data ) {
+                        var news = ( data.events || [] ).filter( function ( ev ) { return ev.thread === uuid; } );
+                        news.forEach( function ( ev ) {
+                            app.cursor[uuid] = Math.max( app.cursor[uuid] || 0, ev.id );
+                            if ( ev.kind === 'error' && ev.payload ) { lastError = ev.payload.message || ''; }
+                            if ( ev.kind === 'step_end' && ev.payload && ev.payload.text ) {
+                                steps++;
+                                el.workingText.textContent = T( 'working_background', { '%count': steps } ) + ' ' + ev.payload.text;
+                                announce( ev.payload.text );
+                            }
+                        } );
+                        var st = ( data.threads || [] ).filter( function ( t ) { return t.uuid === uuid; } )[0];
+                        var done = !st || ( st.state !== 'queued' && st.state !== 'running' );
+                        var reload = news.length ? api( 'thread', { thread: uuid } ).then( function ( d ) {
+                            ( d.history.exchanges || [] ).forEach( function ( x ) { showExchange( x, false ); } );
+                            renderDrafts( d.drafts );
+                            setHeader( d.thread );
+                            scrollDown();
+                        } ) : Promise.resolve();
+                        return reload.then( function () {
+                            if ( done ) {
+                                if ( st && st.state === 'stopped' ) { toast( T( 'stopped' ) ); }
+                                if ( st && st.state === 'failed' ) { showError( el.error, { message: lastError || T( 'background_failed' ) } ); }
+                                ExpAi.emit( 'vector:done', { data: { status: st ? st.state : 'done' } } );
+                                resolve( null );
+                            } else {
+                                window.setTimeout( tick, Math.min( data.next_ms || 1000, 3000 ) );
+                            }
+                        } );
+                    } ).catch( function () { window.setTimeout( tick, 3000 ); } );
+                }
+                window.setTimeout( tick, 800 );
             } );
         }
 

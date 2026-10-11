@@ -843,9 +843,17 @@ PollActiveMs=1000
 PollWorkingMs=3000
 PollIdleMs=15000
 # How events reach the browser (expai/stream): auto | poll | sse. auto: Server-Sent Events under PHP-FPM/Apache
-# (the proxy must flush each packet: flushpackets=on), polling under Velocity (its pool workers do not stream yet).
+# (the proxy must flush each packet: flushpackets=on) and under Velocity (its own stream cap: 503 past it); polling elsewhere.
 # A browser that gets no first line within 2 s falls back to polling.
 Transport=auto
+# Background runs (owner decision: slow models never run inside one web request): auto | always | never.
+# auto: in the background when the model is slow ([Model_<alias>] RunInBackground=always|never, else its Slow flag;
+# local models are slow). Needs the extension expqueue; the panel uses it too.
+Background=auto
+# Without a running worker, start one detached worker for interactive jobs right after queueing (the cron part of
+# expqueue stays the safety net). PhpCli: the PHP command line binary for it (empty: the one of this PHP).
+KickWorker=enabled
+PhpCli=
 # Streams open at once (one PHP process each: at most 25 % of PHP-FPM pm.max_children); over it the browser polls
 MaxStreams=4
 # Seconds one stream is held before the browser reconnects (Last-Event-ID)

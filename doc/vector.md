@@ -69,7 +69,7 @@ the chosen lane applies to background runs.
 - **Queue** (Alt+Enter, or Enter on the Queue button while a turn runs) keeps the message in the thread's queue
   (`expai_followup`); when the turn ends the first one is sent automatically. A queued message can be removed (x).
 
-Background runs in the queue (expqueue), parallel runs of an approved plan and steering a running turn come with the
+Parallel runs of an approved plan and steering a running turn come with the
 next steps; the thread data, events and the stream are ready for them.
 
 ## How events reach the browser
@@ -79,7 +79,7 @@ next steps; the thread data, events and the stream are ready for them.
 | Polling | everywhere | `expaivector::events` (POST with the form token) every `[VectorSettings] PollActiveMs` (1 s) while the open thread runs, `PollWorkingMs` (3 s) while another thread works, `PollIdleMs` (15 s) otherwise; doubled while the host is busy, none while the browser tab is hidden |
 | Server-Sent Events | `Transport=auto` under PHP-FPM/Apache | `expai/stream/(thread)/<uuid>/(after)/<event id>`: the session lock is released first, a first line is sent at once, the stream is held at most `StreamSeconds` (25) and resumed with Last-Event-ID; at most `MaxStreams` streams at once (one PHP process each), over it the answer is 204 and the browser polls. Without a first line within 2 seconds the browser polls for the rest of the session. |
 
-Under Velocity `auto` means polling (its pool workers do not stream yet). On Apache the proxy to PHP-FPM must flush
+Under Velocity `auto` streams too (its pool workers stream; past Velocity's stream cap the answer is 503 and the browser polls). On Apache the proxy to PHP-FPM must flush
 each packet (`flushpackets=on`). Every Vector function that only reads the session releases its lock at once, so a
 poll or a long turn never holds up the editor's other pages. A poll costs one kernel bootstrap and writes nothing.
 
@@ -118,3 +118,27 @@ PollActiveMs, PollWorkingMs, PollIdleMs, Transport, MaxStreams, StreamSeconds), 
   JavaScript on the `vector:open`, `vector:step` and `vector:done` events (`ExpAi.on( ... )`).
 - A command of your own in the palette: `ExpAi.commands.register( 'my_command', { label: 'Do it', run: function () { ... } } )`
   ([keyboard.md](keyboard.md)).
+
+## Background runs
+
+Owner decision: a slow model never runs inside one web request (the web server would end it after its time limit).
+When `[VectorSettings] Background=auto` and the thread's model is slow (`[Model_<alias>] RunInBackground=always`,
+or its `Slow` flag: local models are slow unless `Slow=false`), a turn is a queue job `expai.thread.turn` (extension
+expqueue, class `interactive`) instead:
+
+- the browser gets "queued" at once and follows the thread's events (the working line shows each step; the
+  exchange appears as it grows); the editor may leave the page, the thread keeps working;
+- the worker runs every step as the thread's owner, exactly as in the browser (the same tools, permissions, data
+  policy, write gate and fallback model), and checks again that the owner may still use the thread;
+- Stop cancels the job; a running turn stops after its current step;
+- a crash of the worker repeats the turn once without sending the message twice; a model error ends the turn
+  (state failed, the reason as an event).
+
+Without a running worker, the request that queues the turn starts one detached worker for interactive jobs
+(`ext:expqueue:work --until-empty --max-seconds=60 --class=interactive -s <siteaccess>`, at most one start per 15
+seconds; `KickWorker=enabled`, `PhpCli=` the PHP command line binary, empty for the one of this PHP); the cron part
+of expqueue and its systemd service stay the safety net. The worker must run in a siteaccess where expai is active:
+if expai is an access extension of the admin siteaccess only, the cron line of expqueue needs `-s <admin siteaccess>`.
+
+The Intelligence tab does the same for a slow model (`expai::chat` answers "queued" with the thread, and the panel
+follows it). `Background=always` sends every Vector and panel turn to the queue, `never` none.

@@ -3337,6 +3337,18 @@
         <translation>Accept and reject apply to staged changes, which arrive with staged review.</translation>
     </message>
     <message>
+        <source>This model is slow: the turn runs in the background. You may leave this page; the thread keeps working.</source>
+        <translation>This model is slow: the turn runs in the background. You may leave this page; the thread keeps working.</translation>
+    </message>
+    <message>
+        <source>Working in the background, step %count:</source>
+        <translation>Working in the background, step %count:</translation>
+    </message>
+    <message>
+        <source>The turn in the background failed.</source>
+        <translation>The turn in the background failed.</translation>
+    </message>
+    <message>
         <source>Estimated from the request log at list prices; the provider's invoice is authoritative.</source>
         <translation>Estimated from the request log at list prices; the provider's invoice is authoritative.</translation>
     </message>
@@ -3391,6 +3403,14 @@
     <message>
         <source>Part of the scope lies in a section your role does not allow for Vector.</source>
         <translation>Part of the scope lies in a section your role does not allow for Vector.</translation>
+    </message>
+    <message>
+        <source>The background job of this turn ended without an answer: %error</source>
+        <translation>The background job of this turn ended without an answer: %error</translation>
+    </message>
+    <message>
+        <source>The owner of this thread no longer has access to it.</source>
+        <translation>The owner of this thread no longer has access to it.</translation>
     </message>
     <message>
         <source>Automatic</source>

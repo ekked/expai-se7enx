@@ -11,8 +11,8 @@
  * The transport of thread events (modules/expai/stream.php): which one applies, the stream slots, the stream loop.
  *
  *   [VectorSettings] Transport=auto | poll | sse
- *     auto  SSE under PHP-FPM or Apache's PHP module, polling under Velocity (PHP_SAPI cli: its pool workers send a
- *           response only when the script ends) and anywhere else
+ *     auto  SSE under PHP-FPM, Apache's PHP module and Velocity (its pool workers stream a text/event-stream
+ *           answer; past its stream cap it answers 503 and the browser polls); polling elsewhere
  *   MaxStreams    streams open at once on this server (one PHP process each; 25 % of FPM pm.max_children)
  *   StreamSeconds how long one stream is held (the browser reconnects with Last-Event-ID)
  */
@@ -25,7 +25,8 @@ class expAiVectorStream
         $setting = (string) $config->get( 'VectorSettings', 'Transport', 'auto' );
         if ( $setting === 'poll' )
             return 'poll';
-        $streams = in_array( PHP_SAPI, array( 'fpm-fcgi', 'apache2handler', 'cgi-fcgi' ), true );
+        // cli: Velocity's workers (the stream view is never called from a command line script)
+        $streams = in_array( PHP_SAPI, array( 'fpm-fcgi', 'apache2handler', 'cgi-fcgi', 'cli' ), true );
         if ( $setting === 'sse' )
             return $streams ? 'sse' : 'poll';
         return $streams ? 'sse' : 'poll';
@@ -75,8 +76,11 @@ class expAiVectorStream
     {
         $config = $config ?: expAiConfig::instance();
         $seconds = $config->int( 'VectorSettings', 'StreamSeconds', 25, 5, 25 );
-        while ( ob_get_level() > 0 )
-            ob_end_clean();
+        // PHP-FPM: no output buffer may hold the stream back. Velocity captures the answer in its own buffer and sends
+        // it on flush(): its buffers stay
+        if ( PHP_SAPI !== 'cli' )
+            while ( ob_get_level() > 0 && @ob_end_clean() )
+                ;
         header( 'Content-Type: text/event-stream; charset=utf-8' );
         header( 'Cache-Control: no-store' );
         header( 'X-Accel-Buffering: no' );

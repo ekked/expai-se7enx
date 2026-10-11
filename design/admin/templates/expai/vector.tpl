@@ -253,7 +253,10 @@
         'cost_lane', 'Lane'|i18n( $exp_ai_i18n ),
         'cost_off', 'Costs are not shown on this site.'|i18n( $exp_ai_i18n ),
         'today', 'today'|i18n( $exp_ai_i18n ),
-        'item_placeholder', 'Accept and reject apply to staged changes, which arrive with staged review.'|i18n( $exp_ai_i18n )
+        'item_placeholder', 'Accept and reject apply to staged changes, which arrive with staged review.'|i18n( $exp_ai_i18n ),
+        'queued_background', 'This model is slow: the turn runs in the background. You may leave this page; the thread keeps working.'|i18n( $exp_ai_i18n ),
+        'working_background', 'Working in the background, step %count:'|i18n( $exp_ai_i18n ),
+        'background_failed', 'The turn in the background failed.'|i18n( $exp_ai_i18n )
     ) )}</script>
 </div>
 {undef $exp_ai_i18n}
