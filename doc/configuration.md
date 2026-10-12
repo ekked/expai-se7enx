@@ -69,6 +69,8 @@ settings keep working unchanged). More providers: the next three sections and [p
 | `ExtraBody` | A JSON object merged into every request body, e.g. OpenRouter's routing `{"provider":{"data_collection":"deny","zdr":true}}`. It cannot change the model, the messages or the tools. |
 | `Region`, `Retention`, `TermsCheckedAt` | As in `[AISettings]`; used by the data policy ([data-policy.md](data-policy.md)) and shown per request. |
 | `Timeout`, `ConnectTimeout`, `MaxResponseBytes` | As in `[AISettings]`, for this provider (a local CPU model needs a longer `Timeout`, e.g. 280). |
+| `TimeoutBackground` | Seconds one call may take outside a web request (the queue worker of Vector and the Intelligence tab, the command line); empty: `Timeout`. The shipped `[Provider_local]` has 900 (the job lease of a turn is 900 + 60 s). A timeout there is shown to the editor and never hands the turn to another model ([local-models.md](local-models.md), "Making a local model usable"). |
+| `KeepAlive` | `Flavor=ollama` only: how long Ollama keeps the model (and the prompt it has cached) in memory after a request, an Ollama duration (`30m`) or seconds; sent as `keep_alive`. |
 | `RateLimitHeaders[]` | Glob patterns of the response headers kept in the usage log (default: `anthropic-ratelimit-*` and `retry-after` for anthropic; `x-ratelimit-*`, `retry-after`, `x-request-id` for openai_chat). |
 | `RetryAfterMax` | Seconds of a `retry-after` on 429/503/529 that expai waits once before retrying (default 5); a longer wait is reported to the editor at once. |
 | `RetryOnServerError` | `enabled` (default): one retry after a second on 500/502/504 or a failed connection (never after a timeout). |
@@ -92,6 +94,8 @@ The alias is what users choose and what the usage log records (letters, digits, 
 | `Effort` | `none`, `minimal`, `low`, `medium`, `high`, `xhigh` (with `Capabilities[]=reasoning_effort`; `none` switches thinking off, e.g. for Qwen on a CPU). |
 | `InputPerMTok`, `OutputPerMTok`, `CacheWritePerMTok`, `CacheReadPerMTok` | Prices per million tokens (0: free). Without them the model is priced by `[Pricing]` by its id; a model of another provider without prices has an unknown cost (never a Claude price). A cost the provider reports (OpenRouter) always wins. |
 | `Slow` | `true` marks the model "slow" in the picker (default for providers with `Region=local`). |
+| `PromptProfile` | `compact` (default for providers with `Region=local`) or `full`: a compact prompt is a short system prompt, only the tools the editor's message needs and a short snapshot of the open page for a question about it ([local-models.md](local-models.md), "Making a local model usable"). |
+| `Tools[]` | With `PromptProfile=compact`: the tools a compact prompt may offer this model (empty: `get_node`, `list_children`, `get_class_definition`, `create_draft`, `update_draft`, `propose_plan`). |
 | `MaxTokensParameter`, `ParallelToolCalls`, `StrictTools`, `ExtraBody` | `max_tokens` or `max_completion_tokens`; `enabled`/`disabled` sends `parallel_tool_calls`; `enabled` sends `strict: true` on tool definitions; a JSON object merged into the body for this model. |
 
 ## [AssistantSettings]: the conversation
@@ -105,6 +109,7 @@ The alias is what users choose and what the usage log records (letters, digits, 
 | `MaxDraftsPerConversation` | `10` | The most drafts one conversation may create (new objects and new versions). |
 | `ConversationLifetime` | `604800` | Seconds after its last message a conversation is still continued (older: a new one starts). |
 | `ContextWindowTurns` | `8` | Exchanges in the window sent to the model. When it is full, the older exchanges become a short summary (cut from their own text, no extra call) and the last half are kept word for word. The panel still shows the whole history. |
+| `CompactContextChars` | `1800` | The longest snapshot of the open page in a compact prompt (`[Model_<alias>] PromptProfile=compact`), in characters: its writable text fields as plain text, each cut to 600. |
 | `ExtraInstructions[]` | (none) | Lines added to the instructions of the panel and the edit form, e.g. `ExtraInstructions[]=Write in British English.` New conversations get them; running ones keep the instructions they started with. |
 
 ## [ToolSettings]: what the assistant may use
