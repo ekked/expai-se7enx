@@ -1138,6 +1138,22 @@
         <source>Exponential Intelligence help</source>
         <translation>Hilfe zu Exponential Intelligence</translation>
     </message>
+    <message>
+        <source>EI: Log</source>
+        <translation>EI: Protokoll</translation>
+    </message>
+    <message>
+        <source>EI: Help</source>
+        <translation>EI: Hilfe</translation>
+    </message>
+    <message>
+        <source>EI: Chains</source>
+        <translation>EI: Ketten</translation>
+    </message>
+    <message>
+        <source>EI: Vector</source>
+        <translation>EI: Vector</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/dashboard</name>

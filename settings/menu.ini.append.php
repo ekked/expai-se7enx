@@ -8,21 +8,21 @@ LinkNames[expai]=Exponential Intelligence
 PolicyList_expai[]=expai/write
 # Vector, the workspace of threads (doc/vector.md): users with expai/write and expai/vector
 Links[expai_vector]=expai/vector
-LinkNames[expai_vector]=Vector
+LinkNames[expai_vector]=EI: Vector
 PolicyList_expai_vector[]=expai/write
 PolicyList_expai_vector[]=expai/vector
 # AI chains (doc/chains.md): the runs and their checkpoints, users with expai/write and expai/chain
 Links[expai_chain]=expai/chain
-LinkNames[expai_chain]=Chains
+LinkNames[expai_chain]=EI: Chains
 PolicyList_expai_chain[]=expai/write
 PolicyList_expai_chain[]=expai/chain
 # The usage log (doc/usage-tracking.md), just above the help
 Links[expai_log]=expai/log
-LinkNames[expai_log]=Exponential Intelligence log
+LinkNames[expai_log]=EI: Log
 PolicyList_expai_log[]=expai/write
 # The extension's documentation (expai/help, doc/index.md)
 Links[expai_help]=expai/help
-LinkNames[expai_help]=Exponential Intelligence help
+LinkNames[expai_help]=EI: Help
 PolicyList_expai_help[]=expai/write
 
 # Setup > AI facts: the printable "AI facts" page for a data protection officer (doc/ai-facts.md), shown only to users
