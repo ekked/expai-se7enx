@@ -1,6 +1,6 @@
 <?php
 /**
- * expai/summary (policy expai/facts): the "EI: Summary" page for a data protection officer (doc/summary.md). One printable
+ * expai/summary (policy expai/summary): the "EI: Summary" page for a data protection officer (doc/summary.md). One printable
  * page with what goes where: per provider the region, the retention, the date the terms were checked, where the key
  * comes from (never the key), who may use it, the models with their write gate and probe date, the lanes and their
  * retention, the data policy rules, the limits and budgets against this month's usage, the tools that reach outside
@@ -15,9 +15,9 @@
 $Module = $Params['Module'];
 
 $tpl = eZTemplate::factory();
-$tpl->setVariable( 'facts', ( new expAiFacts() )->collect() );
+$tpl->setVariable( 'summary', ( new expAiSummary() )->collect() );
 
 $Result = array();
-$Result['content'] = $tpl->fetch( 'design:expai/facts.tpl' );
-$Result['path'] = array( array( 'url' => 'expai/dashboard', 'text' => ezpI18n::tr( 'extension/expai/facts', 'Exponential Intelligence' ) ),
-                         array( 'url' => false, 'text' => ezpI18n::tr( 'extension/expai/facts', 'EI: Summary' ) ) );
+$Result['content'] = $tpl->fetch( 'design:expai/summary.tpl' );
+$Result['path'] = array( array( 'url' => 'expai/dashboard', 'text' => ezpI18n::tr( 'extension/expai/summary', 'Exponential Intelligence' ) ),
+                         array( 'url' => false, 'text' => ezpI18n::tr( 'extension/expai/summary', 'EI: Summary' ) ) );

@@ -5,15 +5,12 @@ protection officer or anyone who has to answer "what does the AI feature send wh
 view parameters: every fact is read from the settings, the roles, the probe results and the usage log at the moment
 the page is opened, so it never goes stale.
 
-Formerly the "AI facts" page at `expai/facts`, with the help page `ai-facts`: that address and that help page name no
-longer exist (use `expai/summary` and `expai/help/(page)/summary`); the policy kept its name `expai/facts`.
-
-Policy: `expai/facts` (no limitation; the policy kept its name). The Administrator role has it; give it to a role of its own for a data
+Policy: `expai/summary` (no limitation). The Administrator role has it; give it to a role of its own for a data
 protection officer, who then needs no other expai policy and no access to content.
 
 ## What it shows
 
-| Section | Facts |
+| Section | What it lists |
 | --- | --- |
 | Master switch and surfaces | `[AISettings] Enabled` (and whether a model is configured), the edit form controls, the presets, Vector, the translation sync, whether users may choose a model, the service tools |
 | Providers | per active provider: host, region, retention, the date the terms were checked (`TermsCheckedAt`), **where the key comes from** (the settings file and its placement, e.g. `settings/override/expai.ini.append.php (override)`; never the key), who may use it (every user with `expai/write` for providers in `ProvidersWithoutPolicy[]`, else the roles with `expai/model_use` for it), this month's requests, tokens and estimated cost, the provider's monthly limits; per model: id, tool mode, the write gate (may write drafts, or read only and why), the latest live probe (pass rate and date), the price class |
@@ -24,13 +21,13 @@ protection officer, who then needs no other expai policy and no access to conten
 | What this site keeps | the usage log retention (`[UsageSettings] RetentionDays`), whether full requests are logged, the length of the request summary in the draft log, the retention of thread events, proposals and checkpoints |
 | Roles with Exponential Intelligence policies | every role with an `expai/*` policy (or every module), its functions and limitations |
 
-Two free texts come from `[FactsSettings]`: `Contact` (who answers questions about the processing) and `Note` (for
+Two free texts come from `[SummarySettings]`: `Contact` (who answers questions about the processing) and `Note` (for
 example the reference of the record of processing activities). Both are printed under the title.
 
 ## Printing and PDF
 
-**Print or save as PDF** opens the browser's print dialog. The print stylesheet (`expai_facts.css`) hides the admin
-chrome (menus, header, path, footer, debug output) and prints the facts black on white with section headings kept
+**Print or save as PDF** opens the browser's print dialog. The print stylesheet (`expai_summary.css`) hides the admin
+chrome (menus, header, path, footer, debug output) and prints the page black on white with section headings kept
 with their tables; "Save as PDF" in the print dialog gives the PDF. Nothing is generated on the server.
 
 ## Never a key
@@ -44,7 +41,7 @@ authoritative.
 
 | File | Part |
 | --- | --- |
-| `classes/expaifacts.php` | `expAiFacts::collect()`: every fact |
-| `modules/expai/facts.php` | the view `expai/summary` |
-| `design/admin/templates/expai/facts.tpl` | the page |
-| `design/admin/stylesheets/expai_facts.css` | screen and print styles |
+| `classes/expaisummary.php` | `expAiSummary::collect()`: every fact |
+| `modules/expai/summary.php` | the view `expai/summary` |
+| `design/admin/templates/expai/summary.tpl` | the page |
+| `design/admin/stylesheets/expai_summary.css` | screen and print styles |

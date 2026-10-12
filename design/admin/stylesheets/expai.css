@@ -274,11 +274,11 @@ div#node-tab-expai_media-content.tab-content {
     min-width: 0;
 }
 .exp-ai .exp-ai-card h2 { margin: 0 0 0.5em; padding: 0; border: 0; font-size: 1.1em; }
-.exp-ai-facts { margin: 0; }
-.exp-ai-facts > div { display: flex; flex-wrap: wrap; gap: 0.2em 0.8em; padding: 0.25em 0; border-top: 1px solid var(--exp-ai-line); }
-.exp-ai-facts > div:first-child { border-top: 0; }
-.exp-ai-facts dt { flex: 0 0 11em; font-weight: 600; margin: 0; }
-.exp-ai-facts dd { flex: 1 1 12em; margin: 0; }
+.exp-ai-summary { margin: 0; }
+.exp-ai-summary > div { display: flex; flex-wrap: wrap; gap: 0.2em 0.8em; padding: 0.25em 0; border-top: 1px solid var(--exp-ai-line); }
+.exp-ai-summary > div:first-child { border-top: 0; }
+.exp-ai-summary dt { flex: 0 0 11em; font-weight: 600; margin: 0; }
+.exp-ai-summary dd { flex: 1 1 12em; margin: 0; }
 .exp-ai-dash-note:empty { display: none; }
 .exp-ai-draft-table th { text-align: left; }
 

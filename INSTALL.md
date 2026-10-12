@@ -106,9 +106,10 @@ php extension/expai/bin/php/expaischema.php --install -s <admin siteaccess>
 ```
 
 It is idempotent (a second run creates nothing), uses the kernel's schema handler of the database's engine, and is
-also the upgrade: for tables that exist it adds missing columns and indexes, and it moves panel conversations into
-threads. `--check` only reports. When several siteaccesses use different databases, run it once per database. To
-create the tables by hand instead, use the file of your engine:
+also the upgrade: for tables that exist it adds missing columns and indexes, it moves panel conversations into
+threads, and it gives role policies of pre-release builds the current function names (with their limitations).
+`--check` only reports. When several siteaccesses use different databases, run it once per database. To create the
+tables by hand instead, use the file of your engine:
 
 | Engine | File |
 | --- | --- |
@@ -136,7 +137,7 @@ create the tables by hand instead, use the file of your engine:
 | `expai/log` | everyone's requests and versions, the site view of the dashboard, budgets and lanes |
 | `expai/settings` | where the site default model is set; "Resume held jobs" |
 | `expai/model_manage` | `expai/models`: providers, probe results, the local model |
-| `expai/facts` | the "EI: Summary" page `expai/summary` (needs nothing else; also opens the help pages) |
+| `expai/summary` | the "EI: Summary" page `expai/summary` (needs nothing else; also opens the help pages) |
 | `ezjscore/call` | needed for every browser request of expai; unlimited, or limited to the function list `expai` |
 
 **A recommended Editor set** (Setup > Roles and policies > Editor > New policy):
@@ -151,7 +152,7 @@ create the tables by hand instead, use the file of your engine:
 Leave `expai/web`, `expai/mcp`, `expai/services`, `expai/model_use` and `expai/lane_fast` off until you have
 configured what they open and checked it against your data policy. Give `expai/log`, `expai/settings`,
 `expai/model_manage` and the package policies to administrators (the Administrator role holds every policy already),
-and `expai/facts` alone to a data protection officer's role. What the assistant may then do in the content tree is
+and `expai/summary` alone to a data protection officer's role. What the assistant may then do in the content tree is
 decided by the editor's own content policies ([doc/permissions.md](doc/permissions.md)).
 
 ## 7. Autoloads, caches, web server
@@ -283,7 +284,8 @@ Upgrade (a newer expai over an older one):
 - [ ] Read the changelog of the new version (`doc/changelog/`)
 - [ ] Update the files (Composer or `git pull`), keep `settings/override/expai.ini.append.php`
 - [ ] Run `expaischema.php --install -s <admin siteaccess>` on each database **before** the new code serves requests
-      (it adds new tables, columns and indexes; `--check` first shows what is missing)
+      (it adds new tables, columns and indexes and renames role policies of pre-release builds; `--check` first
+      shows what is missing)
 - [ ] Compare your override with the new `settings/expai.ini.append.php` for new groups (new providers, lanes, presets)
 - [ ] Autoloads, INI and template caches, packed scripts and styles (`ezjscore-packer`, `template-block`), PHP-FPM
       reload; Velocity restart or `./console exp:velocity deploy --packer`

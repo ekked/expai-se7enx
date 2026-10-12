@@ -1,12 +1,12 @@
 <?php
 /**
- * Test of the editor presets (expAiEditPresets) and the "AI facts" page (expAiFacts), no network:
+ * Test of the editor presets (expAiEditPresets) and the "EI: Summary" page (expAiSummary), no network:
  *   - the shipped mapping ([Presets] in extension/expai/settings/expai.ini.append.php): every preset and Improve entry
  *     has its field action section; every target of an installed class exists and fits (writable datatype, or a part
  *     of an xrowmetadata field);
  *   - target parsing and the cleaning of xrowmetadata parts;
- *   - expAiFacts::collect() with the site's settings: every section is there, and no key or token value appears in
- *     the collected facts.
+ *   - expAiSummary::collect() with the site's settings: every section is there, and no key or token value appears in
+ *     the collected summary.
  *
  * Run from the installation root (siteaccess with the site's expai settings, e.g. admin):
  *   php bin/php/ezexec.php extension/expai/tests/expaipresets_test.php -s admin
@@ -81,33 +81,33 @@ $check( 'description part loses quotes and tags', $request->clean( '"<b>A garden
 $request->part = 'keywords';
 $check( 'keywords part is a comma list', $request->clean( "garden,  library ,,reading\nhour" ) === 'garden, library, reading hour' );
 
-// the facts of the site
+// the summary of the site
 $config = expAiConfig::instance();
 try
 {
-    $facts = ( new expAiFacts( $config ) )->collect();
-    $check( 'expAiFacts::collect()', true );
+    $summary = ( new expAiSummary( $config ) )->collect();
+    $check( 'expAiSummary::collect()', true );
 }
 catch ( Throwable $e )
 {
-    $facts = array();
-    $check( 'expAiFacts::collect()', false, get_class( $e ) . ': ' . $e->getMessage() );
+    $summary = array();
+    $check( 'expAiSummary::collect()', false, get_class( $e ) . ': ' . $e->getMessage() );
 }
 foreach ( array( 'switches', 'providers', 'policy', 'limits', 'retention', 'tools', 'roles' ) as $part )
-    $check( "facts have $part", isset( $facts[$part] ) );
-$check( 'facts: master switch matches [AISettings] Enabled', isset( $facts['switches'] ) && $facts['switches']['master'] === $config->isEnabled() );
-$dump = json_encode( $facts );
+    $check( "summary has $part", isset( $summary[$part] ) );
+$check( 'summary: master switch matches [AISettings] Enabled', isset( $summary['switches'] ) && $summary['switches']['master'] === $config->isEnabled() );
+$dump = json_encode( $summary );
 $secrets = 0;
 foreach ( $config->ini()->groups() as $group => $values )
     foreach ( array( 'ApiKey', 'Token' ) as $name )
         if ( isset( $values[$name] ) && is_string( $values[$name] ) && strlen( trim( $values[$name] ) ) >= 8 )
         {
             ++$secrets;
-            $check( "facts do not contain [$group] $name", strpos( $dump, trim( $values[$name] ) ) === false );
+            $check( "summary does not contain [$group] $name", strpos( $dump, trim( $values[$name] ) ) === false );
         }
 echo "      ($secrets key(s) or token(s) set in the site's settings)\n";
-foreach ( isset( $facts['providers'] ) ? $facts['providers'] : array() as $p )
-    $check( "facts: provider {$p['id']} names the key source without the key", $p['key']['set'] ? $p['key']['file'] !== '' : true, $p['key']['set'] ? $p['key']['file'] : 'no key' );
+foreach ( isset( $summary['providers'] ) ? $summary['providers'] : array() as $p )
+    $check( "summary: provider {$p['id']} names the key source without the key", $p['key']['set'] ? $p['key']['file'] !== '' : true, $p['key']['set'] ? $p['key']['file'] : 'no key' );
 
 echo ( $failures ? 'FAIL' : 'PASS' ) . " $checks checks, $failures failure(s)\n";
 eZScript::instance()->shutdown( $failures ? 1 : 0 );

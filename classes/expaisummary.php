@@ -1,6 +1,6 @@
 <?php
 /**
- * File containing the expAiFacts class.
+ * File containing the expAiSummary class.
  *
  * @copyright Copyright (C) 1998 - 2026 7x & Exponential Foundation. All rights reserved.
  * @license GNU General Public License v2.0 (or any later version)
@@ -8,11 +8,11 @@
  */
 
 /**
- * The facts of the "EI: Summary" page (expai/summary, doc/summary.md): what goes where, kept how long, used by whom and at
+ * The content of the "EI: Summary" page (expai/summary, doc/summary.md): what goes where, kept how long, used by whom and at
  * what cost, read from the settings, the roles, the probe results and the usage log as they are now. Never a key:
  * only where a key comes from (the settings file) and whether one is set.
  */
-class expAiFacts
+class expAiSummary
 {
     /** @var expAiConfig */
     protected $config;
@@ -37,8 +37,8 @@ class expAiFacts
             'generated' => time(),
             'site' => (string) eZINI::instance()->variable( 'SiteSettings', 'SiteName' ),
             'version' => $this->version(),
-            'contact' => trim( (string) $this->config->get( 'FactsSettings', 'Contact', '' ) ),
-            'note' => trim( (string) $this->config->get( 'FactsSettings', 'Note', '' ) ),
+            'contact' => trim( (string) $this->config->get( 'SummarySettings', 'Contact', '' ) ),
+            'note' => trim( (string) $this->config->get( 'SummarySettings', 'Note', '' ) ),
             'switches' => $this->switches(),
             'providers' => $this->providers( $roles ),
             'policy' => $this->dataPolicy(),
@@ -55,7 +55,7 @@ class expAiFacts
     public static function regionLabel( $region )
     {
         $labels = array( 'us' => 'US', 'eu' => 'EU', 'local' => 'this server' );
-        return ezpI18n::tr( 'extension/expai/facts', isset( $labels[$region] ) ? $labels[$region] : 'unknown' );
+        return ezpI18n::tr( 'extension/expai/summary', isset( $labels[$region] ) ? $labels[$region] : 'unknown' );
     }
 
     /** @return string the version of expai (ezinfo.php) */

@@ -33,7 +33,7 @@
 | [edit-view-integration.md](edit-view-integration.md) | The edit form hook, field actions, how values reach Tiptap / the Online Editor |
 | [alt-text.md](alt-text.md) | Alt text for images: the "Write alt text" button, vision models only, the data policy for images, image preparation and limits, the accessibility rules, the "Missing alt text" report and its draft jobs, cost |
 | [presets.md](presets.md) | Editor presets per class (title, summary, meta description, keywords), the Improve menu, the defaults line, the palette entries |
-| [summary.md](summary.md) | The printable "EI: Summary" page (expai/summary, formerly "AI facts") for a data protection officer: providers, regions, key sources, roles, lanes, limits, tools |
+| [summary.md](summary.md) | The printable "EI: Summary" page (expai/summary) for a data protection officer: providers, regions, key sources, roles, lanes, limits, tools |
 | [dashboard.md](dashboard.md) | expai/dashboard (figures, chart, limits, Start writing, view parameters), the menu entries, the dashboard block, the log page |
 | [usage-tracking.md](usage-tracking.md) | What is recorded per request, turns, the estimated cost and how to check it, limits, retention, privacy |
 | [tools.md](tools.md) | Every tool the model can call: input, result, permission checks, limits |
@@ -55,7 +55,7 @@ Every page above is also part of the administration interface: `expai/help` (Das
 index, `expai/help/(page)/<name>` one page (`readme`, `install`, `usage`, the name of a `doc/*.md`
 without `.md`, or `changelog-<version>`), and each expai page (the dashboard, the Intelligence tab, Vector, EI: Summary,
 the "Missing alt text" report, chains) has a "?" link to its page. The pages are rendered from the
-installed files, so they always match the installed version. Policy: `expai/write` or `expai/facts`.
+installed files, so they always match the installed version. Policy: `expai/write` or `expai/summary`.
 
 The rendering is a Markdown subset (headings, paragraphs, lists, tables, code, emphasis, links) by `expAiHelp`
 (classes/expaihelp.php): every character of a document is escaped, only the renderer's own tags are written, and

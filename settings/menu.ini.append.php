@@ -25,12 +25,12 @@ Links[expai_help]=expai/help
 LinkNames[expai_help]=EI: Help
 PolicyList_expai_help[]=expai/write
 
-# Setup > EI: Summary (expai/summary, formerly "AI facts"): the printable page for a data protection officer (doc/summary.md), shown only to users
-# with the policy expai/facts (the Administrator role holds every policy).
+# Setup > EI: Summary (expai/summary): the printable page for a data protection officer (doc/summary.md), shown only to users
+# with the policy expai/summary (the Administrator role holds every policy).
 [Leftmenu_setup]
-Links[expai_facts]=expai/summary
-LinkNames[expai_facts]=EI: Summary
-PolicyList_expai_facts[]=expai/facts
+Links[expai_summary]=expai/summary
+LinkNames[expai_summary]=EI: Summary
+PolicyList_expai_summary[]=expai/summary
 # Setup > EI: Models: providers, key presence, probe results, the local model (doc/local-models.md, expai/model_manage)
 Links[expai_models]=expai/models
 LinkNames[expai_models]=EI: Models

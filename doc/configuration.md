@@ -628,7 +628,7 @@ See [presets.md](presets.md).
 | `ImproveDatatypes[]` | ezstring, eztext, ezxmltext | The datatypes that get the Improve menu (also needed in `[ToolSettings] WritableDatatypes[]`). |
 | `[Presets] Class_<class identifier>[<preset>]` | article, blog_post, folder, ng_article, ng_blog_post, ng_news, ng_landing_page, ng_category | The fields a preset fills in a class: attribute identifiers, or `<attribute>.<part>` for an xrowmetadata part (title, description, keywords), separated by commas. A class without a line gets no presets. |
 
-## [FactsSettings]: the "EI: Summary" page
+## [SummarySettings]: the "EI: Summary" page
 
 See [summary.md](summary.md).
 
@@ -638,4 +638,4 @@ See [summary.md](summary.md).
 | `Note` | (empty) | A note printed under the title (e.g. the reference of the record of processing activities). |
 
 Other files: `ezjscore.ini [ezjscServer_expaipreset]` (the function `expaipreset::preset`), `menu.ini
-[Leftmenu_setup]` (the entry Setup > EI: Summary, policy `expai/facts`).
+[Leftmenu_setup]` (the entry Setup > EI: Summary, policy `expai/summary`).

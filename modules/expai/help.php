@@ -1,6 +1,6 @@
 <?php
 /**
- * expai/help (policy expai/write or expai/facts): the extension's documentation inside the administration interface
+ * expai/help (policy expai/write or expai/summary): the extension's documentation inside the administration interface
  * (doc/index.md, "Help in the administration interface"). (page)/<name> shows one document: readme, install, usage,
  * index, the name of any doc/*.md without .md (providers, vector, summary, ...) or changelog-<version>. The documents
  * are rendered from Markdown by expAiHelp, which escapes every character of them; an unknown name is "not found".

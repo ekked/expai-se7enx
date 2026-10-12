@@ -16,7 +16,7 @@
  *   expai/vector        the Vector workspace and its functions (expaivector::*), with expai/write; limitations
  *                       Subtree, Section (the scope must lie inside), Scope (node, subtree, class), Review (staged, direct)
  *   expai/translation_sync  Check, Approve and Skip of translation updates (the Translations section of the tab)
- *   expai/facts         the view expai/summary: the printable "EI: Summary" page (providers, regions, key sources, roles,
+ *   expai/summary       the view expai/summary: the printable "EI: Summary" page (providers, regions, key sources, roles,
  *                       limits, tools); grant it to a data protection officer
  *
  * Views:
@@ -28,7 +28,7 @@
  *                    (offset)/<n>; POST starts runs and approves, asks for changes, stops or continues them
  *   expai/vector     the Vector workspace: threads, conversation and steps, plan/diff/cost (doc/vector.md);
  *                    (thread)/<uuid>, (node)/<node id>, (tab)/plan|diff|cost, (shelf)/settled|archived
- *   expai/summary    the "EI: Summary" page for a data protection officer, printable (expai/facts)
+ *   expai/summary    the "EI: Summary" page for a data protection officer, printable (expai/summary)
  *
  * @copyright Copyright (C) 1998 - 2026 7x & Exponential Foundation. All rights reserved.
  * @license GNU General Public License v2.0 (or any later version)
@@ -105,11 +105,11 @@ $ViewList['stream'] = array(
     'params' => array(),
     'unordered_params' => array( 'thread' => 'Thread', 'after' => 'After' ) );
 
-// the "EI: Summary" page (classes/expaifacts.php, doc/summary.md): one printable page for a data protection officer
+// the "EI: Summary" page (classes/expaisummary.php, doc/summary.md): one printable page for a data protection officer
 $ViewList['summary'] = array(
     'default_navigation_part' => 'ezsetupnavigationpart',
-    'script' => 'facts.php',
-    'functions' => array( 'facts' ),
+    'script' => 'summary.php',
+    'functions' => array( 'summary' ),
     'params' => array(),
     'unordered_params' => array() );
 
@@ -149,7 +149,7 @@ $FunctionList['services'] = array(
     'Domain' => array( 'name' => 'Domain', 'values' => array(), 'class' => 'expAiPolicy', 'function' => 'serviceDomains', 'parameter' => array() ) );
 
 // the "EI: Summary" page expai/summary (read-only: providers, regions, key sources, roles, limits, tools)
-$FunctionList['facts'] = array();
+$FunctionList['summary'] = array();
 
 // Alt text for images (#370 M5 alt text, doc/alt-text.md): the "Missing alt text" report of a subtree, and queueing
 // suggestions as drafts; (node)/<node id>
@@ -161,11 +161,11 @@ $ViewList['alttext'] = array(
     'unordered_params' => array( 'node' => 'Node' ) );
 
 // Help (classes/expaihelp.php, doc/index.md): the extension's documentation in the administration interface,
-// (page)/<name>; for editors (expai/write) and for a data protection officer with only expai/facts
+// (page)/<name>; for editors (expai/write) and for a data protection officer with only expai/summary
 $ViewList['help'] = array(
     'default_navigation_part' => 'ezmynavigationpart',
     'script' => 'help.php',
-    'functions' => array( 'write or facts' ),
+    'functions' => array( 'write or summary' ),
     'params' => array(),
     'unordered_params' => array( 'page' => 'Page' ) );
 
