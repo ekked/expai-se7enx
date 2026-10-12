@@ -202,6 +202,9 @@ class expAiGate
         $off = self::switchedOff( $config, isset( $known['siteaccess'] ) ? (string) $known['siteaccess'] : null );
         if ( $off !== '' )
         {
+            // the audit trail (doc/audit-trail.md): a request the master switch refused
+            if ( class_exists( 'expAiAudit' ) )
+                expAiAudit::switchedOff( $known, $off === 'Exponential Intelligence is switched off.' ? 'site' : 'siteaccess' );
             // one literal per text, so that the translation files list each of them
             if ( $off === 'Exponential Intelligence is switched off.' )
                 throw new expAiException( 'Exponential Intelligence is switched off.', 'master switch: [AISettings] Enabled' );

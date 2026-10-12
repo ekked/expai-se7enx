@@ -45,6 +45,17 @@ LinkNames[expqueue]=Job queue
 PolicyList_expqueue[]=expqueue/view
 
 
+# Audit > the events of Exponential Intelligence (doc/audit-trail.md): the channel "ai" in the
+# audit console (audit/read), and the usage log for users who see everyone's requests (expai/log)
+[Leftmenu_audit]
+Links[expai_events]=audit/console/(channel)/ai
+LinkNames[expai_events]=AI events
+PolicyList_expai_events[]=audit/read
+Links[expai_log]=expai/log
+LinkNames[expai_log]=EI: Log
+PolicyList_expai_log[]=expai/write
+PolicyList_expai_log[]=expai/log
+
 # Design > Missing alt text: images without alt text under a subtree (doc/alt-text.md), users with expai/write
 [Leftmenu_design]
 Links[expai_alttext]=expai/alttext

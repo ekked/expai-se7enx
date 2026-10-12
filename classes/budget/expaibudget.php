@@ -222,6 +222,8 @@ class expAiBudget
         return $ok;
     }
 
+            if ( class_exists( 'expAiAudit' ) )
+                expAiAudit::budgetHold( $job );
     /**
      * Resumes held jobs whose reservation fits now, oldest first by priority.
      * @param int $limit

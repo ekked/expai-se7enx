@@ -36,6 +36,7 @@
 | [summary.md](summary.md) | The printable "EI: Summary" page (expai/summary) for a data protection officer: providers, regions, key sources, roles, lanes, limits, tools |
 | [dashboard.md](dashboard.md) | expai/dashboard (figures, chart, limits, Start writing, view parameters), the menu entries, the dashboard block, the log page |
 | [usage-tracking.md](usage-tracking.md) | What is recorded per request, turns, the estimated cost and how to check it, limits, retention, privacy |
+| [audit-trail.md](audit-trail.md) | What expai records in the system's audit trail (channel ai): the events and their fields, never prompts or answers; the panel, sidebar entries, links, chart and alert rule in the audit console; settings and checks |
 | [tools.md](tools.md) | Every tool the model can call: input, result, permission checks, limits |
 | [service-tools.md](service-tools.md) | Service tools: one expservices declaration as HTTP endpoint, MCP tool and assistant tool; opting in, checks, the tested example |
 | [approval-workflow.md](approval-workflow.md) | Drafts, ezapprove, the collaboration item and the label, the tested path |

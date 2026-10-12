@@ -5880,4 +5880,325 @@
         <translation>Missing alt text</translation>
     </message>
 </context>
+<context>
+    <name>extension/expai/audit</name>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation>Exponential Intelligence</translation>
+    </message>
+    <message>
+        <source>AI events in the console</source>
+        <translation>AI events in the console</translation>
+    </message>
+    <message>
+        <source>Alerts on AI events</source>
+        <translation>Alerts on AI events</translation>
+    </message>
+    <message>
+        <source>Chain</source>
+        <translation>Chain</translation>
+    </message>
+    <message>
+        <source>Charts of the AI events</source>
+        <translation>Charts of the AI events</translation>
+    </message>
+    <message>
+        <source>Charts</source>
+        <translation>Charts</translation>
+    </message>
+    <message>
+        <source>Draft source</source>
+        <translation>Draft source</translation>
+    </message>
+    <message>
+        <source>Drafts</source>
+        <translation>Drafts</translation>
+    </message>
+    <message>
+        <source>EI: Budgets</source>
+        <translation>EI: Budgets</translation>
+    </message>
+    <message>
+        <source>EI: Drafts</source>
+        <translation>EI: Drafts</translation>
+    </message>
+    <message>
+        <source>EI: Log</source>
+        <translation>EI: Log</translation>
+    </message>
+    <message>
+        <source>EI: Log, errors</source>
+        <translation>EI: Log, errors</translation>
+    </message>
+    <message>
+        <source>Estimated cost</source>
+        <translation>Estimated cost</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence per day</source>
+        <translation>Exponential Intelligence per day</translation>
+    </message>
+    <message>
+        <source>Export the AI events</source>
+        <translation>Export the AI events</translation>
+    </message>
+    <message>
+        <source>Failed requests</source>
+        <translation>Failed requests</translation>
+    </message>
+    <message>
+        <source>Fallback from</source>
+        <translation>Fallback from</translation>
+    </message>
+    <message>
+        <source>For user</source>
+        <translation>For user</translation>
+    </message>
+    <message>
+        <source>HTTP status</source>
+        <translation>HTTP status</translation>
+    </message>
+    <message>
+        <source>Lane</source>
+        <translation>Lane</translation>
+    </message>
+    <message>
+        <source>Language</source>
+        <translation>Language</translation>
+    </message>
+    <message>
+        <source>Latency</source>
+        <translation>Latency</translation>
+    </message>
+    <message>
+        <source>MCP server</source>
+        <translation>MCP server</translation>
+    </message>
+    <message>
+        <source>MCP tool</source>
+        <translation>MCP tool</translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>Model</translation>
+    </message>
+    <message>
+        <source>Provider</source>
+        <translation>Provider</translation>
+    </message>
+    <message>
+        <source>Purpose</source>
+        <translation>Purpose</translation>
+    </message>
+    <message>
+        <source>Recent AI events</source>
+        <translation>Recent AI events</translation>
+    </message>
+    <message>
+        <source>Region</source>
+        <translation>Region</translation>
+    </message>
+    <message>
+        <source>retention</source>
+        <translation>retention</translation>
+    </message>
+    <message>
+        <source>The audit trail records who asked which model for what, never a prompt or an answer.</source>
+        <translation>The audit trail records who asked which model for what, never a prompt or an answer.</translation>
+    </message>
+    <message>
+        <source>The requests of this thread</source>
+        <translation>The requests of this thread</translation>
+    </message>
+    <message>
+        <source>This chain run</source>
+        <translation>This chain run</translation>
+    </message>
+    <message>
+        <source>This job</source>
+        <translation>This job</translation>
+    </message>
+    <message>
+        <source>This request in EI: Log</source>
+        <translation>This request in EI: Log</translation>
+    </message>
+    <message>
+        <source>Tokens</source>
+        <translation>Tokens</translation>
+    </message>
+    <message>
+        <source>Top models, 7 days</source>
+        <translation>Top models, 7 days</translation>
+    </message>
+    <message>
+        <source>Top users, 7 days</source>
+        <translation>Top users, 7 days</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation>Version</translation>
+    </message>
+    <message>
+        <source>drafts published</source>
+        <translation>drafts published</translation>
+    </message>
+    <message>
+        <source>drafts published, 7 days</source>
+        <translation>drafts published, 7 days</translation>
+    </message>
+    <message>
+        <source>drafts written</source>
+        <translation>drafts written</translation>
+    </message>
+    <message>
+        <source>drafts written, 7 days</source>
+        <translation>drafts written, 7 days</translation>
+    </message>
+    <message>
+        <source>estimated cost, 7 days</source>
+        <translation>estimated cost, 7 days</translation>
+    </message>
+    <message>
+        <source>estimated cost, 7 days (some prices unknown)</source>
+        <translation>estimated cost, 7 days (some prices unknown)</translation>
+    </message>
+    <message>
+        <source>failed</source>
+        <translation>failed</translation>
+    </message>
+    <message>
+        <source>failed, 7 days</source>
+        <translation>failed, 7 days</translation>
+    </message>
+    <message>
+        <source>held by a budget, 7 days</source>
+        <translation>held by a budget, 7 days</translation>
+    </message>
+    <message>
+        <source>refused</source>
+        <translation>refused</translation>
+    </message>
+    <message>
+        <source>refused, 7 days</source>
+        <translation>refused, 7 days</translation>
+    </message>
+    <message>
+        <source>requests</source>
+        <translation>requests</translation>
+    </message>
+    <message>
+        <source>requests today</source>
+        <translation>requests today</translation>
+    </message>
+    <message>
+        <source>requests, 7 days</source>
+        <translation>requests, 7 days</translation>
+    </message>
+    <message>
+        <source>%in in, %out out</source>
+        <translation>%in in, %out out</translation>
+    </message>
+    <message>
+        <source>%n cache</source>
+        <translation>%n cache</translation>
+    </message>
+</context>
+<context>
+    <name>kernel/audit</name>
+    <message>
+        <source>Model request</source>
+        <translation>Model request</translation>
+    </message>
+    <message>
+        <source>Model request failed</source>
+        <translation>Model request failed</translation>
+    </message>
+    <message>
+        <source>Model request refused</source>
+        <translation>Model request refused</translation>
+    </message>
+    <message>
+        <source>Draft written by Exponential Intelligence</source>
+        <translation>Draft written by Exponential Intelligence</translation>
+    </message>
+    <message>
+        <source>Draft kept</source>
+        <translation>Draft kept</translation>
+    </message>
+    <message>
+        <source>Draft sent for approval</source>
+        <translation>Draft sent for approval</translation>
+    </message>
+    <message>
+        <source>Draft published</source>
+        <translation>Draft published</translation>
+    </message>
+    <message>
+        <source>Draft discarded</source>
+        <translation>Draft discarded</translation>
+    </message>
+    <message>
+        <source>Draft back in progress</source>
+        <translation>Draft back in progress</translation>
+    </message>
+    <message>
+        <source>Chain started</source>
+        <translation>Chain started</translation>
+    </message>
+    <message>
+        <source>Chain checkpoint approved</source>
+        <translation>Chain checkpoint approved</translation>
+    </message>
+    <message>
+        <source>Chain changes requested</source>
+        <translation>Chain changes requested</translation>
+    </message>
+    <message>
+        <source>Chain stopped</source>
+        <translation>Chain stopped</translation>
+    </message>
+    <message>
+        <source>Chain resumed</source>
+        <translation>Chain resumed</translation>
+    </message>
+    <message>
+        <source>Model action</source>
+        <translation>Model action</translation>
+    </message>
+    <message>
+        <source>Job held by a budget</source>
+        <translation>Job held by a budget</translation>
+    </message>
+    <message>
+        <source>Held jobs resumed</source>
+        <translation>Held jobs resumed</translation>
+    </message>
+    <message>
+        <source>External MCP tool called</source>
+        <translation>External MCP tool called</translation>
+    </message>
+    <message>
+        <source>External MCP tool failed</source>
+        <translation>External MCP tool failed</translation>
+    </message>
+    <message>
+        <source>External MCP tool refused</source>
+        <translation>External MCP tool refused</translation>
+    </message>
+    <message>
+        <source>Policies migrated</source>
+        <translation>Policies migrated</translation>
+    </message>
+</context>
+<context>
+    <name>design/admin/parts/audit/menu</name>
+    <message>
+        <source>AI events</source>
+        <translation>AI events</translation>
+    </message>
+    <message>
+        <source>EI: Log</source>
+        <translation>EI: Log</translation>
+    </message>
+</context>
 </TS>

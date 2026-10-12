@@ -61,6 +61,8 @@ class expAiPolicyMigration
         {
             eZRole::expireCache();
             eZUser::cleanupCache();
+            if ( class_exists( 'expAiAudit' ) )
+                expAiAudit::policyMigration( $rows );
         }
         return $rows;
     }

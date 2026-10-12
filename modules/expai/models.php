@@ -31,10 +31,14 @@ if ( $Module->isCurrentAction( 'LocalAction' ) )
             throw new expAiException( 'No local model server is configured.' );
         $id = ( new expAiLocalModel( $config, $managed[0] ) )->request( $action, $model );
         $notice = ezpI18n::tr( 'extension/expai/models', 'The request %id was handed to the local model helper.', null, array( '%id' => substr( $id, 0, 8 ) ) );
+        if ( class_exists( 'expAiAudit' ) )
+            expAiAudit::modelAction( 'local_' . $action, $model );
     }
     catch ( expAiException $e )
     {
         $error = $e->translatedMessage();
+        if ( class_exists( 'expAiAudit' ) )
+            expAiAudit::modelAction( 'local_' . $action, $model, get_class( $e ) );
     }
 }
 // Test prompt and Load model (doc/local-models.md "Test prompt and Load model"): queued as a job of expai.model.test,
@@ -52,6 +56,8 @@ if ( $Module->isCurrentAction( 'TestPrompt' ) || $Module->isCurrentAction( 'Load
         {
             $started = expAiModelTest::start( $alias, $action, $config );
             $notice = expAiModelServerFunctions::notice( $config, $alias, $action, $started['duplicate'] );
+            if ( class_exists( 'expAiAudit' ) && empty( $started['duplicate'] ) )
+                expAiAudit::modelAction( $action, $alias );
         }
         elseif ( $action === 'test' )
         {
@@ -72,6 +78,8 @@ if ( $Module->isCurrentAction( 'TestPrompt' ) || $Module->isCurrentAction( 'Load
     catch ( expAiException $e )
     {
         $error = $e->translatedMessage();
+        if ( class_exists( 'expAiAudit' ) )
+            expAiAudit::modelAction( $action, $alias !== '' ? $alias : (string) $Module->actionParameter( 'Model' ), get_class( $e ) );
     }
 }
 

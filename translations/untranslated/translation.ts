@@ -5880,4 +5880,325 @@
         <translation type="unfinished"></translation>
     </message>
 </context>
+<context>
+    <name>extension/expai/audit</name>
+    <message>
+        <source>Exponential Intelligence</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AI events in the console</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alerts on AI events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Charts of the AI events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Charts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draft source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drafts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>EI: Budgets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>EI: Drafts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>EI: Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>EI: Log, errors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Estimated cost</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence per day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export the AI events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed requests</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fallback from</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HTTP status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lane</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Latency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MCP server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MCP tool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Provider</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Purpose</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recent AI events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Region</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>retention</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The audit trail records who asked which model for what, never a prompt or an answer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The requests of this thread</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This chain run</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This job</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This request in EI: Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tokens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top models, 7 days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top users, 7 days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>drafts published</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>drafts published, 7 days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>drafts written</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>drafts written, 7 days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>estimated cost, 7 days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>estimated cost, 7 days (some prices unknown)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>failed, 7 days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>held by a budget, 7 days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>refused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>refused, 7 days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>requests</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>requests today</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>requests, 7 days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%in in, %out out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n cache</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>kernel/audit</name>
+    <message>
+        <source>Model request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model request failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model request refused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draft written by Exponential Intelligence</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draft kept</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draft sent for approval</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draft published</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draft discarded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draft back in progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chain started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chain checkpoint approved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chain changes requested</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chain stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chain resumed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job held by a budget</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Held jobs resumed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>External MCP tool called</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>External MCP tool failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>External MCP tool refused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Policies migrated</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>design/admin/parts/audit/menu</name>
+    <message>
+        <source>AI events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>EI: Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>

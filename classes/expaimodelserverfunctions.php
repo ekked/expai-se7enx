@@ -112,9 +112,13 @@ class expAiModelServerFunctions extends ezjscServerFunctions
         try
         {
             $started = expAiModelTest::start( $aliases[0], $action, $config );
+            if ( class_exists( 'expAiAudit' ) && empty( $started['duplicate'] ) )
+                expAiAudit::modelAction( $action, $aliases[0] );
         }
         catch ( expAiException $e )
         {
+            if ( class_exists( 'expAiAudit' ) )
+                expAiAudit::modelAction( $action, $aliases[0], get_class( $e ) );
             throw $e->translated();
         }
         return self::answer( $config, $aliases, self::notice( $config, $aliases[0], $action, $started['duplicate'] ) );

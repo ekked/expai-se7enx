@@ -20,6 +20,8 @@ $canManage = eZUser::currentUser()->hasAccessTo( 'expai', 'settings' )['accessWo
 if ( $Module->isCurrentAction( 'ResumeHeld' ) && $canManage && expAiQueue::available() )
 {
     $r = $budget->resumeHeld();
+    if ( class_exists( 'expAiAudit' ) )
+        expAiAudit::budgetResume( $r );
     $notice = ezpI18n::tr( 'extension/expai/budget', '%resumed held jobs resumed, %held still held by a budget.', null,
                            array( '%resumed' => $r['resumed'], '%held' => $r['still_held'] ) );
 }

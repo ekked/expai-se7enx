@@ -67,9 +67,31 @@ class expAiMcpRemoteTool extends expAiTool
                 'Label' => isset( $this->settings['Label'] ) && $this->settings['Label'] !== '' ? (string) $this->settings['Label'] : (string) $this->settings['ServerId'],
                 'Region' => expAiProviderRegistry::cleanRegion( isset( $this->settings['Region'] ) ? $this->settings['Region'] : '' ),
                 'Retention' => expAiProviderRegistry::cleanRetention( isset( $this->settings['Retention'] ) ? $this->settings['Retention'] : '' ) ) );
-            $policy->assertObject( $object );
+            try
+            {
+                $policy->assertObject( $object );
+            }
+            catch ( expAiException $e )
+            {
+                // the audit trail (doc/audit-trail.md): the call the node's data policy kept from leaving
+                if ( class_exists( 'expAiAudit' ) )
+                    expAiAudit::mcpCall( $this->settings['ServerId'], (string) $this->definition['name'], (int) $context->nodeID, 'refused' );
+                throw $e;
+            }
         }
-        $result = $this->client->callTool( (string) $this->definition['name'], $input );
+        try
+        {
+            $result = $this->client->callTool( (string) $this->definition['name'], $input );
+        }
+        catch ( expAiException $e )
+        {
+            if ( class_exists( 'expAiAudit' ) )
+                expAiAudit::mcpCall( $this->settings['ServerId'], (string) $this->definition['name'], (int) $context->nodeID, 'failed' );
+            throw $e;
+        }
+        // which server and tool, for which node; never the arguments or the result
+        if ( class_exists( 'expAiAudit' ) )
+            expAiAudit::mcpCall( $this->settings['ServerId'], (string) $this->definition['name'], (int) $context->nodeID, !empty( $result['isError'] ) ? 'failed' : 'success' );
         $text = '';
         foreach ( isset( $result['content'] ) && is_array( $result['content'] ) ? $result['content'] : array() as $part )
             if ( is_array( $part ) && isset( $part['type'] ) && $part['type'] === 'text' && isset( $part['text'] ) )

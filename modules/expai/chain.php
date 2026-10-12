@@ -44,6 +44,9 @@ if ( $Module->isCurrentAction( 'StartChain' ) )
             throw new expAiException( 'The job queue is not available.', 'expqueue or the chain tables are missing' );
         $runs = $engine->start( $post( 'ExpAiChain' ), $nodeID, $post( 'ExpAiPrompt' ), (int) $post( 'ExpAiCount', '1' ),
                                 array( 'language' => $post( 'ExpAiChainLanguage' ) ) );
+        // the audit trail (doc/audit-trail.md): which chain, which node, never the prompt
+        if ( class_exists( 'expAiAudit' ) )
+            expAiAudit::chain( 'start', array_map( function ( $run ) { return (int) $run->attribute( 'id' ); }, $runs ), $nodeID, (string) $post( 'ExpAiChain' ) );
         if ( count( $runs ) === 1 )
             return $Module->redirectTo( '/expai/chain/(run)/' . (int) $runs[0]->attribute( 'id' ) );
         // several runs: the list names them, with their job groups, so the editor can follow each one
@@ -76,6 +79,10 @@ foreach ( $actions as $action )
             $engine->stop( $run, 'stopped by an editor (user ' . (int) eZUser::currentUserID() . ')' );
         else
             $engine->resume( $run );
+        // the audit trail (doc/audit-trail.md): the action on the run, never the note
+        if ( class_exists( 'expAiAudit' ) )
+            expAiAudit::chain( array( 'Approve' => 'approve', 'RequestChanges' => 'changes', 'StopRun' => 'stop', 'ResumeRun' => 'resume' )[$action],
+                               array( (int) $run->attribute( 'id' ) ), (int) $run->attribute( 'node_id' ), (string) $run->attribute( 'chain' ) );
         return $Module->redirectTo( '/expai/chain/(run)/' . (int) $run->attribute( 'id' ) );
     }
     catch ( expAiException $e )

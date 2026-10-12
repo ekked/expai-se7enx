@@ -88,6 +88,9 @@ class expAiDraftLog extends eZPersistentObject
         }
         $log = new self( $row );
         $log->store();
+        // the audit trail (doc/audit-trail.md): the version written, never its text or the prompt
+        if ( class_exists( 'expAiAudit' ) )
+            expAiAudit::draftWritten( $log );
         return $log;
     }
 
@@ -162,8 +165,11 @@ class expAiDraftLog extends eZPersistentObject
 
     public function setStatus( $status )
     {
+        $from = (string) $this->attribute( 'status' );
         $this->setAttribute( 'status', $status );
         $this->setAttribute( 'modified', time() );
         $this->store();
+        if ( class_exists( 'expAiAudit' ) )
+            expAiAudit::draftState( $this, $from, (string) $status );
     }
 }

@@ -29,6 +29,9 @@ class expAiUsage
                 $row[$field] = expAiText::cut( (string) $row[$field], $max );
         $log = new expAiUsageLog( $row );
         $log->store();
+        // the audit trail (doc/audit-trail.md): who asked which model, never what
+        if ( class_exists( 'expAiAudit' ) )
+            expAiAudit::request( $log );
         return $log;
     }
 
