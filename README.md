@@ -10,7 +10,7 @@ publishing, where an approval workflow holds them for the approver.
 Copyright (C) 1998 - 2026 7x & Exponential Foundation. All rights reserved.
 Licensed under the GNU General Public License v2.0 (or any later version), see [LICENSE](LICENSE).
 
-Version 0.0.1.0. What is new: [doc/changelog/0.0.1.0.md](doc/changelog/0.0.1.0.md).
+Version 0.0.1.1. What is new: [doc/changelog/0.0.1.1.md](doc/changelog/0.0.1.1.md).
 
 ## Why Exponential Intelligence
 

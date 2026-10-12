@@ -49,6 +49,7 @@
 | [testing.md](testing.md) | The PHPUnit suite: running it, suites and groups, what the tests may touch, measuring coverage, the current figures |
 | [troubleshooting.md](troubleshooting.md) | Failures and their fixes |
 | [faq.md](faq.md) | Short answers |
+| [changelog/0.0.1.1.md](changelog/0.0.1.1.md) | No "Decorative" choice for a field that requires an alt text |
 | [changelog/0.0.1.0.md](changelog/0.0.1.0.md) | The first release |
 | [examples/expaiexample](examples/expaiexample) | The example extension of extending.md |
 
