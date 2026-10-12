@@ -162,7 +162,7 @@ $check( 'hostile document: block quote is escaped', strpos( $html, '<blockquote>
 
 // the subset on a real page
 $config = isset( $rendered['configuration'] ) ? $rendered['configuration'] : '';
-$check( 'configuration: tables and anchored headings', substr_count( $config, '<table' ) > 20 && strpos( $config, 'id="packagesettings-content-packages"' ) !== false );
+$check( 'configuration: tables and anchored headings', substr_count( $config, '<table' ) > 20 && strpos( $config, 'id="providersettings-the-providers"' ) !== false );
 $lanes = isset( $rendered['lanes'] ) ? $rendered['lanes'] : '';
 $check( 'lanes: a nested list', preg_match( '#<ol>.*<li>.*<ul>#s', $lanes ) === 1 );
 $check( 'permissions: indented code', isset( $rendered['permissions'] ) && strpos( $rendered['permissions'], '<pre class="exp-ai-help-code"><code>module expai, function vector' ) !== false );
