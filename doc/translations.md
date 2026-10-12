@@ -19,10 +19,11 @@ as the start for a new language). site.ini `[RegionalSettings] TranslationExtens
 | `extension/expai/threads`, `extension/expai/vector`, `extension/expai/keyboard` | threads, Vector, the command palette and the shortcuts |
 | `extension/expai/chain`, `extension/expai/translation` | AI chains; translation sync |
 | `extension/expai/budget`, `extension/expai/package` | budgets and lanes; content packages |
-| `extension/expai/preset`, `extension/expai/alttext`, `extension/expai/facts` | presets and the Improve menu; alt text; the "AI facts" page |
+| `extension/expai/preset`, `extension/expai/alttext`, `extension/expai/facts` | presets and the Improve menu; alt text; the "EI: Summary" page |
 | `extension/expai/help` | the help pages and the "?" links |
-| `design/admin/parts/setup/menu` | the Setup menu entries (AI facts, AI models, Budgets and lanes, Content packages) |
-| `design/admin/parts/my/menu` | the Dashboard menu entries (Exponential Intelligence, Vector, the log, Chains, Missing alt text, the help) |
+| `design/admin/parts/setup/menu` | the Setup menu entries (EI: Summary, EI: Models, EI: Budgets, Job queue, Content packages) |
+| `design/admin/parts/my/menu` | the Dashboard menu entries (Exponential Intelligence, EI: Vector, EI: Chains, EI: Log, EI: Help) |
+| `design/admin/parts/design/menu` | the Design menu entry (Missing alt text) |
 
 Not translated, in every language: "Exponential Intelligence", "Claude", "Anthropic". German: "Powered by Claude from
 Anthropic" is "Bereitgestellt von Claude von Anthropic"; the tab is "Intelligenz".

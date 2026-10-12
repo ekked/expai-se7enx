@@ -25,7 +25,7 @@ Links[expai_help]=expai/help
 LinkNames[expai_help]=EI: Help
 PolicyList_expai_help[]=expai/write
 
-# Setup > EI: Summary (expai/summary, formerly "AI facts"): the printable page for a data protection officer (doc/ai-facts.md), shown only to users
+# Setup > EI: Summary (expai/summary, formerly "AI facts"): the printable page for a data protection officer (doc/summary.md), shown only to users
 # with the policy expai/facts (the Administrator role holds every policy).
 [Leftmenu_setup]
 Links[expai_facts]=expai/summary

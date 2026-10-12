@@ -25,19 +25,23 @@ All menu entries of expai (settings/menu.ini.append.php), each shown only with i
 | Menu | Entry | View | Policies |
 | --- | --- | --- | --- |
 | Dashboard | Exponential Intelligence | `expai/dashboard` | `expai/write` |
-| Dashboard | Vector | `expai/vector` | `expai/write`, `expai/vector` |
-| Dashboard | Exponential Intelligence log | `expai/log` | `expai/write` |
-| Dashboard | Chains | `expai/chain` | `expai/write`, `expai/chain` |
-| Dashboard | Missing alt text | `expai/alttext` | `expai/write` |
-| Dashboard | Exponential Intelligence help | `expai/help` | `expai/write` |
-| Setup | AI facts | `expai/facts` | `expai/facts` |
-| Setup | AI models | `expai/models` | `expai/model_manage` |
-| Setup | Budgets and lanes | `expai/budgets` | `expai/log` |
+| Dashboard | EI: Vector | `expai/vector` | `expai/write`, `expai/vector` |
+| Dashboard | EI: Chains | `expai/chain` | `expai/write`, `expai/chain` |
+| Dashboard | EI: Log | `expai/log` | `expai/write` |
+| Dashboard | EI: Help | `expai/help` | `expai/write` |
+| Design | Missing alt text | `expai/alttext` | `expai/write` |
+| Setup | EI: Summary | `expai/summary` | `expai/facts` |
+| Setup | EI: Models | `expai/models` | `expai/model_manage` |
+| Setup | EI: Budgets | `expai/budgets` | `expai/log` |
+| Setup | Job queue | `expqueue/dashboard` | `expqueue/view` |
 | Setup | Content packages | `expai/packages` | `expai/package_import` |
 
-The Setup entries are translated in `design/admin/parts/setup/menu`. Every expai page also has a "?" link to its help
-page (`expai/help/(page)/<name>`), and the dashboard's **Details** link to the models page (with
-`expai/model_manage`), the "AI facts" page (with `expai/facts`), the "Missing alt text" report and the help.
+Job queue is the page of the extension expqueue; expai lists it right after EI: Budgets. Missing alt text is in the
+left menu of the Design tab: `expai/alttext` uses the navigation part `ezvisualnavigationpart`, so the Design tab
+stays active. The Setup entries are translated in `design/admin/parts/setup/menu`, the Design entry in
+`design/admin/parts/design/menu`. Every expai page also has a "?" link to its help page (`expai/help/(page)/<name>`),
+and the dashboard's **Details** link to the models page (with `expai/model_manage`), the "EI: Summary" page
+(`expai/summary`, with `expai/facts`), the "Missing alt text" report and the help.
 
 ### Start writing
 

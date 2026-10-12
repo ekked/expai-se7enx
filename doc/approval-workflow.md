@@ -47,7 +47,7 @@ before `content/publish` and evaluates each approve event (`event_ezapprove`) as
 1. The editor sends the draft. The approve event creates a collaboration item (type `ezapprove`) for the approvers
    and defers the workflow to the cronjob; the version is **pending**. The panel and the dashboard show "Waiting for
    approval".
-2. The approver sees the item in the collaboration inbox (the label next to it), in "Waiting for my approval" on
+2. The approver sees the item in the collaboration inbox, in "Waiting for my approval" on
    expai's dashboard page, and opens it: the item page shows the note "Exponential Intelligence (Powered by Claude
    from Anthropic) - This version was written with Exponential Intelligence ... Model: ..." above the decision.
 3. **Approve**: the workflow cronjob (the `frequent` part runs `workflow.php`) continues the workflow and publishes
@@ -55,8 +55,8 @@ before `content/publish` and evaluates each approve event (`event_ezapprove`) as
    shows it as Draft; it can be edited and sent again (a new approval).
 
 The label in the approval views is drawn by expai.js: on `collaboration/item/full/<id>` it asks `expai::labels` for
-that item (only participants get an answer) and shows the note; in lists it adds the label next to links to items and
-versions it wrote. No collaboration template is overridden.
+that item (only participants get an answer) and shows the note. Only the page of the version or item itself shows
+it, as a banner; links to such versions in lists get no badge. No collaboration template is overridden.
 
 ## Tested
 

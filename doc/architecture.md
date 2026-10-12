@@ -35,7 +35,7 @@ expai_presets.js, ...                    (Functions[]=expai)  expAiVectorServerF
 | Safety | `expAiGate`, `expAiDataPolicy`, `expAiProbe`, `expAiLimits`, `expAiModelFallback` | master switch and veto, regions and retention, the write gate, limits, fallback |
 | Tools | `expAiTool`, `expAiToolRegistry`, `expAiToolContext`, classes/tools/, classes/web/, classes/history/, classes/mcp/ | what the model may call, as the user ([tools.md](tools.md)) |
 | Content | `expAiContentReader`, `expAiContentWriter`, `expAiPublisher`, `expAiApprovalCheck`, `expAiDraftLog` | reading with the user's checks, writing drafts, keep / send / discard |
-| Usage and cost | `expAiUsageRecorder`, `expAiUsageLog`, `expAiCost`, `expAiDashboard`, `expAiFacts` | the usage log, prices, the dashboard and the "AI facts" page |
+| Usage and cost | `expAiUsageRecorder`, `expAiUsageLog`, `expAiCost`, `expAiDashboard`, `expAiFacts` | the usage log, prices, the dashboard and the "EI: Summary" page |
 | Queued work | classes/queue/, classes/lanes/, classes/budget/, classes/chain/, classes/diff/, classes/package/ | lanes and batches, budgets, chains, translation sync, packages ([lanes.md](lanes.md)) |
 | Help | `expAiHelp` | the documentation at `expai/help` |
 | Storage | `expAiSchema` (with `expAiThreadSchema`, `expAiChainSchema`) | the 15 tables, per engine ([database.md](database.md)) |
@@ -57,7 +57,7 @@ and Vector are started by their markup (`#exp-ai-panel`, `#exp-ai-edit`, `#exp-a
 
 The module `expai` holds the policies ([permissions.md](permissions.md)) and the views `expai/dashboard`, `expai/log`,
 `expai/vector`, `expai/stream`, `expai/chain`, `expai/alttext`, `expai/models`, `expai/budgets`, `expai/packages`,
-`expai/facts` and `expai/help`.
+`expai/summary` and `expai/help`.
 
 ## The step loop (panel)
 

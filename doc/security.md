@@ -38,8 +38,8 @@ for this editor and still the editor's own drafts.
 - Not sent: the editor's name, login or e-mail, passwords, session data, the content of other users' drafts.
 
 Choose a provider account and data retention that fit your content: the provider's commercial terms and retention
-options, written into `Region`, `Retention` and `TermsCheckedAt` ([data-policy.md](data-policy.md)). The "AI facts"
-page sums it up for a data protection officer ([ai-facts.md](ai-facts.md)).
+options, written into `Region`, `Retention` and `TermsCheckedAt` ([data-policy.md](data-policy.md)). The "EI: Summary"
+page sums it up for a data protection officer ([summary.md](summary.md)).
 
 ## Several providers
 

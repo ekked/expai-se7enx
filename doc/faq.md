@@ -46,5 +46,5 @@ less for bulk work ([lanes.md](lanes.md)). Prompt caching and the bounded contex
 **Can I switch it off for one siteaccess?** Yes: `[AISettings] DisabledSiteAccesses[]`, `Enabled=false` in that
 siteaccess's expai.ini.append.php, or do not activate the extension there ([switch-and-veto.md](switch-and-veto.md)).
 
-**Where is the help?** In the administration interface at `expai/help` (Dashboard > Exponential Intelligence help,
+**Where is the help?** In the administration interface at `expai/help` (Dashboard > EI: Help,
 and the "?" link on each expai page), and in the `doc/` directory of the extension.

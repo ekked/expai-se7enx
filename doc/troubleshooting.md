@@ -192,5 +192,5 @@ children are held and new requests wait. Remove `enablereuse` (keep `flushpacket
 ## A help page says "not found"
 
 `expai/help/(page)/<name>` knows the extension's own documents only: `readme`, `install`, `usage`, `index`, the name
-of a `doc/*.md` without `.md` (`providers`, `vector`, `ai-facts` ...) and `changelog-<version>`. The pages are read
+of a `doc/*.md` without `.md` (`providers`, `vector`, `summary` ...) and `changelog-<version>`. The pages are read
 from the installed extension, so they always match its version.

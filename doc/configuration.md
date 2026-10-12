@@ -412,12 +412,12 @@ See [mcp.md](mcp.md).
 
 | File | What it sets |
 | --- | --- |
-| `module.ini` | `ModuleList[]=expai`: the module with every policy of [permissions.md](permissions.md) and the views expai/dashboard, log, vector, stream, chain, alttext, models, budgets, packages, facts and help |
+| `module.ini` | `ModuleList[]=expai`: the module with every policy of [permissions.md](permissions.md) and the views expai/dashboard, log, vector, stream, chain, alttext, models, budgets, packages, summary and help |
 | `ezjscore.ini` | `[ezjscServer] FunctionList[]=expai`, `[ezjscServer_expai] Class=expAiServerFunctions`, `Functions[]=expai` |
 | `design.ini` | `DesignExtensions[]=expai`, `BackendJavaScriptList[]=expai.js`, `BackendCSSFileList[]=expai.css` |
 | `admininterface.ini` | the tabs `expai` (content navigation part) and `expai_media` (media), header template `expai_header.tpl`, body `expai.tpl` |
 | `content.ini` | `[EditSettings] AdditionalTemplates[]=content/edit/expai.tpl` |
-| `menu.ini` | the entries of the Dashboard menu (`[Leftmenu_my]`: the dashboard, Vector, the log, Chains, Missing alt text, the help) and of Setup (`[Leftmenu_setup]`: AI facts, AI models, Budgets and lanes, Content packages), each with its policies ([dashboard.md](dashboard.md)) |
+| `menu.ini` | the entries of the Dashboard menu (`[Leftmenu_my]`: Exponential Intelligence, EI: Vector, EI: Chains, EI: Log, EI: Help), of Setup (`[Leftmenu_setup]`: EI: Summary, EI: Models, EI: Budgets, Job queue, Content packages) and of Design (`[Leftmenu_design]`: Missing alt text), each with its policies ([dashboard.md](dashboard.md)) |
 | `cronjob.ini` | the cronjob part `expai`: `expai_queue.php` (resumes held jobs, releases lost batch submits), `expai_prune.php` (usage rows older than `RetentionDays`), `expai_thread_prune.php` (thread events, proposals, checkpoints); run it with `-s <admin siteaccess>` |
 | `dashboard.ini` | the dashboard block `expai_drafts` (Priority 35, 5 items, `expai/write`) |
 | `browse.ini` | `[ExpAiStartWriting]`: the content browser of "Change location" (single node) |
@@ -635,14 +635,14 @@ See [presets.md](presets.md).
 | `ImproveDatatypes[]` | ezstring, eztext, ezxmltext | The datatypes that get the Improve menu (also needed in `[ToolSettings] WritableDatatypes[]`). |
 | `[Presets] Class_<class identifier>[<preset>]` | article, blog_post, folder, ng_article, ng_blog_post, ng_news, ng_landing_page, ng_category | The fields a preset fills in a class: attribute identifiers, or `<attribute>.<part>` for an xrowmetadata part (title, description, keywords), separated by commas. A class without a line gets no presets. |
 
-## [FactsSettings]: the "AI facts" page
+## [FactsSettings]: the "EI: Summary" page
 
-See [ai-facts.md](ai-facts.md).
+See [summary.md](summary.md).
 
 | Setting | Default | Effect |
 | --- | --- | --- |
-| `Contact` | (empty) | The contact for questions about the processing, printed under the title of `expai/facts`. |
+| `Contact` | (empty) | The contact for questions about the processing, printed under the title of `expai/summary`. |
 | `Note` | (empty) | A note printed under the title (e.g. the reference of the record of processing activities). |
 
 Other files: `ezjscore.ini [ezjscServer_expaipreset]` (the function `expaipreset::preset`), `menu.ini
-[Leftmenu_setup]` (the entry Setup > AI facts, policy `expai/facts`).
+[Leftmenu_setup]` (the entry Setup > EI: Summary, policy `expai/facts`).

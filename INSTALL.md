@@ -91,7 +91,7 @@ ApiKey=<your Anthropic API key>
 
 Keys and tokens (providers, external MCP servers, the web search service) belong in `settings/override` only. They
 are read on the server only: never sent to the browser, never written to a log, never shown on a page; `expai/models`
-and the "AI facts" page say only whether a key is set and in which file, and warn about a key in any other file or in
+and the "EI: Summary" page say only whether a key is set and in which file, and warn about a key in any other file or in
 a file every user of the server can read. Every other setting is in [doc/configuration.md](doc/configuration.md);
 regions, retention and the data policy in [doc/data-policy.md](doc/data-policy.md).
 
@@ -137,7 +137,7 @@ create the tables by hand instead, use the file of your engine:
 | `expai/settings` | where the site default model is set; "Resume held jobs" |
 | `expai/model_manage` | `expai/models`: providers, probe results, the local model |
 | `expai/package_import`, `expai/package_export` | content packages: upload and import as drafts; export |
-| `expai/facts` | the "AI facts" page (needs nothing else; also opens the help pages) |
+| `expai/facts` | the "EI: Summary" page `expai/summary` (needs nothing else; also opens the help pages) |
 | `ezjscore/call` | needed for every browser request of expai; unlimited, or limited to the function list `expai` |
 
 **A recommended Editor set** (Setup > Roles and policies > Editor > New policy):
@@ -256,7 +256,7 @@ Then in the browser:
    here?". The panel shows a step "Checked which content you may create here" and an answer.
 2. Ask for a short article. A draft appears in the panel and in My drafts, with the "Exponential Intelligence" label.
 3. Open it in the edit form: the field actions, the presets and the Improve menu are next to the text fields.
-4. The dashboard (Dashboard > Exponential Intelligence) says "Ready"; Setup > AI facts lists your providers; the "?"
+4. The dashboard (Dashboard > Exponential Intelligence) says "Ready"; Setup > EI: Summary lists your providers; the "?"
    link of each page opens its help.
 
 If something does not work, see [doc/troubleshooting.md](doc/troubleshooting.md).

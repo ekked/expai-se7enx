@@ -21,7 +21,7 @@ expai:
 | `expai/vector.tpl`, `expai/vector/pane_*.tpl` | Vector and its right panes (plan, changes, cost) |
 | `expai/chain.tpl`, `expai/chain_run.tpl`, `expai/chains/*.tpl` | AI chains: the runs, one run, the prompt of each step |
 | `expai/alttext.tpl` | the "Missing alt text" report |
-| `expai/models.tpl`, `expai/budgets.tpl`, `expai/packages.tpl`, `expai/facts.tpl` | models and providers, budgets and lanes, content packages, the "AI facts" page |
+| `expai/models.tpl`, `expai/budgets.tpl`, `expai/packages.tpl`, `expai/facts.tpl` | models and providers, budgets and lanes, content packages, the "EI: Summary" page |
 | `expai/help.tpl`, `expai/parts/help_link.tpl` | the help pages, the "?" link of each page |
 | `expai/parts/*.tpl` | shared parts: the model picker, bars, trends, links, budget summary, thread cards |
 

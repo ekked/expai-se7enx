@@ -1,6 +1,6 @@
 <?php
 /**
- * expai/facts (policy expai/facts): the "AI facts" page for a data protection officer (doc/ai-facts.md). One printable
+ * expai/summary (policy expai/facts): the "EI: Summary" page for a data protection officer (doc/summary.md). One printable
  * page with what goes where: per provider the region, the retention, the date the terms were checked, where the key
  * comes from (never the key), who may use it, the models with their write gate and probe date, the lanes and their
  * retention, the data policy rules, the limits and budgets against this month's usage, the tools that reach outside

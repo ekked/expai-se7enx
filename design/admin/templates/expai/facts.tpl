@@ -1,4 +1,4 @@
-{* expai/facts (policy expai/facts): the "AI facts" page for a data protection officer (doc/ai-facts.md). Everything is
+{* expai/summary (policy expai/facts): the "EI: Summary" page for a data protection officer (doc/summary.md). Everything is
    read from the settings, the roles, the probe results and the usage log as they are now. Never shows a key: only
    where it comes from. Printable: expai_facts.css hides the admin chrome for print (the browser's "Save as PDF"). *}
 {ezcss_require( array( 'expai_facts.css' ) )}
@@ -13,7 +13,7 @@
 {if $facts.note}            <p class="exp-ai-facts-note">{$facts.note|wash}</p>{/if}
 {if $facts.contact}            <p class="exp-ai-facts-note">{'Contact for questions about this processing: %contact'|i18n( 'extension/expai/facts',, hash( '%contact', $facts.contact ) )|wash}</p>{/if}
         </div>
-        {include uri='design:expai/parts/help_link.tpl' page='ai-facts' label='AI facts'|i18n( 'extension/expai/help' ) text='?'}
+        {include uri='design:expai/parts/help_link.tpl' page='summary' label='EI: Summary'|i18n( 'extension/expai/facts' ) text='?'}
         <p class="exp-ai-facts-noprint"><input type="button" class="button exp-ai-btn" onclick="window.print();" value="{'Print or save as PDF'|i18n( 'extension/expai/facts' )}" /></p>
     </header>
 

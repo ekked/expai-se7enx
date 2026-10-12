@@ -80,9 +80,9 @@ Version 0.1.0. What is new: [doc/changelog/0.1.0.md](doc/changelog/0.1.0.md).
   site budget and job group budgets with reservations ([doc/lanes.md](doc/lanes.md), [doc/budgets.md](doc/budgets.md)).
 - **Content packages**: the kernel's packages (classic or JSON format) with AI provenance, imported as drafts only
   ([doc/packages.md](doc/packages.md), [doc/package-authoring-for-agents.md](doc/package-authoring-for-agents.md)).
-- **"AI facts"** (Setup > AI facts): one printable page for a data protection officer with every provider's region,
+- **"EI: Summary"** (Setup > EI: Summary, `expai/summary`): one printable page for a data protection officer with every provider's region,
   retention, terms date and key source (never the key), roles, lanes, limits and outside tools
-  ([doc/ai-facts.md](doc/ai-facts.md)).
+  ([doc/summary.md](doc/summary.md)).
 - **Master switch and veto hook**: on, off, or off per siteaccess at every entry point, and rules or an event
   listener that can refuse a request with a reason ([doc/switch-and-veto.md](doc/switch-and-veto.md)).
 

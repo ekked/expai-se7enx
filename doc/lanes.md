@@ -136,7 +136,7 @@ Gemini's batch API is its native API; its key is sent as `x-goog-api-key` (the p
 
 ## Admin and command line
 
-- Setup > Budgets and lanes (`expai/budgets`): the lanes of every model, the provider
+- Setup > EI: Budgets (`expai/budgets`): the lanes of every model, the provider
   batches with their state and whether they were deleted at the provider.
 - The expqueue pages show the jobs (`expai.request`, `expai.batch.submit`, `expai.batch.poll`) with their lane, events
   and results.

@@ -1,11 +1,14 @@
-# The "AI facts" page
+# The "EI: Summary" page
 
-`expai/facts` (Setup > AI facts, and a link in the Details of `expai/dashboard`) is one printable page for a data
+`expai/summary` (Setup > EI: Summary, and a link in the Details of `expai/dashboard`) is one printable page for a data
 protection officer or anyone who has to answer "what does the AI feature send where?". It is read-only and has no
 view parameters: every fact is read from the settings, the roles, the probe results and the usage log at the moment
 the page is opened, so it never goes stale.
 
-Policy: `expai/facts` (no limitation). The Administrator role has it; give it to a role of its own for a data
+Formerly the "AI facts" page at `expai/facts`, with the help page `ai-facts`: that address and that help page name no
+longer exist (use `expai/summary` and `expai/help/(page)/summary`); the policy kept its name `expai/facts`.
+
+Policy: `expai/facts` (no limitation; the policy kept its name). The Administrator role has it; give it to a role of its own for a data
 protection officer, who then needs no other expai policy and no access to content.
 
 ## What it shows
@@ -42,6 +45,6 @@ authoritative.
 | File | Part |
 | --- | --- |
 | `classes/expaifacts.php` | `expAiFacts::collect()`: every fact |
-| `modules/expai/facts.php` | the view |
+| `modules/expai/facts.php` | the view `expai/summary` |
 | `design/admin/templates/expai/facts.tpl` | the page |
 | `design/admin/stylesheets/expai_facts.css` | screen and print styles |

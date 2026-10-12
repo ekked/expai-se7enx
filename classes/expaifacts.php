@@ -8,7 +8,7 @@
  */
 
 /**
- * The facts of the "AI facts" page (expai/facts, doc/ai-facts.md): what goes where, kept how long, used by whom and at
+ * The facts of the "EI: Summary" page (expai/summary, doc/summary.md): what goes where, kept how long, used by whom and at
  * what cost, read from the settings, the roles, the probe results and the usage log as they are now. Never a key:
  * only where a key comes from (the settings file) and whether one is set.
  */

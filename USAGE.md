@@ -108,7 +108,7 @@ edit and send it again. More: doc/approval-workflow.md.
   Intelligence tab. **All in the log** lists all of them.
 
 The dashboard itself (Dashboard > Dashboard) also has a block "Exponential Intelligence: my drafts".
-**Exponential Intelligence log** in the same menu lists every request with its tokens, time and estimated cost.
+**EI: Log** in the same menu lists every request with its tokens, time and estimated cost.
 
 ## 6. Everyday examples
 
@@ -129,7 +129,7 @@ The dashboard itself (Dashboard > Dashboard) also has a block "Exponential Intel
 
 ## 8. Vector: bigger jobs, reviewed before they are written
 
-**Dashboard > Vector** (when your role has it) is a workspace of threads. A thread says what it may touch (a node, a
+**Dashboard > EI: Vector** (when your role has it) is a workspace of threads. A thread says what it may touch (a node, a
 subtree, a class, languages), whether it plans first or writes, which model and lane it uses, and whether its changes
 are **staged**: then every change waits in the **Changes** pane, where you accept, reject or edit it per field and
 part before anything is written into a draft. Bulk work starts with a **plan** and a cost estimate that you approve
@@ -139,7 +139,7 @@ doc/plan-mode.md.
 ## 9. Alt text for images
 
 In the edit form every image field has **Write alt text** (a model that can look at images suggests it, in the
-content's language) and **Decorative (empty alt text)**. The report **Dashboard > Missing alt text** lists the images
+content's language) and **Decorative (empty alt text)**. The report **Design > Missing alt text** (left menu of the Design tab) lists the images
 without alt text under a location and can queue suggestions, which arrive as drafts for you to review. More:
 doc/alt-text.md.
 
@@ -147,12 +147,12 @@ doc/alt-text.md.
 
 - **Write with a chain** in the Intelligence tab (when your role has it): one model writes, another reviews, the
   text is revised until it passes, and you decide at the checkpoint before anything else happens. The runs are under
-  **Dashboard > Chains** (doc/chains.md).
+  **Dashboard > EI: Chains** (doc/chains.md).
 - **Translations** in the Intelligence tab: after the source language changed, each translation is shown as up to
   date, a small patch or a full retranslation, with its estimated cost; you approve, translate in full or skip.
   The results are drafts of the translations (doc/translation-sync.md).
 
 ## 11. Help
 
-**Dashboard > Exponential Intelligence help**, or the **?** next to the title of each Exponential Intelligence page,
+**Dashboard > EI: Help**, or the **?** next to the title of each Exponential Intelligence page,
 opens this documentation inside the administration interface.

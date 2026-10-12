@@ -1515,7 +1515,7 @@ Handler=expAiPromptFieldAction
 Input=none
 Instruction=Rewrite the current value of this field in a more casual, friendly tone. Keep the meaning, the language, the formatting and about the same length.
 
-# ---- The "AI facts" page (doc/ai-facts.md) -------------------------------------------------------------------------
+# ---- The "EI: Summary" page (doc/summary.md) ----------------------------------------------------------------------
 [FactsSettings]
 # expai/facts: one printable page for a data protection officer (policy expai/facts). Nothing is configured here
 # but the free text below; every fact on the page is read from the settings and the usage log as they are.
