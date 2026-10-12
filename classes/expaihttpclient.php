@@ -72,7 +72,8 @@ class expAiHttpClient
     /**
      * @param array $options accept (Accept header, default application/json), resolve (curl CURLOPT_RESOLVE list,
      *                       used to pin a checked address), method (GET, POST, DELETE; default POST),
-     *                       content_type (of the body, default application/json)
+     *                       content_type (of the body, default application/json), on_chunk (a callable that gets
+     *                       every piece of the body as it arrives, e.g. to time the first event of a stream)
      * @return array( int status, string body, array kept headers )
      * @throws expAiException
      */
@@ -115,7 +116,7 @@ class expAiHttpClient
                     $responseHeaders[strtolower( $m[1] )] = substr( $m[2], 0, 200 );
                 return strlen( $line );
             },
-            CURLOPT_WRITEFUNCTION => static function ( $handle, $chunk ) use ( &$received, &$tooLarge, $limit )
+            CURLOPT_WRITEFUNCTION => static function ( $handle, $chunk ) use ( &$received, &$tooLarge, $limit, $options )
             {
                 if ( strlen( $received ) + strlen( $chunk ) > $limit )
                 {
@@ -123,6 +124,9 @@ class expAiHttpClient
                     return 0;
                 }
                 $received .= $chunk;
+                // #392 on_chunk: a callable that sees every piece of the body as it arrives (an event stream)
+                if ( isset( $options['on_chunk'] ) && is_callable( $options['on_chunk'] ) )
+                    call_user_func( $options['on_chunk'], $chunk );
                 return strlen( $chunk );
             },
         ) );

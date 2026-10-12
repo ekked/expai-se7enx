@@ -293,6 +293,12 @@ class expAiOpenAiChatProvider extends expAiProviderBase
         return $payload;
     }
 
+    /** @return bool the server streams answers ([Provider_<id>] / [Model_<alias>] Streaming=enabled) */
+    public function streams()
+    {
+        return $this->enabled( 'Streaming', 'disabled' );
+    }
+
     public function send( array $request )
     {
         $endpoint = $this->endpoint();
@@ -302,6 +308,10 @@ class expAiOpenAiChatProvider extends expAiProviderBase
             throw new expAiException( 'Exponential Intelligence is not configured correctly.', 'Model is not set' );
         $headers = array_merge( $this->keyHeaders( 'authorization' ), $this->extraHeaders() );
         $payload = $this->buildPayload( $request );
+        // #392 a request that wants to know the time to the first token (the test prompt of expai/models) is streamed
+        // from a server that streams; the answer is the same, with timings first_token and eval (ms)
+        if ( !empty( $request['stream_timing'] ) && $this->streams() )
+            return $this->sendStreamed( $endpoint, $headers, $payload );
         list( $status, $received, $rateHeaders, $retries ) = $this->post( $endpoint, $headers, $this->encode( $payload ) );
         $data = json_decode( $received, true );
         if ( $status < 200 || $status >= 300 )
@@ -310,6 +320,107 @@ class expAiOpenAiChatProvider extends expAiProviderBase
         $answer['retries'] = $retries;
         $answer['rate_limits'] = $rateHeaders;
         return $answer;
+    }
+
+    /**
+     * #392 The request as an event stream (stream: true, stream_options.include_usage), timing the first event that
+     * carries text or reasoning. No retry: a test prompt is short and is repeated by the editor.
+     * @return array the answer of parseAnswer() with timings first_token and eval (ms)
+     */
+    protected function sendStreamed( $endpoint, array $headers, array $payload )
+    {
+        $payload['stream'] = true;
+        $payload['stream_options'] = array( 'include_usage' => true );
+        $start = microtime( true );
+        $first = null;
+        $buffer = '';
+        $onChunk = function ( $chunk ) use ( &$first, &$buffer, $start )
+        {
+            if ( $first !== null )
+                return;
+            $buffer .= $chunk;
+            if ( preg_match( '/"(?:content|reasoning_content|reasoning)"\s*:\s*"[^"]/', $buffer ) )
+                $first = (int) round( ( microtime( true ) - $start ) * 1000 );
+            elseif ( strlen( $buffer ) > 65536 )
+                $buffer = substr( $buffer, -4096 );
+        };
+        try
+        {
+            list( $status, $received, $rateHeaders ) = array_pad( $this->http->request( $endpoint, $headers, $this->encode( $payload ),
+                                                                                       array( 'accept' => 'text/event-stream', 'on_chunk' => $onChunk ) ), 3, array() );
+        }
+        catch ( expAiException $e )
+        {
+            throw $this->named( $e );
+        }
+        $total = (int) round( ( microtime( true ) - $start ) * 1000 );
+        if ( $status < 200 || $status >= 300 )
+            throw $this->httpError( $status, json_decode( $received, true ), $rateHeaders, 0 );
+        $answer = $this->parseAnswer( self::assembleStream( $received ), $status );
+        $answer['retries'] = 0;
+        $answer['rate_limits'] = $rateHeaders;
+        $answer['timings'] = array( 'first_token' => $first, 'eval' => $first !== null ? max( 1, $total - $first ) : null, 'total' => $total );
+        return $answer;
+    }
+
+    /**
+     * #392 A Chat Completions response from the events of a stream (data: {chunk} lines, data: [DONE]): the text, the
+     * reasoning, the tool calls (by index, their arguments joined), the finish reason, the usage of the last chunk and
+     * the other top-level fields of the last chunk (billing_cost of Melious, model).
+     * @param string $sse
+     * @return array
+     */
+    public static function assembleStream( $sse )
+    {
+        $message = array( 'role' => 'assistant', 'content' => '' );
+        $reasoning = '';
+        $calls = array();
+        $finish = '';
+        $top = array();
+        foreach ( preg_split( '/\r?\n/', (string) $sse ) as $line )
+        {
+            if ( strpos( $line, 'data:' ) !== 0 )
+                continue;
+            $json = trim( substr( $line, 5 ) );
+            if ( $json === '' || $json === '[DONE]' )
+                continue;
+            $chunk = json_decode( $json, true );
+            if ( !is_array( $chunk ) )
+                continue;
+            if ( isset( $chunk['error'] ) )
+                return $chunk;
+            foreach ( $chunk as $key => $value )
+                if ( $key !== 'choices' && $value !== null )
+                    $top[$key] = $value;
+            $delta = isset( $chunk['choices'][0]['delta'] ) && is_array( $chunk['choices'][0]['delta'] ) ? $chunk['choices'][0]['delta'] : array();
+            if ( isset( $delta['content'] ) && is_string( $delta['content'] ) )
+                $message['content'] .= $delta['content'];
+            foreach ( array( 'reasoning_content', 'reasoning' ) as $field )
+                if ( isset( $delta[$field] ) && is_string( $delta[$field] ) )
+                    $reasoning .= $delta[$field];
+            foreach ( isset( $delta['tool_calls'] ) && is_array( $delta['tool_calls'] ) ? $delta['tool_calls'] : array() as $part )
+            {
+                $i = isset( $part['index'] ) ? (int) $part['index'] : count( $calls );
+                if ( !isset( $calls[$i] ) )
+                    $calls[$i] = array( 'id' => '', 'type' => 'function', 'function' => array( 'name' => '', 'arguments' => '' ) );
+                if ( !empty( $part['id'] ) )
+                    $calls[$i]['id'] = (string) $part['id'];
+                if ( isset( $part['function']['name'] ) && is_string( $part['function']['name'] ) )
+                    $calls[$i]['function']['name'] .= $part['function']['name'];
+                if ( isset( $part['function']['arguments'] ) && is_string( $part['function']['arguments'] ) )
+                    $calls[$i]['function']['arguments'] .= $part['function']['arguments'];
+            }
+            if ( !empty( $chunk['choices'][0]['finish_reason'] ) )
+                $finish = (string) $chunk['choices'][0]['finish_reason'];
+        }
+        if ( $reasoning !== '' )
+            $message['reasoning_content'] = $reasoning;
+        if ( $calls )
+        {
+            ksort( $calls );
+            $message['tool_calls'] = array_values( $calls );
+        }
+        return array( 'choices' => array( array( 'index' => 0, 'message' => $message, 'finish_reason' => $finish ) ) ) + $top;
     }
 
     /**

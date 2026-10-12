@@ -166,6 +166,8 @@ Region=eu
 Retention=zdr
 TermsCheckedAt=2026-10-12
 PriceCurrency=EUR
+# Melious streams (SSE): the test prompt of expai/models is streamed to measure the time to the first token
+Streaming=enabled
 Timeout=115
 
 # Example: a local Ollama on this server (see doc/local-models.md). No key; nothing leaves the server.

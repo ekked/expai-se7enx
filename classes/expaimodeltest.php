@@ -289,7 +289,9 @@ class expAiModelTest
             + ( !empty( $context['user_id'] ) ? array( 'user_id' => (int) $context['user_id'] ) : array() )
             + ( !empty( $context['siteaccess'] ) ? array( 'siteaccess' => (string) $context['siteaccess'] ) : array() ) );
         $start = microtime( true );
-        $answer = $recorder->send( array( 'system' => self::SYSTEM, 'messages' => array( array( 'role' => 'user', 'content' => self::PROMPT ) ), 'max_tokens' => 120 ) );
+        // #392 stream_timing: a provider that streams (Streaming=enabled) is timed to its first token
+        $answer = $recorder->send( array( 'system' => self::SYSTEM, 'messages' => array( array( 'role' => 'user', 'content' => self::PROMPT ) ), 'max_tokens' => 120,
+                                          'stream_timing' => true ) );
         $totalMs = (int) round( ( microtime( true ) - $start ) * 1000 );
         $text = '';
         foreach ( isset( $answer['content'] ) ? (array) $answer['content'] : array() as $block )
@@ -310,7 +312,8 @@ class expAiModelTest
             'text' => expAiText::cut( trim( $text ), 600 ),
             'input' => $input, 'output' => $output,
             'total_ms' => $totalMs,
-            // Ollama reports where the time went; another provider answers in one piece, so its first token is not known
+            // Ollama reports where the time went; a provider that streams is timed to its first token (#392); another
+            // answers in one piece, so its first token is not known
             'ttft_ms' => isset( $t['first_token'] ) ? $t['first_token'] : null,
             'load_ms' => isset( $t['load'] ) ? $t['load'] : null,
             'in_tps' => isset( $t['prompt'] ) ? $rate( $input, $t['prompt'] ) : null,
