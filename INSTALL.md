@@ -246,6 +246,7 @@ php extension/expai/bin/php/expaischema.php --check -s <admin siteaccess>       
 php bin/php/ezexec.php extension/expai/tests/expaiprovider_test.php -s <admin siteaccess>   # the provider layer, no network
 php bin/php/ezexec.php extension/expai/tests/expaicost_test.php -s <admin siteaccess>       # the price table
 php bin/php/ezexec.php extension/expai/tests/expaihelp_test.php -s <admin siteaccess>       # the help pages
+php vendor/bin/phpunit -c extension/expai/phpunit.xml.dist --exclude-group e2e             # the test suite (doc/testing.md)
 php extension/expai/bin/php/expaiprobe.php --list -s <admin siteaccess>                    # the models and their probe state
 php runcronjobs.php -s <admin siteaccess> expai                                             # the cron part runs without errors
 ```

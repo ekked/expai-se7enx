@@ -46,6 +46,7 @@
 | [extending.md](extending.md) | Adding field actions, panel sections, tools, providers, JavaScript hooks (worked examples) |
 | [customization.md](customization.md) | Template overrides, CSS tokens, labels, translations, instructions |
 | [translations.md](translations.md) | Contexts, the shipped languages, adding one |
+| [testing.md](testing.md) | The PHPUnit suite: running it, suites and groups, what the tests may touch, measuring coverage, the current figures |
 | [troubleshooting.md](troubleshooting.md) | Failures and their fixes |
 | [faq.md](faq.md) | Short answers |
 | [changelog/0.1.0.md](changelog/0.1.0.md) | The first release |

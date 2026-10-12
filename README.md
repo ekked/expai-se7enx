@@ -135,7 +135,8 @@ What has been run, and how ([doc/provider-support.md](doc/provider-support.md) h
    ([INSTALL.md](INSTALL.md), "Checklist").
 5. Open a folder in the admin, choose the **Intelligence** tab and ask for something.
 
-How it is used day to day: [USAGE.md](USAGE.md). All documentation: [doc/index.md](doc/index.md).
+How it is used day to day: [USAGE.md](USAGE.md). All documentation: [doc/index.md](doc/index.md). The test suite
+and its coverage: [doc/testing.md](doc/testing.md).
 
 ## Screenshots
 
