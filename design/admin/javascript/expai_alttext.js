@@ -8,7 +8,8 @@
  *                                  put into the alternative text field of the image (and into the companion text
  *                                  fields of [AltTextSettings] CompanionAttributes[] that repeat it), with undo
  *   "Decorative (empty alt text)"  the editor's explicit choice for an image without information: the field is
- *                                  emptied (with undo); no request is made
+ *                                  emptied (with undo); no request is made. It is disabled (with the reason as its
+ *                                  tooltip) for a field whose class requires an alternative text (alt_text_required)
  * Nothing is stored: the editor stores or publishes the draft as usual.
  * Extension points: window.ExpAi.altTextHooks = { before( ctx, params ), after( ctx, result ) } (return false to stop) and
  * the event field:filled (with decorative: true for the explicit choice).
@@ -105,12 +106,15 @@
             var model = C.model || {};
             var disabled = !model.available || !image.has_image;
             var why = !model.available ? ( S.unavailable + ' ' + ( model.reason || '' ) ) : ( !image.has_image ? S.no_image : '' );
+            // a field that requires an alternative text refuses an empty one: no "Decorative" choice there
+            var required = !!image.alt_text_required;
             var bar = document.createElement( 'div' );
             bar.className = 'exp-ai exp-ai-field-bar exp-ai-alttext-bar';
             bar.innerHTML = '<span class="exp-ai-field-title" title="' + esc( S.actions_title ) + '"><span class="exp-ai-mark" aria-hidden="true"></span>' + esc( S.actions ) + '</span>'
                 + '<button type="button" class="exp-ai-chip exp-ai-alttext-write" data-action="alt_text"' + ( disabled ? ' disabled="disabled"' : '' )
                 + ' title="' + esc( disabled ? why : S.write_title ) + '">' + esc( S.write ) + '</button>'
-                + '<button type="button" class="exp-ai-chip exp-ai-alttext-decorative" title="' + esc( S.decorative_title ) + '">' + esc( S.decorative ) + '</button>'
+                + '<button type="button" class="exp-ai-chip exp-ai-alttext-decorative"' + ( required ? ' disabled="disabled" aria-disabled="true"' : '' )
+                + ' title="' + esc( required ? ( S.decorative_required || '' ) : S.decorative_title ) + '">' + esc( S.decorative ) + '</button>'
                 + '<p class="exp-ai-field-note" aria-live="polite">' + ( disabled ? esc( why ) : '' ) + '</p>';
             // right above the alt text field of the image
             var holder = input.closest( '.block, .form-group, div' ) || block;
@@ -136,6 +140,9 @@
                     return;
                 }
                 if ( e.target.closest( '.exp-ai-alttext-decorative' ) ) {
+                    if ( required ) {
+                        return;
+                    }
                     done( esc( S.decorative_done ), fill( image, '' ) );
                     ExpAi.emit( 'field:filled', { field: ctx, value: '', previous: undo.alt, decorative: true } );
                     return;
@@ -161,7 +168,7 @@
                     var facts = ExpAi.format( r.cost ? S.facts : S.facts_nocost, { '%model': r.model_label || r.model, '%width': img.width, '%height': img.height,
                                                                                   '%tokens': img.image_tokens, '%cost': r.cost } );
                     done( esc( S.filled ) + ( r.note ? ' <em>' + esc( r.note ) + '</em>' : '' )
-                          + ( r.decorative ? ' <strong>' + esc( S.decorative_hint ) + '</strong>' : '' )
+                          + ( r.decorative && !required ? ' <strong>' + esc( S.decorative_hint ) + '</strong>' : '' )
                           + ' <span class="exp-ai-alttext-facts">' + esc( facts ) + '</span>', previous );
                     ExpAi.emit( 'field:filled', { field: ctx, value: r.value, previous: previous.alt } );
                 } ).catch( function ( err ) {

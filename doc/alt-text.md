@@ -17,6 +17,12 @@ Every image field (datatype `ezimage`) gets two buttons above its "Alternative i
 The model never decides that an image is decorative: when it thinks so, it still writes a description and says so in
 the note ("The model thinks this image may be decorative ..."). The editor chooses.
 
+**A field that requires an alternative text.** When the class attribute has the option "Alternative text is required"
+(Exponential 6.0.15 and later, set on the class edit page), the image cannot be stored without an alt text. For such
+a field **Decorative (empty alt text)** is disabled, and its tooltip says why: "This field requires an alternative
+text, so it cannot be left empty." The model's remark that an image may be decorative is not shown there either.
+**Write alt text** works as before. On an Exponential version without the option both buttons are always offered.
+
 - The image must be **stored in the draft**: a file chosen in "New image file for upload" is only used after
   "Store draft". Without a stored image the button is disabled and says why.
 - Plain text fields that repeat the alt text (`[AltTextSettings] CompanionAttributes[]`, by default the identifiers
@@ -171,7 +177,7 @@ browser calls `expaialttext::suggest` (ezjscore.ini `[ezjscServer_expaialttext]`
 | The field action (on a provider given by the caller) | `classes/alttext/expaialttextfieldaction.php` |
 | `expaialttext::suggest` | `classes/alttext/expaialttextserverfunctions.php` |
 | The job type `expai.alttext` | `classes/alttext/expaialttextjobhandler.php` |
-| `fetch( 'expai', 'alt_text_model', hash( 'object', $object ) )` | `classes/alttext/expaialttextfunctioncollection.php` |
+| `fetch( 'expai', 'alt_text_model', hash( 'object', $object ) )`, `fetch( 'expai', 'alt_text_required', hash( 'attribute', $attribute ) )` | `classes/alttext/expaialttextfunctioncollection.php` |
 | The buttons | `design/admin/templates/expai/edit/alttext.tpl`, `design/admin/javascript/expai_alttext.js` |
 | The report | `modules/expai/alttext.php`, `design/admin/templates/expai/alttext.tpl` |
 

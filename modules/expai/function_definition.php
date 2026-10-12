@@ -74,6 +74,13 @@ $FunctionList['alt_text_model'] = array( 'name' => 'alt_text_model',
                                          'call_method' => array( 'class' => 'expAiAltTextFunctionCollection', 'method' => 'fetchModel' ),
                                          'parameter_type' => 'standard',
                                          'parameters' => array( array( 'name' => 'object', 'type' => 'object', 'required' => true ) ) );
+// fetch( 'expai', 'alt_text_required', hash( 'attribute', $attribute ) ): whether the image field refuses an empty alt
+// text (the class attribute option "Alternative text is required"; false on a kernel without it)
+$FunctionList['alt_text_required'] = array( 'name' => 'alt_text_required',
+                                            'operation_types' => array( 'read' ),
+                                            'call_method' => array( 'class' => 'expAiAltTextFunctionCollection', 'method' => 'fetchAltTextRequired' ),
+                                            'parameter_type' => 'standard',
+                                            'parameters' => array( array( 'name' => 'attribute', 'type' => 'object', 'required' => true ) ) );
 
 // editor presets and the Improve menu (classes/fieldactions/expaieditpresets.php): fetch( 'expai', 'edit_presets',
 // hash( 'object', $object, 'attributes', $content_attributes ) ) the preset buttons, the Improve menu and the defaults line

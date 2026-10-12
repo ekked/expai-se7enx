@@ -3930,6 +3930,10 @@
         <translation>Only for images that carry no information: screen readers skip an image with an empty alt text.</translation>
     </message>
     <message>
+        <source>This field requires an alternative text, so it cannot be left empty.</source>
+        <translation>This field requires an alternative text, so it cannot be left empty.</translation>
+    </message>
+    <message>
         <source>The alt text is empty now: screen readers skip this image. Review it before you store the draft.</source>
         <translation>The alt text is empty now: screen readers skip this image. Review it before you store the draft.</translation>
     </message>

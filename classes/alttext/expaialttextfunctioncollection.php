@@ -34,4 +34,14 @@ class expAiAltTextFunctionCollection
         }
         return array( 'result' => $out );
     }
+
+    /**
+     * fetch( 'expai', 'alt_text_required', hash( 'attribute', $attribute ) ): whether the image field refuses an empty
+     * alternative text (expAiAltText::altTextRequired()), so the edit form leaves out the "Decorative" choice.
+     * @return array result: bool
+     */
+    public static function fetchAltTextRequired( $attribute )
+    {
+        return array( 'result' => expAiAltText::altTextRequired( $attribute ) );
+    }
 }

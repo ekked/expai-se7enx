@@ -29,6 +29,20 @@ class expAiAltText
         return $config->flag( 'AltTextSettings', 'Enabled', true );
     }
 
+    /**
+     * Whether the image field refuses an empty alternative text (the class attribute option "Alternative text is
+     * required", eZImageType::isAltTextRequired()). Then the edit form offers no "Decorative (empty alt text)" choice.
+     * On a kernel without that option it is always false.
+     * @param eZContentObjectAttribute|eZContentClassAttribute|mixed $attribute
+     * @return bool
+     */
+    public static function altTextRequired( $attribute )
+    {
+        if ( !class_exists( 'eZImageType' ) || !method_exists( 'eZImageType', 'isAltTextRequired' ) )
+            return false;
+        return (bool) eZImageType::isAltTextRequired( $attribute );
+    }
+
     /** @return string[] the aliases of the vision models, in the order they are tried */
     public static function visionModels( expAiConfig $config )
     {

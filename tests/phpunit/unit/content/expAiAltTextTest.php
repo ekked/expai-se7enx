@@ -252,4 +252,35 @@ class expAiAltTextTest extends expAiContentTestCase
         $this->assertRefused( function () use ( $action, $request, $config ) { $action->run( $request, $config->registry()->providerFor( self::ALIAS ) ); }, 'data policy keeps' );
         $this->assertRefused( function () use ( $image ) { throw new expAiException( expAiAltTextFunctionCollection::fetchModel( $image )['result']['reason'] ); }, 'data policy' );
     }
+
+    public function testAFieldThatRequiresAnAltTextOffersNoDecorativeChoice(): void
+    {
+        // class attributes that are never stored: the option "Alternative text is required" on and off
+        $required = new eZContentClassAttribute( array( 'data_type_string' => 'ezimage', 'data_int2' => 1 ) );
+        $optional = new eZContentClassAttribute( array( 'data_type_string' => 'ezimage', 'data_int2' => 0 ) );
+        $this->assertFalse( expAiAltText::altTextRequired( $optional ) );
+        $this->assertFalse( expAiAltTextFunctionCollection::fetchAltTextRequired( $optional )['result'] );
+        $this->assertFalse( expAiAltText::altTextRequired( null ), 'anything but an attribute requires nothing' );
+        $this->assertFalse( expAiAltText::altTextRequired( 'image' ) );
+
+        // the edit form leaves the "Decorative" choice out for such a field and says why
+        $template = file_get_contents( __DIR__ . '/../../../../design/admin/templates/expai/edit/alttext.tpl' );
+        $this->assertStringContainsString( "'alt_text_required', fetch( 'expai', 'alt_text_required', hash( 'attribute', \$exp_ai_alt_attribute ) )", $template );
+        $this->assertStringContainsString( "'decorative_required', 'This field requires an alternative text, so it cannot be left empty.'", $template );
+        $script = file_get_contents( __DIR__ . '/../../../../design/admin/javascript/expai_alttext.js' );
+        $this->assertStringContainsString( "var required = !!image.alt_text_required;", $script );
+        $this->assertStringContainsString( "( required ? ' disabled=\"disabled\" aria-disabled=\"true\"' : '' )", $script );
+        foreach ( array( 'eng-US', 'ger-DE', 'untranslated' ) as $language )
+            $this->assertStringContainsString( '<source>This field requires an alternative text, so it cannot be left empty.</source>',
+                file_get_contents( __DIR__ . '/../../../../translations/' . $language . '/translation.ts' ), $language );
+
+        if ( !method_exists( 'eZImageType', 'isAltTextRequired' ) )
+        {
+            // a kernel without the option: no field requires an alt text, the choice stays
+            $this->assertFalse( expAiAltText::altTextRequired( $required ) );
+            return;
+        }
+        $this->assertTrue( expAiAltText::altTextRequired( $required ) );
+        $this->assertTrue( expAiAltTextFunctionCollection::fetchAltTextRequired( $required )['result'] );
+    }
 }

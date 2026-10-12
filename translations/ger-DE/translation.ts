@@ -3930,6 +3930,10 @@
         <translation>Nur für Bilder ohne Information: Screenreader überspringen ein Bild mit leerem Alternativtext.</translation>
     </message>
     <message>
+        <source>This field requires an alternative text, so it cannot be left empty.</source>
+        <translation>Dieses Feld verlangt einen Alternativtext, er darf nicht leer bleiben.</translation>
+    </message>
+    <message>
         <source>The alt text is empty now: screen readers skip this image. Review it before you store the draft.</source>
         <translation>Der Alternativtext ist jetzt leer: Screenreader überspringen dieses Bild. Prüfen Sie das, bevor Sie den Entwurf speichern.</translation>
     </message>

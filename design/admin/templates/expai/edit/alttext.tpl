@@ -10,7 +10,8 @@
         {set $exp_ai_alt_images = $exp_ai_alt_images|append( hash( 'id', $exp_ai_alt_attribute.id,
                                                                   'identifier', $exp_ai_alt_attribute.contentclass_attribute_identifier,
                                                                   'name', $exp_ai_alt_attribute.contentclass_attribute_name,
-                                                                  'has_image', $exp_ai_alt_attribute.content.original.is_valid|choose( false(), true() ) ) )}
+                                                                  'has_image', $exp_ai_alt_attribute.content.original.is_valid|choose( false(), true() ),
+                                                                  'alt_text_required', fetch( 'expai', 'alt_text_required', hash( 'attribute', $exp_ai_alt_attribute ) ) ) )}
     {elseif and( eq( $exp_ai_alt_attribute.data_type_string, 'ezstring' ), $exp_ai_alt_names|contains( $exp_ai_alt_attribute.contentclass_attribute_identifier ) )}
         {set $exp_ai_alt_companions = $exp_ai_alt_companions|append( hash( 'id', $exp_ai_alt_attribute.id, 'identifier', $exp_ai_alt_attribute.contentclass_attribute_identifier ) )}
     {elseif array( 'ezstring', 'eztext', 'ezxmltext', 'ezkeyword' )|contains( $exp_ai_alt_attribute.data_type_string )}
@@ -36,6 +37,7 @@
             'write_title', 'A model that can look at images suggests the alt text: %model'|i18n( 'extension/expai/alttext',, hash( '%model', $exp_ai_alt_model.label ) ),
             'decorative', 'Decorative (empty alt text)'|i18n( 'extension/expai/alttext' ),
             'decorative_title', 'Only for images that carry no information: screen readers skip an image with an empty alt text.'|i18n( 'extension/expai/alttext' ),
+            'decorative_required', 'This field requires an alternative text, so it cannot be left empty.'|i18n( 'extension/expai/alttext' ),
             'decorative_done', 'The alt text is empty now: screen readers skip this image. Review it before you store the draft.'|i18n( 'extension/expai/alttext' ),
             'decorative_hint', 'The model thinks this image may be decorative. If it carries no information, choose "Decorative (empty alt text)".'|i18n( 'extension/expai/alttext' ),
             'no_image', 'Upload the image and store the draft first: the alt text is written from the stored image.'|i18n( 'extension/expai/alttext' ),

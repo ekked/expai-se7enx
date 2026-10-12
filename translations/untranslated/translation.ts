@@ -3930,6 +3930,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>This field requires an alternative text, so it cannot be left empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>The alt text is empty now: screen readers skip this image. Review it before you store the draft.</source>
         <translation type="unfinished"></translation>
     </message>
