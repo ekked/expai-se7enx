@@ -197,6 +197,8 @@ class expAiAssistant
                     $messages[] = array( 'role' => 'user', 'content' => array( array( 'type' => 'text', 'text' => (string) $pending['user'] ) ) );
                 $conversation->setWindowTurns( min( count( $done ), $keep ) + ( $pending ? 1 : 0 ) );
                 $conversation->setFrame( '', array() );
+                // the compacted window keeps the editor's words only: the thread's scope is told again
+                $conversation->setScopeNote( '' );
                 $conversation->setMessages( $messages );
                 $conversation->setAttribute( 'iterations', 0 );
             }
