@@ -4163,14 +4163,10 @@
     </message>
 </context>
 <context>
-    <name>extension/expai/facts</name>
+    <name>extension/expai/summary</name>
     <message>
         <source>Exponential Intelligence</source>
         <translation>Exponential Intelligence</translation>
-    </message>
-    <message>
-        <source>AI facts</source>
-        <translation>KI-Fakten</translation>
     </message>
     <message>
         <source>What goes where, kept how long, used by whom, at what cost (printable)</source>
@@ -5106,10 +5102,6 @@
         <translation>Vector</translation>
     </message>
     <message>
-        <source>AI facts</source>
-        <translation>KI-Fakten</translation>
-    </message>
-    <message>
         <source>alt text</source>
         <translation>Alternativtexte</translation>
     </message>
@@ -5132,10 +5124,6 @@
 </context>
 <context>
     <name>design/admin/parts/setup/menu</name>
-    <message>
-        <source>AI facts</source>
-        <translation>KI-Fakten</translation>
-    </message>
     <message>
         <source>AI models</source>
         <translation>KI-Modelle</translation>

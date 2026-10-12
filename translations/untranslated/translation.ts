@@ -4163,13 +4163,9 @@
     </message>
 </context>
 <context>
-    <name>extension/expai/facts</name>
+    <name>extension/expai/summary</name>
     <message>
         <source>Exponential Intelligence</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>AI facts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5106,10 +5102,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>AI facts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>alt text</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5132,10 +5124,6 @@
 </context>
 <context>
     <name>design/admin/parts/setup/menu</name>
-    <message>
-        <source>AI facts</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>AI models</source>
         <translation type="unfinished"></translation>
