@@ -81,7 +81,7 @@ if ( !$options['live'] && !$options['base-url'] )
     $provider = $registry->providerFor( $alias );
     if ( method_exists( $provider, 'buildPayload' ) )
     {
-        $tools = ( new expAiToolRegistry( $config, false ) )->definitions( true );
+        $tools = $probe->toolsFor( $provider );
         $payload = $provider->buildPayload( array( 'system' => '(instructions)', 'messages' => array( array( 'role' => 'user', 'content' => 'What is the name of node ' . $nodeID . '?' ) ), 'tools' => $tools ) );
         $cli->output( 'first request body (tools shortened): ' . substr( json_encode( $payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ), 0, 600 ) . ' ...' );
     }

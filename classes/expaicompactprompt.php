@@ -36,6 +36,8 @@ class expAiCompactPrompt
         'get_node' => 'Read a node and its fields (default: the open node).',
         'list_children' => 'List the children of a node (default: the open node).',
         'get_class_definition' => 'Read the fields of a content class.',
+        'get_tree_context' => 'Read the path and the siblings of a node (default: the open node).',
+        'list_creatable_classes' => 'List the classes the editor may create under a node.',
         'create_draft' => 'Create a new object as a DRAFT (never published). fields: field identifier => value.',
         'update_draft' => 'Change fields of an existing object in a DRAFT (never published). Only the fields you give change.',
         'propose_plan' => 'Propose a plan: one item per object and action. Writes nothing.',
@@ -125,9 +127,10 @@ class expAiCompactPrompt
     /**
      * Short definitions of tools: the short description, property descriptions cut to a few words.
      * @param expAiTool[] $tools
+     * @param string[] $keep properties that stay although a compact prompt drops them (the probe: offset for paging)
      * @return array
      */
-    public static function definitions( array $tools, $staged = false )
+    public static function definitions( array $tools, $staged = false, array $keep = array() )
     {
         $out = array();
         foreach ( $tools as $tool )
@@ -141,7 +144,7 @@ class expAiCompactPrompt
             $schema = isset( $definition['input_schema'] ) && is_array( $definition['input_schema'] ) ? $definition['input_schema'] : array( 'type' => 'object' );
             // revising a staged proposal is for large models; paging is not needed for a short answer
             if ( isset( $schema['properties'] ) && is_array( $schema['properties'] ) )
-                foreach ( array_merge( array( 'offset', 'include_fields' ), $staged ? array() : array( 'new_key' ) ) as $drop )
+                foreach ( array_diff( array_merge( array( 'offset', 'include_fields' ), $staged ? array() : array( 'new_key' ) ), $keep ) as $drop )
                     unset( $schema['properties'][$drop] );
             $definition['input_schema'] = self::shortSchema( $schema );
             $out[] = $definition;

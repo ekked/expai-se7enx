@@ -176,5 +176,12 @@ $check( 'card: the share of prompt tokens from the cache', $stats[0]['cache_perc
 $check( 'card: no prompt figures without requests', expAiModelStats::aggregate( array( $row( 5, 0, 0, 'expAiException' ) ) )[0]['prompt_median'], null );
 $check( 'models page: the profile of each model', ( function () use ( $config ) { foreach ( $config->registry()->describeProvider( 'cplocal' )['models'] as $m ) if ( $m['alias'] === 'cplocal.small' ) return $m['prompt_profile']; return null; } )(), 'compact' );
 
+// ---------------------------------------------------------------- the probe tests what a compact model is sent
+$probeTools = ( new expAiProbe( $config ) )->toolsFor( new expAiOpenAiChatProvider( $config->registry()->settingsFor( 'cplocal.small' ) ) );
+$check( 'probe: a compact model gets the seven short panel tools', array_map( function ( $d ) { return $d['name']; }, $probeTools ),
+        array( 'get_node', 'list_children', 'get_tree_context', 'list_creatable_classes', 'get_class_definition', 'create_draft', 'update_draft' ) );
+$check( 'probe: paging stays for the paging task', isset( $probeTools[1]['input_schema']['properties']['offset'] ), true );
+$check( 'probe: a full model gets the full definitions', count( ( new expAiProbe( $config ) )->toolsFor( new expAiOpenAiChatProvider( $config->registry()->settingsFor( 'cpremote.m' ) ) ) ) > 7, true );
+
 echo ( $failures ? 'FAIL' : 'PASS' ) . " ($checks checks, $failures failed)\n";
 eZScript::instance()->shutdown( $failures ? 1 : 0 );
