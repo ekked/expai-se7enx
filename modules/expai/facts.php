@@ -14,10 +14,6 @@
 /** @var eZModule $Module */
 $Module = $Params['Module'];
 
-// The page is called EI: Summary and lives at expai/summary; the old address expai/facts goes there.
-if ( isset( $Params['FunctionName'] ) && $Params['FunctionName'] === 'facts' )
-    return $Module->redirectTo( '/expai/summary' );
-
 $tpl = eZTemplate::factory();
 $tpl->setVariable( 'facts', ( new expAiFacts() )->collect() );
 

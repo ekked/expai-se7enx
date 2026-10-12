@@ -128,14 +128,6 @@ $ViewList['summary'] = array(
     'params' => array(),
     'unordered_params' => array() );
 
-// the old address of that page, expai/facts, answers with a redirect to expai/summary
-$ViewList['facts'] = array(
-    'default_navigation_part' => 'ezsetupnavigationpart',
-    'script' => 'facts.php',
-    'functions' => array( 'facts' ),
-    'params' => array(),
-    'unordered_params' => array() );
-
 $Provider = array( 'name' => 'Provider', 'values' => array(), 'class' => 'expAiPolicy', 'function' => 'providers', 'parameter' => array() );
 $Server = array( 'name' => 'Server', 'values' => array(), 'class' => 'expAiPolicy', 'function' => 'mcpServers', 'parameter' => array() );
 
