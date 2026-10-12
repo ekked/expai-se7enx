@@ -630,6 +630,8 @@
                     + '<td class="exp-ai-draft-links">'
                     + ( d.urls.edit ? '<a href="' + esc( url( d.urls.edit ) ) + '">' + esc( S.edit ) + '</a>' : '' )
                     + ' <a href="' + esc( url( d.urls.view ) ) + '">' + esc( S.view ) + '</a>'
+                    // #382 "What changed": the diff against the base version, revert per part (expai_whatchanged.js)
+                    + ( d.is_draft ? ' <button type="button" class="exp-ai-link exp-ai-what-changed" data-exp-ai-what-changed="' + esc( key ) + '">' + esc( S.what_changed || 'What changed' ) + '</button>' : '' )
                     + ( d.urls.node && !d.is_draft ? ' <a href="' + esc( url( d.urls.node ) ) + '">' + esc( S.open ) + '</a>' : '' )
                     + ( d.is_draft ? ' <button type="button" class="exp-ai-link exp-ai-discard">' + esc( S.discard ) + '</button>' : '' )
                     + '</td></tr>';

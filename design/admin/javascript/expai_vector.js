@@ -366,7 +366,10 @@
                 return '<li role="option" id="exp-ai-v-draft-' + i + '" class="exp-ai-v-draft"><span class="exp-ai-mark" aria-hidden="true"></span><span class="exp-ai-v-draft-name">' + esc( d.name ) + '</span>'
                      + '<span class="exp-ai-v-draft-meta">' + esc( d.class_name + ' · ' + d.language + ' · ' + T( 'status_' + d.status ) ) + '</span>'
                      + '<span class="exp-ai-v-draft-links">' + ( d.urls.edit ? '<a href="' + esc( url( d.urls.edit ) ) + '">' + esc( T( 'edit' ) ) + '</a>' : '' )
-                     + '<a href="' + esc( url( d.urls.view ) ) + '">' + esc( T( 'view' ) ) + '</a></span></li>';
+                     + '<a href="' + esc( url( d.urls.view ) ) + '">' + esc( T( 'view' ) ) + '</a>'
+                     // #382 "What changed" of a draft written directly: the diff against its base, revert per part (expai_whatchanged.js)
+                     + ( d.is_draft && canWrite() ? '<button type="button" class="exp-ai-v-link" data-exp-ai-what-changed="' + esc( d.object_id + ':' + d.version ) + '">' + esc( T( 'what_changed' ) ) + '</button>' : '' )
+                     + '</span></li>';
             } ).join( '' );
             var none = q( '[data-placeholder="drafts"]' );
             if ( none ) { none.hidden = !!( drafts && drafts.length ); }

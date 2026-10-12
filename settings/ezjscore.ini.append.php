@@ -43,6 +43,13 @@ Functions[]=expai
 Class=expAiModelServerFunctions
 Functions[]=expai
 
+# #382 "What changed" of a draft written directly: expairevert::changes|revert
+# (classes/diff/expaidraftrevertserverfunctions.php). The function list "expai"; each function checks expai/write,
+# that the draft is the editor's (a thread's: its owner's), and revert content/edit in the draft's language.
+[ezjscServer_expairevert]
+Class=expAiDraftRevertServerFunctions
+Functions[]=expai
+
 # "Watch this run" of the dashboard's Start writing: expaiwatch::state (classes/expairunwatch.php). The function list
 # "expai"; the function checks the policy expai/write.
 [ezjscServer_expaiwatch]

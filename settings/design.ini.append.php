@@ -8,8 +8,11 @@ DesignExtensions[]=expai
 # items; the panel and the edit form load their own scripts with ezscript_require().
 [JavaScriptSettings]
 BackendJavaScriptList[]=expai.js
+# #382 "What changed" of a draft written directly, with revert per part (after expai.js, which it extends)
+BackendJavaScriptList[]=expai_whatchanged.js
 
 [StylesheetSettings]
 BackendCSSFileList[]=expai.css
+BackendCSSFileList[]=expai_whatchanged.css
 
 */ ?>

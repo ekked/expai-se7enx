@@ -30,6 +30,7 @@
         'no_drafts', 'No drafts yet.'|i18n( 'extension/expai/panel' ),
         'edit', 'Edit'|i18n( 'extension/expai/panel' ),
         'view', 'View version'|i18n( 'extension/expai/panel' ),
+        'what_changed', 'What changed'|i18n( 'extension/expai/revert' ),
         'open', 'Open'|i18n( 'extension/expai/panel' ),
         'discard', 'Discard'|i18n( 'extension/expai/panel' ),
         'discard_confirm', 'Discard the draft "%name"? This cannot be undone.'|i18n( 'extension/expai/panel' ),

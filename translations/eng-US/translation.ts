@@ -367,6 +367,30 @@
         <source>The job queue is not available.</source>
         <translation>The job queue is not available.</translation>
     </message>
+    <message>
+        <source>This version was not written by Exponential Intelligence.</source>
+        <translation>This version was not written by Exponential Intelligence.</translation>
+    </message>
+    <message>
+        <source>Only the owner of the thread can see and revert what this draft changed.</source>
+        <translation>Only the owner of the thread can see and revert what this draft changed.</translation>
+    </message>
+    <message>
+        <source>Only the editor the draft was written for can see and revert what it changed.</source>
+        <translation>Only the editor the draft was written for can see and revert what it changed.</translation>
+    </message>
+    <message>
+        <source>Choose a part or a field to revert.</source>
+        <translation>Choose a part or a field to revert.</translation>
+    </message>
+    <message>
+        <source>This part cannot be taken back alone (a table cell). Revert the whole field instead.</source>
+        <translation>This part cannot be taken back alone (a table cell). Revert the whole field instead.</translation>
+    </message>
+    <message>
+        <source>The draft could not be written.</source>
+        <translation>The draft could not be written.</translation>
+    </message>
 </context>
 <!-- expai chains: end -->
 <!-- expai lanes/budgets/packages: begin -->
@@ -5752,6 +5776,101 @@
     <message>
         <source>%percent % from the cache</source>
         <translation>%percent % from the cache</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/revert</name>
+    <message>
+        <source>What changed</source>
+        <translation>What changed</translation>
+    </message>
+    <message>
+        <source>The draft against the version it was based on. Revert takes a part back into this draft; the published version stays as it is.</source>
+        <translation>The draft against the version it was based on. Revert takes a part back into this draft; the published version stays as it is.</translation>
+    </message>
+    <message>
+        <source>Compared with version %base</source>
+        <translation>Compared with version %base</translation>
+    </message>
+    <message>
+        <source>Compared with an empty object (the draft is new)</source>
+        <translation>Compared with an empty object (the draft is new)</translation>
+    </message>
+    <message>
+        <source>Version %published was published after this draft was written; reverting brings back the text of version %base.</source>
+        <translation>Version %published was published after this draft was written; reverting brings back the text of version %base.</translation>
+    </message>
+    <message>
+        <source>This draft changes nothing in the fields Exponential Intelligence writes.</source>
+        <translation>This draft changes nothing in the fields Exponential Intelligence writes.</translation>
+    </message>
+    <message>
+        <source>Part %n of %count</source>
+        <translation>Part %n of %count</translation>
+    </message>
+    <message>
+        <source>Revert</source>
+        <translation>Revert</translation>
+    </message>
+    <message>
+        <source>Revert field</source>
+        <translation>Revert field</translation>
+    </message>
+    <message>
+        <source>This part cannot be taken back alone; revert the whole field.</source>
+        <translation>This part cannot be taken back alone; revert the whole field.</translation>
+    </message>
+    <message>
+        <source>Rich text is shown as text; links, formatting and embeds are kept.</source>
+        <translation>Rich text is shown as text; links, formatting and embeds are kept.</translation>
+    </message>
+    <message>
+        <source>Reverted. The draft was updated; the published version is unchanged.</source>
+        <translation>Reverted. The draft was updated; the published version is unchanged.</translation>
+    </message>
+    <message>
+        <source>Nothing to revert: the draft already has this text.</source>
+        <translation>Nothing to revert: the draft already has this text.</translation>
+    </message>
+    <message>
+        <source>The draft changed since you opened this. Here is what it changes now; check it and revert again.</source>
+        <translation>The draft changed since you opened this. Here is what it changes now; check it and revert again.</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Close</translation>
+    </message>
+    <message>
+        <source>Edit draft</source>
+        <translation>Edit draft</translation>
+    </message>
+    <message>
+        <source>View version</source>
+        <translation>View version</translation>
+    </message>
+    <message>
+        <source>j / k: next / previous part · x: revert the part · Shift+X: revert the field · Esc: close</source>
+        <translation>j / k: next / previous part · x: revert the part · Shift+X: revert the field · Esc: close</translation>
+    </message>
+    <message>
+        <source>Loading...</source>
+        <translation>Loading...</translation>
+    </message>
+    <message>
+        <source>Something went wrong:</source>
+        <translation>Something went wrong:</translation>
+    </message>
+    <message>
+        <source>This version is no longer a draft; only drafts can be reverted.</source>
+        <translation>This version is no longer a draft; only drafts can be reverted.</translation>
+    </message>
+    <message>
+        <source>This draft belongs to someone else.</source>
+        <translation>This draft belongs to someone else.</translation>
+    </message>
+    <message>
+        <source>You may not edit this content in %language.</source>
+        <translation>You may not edit this content in %language.</translation>
     </message>
 </context>
 </TS>

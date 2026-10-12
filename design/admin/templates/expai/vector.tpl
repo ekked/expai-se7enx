@@ -267,6 +267,7 @@
         'no_nodes', 'No readable node found.'|i18n( $exp_ai_i18n ),
         'edit', 'Edit'|i18n( $exp_ai_i18n ),
         'view', 'View version'|i18n( $exp_ai_i18n ),
+        'what_changed', 'What changed'|i18n( 'extension/expai/revert' ),
         'open_panel', 'Open the Intelligence tab'|i18n( $exp_ai_i18n ),
         'status_draft', 'Draft'|i18n( $exp_ai_i18n ),
         'status_kept', 'Saved as draft'|i18n( $exp_ai_i18n ),

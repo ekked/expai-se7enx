@@ -1,0 +1,57 @@
+/*!
+ * expai - "What changed" of a draft written directly (doc/review.md, expai_whatchanged.js)
+ * Copyright (C) 1998 - 2026 7x & Exponential Foundation. All rights reserved.
+ * GNU General Public License v2.0 (or any later version)
+ *
+ * Loaded on every admin page (design.ini BackendCSSFileList[]). Scoped to .exp-ai-wc; colors are the .exp-ai tokens
+ * of expai.css and the admin4 tokens where present (light and dark); the parts look like those of Vector's Changes tab.
+ */
+.exp-ai-wc {
+    width: min(46em, calc(100vw - 2em)); max-height: calc(100vh - 3em); padding: 1em 1.2em; box-sizing: border-box;
+    border: 1px solid var(--exp-ai-line); border-radius: var(--a4-radius-s, 9px);
+    background: var(--a4-card-bg, #fff); color: var(--a4-ink, #1f2430); font-family: var(--a4-font, inherit); line-height: 1.45;
+    box-shadow: 0 24px 64px rgba(16, 24, 40, 0.28); overflow: auto;
+}
+.exp-ai-wc *, .exp-ai-wc *::before, .exp-ai-wc *::after { box-sizing: border-box; }
+.exp-ai-wc::backdrop { background: rgba(16, 24, 40, 0.38); }
+.exp-ai-wc :focus-visible { outline: 2px solid var(--exp-ai-accent); outline-offset: 2px; }
+.exp-ai-wc-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75em; }
+.exp-ai-wc-head h2 { margin: 0; font-size: 1.15em; overflow-wrap: anywhere; }
+.exp-ai-wc-meta { margin: 0.35em 0 0; color: var(--exp-ai-muted); font-size: 0.88em; }
+.exp-ai-wc-meta strong { color: var(--a4-ink, inherit); }
+.exp-ai-wc-status { min-height: 1.2em; margin: 0.4em 0; font-size: 0.9em; }
+.exp-ai-wc-status-ok { color: var(--exp-ai-ok); }
+.exp-ai-wc-status-warn { color: var(--exp-ai-accent); font-weight: 600; }
+.exp-ai-wc-status-error { color: var(--exp-ai-error); }
+.exp-ai-wc-none, .exp-ai-wc-hint, .exp-ai-wc-keys { color: var(--exp-ai-muted); font-size: 0.85em; }
+.exp-ai-wc-hint { margin: 0.2em 0; }
+.exp-ai-wc-keys { margin: 0.8em 0 0; }
+.exp-ai-wc-field { margin: 0.8em 0 0; }
+.exp-ai-wc-field-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5em; }
+.exp-ai-wc-btn, .exp-ai-wc-close {
+    display: inline-flex; align-items: center; gap: 0.4em; padding: 0.3em 0.7em; border: 1px solid var(--exp-ai-line);
+    border-radius: var(--exp-ai-radius); background: transparent; color: inherit; font: inherit; font-size: 0.88em; font-weight: 600; cursor: pointer; white-space: nowrap;
+}
+.exp-ai-wc-btn:hover, .exp-ai-wc-close:hover { border-color: var(--exp-ai-accent); }
+.exp-ai-wc kbd {
+    display: inline-block; padding: 0 0.35em; border: 1px solid var(--exp-ai-line); border-bottom-width: 2px; border-radius: 4px;
+    font: 600 0.75em/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--exp-ai-muted);
+}
+.exp-ai-wc-hunk {
+    margin: 0.4em 0 0; padding: 0.4em 0.5em; border: 1px solid var(--exp-ai-line); border-left-width: 4px;
+    border-radius: var(--exp-ai-radius); background: var(--exp-ai-surface);
+}
+.exp-ai-wc-active { border-left-color: var(--exp-ai-accent); outline: 2px solid var(--exp-ai-accent); outline-offset: 1px; }
+.exp-ai-wc-hunk-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5em; color: var(--exp-ai-muted); font-size: 0.8em; }
+.exp-ai-wc-hunk-body { margin: 0.3em 0; font-size: 0.9em; overflow-wrap: anywhere; }
+.exp-ai-wc-line { display: flex; gap: 0.4em; padding: 0.05em 0.3em; white-space: pre-wrap; }
+.exp-ai-wc-sign { flex: 0 0 auto; width: 0.8em; color: var(--exp-ai-muted); }
+.exp-ai-wc-ctx { color: var(--exp-ai-muted); }
+.exp-ai-wc-del { background: rgba(220, 38, 38, 0.08); }
+.exp-ai-wc-ins { background: rgba(22, 163, 74, 0.1); }
+.exp-ai-wc-line del { background: rgba(220, 38, 38, 0.24); color: inherit; }
+.exp-ai-wc-line ins { background: rgba(22, 163, 74, 0.26); color: inherit; text-decoration: none; }
+@media (max-width: 520px) {
+    .exp-ai-wc { width: calc(100vw - 1em); padding: 0.8em; }
+    .exp-ai-wc-btn { white-space: normal; }
+}
