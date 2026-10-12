@@ -255,6 +255,22 @@ See [service-tools.md](service-tools.md). The read services of expservices the a
 | `StatusFile` | `/var/lib/expai-llm/status.json` | The status the helper writes (read by expai/models). |
 | `Models[]` | `qwen3.5:4b` | The models the view offers to pull and remove (the helper has its own allowlist). |
 
+## [ModelTest] and [WebBudget]: test prompt, load model and the web budget
+
+"Test prompt" and "Load model" of expai/models run as jobs of the job queue (type `expai.model.test`, expqueue.ini
+`[JobType_expai.model.test]`; [local-models.md](local-models.md), "Test prompt and Load model"). The page follows
+them through `expaimodel::status`, `expaimodel::test` and `expaimodel::load` (ezjscore.ini `[ezjscServer_expaimodel]`,
+policy `expai/model_manage`).
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `[ModelTest] PollSeconds` | `3` | Seconds between two questions of the page while a job waits or runs (2 to 30). |
+| `[ModelTest] ShowResultMinutes` | `60` | How long a finished test or load stays on the page, also after a reload. |
+| `[ModelTest] LoadKeepAlive` | `30m` | How long Ollama keeps a model in memory after "Load model" (`30m`, `2h`, or seconds). |
+| `[WebBudget] Seconds` | `25` | What one model call from a web request may take. Keep it below the web server's request timeout. |
+| `[WebBudget] SlowModels` | `queue` | `queue`: slow models (`Slow=true`, a provider with `Managed=ollama`) are never called from a web request: the field actions and the fill of the edit form refuse them with a message, the test prompt and Vector turns run them as jobs. `allow`: they are called anyway (a web server with a long timeout). `[Model_<alias>] RunInBackground=always` or `never` decides for one model. |
+| `[WebBudget] MinSamples` | `5` | Another model counts as too slow when at least this many of its last 20 successful requests took longer than `Seconds` on average. |
+
 ## Lanes
 
 ### [Lane_<provider>.<lane>]: one lane

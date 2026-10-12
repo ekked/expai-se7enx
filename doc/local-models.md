@@ -69,7 +69,7 @@ Id=exp-qwen3.5:4b
 
 The view (policy `expai/model_manage`) shows the server's state (running, version, the loaded and installed models,
 read from Ollama's `/api/version`, `/api/ps`, `/api/tags` on the loopback address), the helper's last run, and offers
-Start, Stop, Pull, Remove and "Refresh the status", and a test prompt that measures tokens per second.
+Start, Stop, Pull, Remove and "Refresh the status", and per model **Test prompt** and **Load model** (below).
 
 The web process never runs a command. A button writes a request `<id>.json` into `/var/lib/expai-llm/spool`
 (`{action, model, requested_by_user_id, ts}`) and logs it to `var/log/expai-models.log`; `expai-llm-helper.path` starts
@@ -80,6 +80,37 @@ journal (`journalctl -u expai-llm-helper`). The helper writes `/var/lib/expai-ll
 
 `expai-llm-idle.timer` runs every 5 minutes and stops Ollama after 30 minutes without a loaded model (Ollama itself
 unloads a model after `OLLAMA_KEEP_ALIVE`).
+
+## Test prompt and Load model
+
+A local model needs about a minute to load (3.6 GB for Qwen3.5 4B) and then writes a few tokens per second on a
+CPU. That is far longer than a web server lets one request run (Velocity ends a request after its request timeout,
+Apache after its proxy timeout). So neither button waits in the page request: each queues a job of the job queue
+(type `expai.model.test`, class `interactive`; extension expqueue) and starts a worker for it when none runs (the
+same detached `ext:expqueue:work --until-empty` for the current siteaccess that background Vector turns use; the
+cron part of expqueue is the safety net). The page shows "Testing… (loading the model can take a minute)" with the
+seconds so far, asks `expaimodel::status` every `[ModelTest] PollSeconds` (POST with the form token; the session is
+closed first; nothing is asked while the browser tab is hidden), and then shows the result:
+
+- **Test prompt** (every model): the time to the first token, tokens in and out with their tokens per second, the
+  total time, the cost and the answer. For a local model the figures come from Ollama's own API (`/api/chat`, which
+  reports `load_duration`, `prompt_eval_*` and `eval_*`): the time to the first token is loading the model plus
+  reading the prompt. Another provider answers in one piece, so its first token is "not measured" and its tokens per
+  second are the output tokens over the total time. The test goes through the usage recorder like every request
+  (master switch, veto, limits, a usage row of action `test`).
+- **Load model** (models of a provider with `Managed=ollama`): loads the model into memory without generating
+  anything (`/api/generate` with an empty prompt) and keeps it there for `[ModelTest] LoadKeepAlive`. Under the
+  buttons the page shows "loaded until 16:43" (or "not loaded") from `/api/ps`. Load the model before editors start
+  working, and the first request does not wait.
+
+One job per model and action at a time: a second click while one waits or runs shows that job (its idempotency key
+names the model, the action and the job before it). A failure (the server is stopped, the model is missing) is the
+result of the job, shown in the row; nothing is retried. The result stays on the page for
+`[ModelTest] ShowResultMinutes`, also after a reload. Without JavaScript the buttons post to expai/models, which
+queues the same job; reload the page to see the state. Without the job queue only a model that fits into the web
+budget ([troubleshooting.md](troubleshooting.md), "504 Gateway Timeout") is tested in the page request.
+
+The jobs are listed in the job queue's admin pages like any other (`expqueue/list`, type `expai.model.test`).
 
 ## When the server is stopped
 
