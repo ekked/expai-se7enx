@@ -34,6 +34,9 @@
             <a class="button exp-ai-btn" href={concat( 'expai/log/(export)/csv', $filter_path, $sort_path )|ezurl}>{'Export CSV'|i18n( 'extension/expai/log' )}</a>
         </span>
     </form>
+{if or( $query.request, $query.thread )}
+    <p class="exp-ai-notice" role="status">{if $query.request}{'Showing request %id only.'|i18n( 'extension/expai/log',, hash( '%id', $query.request ) )|wash}{else}{'Showing the requests of thread %id only.'|i18n( 'extension/expai/log',, hash( '%id', $query.thread ) )|wash}{/if} <a href={'expai/log'|ezurl}>{'Show all'|i18n( 'extension/expai/log' )}</a></p>
+{/if}
 
     {def $t = $stats.totals}
     <section class="exp-ai-card" aria-labelledby="exp-ai-totals-title">

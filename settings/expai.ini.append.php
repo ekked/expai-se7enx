@@ -1507,4 +1507,10 @@ SlowModels=queue
 # Seconds on average
 MinSamples=5
 
+# The "Models" card of expai/dashboard (doc/dashboard.md "Models"): the figures of a period and scope are kept for
+# CacheSeconds in a small cache file (var/<site>/cache/expai/model-stats/), so the card costs a file read on most page
+# views; 0 computes them on every view.
+[ModelStats]
+CacheSeconds=60
+
 */ ?>

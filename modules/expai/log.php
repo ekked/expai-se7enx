@@ -8,8 +8,9 @@
  *   expai/log/(export)/csv         the filtered requests as CSV (no request texts)
  *
  * Filters are view parameters, e.g. expai/log/(from)/2026-10-01/(to)/2026-10-31/(user)/14/(errors)/1/(sort)/latency_ms/(dir)/asc:
- * from, to (YYYY-MM-DD), user (user object id, with expai/log only), node, action, model, provider, region (us, eu,
- * local), errors (1),
+ * from, to (YYYY-MM-DD), user (user object id, with expai/log only), node, action, model (a model alias of the
+ * registry, or a model id), provider, region (us, eu, local), errors (1),
+ * request (one request, by its id), thread (the requests of one thread; both from links, the filter form drops them),
  * sort (created, latency_ms, input_tokens, output_tokens), dir (asc, desc), offset. The filter form posts and is
  * redirected to that address.
  * Users with expai/write see their own rows; with expai/log everyone's.
@@ -39,7 +40,9 @@ $clean = function ( array $in ) use ( $canSeeAll )
                   'model' => preg_replace( '/[^A-Za-z0-9._:\/-]/', '', $value( 'model' ) ),
                   'provider' => preg_replace( '/[^a-z0-9_-]/', '', $value( 'provider' ) ),
                   'region' => in_array( $value( 'region' ), array( 'us', 'eu', 'local' ), true ) ? $value( 'region' ) : '',
-                  'errors' => $value( 'errors' ) === '1' ? '1' : '' );
+                  'errors' => $value( 'errors' ) === '1' ? '1' : '',
+                  // drill-downs from links (the dashboard's Models card, the test prompt, Watch this run): one request, one thread
+                  'request' => $id( $value( 'request' ) ), 'thread' => $id( $value( 'thread' ) ) );
 };
 // the view parameters of a set of filters: /(from)/2026-10-01/(errors)/1 ...
 $path = function ( array $query )
@@ -71,7 +74,15 @@ $filters = array(
     'provider' => $query['provider'],
     'region' => $query['region'],
     'errors' => $query['errors'] === '1',
+    'id' => (int) $query['request'],
+    'thread_id' => (int) $query['thread'],
 );
+// (model)/<x>: an alias of the registry is the model alias of the requests, anything else the model id
+if ( $filters['model'] !== '' && expAiConfig::instance()->registry()->getModel( $filters['model'] ) )
+{
+    $filters['model_alias'] = $filters['model'];
+    $filters['model'] = '';
+}
 $sort = isset( $user['sort'] ) && in_array( $user['sort'], array( 'created', 'latency_ms', 'input_tokens', 'output_tokens' ), true ) ? $user['sort'] : 'created';
 $dir = isset( $user['dir'] ) && $user['dir'] === 'asc' ? 'asc' : 'desc';
 $filterPath = $path( $query );

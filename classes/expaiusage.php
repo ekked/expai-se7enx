@@ -104,7 +104,8 @@ class expAiUsage
 
     /**
      * Conditions for eZPersistentObject from the log page's filters.
-     * @param array $filters from, to (Unix time), user_id, node_id, action, model, errors (bool)
+     * @param array $filters from, to (Unix time), user_id, node_id, conversation_id, thread_id, id (one request), action,
+     *                       model (the model id), model_alias, session_key, provider, region, errors (bool)
      * @return array
      */
     public static function conditions( array $filters )
@@ -114,10 +115,10 @@ class expAiUsage
         $to = isset( $filters['to'] ) && (int) $filters['to'] > 0 ? (int) $filters['to'] : 2147483647;
         if ( $from > 0 || $to < 2147483647 )
             $conds['created'] = array( false, array( $from, $to ) );
-        foreach ( array( 'user_id', 'node_id', 'conversation_id', 'thread_id' ) as $field )
+        foreach ( array( 'user_id', 'node_id', 'conversation_id', 'thread_id', 'id' ) as $field )
             if ( !empty( $filters[$field] ) )
                 $conds[$field] = (int) $filters[$field];
-        foreach ( array( 'action', 'model', 'session_key', 'provider', 'region' ) as $field )
+        foreach ( array( 'action', 'model', 'model_alias', 'session_key', 'provider', 'region' ) as $field )
             if ( isset( $filters[$field] ) && $filters[$field] !== '' )
                 $conds[$field] = (string) $filters[$field];
         if ( !empty( $filters['errors'] ) )

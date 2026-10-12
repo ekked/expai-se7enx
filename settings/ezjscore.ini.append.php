@@ -43,4 +43,10 @@ Functions[]=expai
 Class=expAiModelServerFunctions
 Functions[]=expai
 
+# "Watch this run" of the dashboard's Start writing: expaiwatch::state (classes/expairunwatch.php). The function list
+# "expai"; the function checks the policy expai/write.
+[ezjscServer_expaiwatch]
+Class=expAiRunWatch
+Functions[]=expai
+
 */ ?>

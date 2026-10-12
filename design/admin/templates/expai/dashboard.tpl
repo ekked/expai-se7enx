@@ -1,6 +1,10 @@
 {* expai/dashboard: Exponential Intelligence on the Dashboard tab.
    Header with period and scope, a status line, four KPI cards, "Start writing" with the limits beside it, one chart,
-   the recent drafts. Every figure comes from expAiUsage (the same numbers as expai/log); costs from expAiCost. *}
+   the Models card (expAiModelStats), the recent drafts. Every figure comes from expAiUsage (the same numbers as
+   expai/log); costs from expAiCost. "Start writing" shows the state of the request sent last ("Watch this run",
+   expAiRunWatch). *}
+{ezcss_require( array( 'expai_dashboard.css' ) )}
+{ezscript_require( array( 'expai_watch.js' ) )}
 {def $c = $summary.current
      $p = $summary.previous
      $ch = $summary.change
@@ -114,6 +118,9 @@
         {* Start writing: the main action *}
         <section class="exp-ai-card exp-ai-start" aria-labelledby="exp-ai-start-title">
             <h2 id="exp-ai-start-title">{'Start writing'|i18n( 'extension/expai/dashboard' )}</h2>
+{if $watch}
+            <div class="exp-ai-watch" data-exp-ai-watch="1" data-active="{if $watch.active}1{else}0{/if}" aria-live="polite">{include uri='design:expai/parts/run_watch.tpl' watch=$watch}</div>
+{/if}
             <form method="post" action={'expai/dashboard'|ezurl}>
 {if $start.usable}
                 <input type="hidden" name="ExpAiNodeID" value="{$start.node_id}" />
@@ -272,6 +279,9 @@
         </table>
         <p class="exp-ai-card-foot"><a href={concat( 'expai/log', $details_path )|ezurl}>{'Details in the log'|i18n( 'extension/expai/usage' )}</a></p>
     </section>
+
+    {* models: the track record of each model in the period and scope (doc/dashboard.md "Models") *}
+    {include uri='design:expai/parts/models_card.tpl' stats=$model_stats cost_enabled=$cost_enabled details_path=$details_path}
 
     {* threads: the latest of the user's own threads and Vector (doc/threads.md) *}
     {include uri='design:expai/parts/threads_card.tpl'}

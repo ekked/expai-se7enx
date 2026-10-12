@@ -11,7 +11,8 @@
         {include uri='design:expai/parts/help_link.tpl' page='alt-text' label='alt text'|i18n( 'extension/expai/help' ) text='?'}
     </header>
 {if $error}<p class="exp-ai-error" role="alert">{$error|wash}</p>{/if}
-{if $notice}<p class="exp-ai-notice" role="status">{$notice|wash}</p>{/if}
+{if $notice}<p class="exp-ai-notice" role="status">{$notice|wash}{if and( $queued, $queued.group, $queued.queued, fetch( 'user', 'has_access_to', hash( 'module', 'expqueue', 'function', 'view' ) ) )}
+    <a href={concat( 'expqueue/group/', $queued.group )|ezurl}>{'Watch the jobs'|i18n( 'extension/expai/alttext' )} <span aria-hidden="true">&rarr;</span></a>{/if}</p>{/if}
 {if and( $queued, $queued.skipped|count )}
     <ul class="exp-ai-compact-list">
 {foreach $queued.skipped as $exp_ai_id => $exp_ai_why}

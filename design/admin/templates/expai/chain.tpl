@@ -1,5 +1,6 @@
 {* expai/chain: the runs of AI chains. Variables: rows (expAiChainFunctionCollection::row()), total, offset, limit,
-   all_users (expai/log: everyone's runs), error, notice, ready. *}
+   all_users (expai/log: everyone's runs), error, notice, ready, started (the runs just started together: id, label,
+   group). *}
 <div class="exp-ai exp-ai-chain-page">
     <header class="exp-ai-head">
         <span class="exp-ai-mark" aria-hidden="true"></span>
@@ -11,6 +12,18 @@
     </header>
 {if $error}<p class="exp-ai-error" role="alert">{$error|wash}</p>{/if}
 {if $notice}<p class="exp-ai-notice" role="status">{$notice|wash}</p>{/if}
+{if $started|count}
+    <div class="exp-ai-notice" role="status">
+        <p>{'%count runs started. Watch them here:'|i18n( 'extension/expai/chain',, hash( '%count', $started|count ) )|wash}</p>
+        <ul class="exp-ai-compact-list">
+{def $exp_ai_queue = fetch( 'user', 'has_access_to', hash( 'module', 'expqueue', 'function', 'view' ) )}
+{foreach $started as $s}
+            <li><a href={concat( 'expai/chain/(run)/', $s.id )|ezurl}>{$s.label|wash}</a>{if and( $s.group, $exp_ai_queue )} &middot; <a href={concat( 'expqueue/group/', $s.group )|ezurl}>{'Job group'|i18n( 'extension/expai/chain' )}</a>{/if}</li>
+{/foreach}
+{undef $exp_ai_queue}
+        </ul>
+    </div>
+{/if}
 {if $ready|not}<p class="exp-ai-muted">{'Chains need the job queue (extension expqueue) and the chain tables (bin/php/expaischema.php --install).'|i18n( 'extension/expai/chain' )}</p>{/if}
     <p class="exp-ai-muted">{'A chain writes in steps: a model writes, another reviews and the text is revised until it passes, a third prepares the title and summary, then an editor approves before anything else happens. Every step is a queued job with its cost; the result is a draft.'|i18n( 'extension/expai/chain' )}</p>
 

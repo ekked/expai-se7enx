@@ -272,6 +272,10 @@
         <source>Stopped</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>%count runs started. Watch them here:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/error</name>
@@ -1305,6 +1309,30 @@
         <source>All my Exponential Intelligence drafts</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Not sent yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your request at %name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch this run</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Intelligence tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/edit</name>
@@ -2244,6 +2272,18 @@
     </message>
     <message>
         <source>Nothing written with Exponential Intelligence yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showing request %id only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showing the requests of thread %id only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show all</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4300,6 +4340,10 @@
         <source>The jobs could not be queued: %error</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Watch the jobs</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/error</name>
@@ -5629,6 +5673,14 @@
         <source>The thread already runs on this model.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Request in the log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/keyboard</name>
@@ -5753,5 +5805,160 @@
     </message>
 </context>
 <!-- expai vector parallel/checkpoints: end -->
+</context>
+<context>
+    <name>extension/expai/modelstats</name>
+    <message>
+        <source>Models</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test and manage models</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Requests</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Latency (median)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed (median)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cost</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Per day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test and probe</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>slow: ~%seconds s per step</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%rate % successful</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count errors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unreachable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HTTP error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>refused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>limit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>budget</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>other</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>replaced by the fallback %count times</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>answered %count for another model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>p95 %seconds s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%rate tokens/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%seconds s per turn</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>no successful request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Median latency per day:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test %time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%seconds s to the first token</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%seconds s in all</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test %time failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>job</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Probe %date: %rate % (%passed of %tasks)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Latency and speed count successful requests. Slow: the median request takes longer than the %seconds seconds a web request may spend on one model call.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No requests in this period.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

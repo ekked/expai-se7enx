@@ -46,6 +46,8 @@ if ( $Module->isCurrentAction( 'StartChain' ) )
                                 array( 'language' => $post( 'ExpAiChainLanguage' ) ) );
         if ( count( $runs ) === 1 )
             return $Module->redirectTo( '/expai/chain/(run)/' . (int) $runs[0]->attribute( 'id' ) );
+        // several runs: the list names them, with their job groups, so the editor can follow each one
+        $http->setSessionVariable( 'ExpAiChainStarted', array_map( function ( $run ) { return (int) $run->attribute( 'id' ); }, $runs ) );
         return $Module->redirectTo( '/expai/chain' );
     }
     catch ( expAiException $e )
@@ -177,6 +179,16 @@ $tpl->setVariable( 'total', $total );
 $tpl->setVariable( 'offset', $offset );
 $tpl->setVariable( 'limit', $limit );
 $tpl->setVariable( 'all_users', $canSeeAll );
+// the runs started just before (several at once): links to each run and its job group
+$started = array();
+if ( $http->hasSessionVariable( 'ExpAiChainStarted' ) )
+{
+    foreach ( array_slice( (array) $http->sessionVariable( 'ExpAiChainStarted' ), 0, 50 ) as $runID )
+        if ( $ready && ( $run = expAiChainRun::fetch( (int) $runID ) ) && expAiChainPolicy::maySee( $run ) )
+            $started[] = array( 'id' => (int) $run->attribute( 'id' ), 'label' => (string) $run->attribute( 'label' ), 'group' => (string) $run->attribute( 'group_uuid' ) );
+    $http->removeSessionVariable( 'ExpAiChainStarted' );
+}
+$tpl->setVariable( 'started', $started );
 $Result = array();
 $Result['content'] = $tpl->fetch( 'design:expai/chain.tpl' );
 $Result['path'] = array( array( 'url' => 'expai/dashboard', 'text' => ezpI18n::tr( 'extension/expai/chain', 'Exponential Intelligence' ) ),

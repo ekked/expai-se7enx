@@ -7,6 +7,7 @@
     <span class="exp-ai-working exp-ai-model-busy" role="status"><span class="exp-ai-spinner" aria-hidden="true"></span>
     {if eq( $job.action, 'load' )}{'Loading the model…'|i18n( 'extension/expai/modeltest' )}{elseif $t.managed}{'Testing… (loading the model can take a minute)'|i18n( 'extension/expai/modeltest' )}{else}{'Testing…'|i18n( 'extension/expai/modeltest' )}{/if}
     {if eq( $job.phase, 'waiting' )}{if $job.held}{'held: %reason'|i18n( 'extension/expai/modeltest',, hash( '%reason', $job.held ) )|wash}{else}{'waiting for a worker, %seconds s'|i18n( 'extension/expai/modeltest',, hash( '%seconds', $job.seconds ) )}{/if}{else}{'%seconds s'|i18n( 'extension/expai/modeltest',, hash( '%seconds', $job.seconds ) )}{/if}</span>
+    {if fetch( 'user', 'has_access_to', hash( 'module', 'expqueue', 'function', 'view' ) )}<a class="exp-ai-test-links" href={concat( 'expqueue/job/', $job.uuid )|ezurl}>{'Job'|i18n( 'extension/expai/modeltest' )}</a>{/if}
 {/if}
 {if $t.loaded}
     <small class="exp-ai-model-loaded">{if $t.loaded.loaded}{if $t.loaded.until}{'loaded until %time'|i18n( 'extension/expai/modeltest',, hash( '%time', $t.loaded.until|l10n( 'shorttime' ) ) )}{else}{'loaded'|i18n( 'extension/expai/modeltest' )}{/if}{elseif $t.loaded.reachable}{'not loaded'|i18n( 'extension/expai/modeltest' )}{else}{'server not reachable'|i18n( 'extension/expai/modeltest' )}{/if}</small>
@@ -32,6 +33,9 @@
         {if $d.result.model}&middot; <code>{$d.result.model|wash}</code>{/if}
         <br /><q class="exp-ai-test-answer">{$d.result.text|wash}</q>
 {/if}
+        {* the live record: the request in the usage log, the job of the job queue *}
+        <span class="exp-ai-test-links">{if and( is_set( $d.result.usage_log_id ), $d.result.usage_log_id )}<a href={concat( 'expai/log/(request)/', $d.result.usage_log_id )|ezurl}>{'Request in the log'|i18n( 'extension/expai/modeltest' )}</a>{/if}
+        {if fetch( 'user', 'has_access_to', hash( 'module', 'expqueue', 'function', 'view' ) )}<a href={concat( 'expqueue/job/', $d.uuid )|ezurl}>{'Job'|i18n( 'extension/expai/modeltest' )}</a>{/if}</span>
     </p>
 {/if}
 {/foreach}

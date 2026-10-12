@@ -32,6 +32,9 @@ if ( $Module->isCurrentAction( 'StartWriting' ) )
     if ( $node && $node->canRead() )
     {
         $http->setSessionVariable( 'ExpAiPrefill', array( 'node_id' => $nodeID, 'text' => $text ) );
+        // "Watch this run": the dashboard follows the request sent from there (expAiRunWatch)
+        if ( class_exists( 'expAiRunWatch' ) )
+            expAiRunWatch::remember( $nodeID );
         return $Module->redirectTo( '/content/view/full/' . $nodeID . '#exp-ai' );
     }
     $error = ezpI18n::tr( 'extension/expai/dashboard', 'The chosen location cannot be read.' );
@@ -58,6 +61,8 @@ if ( $Module->isCurrentAction( 'ExpAiStartWriting' ) )
     {
         $pending = $http->hasSessionVariable( 'ExpAiPrefill' ) ? (array) $http->sessionVariable( 'ExpAiPrefill' ) : array();
         $http->setSessionVariable( 'ExpAiPrefill', array( 'node_id' => $nodeID, 'text' => isset( $pending['text'] ) ? (string) $pending['text'] : '' ) );
+        if ( class_exists( 'expAiRunWatch' ) )
+            expAiRunWatch::remember( $nodeID );
         return $Module->redirectTo( '/content/view/full/' . $nodeID . '#exp-ai' );
     }
     $error = ezpI18n::tr( 'extension/expai/dashboard', 'The chosen location cannot be read.' );
@@ -125,6 +130,10 @@ $tpl->setVariable( 'top_users', $monthStats ? array_slice( $monthStats['per_user
 $tpl->setVariable( 'drafts', expAiDashboard::myDrafts( 0, 5 ) );
 $tpl->setVariable( 'draft_count', expAiDashboard::myDraftCount() );
 $tpl->setVariable( 'waiting', expAiDashboard::waitingForMyApproval() );
+// the Models card (the same period and scope) and "Watch this run" of "Start writing"
+// (class_exists: a Velocity worker started before an update knows only the classes of its warm-up)
+$tpl->setVariable( 'model_stats', class_exists( 'expAiModelStats' ) ? expAiModelStats::forPeriod( $summaryUser, $period, $config ) : array( 'models' => array() ) );
+$tpl->setVariable( 'watch', class_exists( 'expAiRunWatch' ) ? expAiRunWatch::describe( $userID ) : null );
 // "Details in the log": the same period (and user) as view parameters of expai/log
 $tpl->setVariable( 'details_path', '/(from)/' . date( 'Y-m-d', $summary['range']['from'] ) . '/(to)/' . date( 'Y-m-d', $summary['range']['to'] )
                                    . ( $summaryUser !== false && $canSeeSite ? '/(user)/' . (int) $summaryUser : '' ) );

@@ -272,6 +272,10 @@
         <source>Stopped</source>
         <translation>Gestoppt</translation>
     </message>
+    <message>
+        <source>%count runs started. Watch them here:</source>
+        <translation>%count Läufe gestartet. Hier verfolgen:</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/error</name>
@@ -1305,6 +1309,30 @@
         <source>All my Exponential Intelligence drafts</source>
         <translation>Alle meine Exponential-Intelligence-Entwürfe</translation>
     </message>
+    <message>
+        <source>Not sent yet</source>
+        <translation>Noch nicht gesendet</translation>
+    </message>
+    <message>
+        <source>Your request at %name</source>
+        <translation>Ihre Anfrage bei %name</translation>
+    </message>
+    <message>
+        <source>Watch this run</source>
+        <translation>Diesen Lauf verfolgen</translation>
+    </message>
+    <message>
+        <source>Intelligence tab</source>
+        <translation>Intelligence-Reiter</translation>
+    </message>
+    <message>
+        <source>Log</source>
+        <translation>Protokoll</translation>
+    </message>
+    <message>
+        <source>Job</source>
+        <translation>Auftrag</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/edit</name>
@@ -2245,6 +2273,18 @@
     <message>
         <source>Nothing written with Exponential Intelligence yet.</source>
         <translation>Noch nichts mit Exponential Intelligence geschrieben.</translation>
+    </message>
+    <message>
+        <source>Showing request %id only.</source>
+        <translation>Nur Anfrage %id wird angezeigt.</translation>
+    </message>
+    <message>
+        <source>Showing the requests of thread %id only.</source>
+        <translation>Nur die Anfragen von Thread %id werden angezeigt.</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <translation>Alle anzeigen</translation>
     </message>
 </context>
 <context>
@@ -4300,6 +4340,10 @@
         <source>The jobs could not be queued: %error</source>
         <translation>Die Aufträge konnten nicht eingereiht werden: %error</translation>
     </message>
+    <message>
+        <source>Watch the jobs</source>
+        <translation>Aufträge verfolgen</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/error</name>
@@ -5629,6 +5673,14 @@
         <source>The thread already runs on this model.</source>
         <translation>Der Thread läuft bereits mit diesem Modell.</translation>
     </message>
+    <message>
+        <source>Request in the log</source>
+        <translation>Anfrage im Protokoll</translation>
+    </message>
+    <message>
+        <source>Job</source>
+        <translation>Auftrag</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/keyboard</name>
@@ -5753,5 +5805,160 @@
     </message>
 </context>
 <!-- expai vector parallel/checkpoints: end -->
+</context>
+<context>
+    <name>extension/expai/modelstats</name>
+    <message>
+        <source>Models</source>
+        <translation>Modelle</translation>
+    </message>
+    <message>
+        <source>Test and manage models</source>
+        <translation>Modelle testen und verwalten</translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>Modell</translation>
+    </message>
+    <message>
+        <source>Requests</source>
+        <translation>Anfragen</translation>
+    </message>
+    <message>
+        <source>Latency (median)</source>
+        <translation>Antwortzeit (Median)</translation>
+    </message>
+    <message>
+        <source>Speed (median)</source>
+        <translation>Tempo (Median)</translation>
+    </message>
+    <message>
+        <source>Cost</source>
+        <translation>Kosten</translation>
+    </message>
+    <message>
+        <source>Per day</source>
+        <translation>Pro Tag</translation>
+    </message>
+    <message>
+        <source>Test and probe</source>
+        <translation>Test und Probe</translation>
+    </message>
+    <message>
+        <source>slow: ~%seconds s per step</source>
+        <translation>langsam: ~%seconds s pro Schritt</translation>
+    </message>
+    <message>
+        <source>%rate % successful</source>
+        <translation>%rate % erfolgreich</translation>
+    </message>
+    <message>
+        <source>1 error</source>
+        <translation>1 Fehler</translation>
+    </message>
+    <message>
+        <source>%count errors</source>
+        <translation>%count Fehler</translation>
+    </message>
+    <message>
+        <source>timeout</source>
+        <translation>Zeitüberschreitung</translation>
+    </message>
+    <message>
+        <source>unreachable</source>
+        <translation>nicht erreichbar</translation>
+    </message>
+    <message>
+        <source>HTTP error</source>
+        <translation>HTTP-Fehler</translation>
+    </message>
+    <message>
+        <source>refused</source>
+        <translation>abgelehnt</translation>
+    </message>
+    <message>
+        <source>limit</source>
+        <translation>Limit</translation>
+    </message>
+    <message>
+        <source>budget</source>
+        <translation>Budget</translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation>gestoppt</translation>
+    </message>
+    <message>
+        <source>other</source>
+        <translation>sonstige</translation>
+    </message>
+    <message>
+        <source>replaced by the fallback %count times</source>
+        <translation>%count-mal durch das Ersatzmodell ersetzt</translation>
+    </message>
+    <message>
+        <source>answered %count for another model</source>
+        <translation>%count für ein anderes Modell beantwortet</translation>
+    </message>
+    <message>
+        <source>p95 %seconds s</source>
+        <translation>p95 %seconds s</translation>
+    </message>
+    <message>
+        <source>%rate tokens/s</source>
+        <translation>%rate Token/s</translation>
+    </message>
+    <message>
+        <source>%seconds s per turn</source>
+        <translation>%seconds s pro Runde</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>unbekannt</translation>
+    </message>
+    <message>
+        <source>no successful request</source>
+        <translation>keine erfolgreiche Anfrage</translation>
+    </message>
+    <message>
+        <source>Median latency per day:</source>
+        <translation>Median der Antwortzeit pro Tag:</translation>
+    </message>
+    <message>
+        <source>Test %time:</source>
+        <translation>Test %time:</translation>
+    </message>
+    <message>
+        <source>%seconds s to the first token</source>
+        <translation>%seconds s bis zum ersten Token</translation>
+    </message>
+    <message>
+        <source>%seconds s in all</source>
+        <translation>%seconds s insgesamt</translation>
+    </message>
+    <message>
+        <source>Test %time failed</source>
+        <translation>Test %time fehlgeschlagen</translation>
+    </message>
+    <message>
+        <source>log</source>
+        <translation>Protokoll</translation>
+    </message>
+    <message>
+        <source>job</source>
+        <translation>Auftrag</translation>
+    </message>
+    <message>
+        <source>Probe %date: %rate % (%passed of %tasks)</source>
+        <translation>Probe %date: %rate % (%passed von %tasks)</translation>
+    </message>
+    <message>
+        <source>Latency and speed count successful requests. Slow: the median request takes longer than the %seconds seconds a web request may spend on one model call.</source>
+        <translation>Antwortzeit und Tempo zählen erfolgreiche Anfragen. Langsam: Die mittlere Anfrage dauert länger als die %seconds Sekunden, die eine Webanfrage für einen Modellaufruf haben darf.</translation>
+    </message>
+    <message>
+        <source>No requests in this period.</source>
+        <translation>Keine Anfragen in diesem Zeitraum.</translation>
+    </message>
 </context>
 </TS>
