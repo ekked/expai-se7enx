@@ -50,3 +50,8 @@ spl_autoload_register( static function ( $class )
 }, true, true );
 
 expAiTestInstallation::boot( getenv( 'EXPAI_TEST_SITEACCESS' ) ?: 'admin' );
+
+// the audit of this process writes into a throwaway directory, never into the site's audit trail
+define( 'EXPAI_TEST_AUDIT_DIR', expAiTestMockServer::tmp( 'audit' ) );
+expAiTestAudit::isolate( EXPAI_TEST_AUDIT_DIR );
+register_shutdown_function( static function () { expAiTestMockServer::removeTree( EXPAI_TEST_AUDIT_DIR ); } );

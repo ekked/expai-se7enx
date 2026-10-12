@@ -31,6 +31,9 @@ abstract class expAiTestCase extends PHPUnit\Framework\TestCase
         parent::setUp();
         chdir( EXPAI_TEST_ROOT );
         expAiTestInstallation::forceFileMail();
+        // again before every test: a test of the audit may have reset its settings
+        if ( defined( 'EXPAI_TEST_AUDIT_DIR' ) )
+            expAiTestAudit::isolate( EXPAI_TEST_AUDIT_DIR );
         $this->previousUser = class_exists( 'eZUser' ) && eZDB::hasInstance() ? eZUser::currentUser() : null;
     }
 

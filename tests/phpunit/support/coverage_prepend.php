@@ -1,6 +1,6 @@
 <?php
 /**
- * Prepended (auto_prepend_file) to a script test that expAiScriptRunner runs while the suite measures coverage: when
+ * Loaded by script_prepend.php in a script test that expAiScriptRunner runs, while the suite measures coverage: when
  * Xdebug is loaded and EXPAI_COVERAGE_FILE is set, the lines (and with EXPAI_COVERAGE_BRANCH=1 the branches) the
  * script runs in the directories of EXPAI_COVERAGE_INCLUDE are written to that file when the script ends, and the
  * test that ran it adds them to the suite's coverage. Without those it does nothing.

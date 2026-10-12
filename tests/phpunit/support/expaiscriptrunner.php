@@ -35,12 +35,16 @@ class expAiScriptRunner
             $so = (string) getenv( 'EXPAI_XDEBUG_SO' );
             if ( $so !== '' )
                 array_push( $command, '-d', 'zend_extension=' . $so );
-            array_push( $command, '-d', 'xdebug.mode=coverage', '-d', 'auto_prepend_file=' . EXPAI_TEST_CHECKOUT . '/tests/phpunit/support/coverage_prepend.php' );
+            array_push( $command, '-d', 'xdebug.mode=coverage' );
             $coverageFile = expAiTestMockServer::tmp( 'coverage' ) . '/raw.ser';
             $env['EXPAI_COVERAGE_FILE'] = $coverageFile;
             $env['EXPAI_COVERAGE_INCLUDE'] = EXPAI_TEST_CHECKOUT . '/classes';
             $env['EXPAI_COVERAGE_BRANCH'] = self::paths( $coverage ) ? '1' : '0';
         }
+        // every script: the audit into a throwaway directory (script_prepend.php), and the coverage hook
+        array_push( $command, '-d', 'auto_prepend_file=' . EXPAI_TEST_CHECKOUT . '/tests/phpunit/support/script_prepend.php' );
+        $auditDir = expAiTestMockServer::tmp( 'audit' );
+        $env['EXPAI_TEST_AUDIT_DIR'] = $auditDir;
         array_push( $command, 'bin/php/ezexec.php', 'extension/expai/tests/' . $script );
         foreach ( $arguments as $argument )
             $command[] = $argument;
@@ -61,6 +65,7 @@ class expAiScriptRunner
         $output = stream_get_contents( $pipes[1] );
         fclose( $pipes[1] );
         $exit = proc_close( $process );
+        expAiTestMockServer::removeTree( $auditDir );
 
         if ( $coverageFile !== null )
         {

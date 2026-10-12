@@ -33,6 +33,7 @@ class expAiScriptTestsTest extends expAiTestCase
         $admin = array( 'EXPAI_TEST_LOGIN' => 'admin' );
         return array(
             'expaialttext' => array( 'expaialttext', array(), array(), false, 48 ),
+            'expaiaudit' => array( 'expaiaudit', array( '-s', 'admin' ), $admin, false, 48 ),
             'expaichain' => array( 'expaichain', array(), array(), false, 87 ),
             'expaicompactprompt' => array( 'expaicompactprompt', array( '-s', 'admin' ), array(), false, 66 ),
             'expaicost' => array( 'expaicost', array(), array(), false, 92 ),
