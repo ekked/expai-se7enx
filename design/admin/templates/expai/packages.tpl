@@ -8,6 +8,7 @@
             <h1 class="context-title">{if is_set( $package )}{$package.name|wash}{else}{'Content packages'|i18n( 'extension/expai/package' )}{/if}</h1>
             <p class="exp-ai-sub">{'Exponential Intelligence'|i18n( 'extension/expai/package' )}</p>
         </div>
+        {include uri='design:expai/parts/help_link.tpl' page='packages' label='content packages'|i18n( 'extension/expai/help' ) text='?'}
     </header>
 {if $notice}<p class="exp-ai-notice" role="status">{$notice|wash}</p>{/if}
 {if $error}<p class="exp-ai-error" role="alert">{$error|wash}</p>{/if}

@@ -1090,6 +1090,18 @@
         <source>Exponential Intelligence log</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Chains</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Missing alt text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence help</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/dashboard</name>
@@ -1733,7 +1745,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The organisation's monthly spend limit is not available through an API key; see it in the Anthropic Console.</source>
+        <source>The organization's monthly spend limit is not available through an API key; see it in the Anthropic Console.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5342,4 +5354,82 @@
     </message>
 </context>
 <!-- expai vector review/plan: end -->
+<context>
+    <name>extension/expai/help</name>
+    <message>
+        <source>Exponential Intelligence help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The documentation of this installation's version, file %file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Help pages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Help: %subject</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>the dashboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>the Intelligence tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AI facts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>alt text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AI chains</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>content packages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Images without alt text, and suggestions as drafts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The documentation of Exponential Intelligence</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>design/admin/parts/setup/menu</name>
+    <message>
+        <source>AI facts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AI models</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Budgets and lanes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Content packages</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>

@@ -13,6 +13,7 @@
 {if $facts.note}            <p class="exp-ai-facts-note">{$facts.note|wash}</p>{/if}
 {if $facts.contact}            <p class="exp-ai-facts-note">{'Contact for questions about this processing: %contact'|i18n( 'extension/expai/facts',, hash( '%contact', $facts.contact ) )|wash}</p>{/if}
         </div>
+        {include uri='design:expai/parts/help_link.tpl' page='ai-facts' label='AI facts'|i18n( 'extension/expai/help' ) text='?'}
         <p class="exp-ai-facts-noprint"><input type="button" class="button exp-ai-btn" onclick="window.print();" value="{'Print or save as PDF'|i18n( 'extension/expai/facts' )}" /></p>
     </header>
 

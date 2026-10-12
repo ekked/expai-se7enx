@@ -10,6 +10,7 @@
             <h2 id="exp-ai-panel-title">{'Exponential Intelligence'|i18n( 'extension/expai/panel' )}</h2>
             <p class="exp-ai-sub">{'Powered by Claude from Anthropic'|i18n( 'extension/expai/panel' )}</p>
         </div>
+        {include uri='design:expai/parts/help_link.tpl' page='full-view-panel' label='the Intelligence tab'|i18n( 'extension/expai/help' ) text='?'}
     </header>
     <p class="exp-ai-intro">{'Ask for new content under "%name" or for changes to it. Everything is written as drafts that you own; nothing is published until you decide.'|i18n( 'extension/expai/panel',, hash( '%name', $node.name ) )|wash}</p>
 {foreach ezini( 'PanelSettings', 'Sections', 'expai.ini' ) as $exp_ai_section}

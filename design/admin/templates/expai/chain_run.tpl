@@ -10,6 +10,7 @@
             <h1 class="context-title">{$run_row.label|wash}</h1>
             <p class="exp-ai-sub">{'Chain "%chain", run %id'|i18n( 'extension/expai/chain',, hash( '%chain', $chain.label, '%id', $run_row.id ) )|wash}</p>
         </div>
+        {include uri='design:expai/parts/help_link.tpl' page='chains' label='AI chains'|i18n( 'extension/expai/help' ) text='?'}
     </header>
 {if $error}<p class="exp-ai-error" role="alert">{$error|wash}</p>{/if}
 

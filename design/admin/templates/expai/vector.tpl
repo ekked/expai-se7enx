@@ -20,6 +20,7 @@
             <kbd class="exp-ai-v-kbd" data-keys="palette"></kbd>
         </button>
         <div class="exp-ai-v-head-end">
+            {include uri='design:expai/parts/help_link.tpl' page='vector' label='Vector'|i18n( 'extension/expai/help' ) text='Help'|i18n( 'extension/expai/help' )}
             <button type="button" class="exp-ai-v-icon exp-ai-v-threads-toggle" data-command="toggle_threads" aria-expanded="false" aria-controls="exp-ai-v-threads"
                     title="{'Threads'|i18n( $exp_ai_i18n )}"><span aria-hidden="true">&#9776;</span><span class="exp-ai-sr">{'Threads'|i18n( $exp_ai_i18n )}</span></button>
             <button type="button" class="exp-ai-v-icon exp-ai-v-side-toggle" data-command="toggle_side" aria-expanded="false" aria-controls="exp-ai-v-side"

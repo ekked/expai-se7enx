@@ -15,6 +15,7 @@
                 <h1>{'Exponential Intelligence'|i18n( 'extension/expai/dashboard' )}</h1>
                 <p class="exp-ai-sub">{'Powered by Claude from Anthropic'|i18n( 'extension/expai/dashboard' )}</p>
             </div>
+            {include uri='design:expai/parts/help_link.tpl' page='dashboard' label='the dashboard'|i18n( 'extension/expai/help' ) text='?'}
         </div>
         <div class="exp-ai-dash-controls">
             <nav class="exp-ai-segmented" aria-label="{'Period'|i18n( 'extension/expai/usage' )}">
@@ -50,13 +51,15 @@
 {if fetch( 'user', 'has_access_to', hash( 'module', 'expai', 'function', 'facts' ) )}
                 <div><dt>{'AI facts'|i18n( 'extension/expai/facts' )}</dt><dd><a href={'expai/facts'|ezurl}>{'What goes where, kept how long, used by whom, at what cost (printable)'|i18n( 'extension/expai/facts' )}</a></dd></div>
 {/if}
+                <div class="exp-ai-help-row"><dt>{'Missing alt text'|i18n( 'extension/expai/alttext' )}</dt><dd><a href={'expai/alttext'|ezurl}>{'Images without alt text, and suggestions as drafts'|i18n( 'extension/expai/help' )}</a></dd></div>
+                <div class="exp-ai-help-row"><dt>{'Help'|i18n( 'extension/expai/help' )}</dt><dd><a href={'expai/help'|ezurl}>{'The documentation of Exponential Intelligence'|i18n( 'extension/expai/help' )}</a></dd></div>
 {if $cost_enabled}
                 <div><dt>{'Prices'|i18n( 'extension/expai/dashboard' )}</dt><dd>{$prices_note|wash}</dd></div>
 {/if}
 {if $rate_limits|not}
                 <div><dt>{'API rate limits'|i18n( 'extension/expai/limits' )}</dt><dd>{'No request has reported its rate limits yet.'|i18n( 'extension/expai/limits' )}</dd></div>
 {/if}
-                <div><dt>{'Spend limit'|i18n( 'extension/expai/limits' )}</dt><dd>{'The organisation\'s monthly spend limit is not available through an API key; see it in the Anthropic Console.'|i18n( 'extension/expai/limits' )} <a href="https://console.anthropic.com/settings/limits" rel="noopener noreferrer" target="_blank">console.anthropic.com</a></dd></div>
+                <div><dt>{'Spend limit'|i18n( 'extension/expai/limits' )}</dt><dd>{'The organization\'s monthly spend limit is not available through an API key; see it in the Anthropic Console.'|i18n( 'extension/expai/limits' )} <a href="https://console.anthropic.com/settings/limits" rel="noopener noreferrer" target="_blank">console.anthropic.com</a></dd></div>
             </dl>
         </details>
     </div>

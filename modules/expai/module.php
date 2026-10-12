@@ -178,4 +178,13 @@ $ViewList['alttext'] = array(
 // the "AI facts" page expai/facts (read-only: providers, regions, key sources, roles, limits, tools)
 $FunctionList['facts'] = array();
 
+// Help (classes/expaihelp.php, doc/index.md): the extension's documentation in the administration interface,
+// (page)/<name>; for editors (expai/write) and for a data protection officer with only expai/facts
+$ViewList['help'] = array(
+    'default_navigation_part' => 'ezmynavigationpart',
+    'script' => 'help.php',
+    'functions' => array( 'write or facts' ),
+    'params' => array(),
+    'unordered_params' => array( 'page' => 'Page' ) );
+
 ?>

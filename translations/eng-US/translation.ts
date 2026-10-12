@@ -1090,6 +1090,18 @@
         <source>Exponential Intelligence log</source>
         <translation>Exponential Intelligence log</translation>
     </message>
+    <message>
+        <source>Chains</source>
+        <translation>Chains</translation>
+    </message>
+    <message>
+        <source>Missing alt text</source>
+        <translation>Missing alt text</translation>
+    </message>
+    <message>
+        <source>Exponential Intelligence help</source>
+        <translation>Exponential Intelligence help</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/dashboard</name>
@@ -1733,8 +1745,8 @@
         <translation>Spend limit</translation>
     </message>
     <message>
-        <source>The organisation's monthly spend limit is not available through an API key; see it in the Anthropic Console.</source>
-        <translation>The organisation's monthly spend limit is not available through an API key; see it in the Anthropic Console.</translation>
+        <source>The organization's monthly spend limit is not available through an API key; see it in the Anthropic Console.</source>
+        <translation>The organization's monthly spend limit is not available through an API key; see it in the Anthropic Console.</translation>
     </message>
     <message>
         <source>Limits</source>
@@ -5342,4 +5354,82 @@
     </message>
 </context>
 <!-- expai vector review/plan: end -->
+<context>
+    <name>extension/expai/help</name>
+    <message>
+        <source>Exponential Intelligence help</source>
+        <translation>Exponential Intelligence help</translation>
+    </message>
+    <message>
+        <source>The documentation of this installation's version, file %file</source>
+        <translation>The documentation of this installation's version, file %file</translation>
+    </message>
+    <message>
+        <source>Help pages</source>
+        <translation>Help pages</translation>
+    </message>
+    <message>
+        <source>Help: %subject</source>
+        <translation>Help: %subject</translation>
+    </message>
+    <message>
+        <source>Help</source>
+        <translation>Help</translation>
+    </message>
+    <message>
+        <source>the dashboard</source>
+        <translation>the dashboard</translation>
+    </message>
+    <message>
+        <source>the Intelligence tab</source>
+        <translation>the Intelligence tab</translation>
+    </message>
+    <message>
+        <source>Vector</source>
+        <translation>Vector</translation>
+    </message>
+    <message>
+        <source>AI facts</source>
+        <translation>AI facts</translation>
+    </message>
+    <message>
+        <source>alt text</source>
+        <translation>alt text</translation>
+    </message>
+    <message>
+        <source>AI chains</source>
+        <translation>AI chains</translation>
+    </message>
+    <message>
+        <source>content packages</source>
+        <translation>content packages</translation>
+    </message>
+    <message>
+        <source>Images without alt text, and suggestions as drafts</source>
+        <translation>Images without alt text, and suggestions as drafts</translation>
+    </message>
+    <message>
+        <source>The documentation of Exponential Intelligence</source>
+        <translation>The documentation of Exponential Intelligence</translation>
+    </message>
+</context>
+<context>
+    <name>design/admin/parts/setup/menu</name>
+    <message>
+        <source>AI facts</source>
+        <translation>AI facts</translation>
+    </message>
+    <message>
+        <source>AI models</source>
+        <translation>AI models</translation>
+    </message>
+    <message>
+        <source>Budgets and lanes</source>
+        <translation>Budgets and lanes</translation>
+    </message>
+    <message>
+        <source>Content packages</source>
+        <translation>Content packages</translation>
+    </message>
+</context>
 </TS>

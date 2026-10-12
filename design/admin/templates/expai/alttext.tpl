@@ -8,6 +8,7 @@
             <h1 class="context-title">{'Missing alt text'|i18n( 'extension/expai/alttext' )}</h1>
             <p class="exp-ai-sub">{'Exponential Intelligence'|i18n( 'extension/expai/alttext' )}</p>
         </div>
+        {include uri='design:expai/parts/help_link.tpl' page='alt-text' label='alt text'|i18n( 'extension/expai/help' ) text='?'}
     </header>
 {if $error}<p class="exp-ai-error" role="alert">{$error|wash}</p>{/if}
 {if $notice}<p class="exp-ai-notice" role="status">{$notice|wash}</p>{/if}

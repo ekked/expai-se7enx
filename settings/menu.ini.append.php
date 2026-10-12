@@ -14,6 +14,19 @@ PolicyList_expai_vector[]=expai/vector
 Links[expai_log]=expai/log
 LinkNames[expai_log]=Exponential Intelligence log
 PolicyList_expai_log[]=expai/write
+# AI chains (doc/chains.md): the runs and their checkpoints, users with expai/write and expai/chain
+Links[expai_chain]=expai/chain
+LinkNames[expai_chain]=Chains
+PolicyList_expai_chain[]=expai/write
+PolicyList_expai_chain[]=expai/chain
+# The "Missing alt text" report (doc/alt-text.md): images without alt text under a subtree
+Links[expai_alttext]=expai/alttext
+LinkNames[expai_alttext]=Missing alt text
+PolicyList_expai_alttext[]=expai/write
+# The extension's documentation (expai/help, doc/index.md)
+Links[expai_help]=expai/help
+LinkNames[expai_help]=Exponential Intelligence help
+PolicyList_expai_help[]=expai/write
 
 # Setup > AI facts: the printable "AI facts" page for a data protection officer (doc/ai-facts.md), shown only to users
 # with the policy expai/facts (the Administrator role holds every policy).
@@ -21,5 +34,17 @@ PolicyList_expai_log[]=expai/write
 Links[expai_facts]=expai/facts
 LinkNames[expai_facts]=AI facts
 PolicyList_expai_facts[]=expai/facts
+# Setup > AI models: providers, key presence, probe results, the local model (doc/local-models.md, expai/model_manage)
+Links[expai_models]=expai/models
+LinkNames[expai_models]=AI models
+PolicyList_expai_models[]=expai/model_manage
+# Setup > Budgets and lanes: the monthly budget of queued requests, job groups, lanes, batches (doc/budgets.md)
+Links[expai_budgets]=expai/budgets
+LinkNames[expai_budgets]=Budgets and lanes
+PolicyList_expai_budgets[]=expai/log
+# Setup > Content packages: upload, validate, dry run, import as drafts (doc/packages.md)
+Links[expai_packages]=expai/packages
+LinkNames[expai_packages]=Content packages
+PolicyList_expai_packages[]=expai/package_import
 
 */ ?>
