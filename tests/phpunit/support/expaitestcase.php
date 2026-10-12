@@ -137,6 +137,9 @@ abstract class expAiTestCase extends PHPUnit\Framework\TestCase
         $nodeID = (int) $node->attribute( 'node_id' );
         $this->cleanup( static function () use ( $nodeID )
         {
+            // as the administrator: the test may end as a user it made, and removed, itself
+            $admin = eZUser::fetchByName( 'admin' );
+            eZUser::setCurrentlyLoggedInUser( $admin, (int) $admin->attribute( 'contentobject_id' ), eZUser::NO_SESSION_REGENERATE );
             if ( eZContentObjectTreeNode::fetch( $nodeID ) )
                 eZContentObjectTreeNode::removeSubtrees( array( $nodeID ), false );
         } );
