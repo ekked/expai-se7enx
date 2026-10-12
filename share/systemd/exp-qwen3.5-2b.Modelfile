@@ -1,0 +1,7 @@
+# /etc/expai-llm/modelfiles/exp-qwen3.5-2b.Modelfile (creates exp-qwen3.5:2b): Qwen3.5 2B (Apache-2.0), the smaller,
+# faster option for simple prompts on a CPU host (#377). Thinking is turned off per request (Effort=none).
+FROM qwen3.5:2b
+# 2 threads, as for the 4B model: on a busy host more threads wait for each other
+PARAMETER num_thread 2
+PARAMETER num_ctx 16384
+PARAMETER temperature 0.6

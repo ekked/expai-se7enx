@@ -276,6 +276,10 @@ class expAiProviderRegistry
             $settings['MaxTokens'] = $this->config->get( 'AISettings', 'MaxTokens', 8000 );
         if ( $model['effort'] !== '' )
             $settings['Effort'] = $model['effort'];
+        // #377 background runs (the queue worker, the command line: no web request and no web server's time limit) get
+        // their own, longer time limit: [Provider_<id>] / [Model_<alias>] TimeoutBackground (seconds)
+        if ( isset( $settings['TimeoutBackground'] ) && (int) $settings['TimeoutBackground'] > 0 && class_exists( 'expAiWebBudget' ) && !expAiWebBudget::inWebRequest() )
+            $settings['Timeout'] = (int) $settings['TimeoutBackground'];
         $settings['ProviderId'] = $model['provider'];
         $settings['ModelAlias'] = $alias;
         $settings['ToolUse'] = $model['tool_use'];
@@ -350,7 +354,8 @@ class expAiProviderRegistry
             'key_present' => trim( (string) ( isset( $settings['ApiKey'] ) ? $settings['ApiKey'] : '' ) ) !== '',
             'ready' => $this->providerReady( $id ),
             'managed' => (string) ( isset( $settings['Managed'] ) ? $settings['Managed'] : '' ),
-            'models' => array_map( function ( $m ) { unset( $m['settings'] ); return $m; }, $models ),
+            // #377 prompt_profile: compact (a short prompt and the tools a message needs) or full, expAiCompactPrompt
+            'models' => array_map( function ( $m ) { unset( $m['settings'] ); return $m + array( 'prompt_profile' => class_exists( 'expAiCompactPrompt' ) ? expAiCompactPrompt::profile( $this->config, $m['alias'] ) : 'full' ); }, $models ),
         );
     }
 

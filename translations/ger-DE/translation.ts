@@ -2660,6 +2660,10 @@
         <source>No external MCP server is configured.</source>
         <translation>Es ist kein externer MCP-Server eingerichtet.</translation>
     </message>
+    <message>
+        <source>compact prompt</source>
+        <translation>kompakter Prompt</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/panel</name>
@@ -6151,6 +6155,14 @@
     <message>
         <source>No requests in this period.</source>
         <translation>Keine Anfragen in diesem Zeitraum.</translation>
+    </message>
+    <message>
+        <source>prompt %tokens tokens (median)</source>
+        <translation>Prompt %tokens Tokens (Median)</translation>
+    </message>
+    <message>
+        <source>%percent % from the cache</source>
+        <translation>%percent % aus dem Cache</translation>
     </message>
 </context>
 </TS>

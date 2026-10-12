@@ -55,6 +55,9 @@
 {if $m.latency_median_ms|is_null|not}
                     <span class="exp-ai-ms-big">{$m.latency_median_ms|div( 1000 )|expai_number( 1 )} s</span>
                     <span class="exp-ai-ms-small">{'p95 %seconds s'|i18n( 'extension/expai/modelstats',, hash( '%seconds', $m.latency_p95_ms|div( 1000 )|expai_number( 1 ) ) )}</span>
+{if $m.prompt_median|is_null|not}
+                    <span class="exp-ai-ms-small">{'prompt %tokens tokens (median)'|i18n( 'extension/expai/modelstats',, hash( '%tokens', $m.prompt_median|expai_number ) )}{if gt( $m.cache_percent, 0 )}, {'%percent % from the cache'|i18n( 'extension/expai/modelstats',, hash( '%percent', $m.cache_percent ) )}{/if}</span>
+{/if}
 {else}<span class="exp-ai-muted">&ndash;</span>{/if}
                 </td>
                 <td>

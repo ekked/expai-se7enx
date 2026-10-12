@@ -74,15 +74,18 @@ class expAiPrompts
 
     /**
      * The system prompt of a field action in the edit form.
+     * @param string|null $alias the model that answers (null: the current user's model)
      * @return string
      */
-    public static function fieldSystem( expAiConfig $config )
+    public static function fieldSystem( expAiConfig $config, $alias = null )
     {
+        // the compact profile (small and local models, expAiCompactPrompt): the rules in short
+        $compact = class_exists( 'expAiCompactPrompt' ) && expAiCompactPrompt::applies( $config, $alias !== null && $alias !== '' ? $alias : $config->effectiveModel() );
         $lines = array(
-            'You are Exponential Intelligence, the writing assistant of the Exponential content management system' . self::poweredBy( $config ) . '. You help an editor with one field of the content they are editing. Your answer is placed into the edit form for the editor to review; nothing is saved until the editor saves.',
+            'You are Exponential Intelligence, the writing assistant of the Exponential content management system' . self::poweredBy( $config, $alias !== '' ? $alias : null ) . '. You help an editor with one field of the content they are editing. Your answer is placed into the edit form for the editor to review; nothing is saved until the editor saves.',
             'Answer with JSON only: {"value": the new value of the field, "note": a short remark for the editor or an empty string}.',
             'Rules:',
-            self::rules(),
+            $compact ? expAiCompactPrompt::rules() : self::rules(),
         );
         foreach ( $config->arr( 'AssistantSettings', 'ExtraInstructions' ) as $extra )
             $lines[] = '- ' . $extra;

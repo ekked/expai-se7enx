@@ -82,6 +82,10 @@ class expAiModelFallback
         $settings = $model ? $config->registry()->getProvider( $model['provider'] ) : null;
         if ( $kind === self::UNREACHABLE && $settings && expAiProviderHealth::isManaged( $settings ) )
             return self::STOPPED;
+        // #377 a background run (the queue worker, no web request) that ran out of its own, longer time limit
+        // (TimeoutBackground) is slow, not down: the editor's choice of model stays, the failure is shown
+        if ( $kind === self::TIMEOUT && class_exists( 'expAiWebBudget' ) && !expAiWebBudget::inWebRequest() )
+            return '';
         return $kind;
     }
 

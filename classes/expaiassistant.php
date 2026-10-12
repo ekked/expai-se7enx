@@ -84,8 +84,8 @@ class expAiAssistant
             throw $e;
         }
         if ( $this->current )
+        {
             expAiThread::afterStep( $this->current, $result, $this->lastWritten );
-        return $result;
             // the state after the step: "Watch this run" and the record of the exchange with this step's request
             $thread = class_exists( 'expAiTurnRecord' ) ? expAiThread::fetchForConversation( $this->current ) : null;
             if ( $thread )
@@ -95,6 +95,7 @@ class expAiAssistant
                 $result['records'] = $history ? self::records( $this->current, array( end( $history ) ) ) : array();
             }
         }
+        return $result;
     }
 
     /** @var expAiDraftLog[] the drafts written in the last step */
@@ -242,6 +243,14 @@ class expAiAssistant
                     $content[] = array( 'type' => 'text', 'text' => $note );
                     $conversation->setScopeNote( $note );
                 }
+                // #377 the compact profile (small and local models, expAiCompactPrompt): a question about the open page
+                // gets a short snapshot of it once per conversation, instead of a tool round
+                if ( class_exists( 'expAiCompactPrompt' ) && expAiCompactPrompt::applies( $this->config, $alias ) && !expAiCompactPrompt::hasSnapshot( $messages ) )
+                {
+                    $intents = expAiCompactPrompt::intents( $message );
+                    if ( $intents['page'] )
+                        $content[] = array( 'type' => 'text', 'text' => expAiCompactPrompt::snapshot( $this->config, $reader, $node ) );
+                }
                 $content[] = array( 'type' => 'text', 'text' => $message );
                 $messages[] = array( 'role' => 'user', 'content' => $content );
             }
@@ -269,6 +278,9 @@ class expAiAssistant
         // the instructions and tools stay as the conversation started (see expAiConversation::document())
         $conversation->bindTo( $alias, $providerID );
         $frame = $conversation->frame();
+        // #377 the compact profile: a short system prompt and only the tools the editor's message needs
+        if ( class_exists( 'expAiCompactPrompt' ) && expAiCompactPrompt::applies( $this->config, $alias ) )
+            $frame = $this->compactFrame( $conversation, $frame, $node, $alias, $request, $frameMode );
         if ( !$frame || $frame['system'] === '' )
         {
             $mode = $this->toolMode();
@@ -513,6 +525,51 @@ class expAiAssistant
              . expAiText::cut( json_encode( $data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE ), 20000 );
     }
 
+    /**
+     * #377 The frame of a conversation in the compact profile (expAiCompactPrompt): the compact system prompt, and the
+     * tools the request needs added to those the conversation has (the set only grows, so the prefix a local server
+     * cached stays the same from turn to turn).
+     * @param array|null $frame the stored frame
+     * @param string $request the editor's message of this turn
+     * @return array system, tools
+     */
+    protected function compactFrame( expAiConversation $conversation, $frame, eZContentObjectTreeNode $node, $alias, $request, $frameMode )
+    {
+        $changed = false;
+        if ( !$frame || $frame['system'] === '' )
+        {
+            $frame = array( 'system' => expAiCompactPrompt::system( $node, $this->config, $alias, $this->writeAllowed, $frameMode ), 'tools' => array() );
+            $changed = true;
+        }
+        $have = array();
+        foreach ( (array) $frame['tools'] as $tool )
+            $have[] = (string) ( is_array( $tool ) ? $tool['name'] : $tool->name );
+        if ( $this->toolMode() !== 'none' )
+        {
+            $names = expAiCompactPrompt::toolNames( $this->config, $alias, $request, $this->writeAllowed, $frameMode, array_keys( $this->tools()->tools() ) );
+            $all = array_values( array_unique( array_merge( $have, $names ) ) );
+            if ( $all !== $have )
+            {
+                $tools = array();
+                foreach ( $all as $name )
+                    if ( $tool = $this->tools()->get( $name ) )
+                        if ( $this->writeAllowed || !$tool->writes() )
+                            $tools[] = $tool;
+                $frame['tools'] = expAiCompactPrompt::definitions( $tools, $frameMode === 'staged' );
+                $changed = true;
+            }
+        }
+        if ( $changed )
+        {
+            $conversation->setFrame( $frame['system'], $frame['tools'] );
+            if ( $this->bound )
+                $conversation->setFrameMode( $frameMode );
+            // stored as JSON: read back as the provider gets it on the next turn
+            $frame = $conversation->frame();
+        }
+        return $frame;
+    }
+
     /** @return string the editor's last text message */
     protected function lastRequest( array $messages )
     {
@@ -532,6 +589,8 @@ class expAiAssistant
         $history = $conversation ? $this->historyOf( $conversation ) : array();
         return array( 'status' => $status, 'text' => (string) $text, 'steps' => $steps,
                       'exchange' => $history ? self::presentExchange( end( $history ) ) : null,
+                      // "Watch this run" and the record of the exchange: set by step() after the thread is updated
+                      'watch' => null, 'records' => array(),
                       'drafts' => self::drafts( $user, $nodeID ),
                       // the fallback: requested, used (aliases and labels), reason, notice; null when the requested model answered
                       'fallback' => $this->fallback,
@@ -589,8 +648,6 @@ class expAiAssistant
         $this->fallback = expAiModelFallback::describe( $this->config, $alias, $used, $reason );
         $this->fallbackTo = $used;
         // the next model gets its own time
-                      // "Watch this run" and the record of the exchange: set by step() after the thread is updated
-                      'watch' => null, 'records' => array(),
         $settings = $this->config->registry()->settingsFor( $used );
         if ( function_exists( 'set_time_limit' ) )
             @set_time_limit( max( 1, min( 600, (int) ( !empty( $settings['Timeout'] ) ? $settings['Timeout'] : $this->config->int( 'AISettings', 'Timeout', 115, 1, 600 ) ) ) ) + 30 );

@@ -1,4 +1,5 @@
 # /etc/expai-llm/models.allow (root:root 0644): the models the helper may pull, remove and create, one per line.
 # A line "<model> <name>" also creates <name> from /etc/expai-llm/modelfiles/<name, ":" written as "-">.Modelfile after the pull
-# (e.g. 4 threads and the context length for this host).
+# (e.g. 2 threads and the context length for this host).
 qwen3.5:4b exp-qwen3.5:4b
+qwen3.5:2b exp-qwen3.5:2b

@@ -265,6 +265,12 @@ class expAiOpenAiChatProvider extends expAiProviderBase
         }
         $payload['stream'] = false;
 
+        // #377 Ollama: KeepAlive (an Ollama duration such as 30m, or seconds) keeps the model and its cached prompt
+        // prefix in memory after the request, so the next turn of an active thread does not load and read it again
+        $keep = trim( (string) $this->setting( 'KeepAlive', '' ) );
+        if ( $flavor === 'ollama' && preg_match( '/^\d{1,5}[smh]?$/', $keep ) )
+            $payload['keep_alive'] = ctype_digit( $keep ) ? (int) $keep : $keep;
+
         // [Provider_<id>] / [Model_<alias>] ExtraBody: a JSON object merged into the body (e.g. OpenRouter provider routing)
         $extra = trim( (string) $this->setting( 'ExtraBody', '' ) );
         if ( $extra !== '' )

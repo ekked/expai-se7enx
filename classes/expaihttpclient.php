@@ -33,7 +33,8 @@ class expAiHttpClient
      */
     public function __construct( $timeout = 115, $connectTimeout = 10, $maxResponseBytes = 4194304, $keepHeaders = null )
     {
-        $this->timeout = max( 1, min( 600, (int) $timeout ) );
+        // at most 10 minutes in a web request; 30 minutes in the background (queue worker, command line: TimeoutBackground)
+        $this->timeout = max( 1, min( class_exists( 'expAiWebBudget' ) && !expAiWebBudget::inWebRequest() ? 1800 : 600, (int) $timeout ) );
         $this->connectTimeout = max( 1, min( $this->timeout, (int) $connectTimeout ) );
         $this->maxResponseBytes = max( 1024, (int) $maxResponseBytes );
         $this->keepHeaders = array_map( 'strtolower', is_array( $keepHeaders ) && $keepHeaders ? array_values( $keepHeaders )

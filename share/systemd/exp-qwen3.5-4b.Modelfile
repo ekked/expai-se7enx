@@ -1,6 +1,8 @@
 # /etc/expai-llm/modelfiles/exp-qwen3.5-4b.Modelfile (creates exp-qwen3.5:4b): Qwen3.5 4B (Apache-2.0) for a CPU host.
 # expai turns thinking off per request (Effort=none -> reasoning_effort "none"), which is much faster on a CPU.
 FROM qwen3.5:4b
-PARAMETER num_thread 4
+# 2 threads: measured on a busy 12 core host (#377), 4 threads wrote 0.8 tokens/s and 2 threads 1.5-1.8 (the threads wait
+# for each other when the host is busy); reading the prompt is only ~15 % slower. More threads (6) were 8x slower.
+PARAMETER num_thread 2
 PARAMETER num_ctx 16384
 PARAMETER temperature 0.6

@@ -120,7 +120,7 @@ class expAiModelStats
                                     'provider' => isset( $registry[$key] ) ? (string) $registry[$key]['provider'] : '', 'region' => '',
                                     'requests' => 0, 'ok' => 0, 'errors' => 0, 'kinds' => array(), 'replaced' => 0, 'replaced_reasons' => array(),
                                     'stood_in' => 0, 'cost' => 0.0, 'cost_known' => true, 'latency' => array(), 'tps' => array(),
-                                    'turn_ms' => array(), 'day_ms' => array(), 'newest' => 0 );
+                                    'turn_ms' => array(), 'day_ms' => array(), 'newest' => 0, 'prompt' => array(), 'prompt_sum' => 0, 'cached_sum' => 0 );
         };
         foreach ( $rows as $row )
         {
@@ -147,6 +147,14 @@ class expAiModelStats
                 if ( (int) $row['output_tokens'] > 0 && $latency > 0 )
                     $m['tps'][] = (int) $row['output_tokens'] * 1000 / $latency;
                 $m['day_ms'][date( 'Y-m-d', $created )][] = $latency;
+                // #377 what the model read: the prompt of each request and the share its server had cached
+                $prompt = (int) $row['input_tokens'] + (int) $row['cache_write_tokens'] + (int) $row['cache_read_tokens'];
+                if ( $prompt > 0 )
+                {
+                    $m['prompt'][] = $prompt;
+                    $m['prompt_sum'] += $prompt;
+                    $m['cached_sum'] += (int) $row['cache_read_tokens'];
+                }
             }
             else
             {
@@ -209,6 +217,9 @@ class expAiModelStats
                 'kinds' => $kinds, 'replaced' => $m['replaced'], 'replaced_reasons' => $m['replaced_reasons'], 'stood_in' => $m['stood_in'],
                 'latency_median_ms' => $median, 'latency_p95_ms' => self::percentile( $m['latency'], 95 ),
                 'tps_median' => $tps === null ? null : round( $tps, 1 ),
+                // #377 the median prompt (tokens) and the share of all prompt tokens read from the server's cache
+                'prompt_median' => self::median( $m['prompt'] ),
+                'cache_percent' => $m['prompt_sum'] > 0 ? (int) round( 100 * $m['cached_sum'] / $m['prompt_sum'] ) : null,
                 'turn_median_ms' => self::median( array_values( $m['turn_ms'] ) ), 'turns' => count( $m['turn_ms'] ),
                 'cost' => round( $m['cost'], 6 ), 'cost_known' => $m['cost_known'],
                 'slow' => $slowSeconds > 0 && $median !== null && $median > $slowSeconds * 1000,

@@ -88,7 +88,7 @@ class expAiPromptFieldAction implements expAiFieldAction
              && trim( strip_tags( (string) $request->value ) ) === '' )
             throw new expAiException( 'The field is empty: there is nothing to rewrite.' );
         $answer = $provider->send( array(
-            'system' => expAiPrompts::fieldSystem( $this->config ),
+            'system' => expAiPrompts::fieldSystem( $this->config, method_exists( $provider, 'modelAlias' ) ? (string) $provider->modelAlias() : null ),
             'messages' => array( array( 'role' => 'user', 'content' => $this->userMessage( $request ) ) ),
             'output_schema' => array( 'type' => 'object', 'properties' => array(
                 'value' => array( 'type' => 'string' ), 'note' => array( 'type' => 'string' ) ),

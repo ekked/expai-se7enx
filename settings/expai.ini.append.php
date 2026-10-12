@@ -164,6 +164,12 @@ Retention=none
 TermsCheckedAt=
 Timeout=280
 Managed=ollama
+# #377 background runs (the queue worker: Vector, the Intelligence tab with a slow model) are not bound by a web
+# server's limit: up to 900 s per call (the job's lease is 900 s + 60 s). A timeout there is shown, never a fallback.
+TimeoutBackground=900
+# Keep the model in memory this long after each request (an Ollama duration), so the next turn of an active thread
+# finds it loaded and its prompt prefix cached; the idle timer stops Ollama after its own idle time.
+KeepAlive=30m
 
 # A model: Provider, Id (what the API expects), Label, ToolUse=native | prompted | none, WriteTools=enabled (drafts;
 # also needs a passed probe unless WriteGate=trusted), Capabilities[] (json_schema, json_object, reasoning_effort,
@@ -208,6 +214,35 @@ MaxOutput=2000
 InputPerMTok=0
 OutputPerMTok=0
 Slow=true
+# #377 the compact prompt (doc/local-models.md "Making a local model usable"): a short system prompt, only the tools
+# the message needs (from this list), a short snapshot of the open page. compact is the default of Region=local.
+PromptProfile=compact
+Tools[]
+Tools[]=get_node
+Tools[]=list_children
+Tools[]=get_class_definition
+Tools[]=create_draft
+Tools[]=update_draft
+Tools[]=propose_plan
+
+# #377 the smaller, faster local option for simple prompts: Qwen3.5 2B (Apache-2.0, tool calling), created as
+# exp-qwen3.5:2b from share/systemd/exp-qwen3.5-2b.Modelfile after a pull (expai/models). Reads only until it passes
+# the probe; never the default unless chosen.
+[Model_local.qwen3.5-2b]
+Provider=local
+Id=exp-qwen3.5:2b
+Label=Qwen3.5 2B (local, faster)
+ToolUse=native
+WriteTools=enabled
+Capabilities[]=json_object
+Capabilities[]=reasoning_effort
+Capabilities[]=no_tool_choice
+Effort=none
+MaxOutput=2000
+InputPerMTok=0
+OutputPerMTok=0
+Slow=true
+PromptProfile=compact
 
 # Examples of providers with lanes (not active until listed in [ProviderSettings] Providers[] and given a key).
 [Provider_openai]
@@ -468,6 +503,9 @@ ConversationLifetime=604800
 # exchanges become a short summary (cut from their text, no extra call) and the last half are kept word for word;
 # the panel still shows the whole history.
 ContextWindowTurns=8
+
+# #377 the longest snapshot of the open page in a compact prompt ([Model_<alias>] PromptProfile=compact), in characters.
+CompactContextChars=1800
 
 # Extra instructions appended to the built-in system prompt (one line per entry), e.g.
 # ExtraInstructions[]=Write in British English.
@@ -891,6 +929,8 @@ SpoolDirectory=/var/lib/expai-llm/spool
 StatusFile=/var/lib/expai-llm/status.json
 # The models the view offers to pull and remove (the helper has its own allowlist, /etc/expai-llm/models.allow).
 Models[]=qwen3.5:4b
+# #377 the smaller, faster option for simple prompts (Apache-2.0, tool calling; model local.qwen3.5-2b)
+Models[]=qwen3.5:2b
 
 [McpBridge]
 # enabled: the panel can use the bridge-safe read tools of the extension expmcp in process, as the current user,
