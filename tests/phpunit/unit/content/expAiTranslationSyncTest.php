@@ -390,6 +390,89 @@ class expAiTranslationSyncTest extends expAiContentTestCase
         $this->assertRefused( function () { expAiTranslationSyncServerFunctions::status( array() ); }, 'switched off' );
     }
 
+    public function testTheQueuedCheckReportsEveryTranslation(): void
+    {
+        $this->siteSettings( array( 'TranslationSync' => array( 'Enabled' => 'enabled', 'SourceLanguages' => array(), 'TargetLanguages' => array(),
+                                                                 'Datatypes' => array(), 'AutoQueuePatch' => 'disabled', 'PatchMaxChangedRatio' => '0.5', 'Model' => '' ) ) );
+        $object = $this->editSource( $this->translatedArticle( $this->folder() ) );
+        $job = new expQueueJob( array( 'user_id' => (int) eZUser::currentUserID(), 'payload' => json_encode( array( 'object_id' => (int) $object->attribute( 'id' ) ) ) ) );
+        $result = ( new expAiTranslationCheckHandler() )->run( $job, new expQueueContext( $job, 'xtc' ) );
+        $this->assertSame( array( self::TARGET ), array_keys( $result['languages'] ) );
+        $row = $result['languages'][self::TARGET];
+        $this->assertSame( array( 'patch', 'waiting', '' ), array( $row['decision'], $row['state'], $row['job_uuid'] ), 'without AutoQueuePatch the patch waits' );
+        $this->assertGreaterThan( 0, $row['change_ratio'] );
+    }
+
+    public function testTheEzjscoreFunctionsFollowThePoliciesOfTheEditor(): void
+    {
+        $this->siteSettings( array( 'TranslationSync' => array( 'Enabled' => 'enabled', 'SourceLanguages' => array(), 'TargetLanguages' => array(),
+                                                                 'Datatypes' => array(), 'AutoQueuePatch' => 'disabled', 'PatchMaxChangedRatio' => '0.5', 'Model' => '' ) ) );
+        $object = $this->editSource( $this->translatedArticle( $this->folder() ) );
+        $nodeID = (int) $object->attribute( 'main_node_id' );
+        $sync = new expAiTranslationSync();
+        $sync->check( $object, array( 'trigger' => 'publish' ) );
+
+        // no expai policy at all: nothing is answered
+        $this->roleUser( array( array( 'content', 'read' ) ) );
+        self::post( array( 'node' => $nodeID ) );
+        $this->assertRefused( function () { expAiTranslationSyncServerFunctions::status( array() ); }, 'You do not have access to Exponential Intelligence.' );
+
+        // expai/write only: the state is shown, starting or skipping a translation is refused
+        $this->roleUser( array( array( 'content', 'read' ), array( 'expai', 'write' ) ) );
+        self::post( array( 'node' => $nodeID ) );
+        $status = expAiTranslationSyncServerFunctions::status( array() );
+        $this->assertFalse( $status['can_act'] );
+        self::post( array( 'node' => $nodeID, 'language' => self::TARGET ) );
+        $this->assertRefused( function () { expAiTranslationSyncServerFunctions::skip( array() ); }, 'You may not start or skip translations.' );
+        $this->assertRefused( function () { expAiTranslationSyncServerFunctions::approve( array() ); }, 'You may not start or skip translations.' );
+
+        // the translation sync policy without the right to edit the translation: refused by the sync, as the editor
+        $this->roleUser( array( array( 'content', 'read' ), array( 'expai', 'write' ), array( 'expai', 'translation_sync' ) ) );
+        self::post( array( 'node' => $nodeID, 'language' => self::TARGET ) );
+        $this->assertRefused( function () { expAiTranslationSyncServerFunctions::skip( array() ); }, 'You may not edit object' );
+        $this->assertRefused( function () { expAiTranslationSyncServerFunctions::approve( array() ); }, 'You may not edit object' );
+    }
+
+    /**
+     * A user of its own with one role, logged in; both are removed after the test (as the administrator).
+     *
+     * @param array $policies array( array( module, function ), ... )
+     */
+    private function roleUser( array $policies )
+    {
+        $name = 'expai-unit-' . bin2hex( random_bytes( 4 ) );
+        $admin = eZUser::fetchByName( 'admin' );
+        $object = eZContentClass::fetchByIdentifier( 'user' )->instantiate( (int) $admin->attribute( 'contentobject_id' ) );
+        $userID = (int) $object->attribute( 'id' );
+        $role = eZRole::create( 'expai unit test ' . $name );
+        $role->store();
+        $this->cleanup( static function () use ( $userID, $role, $admin )
+        {
+            eZUser::setCurrentlyLoggedInUser( $admin, (int) $admin->attribute( 'contentobject_id' ), eZUser::NO_SESSION_REGENERATE );
+            $role->removeThis();
+            if ( $object = eZContentObject::fetch( $userID ) )
+                $object->purge();
+            if ( eZUser::fetch( $userID ) )
+                eZUser::removeUser( $userID );
+            eZUser::purgeUserCacheByUserId( $userID );
+            eZRole::expireCache();
+        } );
+        $user = eZUser::create( $userID );
+        $user->setAttribute( 'login', $name );
+        $user->setAttribute( 'email', $name . '@x1.example.invalid' );
+        $user->setAttribute( 'password_hash', eZUser::createHash( $name, bin2hex( random_bytes( 12 ) ), eZUser::site(), eZUser::hashType() ) );
+        $user->setAttribute( 'password_hash_type', eZUser::hashType() );
+        $user->store();
+        foreach ( $policies as $policy )
+            $role->appendPolicy( $policy[0], $policy[1], array() );
+        $role->assignToUser( $userID );
+        eZRole::expireCache();
+        eZUser::purgeUserCacheByUserId( $userID );
+        $user = eZUser::fetch( $userID );
+        eZUser::setCurrentlyLoggedInUser( $user, $userID, eZUser::NO_SESSION_REGENERATE );
+        return $user;
+    }
+
     /** Removes a queue job of the test with its events. */
     private static function removeJob( $uuid )
     {

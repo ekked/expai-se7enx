@@ -141,6 +141,24 @@ class expAiAltTextTest extends expAiContentTestCase
         expAiContentStubProvider::$answers = array( new expAiException( 'Bad request', 'broken', 400 ) );
         $failed = $handler->run( $job, $context );
         $this->assertSame( array( 'fail', 'alttext' ), array( $failed->outcome, $failed->errorClass ) );
+        // a veto refuses the request: the job fails for good with the reason
+        expAiContentStubProvider::$answers = array( new expAiVetoException( 'Not for %what', '', 0, array( '%what' => 'this image' ) ) );
+        $vetoed = $handler->run( $job, $context );
+        $this->assertSame( array( 'fail', 'veto', 'refused: Not for this image' ), array( $vetoed->outcome, $vetoed->errorClass, $vetoed->message ) );
+
+        // a language the image field is not translated into (any more): a permanent failure, nothing is asked
+        $requests = count( expAiContentStubProvider::$requests );
+        $otherLanguage = new expQueueJob( array( 'payload' => json_encode( array( 'language' => self::TARGET ) + $job->payloadArray() ) ) );
+        try
+        {
+            $handler->run( $otherLanguage, new expQueueContext( $otherLanguage, 'xtc' ) );
+            $this->fail( 'no exception' );
+        }
+        catch ( expQueuePermanentException $e )
+        {
+            $this->assertStringContainsString( 'has no ' . self::TARGET . ' translation of the image field', $e->getMessage() );
+        }
+        $this->assertSame( $requests, count( expAiContentStubProvider::$requests ) );
 
         // switched off: held
         $config->ini()->setVariable( 'AltTextSettings', 'Enabled', 'disabled' );
