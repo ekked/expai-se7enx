@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The expai test suite (doc/testing.md). Run it from the installation root with the root's PHPUnit, as the web
+  server's user:
+    php vendor/bin/phpunit -c extension/expai/phpunit.xml.dist
+    php vendor/bin/phpunit -c extension/expai/phpunit.xml.dist - -testsuite unit
+    php vendor/bin/phpunit -c extension/expai/phpunit.xml.dist - -exclude-group e2e
+  Suites: unit (tests/phpunit/unit), scripts (the script tests of tests/, run through ezexec.php).
+  Groups: database (needs the installation's database), scripts, e2e (mock servers), provider (a real model, costs
+  money; excluded here, run with - -group provider and EXPAI_TEST_ALLOW_PAID=1).
+  EXPONENTIAL_ROOT names another installation; EXPAI_TEST_SITEACCESS another siteaccess (default admin).
+-->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="tests/phpunit/bootstrap.php"
+         colors="false"
+         cacheDirectory="../../var/cache/expai-phpunit"
+         failOnWarning="true"
+         failOnRisky="true"
+         displayDetailsOnSkippedTests="true"
+         displayDetailsOnTestsThatTriggerWarnings="true"
+         beStrictAboutOutputDuringTests="true">
+    <testsuites>
+        <testsuite name="unit">
+            <directory suffix="Test.php">tests/phpunit/unit</directory>
+        </testsuite>
+        <testsuite name="scripts">
+            <directory suffix="Test.php">tests/phpunit/scripts</directory>
+        </testsuite>
+    </testsuites>
+    <groups>
+        <exclude>
+            <group>provider</group>
+        </exclude>
+    </groups>
+    <source>
+        <include>
+            <directory suffix=".php">classes</directory>
+        </include>
+    </source>
+    <php>
+        <env name="EXPAI_TEST_SITEACCESS" value="admin" force="false"/>
+    </php>
+</phpunit>
