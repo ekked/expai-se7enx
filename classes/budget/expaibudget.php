@@ -9,7 +9,7 @@
 
 /**
  * The budgets of queued requests (expai.ini [Budgets]): a monthly budget of the whole site and a budget per job group
- * (an expqueue group: "translate this subtree", a package import).
+ * (an expqueue group: "translate this subtree").
  *
  *   site budget   [Budgets] SiteMonthly (in [Pricing] Currency), else [Limits] MaxCostPerSitePerMonth; it counts
  *                 what every request of the month cost (panel, field actions and queue: expai_usage_log) plus what
@@ -277,7 +277,7 @@ class expAiBudget
             foreach ( expQueueGroup::fetchRecent( max( 1, (int) $groups ) ) as $group )
             {
                 $gid = (int) $group->attribute( 'id' );
-                $jobs = expQueue::count( array( 'group_id' => $gid, 'type' => array( 'expai.request', 'expai.package.import' ) ) );
+                $jobs = expQueue::count( array( 'group_id' => $gid, 'type' => array( 'expai.request' ) ) );
                 $gcap = (int) $group->attribute( 'budget_micros' );
                 if ( !$jobs && $gcap <= 0 )
                     continue;

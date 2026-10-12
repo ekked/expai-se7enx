@@ -18,10 +18,10 @@ as the start for a new language). site.ini `[RegionalSettings] TranslationExtens
 | `extension/expai/model`, `extension/expai/models` | the model picker; the models and providers page |
 | `extension/expai/threads`, `extension/expai/vector`, `extension/expai/keyboard` | threads, Vector, the command palette and the shortcuts |
 | `extension/expai/chain`, `extension/expai/translation` | AI chains; translation sync |
-| `extension/expai/budget`, `extension/expai/package` | budgets and lanes; content packages |
+| `extension/expai/budget` | budgets and lanes |
 | `extension/expai/preset`, `extension/expai/alttext`, `extension/expai/facts` | presets and the Improve menu; alt text; the "EI: Summary" page |
 | `extension/expai/help` | the help pages and the "?" links |
-| `design/admin/parts/setup/menu` | the Setup menu entries (EI: Summary, EI: Models, EI: Budgets, Job queue, Content packages) |
+| `design/admin/parts/setup/menu` | the Setup menu entries (EI: Summary, EI: Models, EI: Budgets, Job queue) |
 | `design/admin/parts/my/menu` | the Dashboard menu entries (Exponential Intelligence, EI: Vector, EI: Chains, EI: Log, EI: Help) |
 | `design/admin/parts/design/menu` | the Design menu entry (Missing alt text) |
 

@@ -17,8 +17,8 @@
 | [lanes.md](lanes.md) | Lanes (standard, flex, batch, fast), the lane policy, queued requests, provider batches of five APIs |
 | [budgets.md](budgets.md) | The monthly site budget and job group budgets: reservation, hold, resume, figures |
 | [chains.md](chains.md) | AI chains: write, review, revise, SEO, the human checkpoint; defining a chain (worked example), prompts, pass criteria, budgets, configuration, permissions, database |
-| [packages.md](packages.md) | Content packages, a thin layer on the kernel's packages (classic or JSON format): provenance, import as drafts only, the draft log, the job queue, expai/packages |
-| [package-authoring-for-agents.md](package-authoring-for-agents.md) | How a local CLI agent writes a package in the kernel's JSON format (terms, data, the validation loop, a minimal package) |
+| [packages.md](packages.md) | Content packages are the kernel's (Setup > Packages, ezpm, the JSON format): what expai adds, the provenance metadata and the draft label |
+| [package-authoring-for-agents.md](package-authoring-for-agents.md) | How a local CLI agent writes a package in the kernel's JSON format and brings it to the site with Setup > Packages or ezpm (terms, data, the validation loop, a minimal package) |
 | [diff.md](diff.md) | The diff engine: segmenters per datatype, sentences, hunks with stable ids, metrics, compare and apply |
 | [translation-sync.md](translation-sync.md) | Translation sync: no-op / patch / full after a source change, thresholds, the workflow event, the Translations section, the CLI |
 | [permissions.md](permissions.md) | Policies, and how the editor's own permissions limit everything the assistant does |
@@ -54,7 +54,7 @@
 Every page above is also part of the administration interface: `expai/help` (Dashboard > EI: Help) shows this
 index, `expai/help/(page)/<name>` one page (`readme`, `install`, `usage`, the name of a `doc/*.md`
 without `.md`, or `changelog-<version>`), and each expai page (the dashboard, the Intelligence tab, Vector, EI: Summary,
-the "Missing alt text" report, chains, content packages) has a "?" link to its page. The pages are rendered from the
+the "Missing alt text" report, chains) has a "?" link to its page. The pages are rendered from the
 installed files, so they always match the installed version. Policy: `expai/write` or `expai/facts`.
 
 The rendering is a Markdown subset (headings, paragraphs, lists, tables, code, emphasis, links) by `expAiHelp`

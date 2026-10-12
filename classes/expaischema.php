@@ -23,8 +23,11 @@
  */
 class expAiSchema
 {
+    /** tables of earlier versions that --install drops (dropRemoved()) */
+    const REMOVED_TABLES = array( 'expai_package' );
+
     /**
-     * @param bool $withQueue with the tables and columns of lanes, batches, budgets and packages (expAiQueueSchema)
+     * @param bool $withQueue with the tables and columns of lanes, batches and budgets (expAiQueueSchema)
      * @return array generic schema (without _info)
      */
     public static function definition( $withQueue = true )
@@ -256,7 +259,7 @@ class expAiSchema
      * asked directly.
      * @return string[]
      */
-    public static function existingTables( $db = null )
+    public static function databaseTables( $db = null )
     {
         $db = $db ?: eZDB::instance();
         $engine = self::engineOf( $db );
@@ -288,7 +291,52 @@ class expAiSchema
                 $names[] = isset( $row['name'] ) ? $row['name'] : reset( $row );
             }
         }
-        return array_values( array_intersect( self::tables(), array_map( 'strtolower', (array) $names ) ) );
+        return array_values( array_unique( array_map( 'strtolower', (array) $names ) ) );
+    }
+
+    /**
+     * The expai tables of the definition that exist.
+     * @return string[]
+     */
+    public static function existingTables( $db = null )
+    {
+        return array_values( array_intersect( self::tables(), self::databaseTables( $db ) ) );
+    }
+
+    /**
+     * Drops the tables of REMOVED_TABLES that still exist (idempotent): expai_package, the record of expai's own
+     * package view, removed in 0.1.0 (content packages are the kernel's: Setup > Packages, ezpm).
+     * @return array( string[] dropped, string[] errors )
+     */
+    public static function dropRemoved( $db = null )
+    {
+        $db = $db ?: eZDB::instance();
+        $engine = self::engineOf( $db );
+        $dropped = array();
+        $errors = array();
+        foreach ( array_intersect( self::REMOVED_TABLES, self::databaseTables( $db ) ) as $table )
+        {
+            if ( $engine === 'mongodb' )
+            {
+                if ( method_exists( $db, 'dropCollection' ) && $db->dropCollection( $table ) !== false )
+                    $dropped[] = $table;
+                else
+                    $errors[] = "mongodb: could not drop $table";
+                continue;
+            }
+            if ( $db->query( "DROP TABLE $table" ) === false )
+            {
+                $errors[] = "$engine: DROP TABLE $table";
+                continue;
+            }
+            // the sequences of the auto increment id
+            if ( $engine === 'postgresql' )
+                $db->query( "DROP SEQUENCE IF EXISTS {$table}_id_seq" );
+            if ( $engine === 'oracle' )
+                $db->query( "BEGIN EXECUTE IMMEDIATE 'DROP SEQUENCE se_$table'; EXCEPTION WHEN OTHERS THEN NULL; END;" );
+            $dropped[] = $table;
+        }
+        return array( $dropped, $errors );
     }
 
     /**
@@ -433,6 +481,11 @@ class expAiSchema
         $engine = self::engineOf( $db );
         $created = array();
         $errors = array();
+        // the tables of earlier versions (REMOVED_TABLES)
+        list( $dropped, $dropErrors ) = self::dropRemoved( $db );
+        foreach ( $dropped as $table )
+            $created[] = 'dropped: ' . $table;
+        $errors = array_merge( $errors, $dropErrors );
         // the columns and indexes an earlier state lacks
         if ( $engine !== 'mongodb' )
             foreach ( self::upgradeStatements( $db ) as $statement )

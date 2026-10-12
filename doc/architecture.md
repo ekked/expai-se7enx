@@ -56,7 +56,7 @@ The token and the root URL come from what every admin page already has: `#ezxfor
 and Vector are started by their markup (`#exp-ai-panel`, `#exp-ai-edit`, `#exp-ai-dashboard`, `#exp-ai-vector`).
 
 The module `expai` holds the policies ([permissions.md](permissions.md)) and the views `expai/dashboard`, `expai/log`,
-`expai/vector`, `expai/stream`, `expai/chain`, `expai/alttext`, `expai/models`, `expai/budgets`, `expai/packages`,
+`expai/vector`, `expai/stream`, `expai/chain`, `expai/alttext`, `expai/models`, `expai/budgets`,
 `expai/summary` and `expai/help`.
 
 ## The step loop (panel)

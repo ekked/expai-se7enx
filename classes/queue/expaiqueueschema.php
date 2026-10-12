@@ -8,15 +8,14 @@
  */
 
 /**
- * The tables and columns of lanes, batches, budgets and content packages, added to expAiSchema::definition() (so
+ * The tables and columns of lanes, batches and budgets, added to expAiSchema::definition() (so
  * bin/php/expaischema.php --install creates and upgrades them on every engine like the other expai tables):
  *
  *   expai_batch     one provider batch (Anthropic Message Batches, OpenAI Batch, Gemini, Mistral, OpenRouter)
- *   expai_package   one content package (uploaded, validated, imported), with its report
  *
  *   expai_usage_log + lane, service_tier (what the provider reported), job_uuid, batch_id, price_factor (percent of
  *                     the list price the request is billed at: 100 standard, 50 batch and flex, 200 fast)
- *   expai_draft_log + job_uuid, package_uuid
+ *   expai_draft_log + job_uuid, package_uuid (package_uuid: unused since content packages are the kernel's; kept, empty)
  */
 class expAiQueueSchema
 {
@@ -89,31 +88,6 @@ class expAiQueueSchema
             'indexes' => array(
                 'PRIMARY' => $primary,
                 'expai_batch_state' => array( 'type' => 'non-unique', 'fields' => array( 'state', 'provider' ) ),
-            ),
-        );
-        $schema['expai_package'] = array(
-            'name' => 'expai_package',
-            'fields' => array(
-                'bytes' => $int,
-                'checksum' => $varchar( 64 ),
-                'created' => $int,
-                'file_count' => $int,
-                'format_version' => $varchar( 10 ),
-                'group_uuid' => $varchar( 36 ),
-                'id' => array( 'type' => 'auto_increment', 'default' => false ),
-                'modified' => $int,
-                'name' => $varchar( 150 ),
-                'object_count' => $int,
-                'origin' => $varchar( 20 ),
-                'report' => array( 'type' => 'longtext', 'default' => false ),
-                'state' => $varchar( 20, 'uploaded' ),
-                'storage' => $varchar( 255 ),
-                'user_id' => $int,
-                'uuid' => $varchar( 36 ),
-            ),
-            'indexes' => array(
-                'PRIMARY' => $primary,
-                'expai_package_uuid' => array( 'type' => 'non-unique', 'fields' => array( 'uuid' ) ),
             ),
         );
         return $schema;

@@ -43,10 +43,6 @@ PolicyList_expai_budgets[]=expai/log
 Links[expqueue]=expqueue/dashboard
 LinkNames[expqueue]=Job queue
 PolicyList_expqueue[]=expqueue/view
-# Setup > Content packages: upload, validate, dry run, import as drafts (doc/packages.md)
-Links[expai_packages]=expai/packages
-LinkNames[expai_packages]=Content packages
-PolicyList_expai_packages[]=expai/package_import
 
 
 # Design > Missing alt text: images without alt text under a subtree (doc/alt-text.md), users with expai/write

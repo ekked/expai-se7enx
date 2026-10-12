@@ -1,7 +1,7 @@
 # FAQ
 
 **Can it publish by itself?** No. It writes drafts. Publishing happens only when an editor presses "Send for
-approval", through the normal publish operation (with approval where configured). Content packages, chains, alt text
+approval", through the normal publish operation (with approval where configured). Packages installed as drafts, chains, alt text
 reports and Vector's staged changes end in drafts too.
 
 **Whose permissions does it use?** The logged-in editor's, for every lookup and every write. There is no service

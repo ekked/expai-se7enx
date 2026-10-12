@@ -378,18 +378,6 @@ alias), `Lane` (`auto`), `PromptTemplate` or `PromptText`, `Tools[]` (read tools
 `Checkpoint` (human, none), `Next`, `MaxTokens`, `OutputFields[]`, `Languages[]`. Every one is explained with an
 example in [chains.md](chains.md#defining-a-chain).
 
-## [PackageSettings]: content packages
-
-See [packages.md](packages.md).
-
-| Setting | Default | Effect |
-| --- | --- | --- |
-| `MaxUploadBytes` | 50 MB | The largest upload on expai/packages. |
-| `QueueAbove` | `20` | A package with more content objects is installed as drafts in the job queue (one `expai.package.import` job). |
-
-The packages are the kernel's: their format, size and upload limits are `package.ini` `[PackageFormatSettings]` and
-`[UploadSettings]` (doc/bc/6.0/package-json-format.md of Exponential).
-
 ## [McpBridge], [McpSettings], [McpServer_<id>]: MCP tools
 
 See [mcp.md](mcp.md).
@@ -422,7 +410,7 @@ See [mcp.md](mcp.md).
 | `design.ini` | `DesignExtensions[]=expai`, `BackendJavaScriptList[]=expai.js`, `BackendCSSFileList[]=expai.css` |
 | `admininterface.ini` | the tabs `expai` (content navigation part) and `expai_media` (media), header template `expai_header.tpl`, body `expai.tpl` |
 | `content.ini` | `[EditSettings] AdditionalTemplates[]=content/edit/expai.tpl` |
-| `menu.ini` | the entries of the Dashboard menu (`[Leftmenu_my]`: Exponential Intelligence, EI: Vector, EI: Chains, EI: Log, EI: Help), of Setup (`[Leftmenu_setup]`: EI: Summary, EI: Models, EI: Budgets, Job queue, Content packages) and of Design (`[Leftmenu_design]`: Missing alt text), each with its policies ([dashboard.md](dashboard.md)) |
+| `menu.ini` | the entries of the Dashboard menu (`[Leftmenu_my]`: Exponential Intelligence, EI: Vector, EI: Chains, EI: Log, EI: Help), of Setup (`[Leftmenu_setup]`: EI: Summary, EI: Models, EI: Budgets, Job queue) and of Design (`[Leftmenu_design]`: Missing alt text), each with its policies ([dashboard.md](dashboard.md)) |
 | `cronjob.ini` | the cronjob part `expai`: `expai_queue.php` (resumes held jobs, releases lost batch submits), `expai_prune.php` (usage rows older than `RetentionDays`), `expai_thread_prune.php` (thread events, proposals, checkpoints); run it with `-s <admin siteaccess>` |
 | `dashboard.ini` | the dashboard block `expai_drafts` (Priority 35, 5 items, `expai/write`) |
 | `browse.ini` | `[ExpAiStartWriting]`: the content browser of "Change location" (single node) |

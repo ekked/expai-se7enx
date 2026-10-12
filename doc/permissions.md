@@ -10,8 +10,6 @@
 | `expai/model_use` | choosing models of providers outside `[ProviderSettings] ProvidersWithoutPolicy[]` (default: every provider but anthropic). Limitation **Provider**: only the models of those providers. Without it a user has the site default and the open providers' models; a model posted that is not allowed is refused ("This model is not available.") |
 | `expai/model_manage` | the view expai/models: providers, key presence, probe results, the local model server (start, stop, pull, remove, test prompt) |
 | `expai/mcp` | MCP tools in the panel ([mcp.md](mcp.md)). Limitation **Server**: `exp` (the in-process expmcp bridge) or the id of an external server |
-| `expai/package_import` | Setup > Content packages (`expai/packages`): upload, validate, dry run, install as drafts; `./console ext:expai:package check` and `import`. Imports write drafts with the user's own content permissions; the package is kept in the kernel's repository `local` ([packages.md](packages.md)) |
-| `expai/package_export` | `./console ext:expai:package export` (only what the user may read) |
 | `expai/lane_fast` | a queued request may ask for a fast lane (a price premium; [lanes.md](lanes.md)) |
 | `expai/chain` | AI chains ([chains.md](chains.md#permissions)): with `expai/write`, starting runs (Intelligence tab, dashboard), the view `expai/chain`, approving, asking for changes, stopping and continuing runs at their checkpoint. Limitation **Chain**: only those chains |
 | `expai/web` | the web and history tools in the panel ([tools.md](tools.md#web-and-history-tools)). Limitation **Tool**: `web_fetch`, `web_search`, `project_history`; without it all three (each is still offered only once configured) |

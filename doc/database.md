@@ -14,7 +14,7 @@
 | conversation_id | int | the panel conversation, 0 for the edit form |
 | language_code | varchar(20) | |
 | action | varchar(20) | create, update, field, fill |
-| source | varchar(20) | panel, edit |
+| source | varchar(20) | panel, edit (and vector, chain, queue, package, diff); `revert` for parts reverted into the same version from "What changed" ([review.md](review.md#direct-mode-what-changed-and-revert)) |
 | status | varchar(20) | draft, kept, pending, published, discarded |
 | model | varchar(100) | the model that answered |
 | provider | varchar(40) | the provider id (default `anthropic`) |
@@ -92,15 +92,9 @@ Index: (model_alias, created). Names fit Oracle's limits; no column is an Oracle
 it was deleted at the provider), `polls`, `submit_job_uuid`, `user_id`, `retention`, `last_error`, `created`,
 `modified`. Index (state, provider). Its requests are the expqueue jobs whose `external_ref` is `expai-batch:<id>`.
 
-**expai_package**: one content package expai imported into the kernel's package repository ([packages.md](packages.md)):
-`uuid`, `name`, `checksum` (the SHA-256 of the archive), `format_version` (the package's format: `xml` or `json`),
-`state` (uploaded, valid, invalid, importing, imported, failed), `object_count`, `file_count`, `bytes`, `origin`
-(upload, cli), `storage` (the kernel package's name, repository `local`), `user_id`, `group_uuid` (a queued import),
-`report` (JSON: validation, dry_run, import), `created`, `modified`. Index (uuid).
-
-Columns of lanes and packages in the other tables: `expai_usage_log.lane`, `service_tier` (what the provider reported),
+Columns of lanes in the other tables: `expai_usage_log.lane`, `service_tier` (what the provider reported),
 `job_uuid`, `batch_id`, `price_factor` (percent of the list price the request is billed at; costs use it; index
-on job_uuid); `expai_draft_log.job_uuid`, `package_uuid` (index).
+on job_uuid); `expai_draft_log.job_uuid` (the queue job or background package install a draft came from), `package_uuid` (index; empty: content packages are the kernel's, [packages.md](packages.md)).
 
 ## Installing
 

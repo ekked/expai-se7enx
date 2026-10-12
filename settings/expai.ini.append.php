@@ -472,13 +472,6 @@ Appliers[]
 # The longest answer kept in a job's checkpoint, in bytes
 MaxStoredAnswerBytes=200000
 
-[PackageSettings]
-# Content packages (doc/packages.md): the kernel's packages (classic XML or JSON format), imported as drafts.
-# The largest upload in expai/packages (larger packages: ./console ext:expai:package import)
-MaxUploadBytes=52428800
-# A package with more content objects is installed as drafts in the job queue (one expai.package.import job)
-QueueAbove=20
-
 [AssistantSettings]
 # The most provider calls one message of the editor may lead to (each tool round is one call).
 # The last allowed call is made without tools, so the assistant always answers in words.

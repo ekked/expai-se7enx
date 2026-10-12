@@ -78,7 +78,8 @@ Version 0.1.0. What is new: [doc/changelog/0.1.0.md](doc/changelog/0.1.0.md).
   ([doc/usage-tracking.md](doc/usage-tracking.md)).
 - **Lanes, batches and budgets**: standard, flex, batch and fast lanes, provider batch APIs for bulk work, a monthly
   site budget and job group budgets with reservations ([doc/lanes.md](doc/lanes.md), [doc/budgets.md](doc/budgets.md)).
-- **Content packages**: the kernel's packages (classic or JSON format) with AI provenance, imported as drafts only
+- **Content packages** are the kernel's (Setup > Packages, `ezpm`, classic or JSON format): AI provenance as package
+  metadata, and the drafts of a package written with AI carry the Exponential Intelligence label
   ([doc/packages.md](doc/packages.md), [doc/package-authoring-for-agents.md](doc/package-authoring-for-agents.md)).
 - **"EI: Summary"** (Setup > EI: Summary, `expai/summary`): one printable page for a data protection officer with every provider's region,
   retention, terms date and key source (never the key), roles, lanes, limits and outside tools

@@ -34,7 +34,6 @@ All menu entries of expai (settings/menu.ini.append.php), each shown only with i
 | Setup | EI: Models | `expai/models` | `expai/model_manage` |
 | Setup | EI: Budgets | `expai/budgets` | `expai/log` |
 | Setup | Job queue | `expqueue/dashboard` | `expqueue/view` |
-| Setup | Content packages | `expai/packages` | `expai/package_import` |
 
 Job queue is the page of the extension expqueue; expai lists it right after EI: Budgets. Missing alt text is in the
 left menu of the Design tab: `expai/alttext` uses the navigation part `ezvisualnavigationpart`, so the Design tab

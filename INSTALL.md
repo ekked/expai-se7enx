@@ -136,7 +136,6 @@ create the tables by hand instead, use the file of your engine:
 | `expai/log` | everyone's requests and versions, the site view of the dashboard, budgets and lanes |
 | `expai/settings` | where the site default model is set; "Resume held jobs" |
 | `expai/model_manage` | `expai/models`: providers, probe results, the local model |
-| `expai/package_import`, `expai/package_export` | content packages: upload and import as drafts; export |
 | `expai/facts` | the "EI: Summary" page `expai/summary` (needs nothing else; also opens the help pages) |
 | `ezjscore/call` | needed for every browser request of expai; unlimited, or limited to the function list `expai` |
 

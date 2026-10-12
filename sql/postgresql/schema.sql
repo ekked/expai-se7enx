@@ -364,33 +364,6 @@ CREATE TABLE IF NOT EXISTS expai_batch (
 
 CREATE INDEX expai_batch_state ON expai_batch USING btree ( state, provider );
 ALTER TABLE ONLY expai_batch ADD CONSTRAINT expai_batch_pkey PRIMARY KEY ( id );
-CREATE SEQUENCE IF NOT EXISTS expai_package_id_seq
-  START 1
-  INCREMENT 1
-  MAXVALUE 9223372036854775807
-  MINVALUE 1
-  CACHE 1;
-CREATE TABLE IF NOT EXISTS expai_package (
-  bytes integer DEFAULT 0 NOT NULL,
-  checksum character varying(64) DEFAULT ''::character varying NOT NULL,
-  created integer DEFAULT 0 NOT NULL,
-  file_count integer DEFAULT 0 NOT NULL,
-  format_version character varying(10) DEFAULT ''::character varying NOT NULL,
-  group_uuid character varying(36) DEFAULT ''::character varying NOT NULL,
-  id integer DEFAULT nextval('expai_package_id_seq'::text) NOT NULL,
-  modified integer DEFAULT 0 NOT NULL,
-  name character varying(150) DEFAULT ''::character varying NOT NULL,
-  object_count integer DEFAULT 0 NOT NULL,
-  origin character varying(20) DEFAULT ''::character varying NOT NULL,
-  report text,
-  state character varying(20) DEFAULT 'uploaded'::character varying NOT NULL,
-  "storage" character varying(255) DEFAULT ''::character varying NOT NULL,
-  user_id integer DEFAULT 0 NOT NULL,
-  uuid character varying(36) DEFAULT ''::character varying NOT NULL
-);
-
-CREATE INDEX expai_package_uuid ON expai_package USING btree ( uuid );
-ALTER TABLE ONLY expai_package ADD CONSTRAINT expai_package_pkey PRIMARY KEY ( id );
 CREATE SEQUENCE IF NOT EXISTS expai_chain_run_id_seq
   START 1
   INCREMENT 1

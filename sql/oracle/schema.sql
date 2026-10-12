@@ -449,40 +449,6 @@ END;
 
 CREATE INDEX expai_batch_state ON expai_batch ( state, provider );
 BEGIN
-  EXECUTE IMMEDIATE 'CREATE SEQUENCE se_expai_package';
-EXCEPTION WHEN OTHERS THEN
-  IF SQLCODE != -955 THEN RAISE; END IF;
-END;
-/
-CREATE TABLE expai_package (
-  bytes INTEGER DEFAULT 0 NOT NULL,
-  checksum VARCHAR2(64),
-  created INTEGER DEFAULT 0 NOT NULL,
-  file_count INTEGER DEFAULT 0 NOT NULL,
-  format_version VARCHAR2(10),
-  group_uuid VARCHAR2(36),
-  id INTEGER NOT NULL,
-  modified INTEGER DEFAULT 0 NOT NULL,
-  name VARCHAR2(150),
-  object_count INTEGER DEFAULT 0 NOT NULL,
-  origin VARCHAR2(20),
-  report CLOB,
-  state VARCHAR2(20) DEFAULT 'uploaded',
-  storage VARCHAR2(255),
-  user_id INTEGER DEFAULT 0 NOT NULL,
-  uuid VARCHAR2(36),
-  PRIMARY KEY ( id )
-);
-
-CREATE OR REPLACE TRIGGER expai_package_id_tr
-BEFORE INSERT ON expai_package FOR EACH ROW WHEN (new.id IS NULL)
-BEGIN
-  SELECT se_expai_package.nextval INTO :new.id FROM dual;
-END;
-/
-
-CREATE INDEX expai_package_uuid ON expai_package ( uuid );
-BEGIN
   EXECUTE IMMEDIATE 'CREATE SEQUENCE se_expai_chain_run';
 EXCEPTION WHEN OTHERS THEN
   IF SQLCODE != -955 THEN RAISE; END IF;

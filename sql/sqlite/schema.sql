@@ -280,26 +280,6 @@ CREATE TABLE expai_batch (
 );
 
 CREATE  INDEX expai_batch_state ON expai_batch  ( state, provider );
-CREATE TABLE expai_package (
-  bytes INTEGER(11) NOT NULL DEFAULT '0',
-  checksum varchar(64) NOT NULL DEFAULT '',
-  created INTEGER(11) NOT NULL DEFAULT '0',
-  file_count INTEGER(11) NOT NULL DEFAULT '0',
-  format_version varchar(10) NOT NULL DEFAULT '',
-  group_uuid varchar(36) NOT NULL DEFAULT '',
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  modified INTEGER(11) NOT NULL DEFAULT '0',
-  name varchar(150) NOT NULL DEFAULT '',
-  object_count INTEGER(11) NOT NULL DEFAULT '0',
-  origin varchar(20) NOT NULL DEFAULT '',
-  report longtext,
-  state varchar(20) NOT NULL DEFAULT 'uploaded',
-  storage varchar(255) NOT NULL DEFAULT '',
-  user_id INTEGER(11) NOT NULL DEFAULT '0',
-  uuid varchar(36) NOT NULL DEFAULT ''
-);
-
-CREATE  INDEX expai_package_uuid ON expai_package  ( uuid );
 CREATE TABLE expai_chain_run (
   brief longtext,
   chain varchar(40) NOT NULL DEFAULT '',

@@ -14,7 +14,7 @@
     <p class="exp-ai-error">{'%n queued jobs are held by a budget.'|i18n( 'extension/expai/budget',, hash( '%n', $status.held ) )}</p>
 {/if}
 {if first_set( $heading, false() )|not}
-    <p><a href={'expai/budgets'|ezurl}>{'Budgets, lanes and batches'|i18n( 'extension/expai/budget' )}</a> &middot; <a href={'expai/packages'|ezurl}>{'Content packages'|i18n( 'extension/expai/budget' )}</a></p>
+    <p><a href={'expai/budgets'|ezurl}>{'Budgets, lanes and batches'|i18n( 'extension/expai/budget' )}</a></p>
 {/if}
 </section>
 {undef $s}

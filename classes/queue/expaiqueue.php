@@ -187,7 +187,7 @@ class expAiQueue
     {
         if ( !self::available() )
             return array();
-        $filter += array( 'type' => array( self::TYPE_REQUEST, self::TYPE_SUBMIT, self::TYPE_POLL, 'expai.package.import' ) );
+        $filter += array( 'type' => array( self::TYPE_REQUEST, self::TYPE_SUBMIT, self::TYPE_POLL ) );
         $out = array();
         foreach ( expQueue::listJobs( $filter, 0, $limit ) as $job )
         {

@@ -268,28 +268,6 @@
             ]
         },
         {
-            "name": "expai_package",
-            "indexes": [
-                {
-                    "keys": {
-                        "id": 1
-                    },
-                    "options": {
-                        "unique": true,
-                        "name": "PRIMARY"
-                    }
-                },
-                {
-                    "keys": {
-                        "uuid": 1
-                    },
-                    "options": {
-                        "name": "expai_package_uuid"
-                    }
-                }
-            ]
-        },
-        {
             "name": "expai_plan",
             "indexes": [
                 {

@@ -17,20 +17,24 @@ not route requests through someone's Free, Pro or Max credentials. Bulk generati
 ordinary, individual use. The site owner checks this, for every CLI used, before relying on it.
 
 **Data.** Content that is exported for local work leaves the site's data policy: it goes wherever the CLI sends it.
-Exports refuse content with region or retention rules unless `--allow-restricted` is given ([packages.md](packages.md)).
+Export only content that may leave the site: not content of a section or class with region or zero-retention rules
+in `expai.ini` ([packages.md](packages.md#data-policy)).
 
 ## Route A: a local or staging copy and expmcp (best fidelity)
 
 1. Export what the agent needs to see from the live site and install it locally:
-   `./console ext:expai:package export --subtree=<node> --out=<dir> --login=<you>` on live,
-   `php ezpm.php import <file>.json.ezpkg` and `php ezpm.php install <name>` locally.
+   on live, Setup > Packages > New package > Content object export (Format: JSON), then Download as JSON on its
+   page (or `./console ezpm create <name>`, `./console ezpm add <name> ezcontentobject <node>`,
+   `./console ezpm export <name> --format=json -d <dir>`);
+   `./console ezpm import <file>.json.ezpkg` and `./console ezpm install <name>` locally.
 2. The agent works on the local installation through expmcp (`exp_content_query`, `exp_content_get`,
    `exp_class_describe` to read, `exp_content_write` to create and update by remote id), following the site's own
    writing rules.
-3. Export what changed: `./console ext:expai:package export --subtree=<node> --ai-generated --models=<model> --out=<dir>`.
-4. On live: `./console ext:expai:package check <file>` (what the install meets, by remote id), then
-   `import <file> --login=<you>` (drafts only), review and send for publishing; or upload it on Setup > Content
-   packages.
+3. Export what changed (`./console ezpm export <name> --format=json`) and mark it as written by AI: the metadata
+   entries `expai.ai-generated`, `expai.models`, `expai.tools` in its package.json (see step 7 below).
+4. On live: upload it on Setup > Packages > Import package (validated before it is imported); the install page shows
+   what the install meets, by remote id; choose "Install as drafts" (and "Install in the background" for a large
+   package), review the drafts and send them for publishing.
 
 ## Route B: write the JSON documents directly
 
@@ -45,7 +49,7 @@ simplefiles/<key>.<ext>              images and files the objects name by their 
 A working loop:
 
 1. **Start from an export.** Export a subtree of the site with an object of each class the agent will write
-   (`ezpm export <package> --format=json`, or `ext:expai:package export`). Its `contentobjects.json` shows exactly
+   (`ezpm export <package> --format=json`, or Download as JSON on Setup > Packages). Its `contentobjects.json` shows exactly
    how each datatype serializes; copy and change it rather than writing from nothing.
 2. **Know the target.** The classes (identifiers, `class_remote_id`, the attributes and their datatypes) and the
    languages of the live site, and the **node remote id** of the parent where the content goes. With expmcp on a
@@ -56,7 +60,7 @@ A working loop:
    same remote ids gives the same objects new drafts.
 4. **Place the objects.** A node assignment with `parent-node-remote-id` goes below that node: an existing node of
    the site, or a node assignment of another object in the package (parents before children). Without it, it goes
-   below the parent chosen at import (`--parent`).
+   below the node chosen on the install page (or `ezpm install -d <node>`).
 5. **Rich text** (`ezxmltext`) is `["#xml", "<section ...>...</section>"]`: the editor's XML (`paragraph`,
    `header`, `strong`, `emphasize`, `link href=...`, `ul`/`ol`/`li`, `table`), with the namespaces of the section
    element. No HTML, no script.
@@ -65,11 +69,11 @@ A working loop:
    `ezimage`, see the export).
 7. **Mark provenance** in the definition: a `metadata` element with `expai.ai-generated` = `true`, `expai.models`,
    `expai.tools` (see the example).
-8. **Validate**: `php ezpm.php validate <dir>` (or `./console ext:expai:package validate <dir>`): the schema, every
+8. **Validate**: `./console ezpm validate <dir>`: the schema, every
    document as XML, the definition and the items. Checksums are optional while writing; the kernel writes them when
-   it packs: `php ezpm.php convert <dir> <name>.json.ezpkg --to=json`.
-9. **Check and import**: `./console ext:expai:package check <file>` shows `create` / `update` / `conflict` / `error`
-   per object; fix every conflict and error, then `import` (drafts only) or upload it on Setup > Content packages.
+   it packs: `./console ezpm convert <dir> <name>.json.ezpkg --to=json`.
+9. **Check and install**: `./console ezpm import <file>` and `./console ezpm check <name> --all`, or the install page after the upload, shows `create` / `update` / `conflict` / `error`
+   per object; fix every conflict and error, then install it as drafts (Setup > Packages, or `ezpm install --as-drafts`).
 
 ### A minimal package
 
@@ -131,5 +135,6 @@ A working loop:
 `packaging` and the element that names the Exponential version and named version are required by the upload check
 (any values; copy the version element from an exported package.json, it is left out above). Attributes the package leaves out keep
 their class defaults; an attribute is written by its `ezremote:identifier`. Pack the directory with
-`php ezpm.php convert <dir> autumn_articles-1.0-1.json.ezpkg --to=json` (which also writes the checksums).
-`ezpm validate` and `ext:expai:package check` say what is wrong before anything is written.
+`./console ezpm convert <dir> autumn_articles-1.0-1.json.ezpkg --to=json` (which also writes the checksums).
+`ezpm validate` and `ezpm check` (or the upload and the install page) say what is wrong before anything is written.
+The drafts of a package with `expai.ai-generated` = `true` carry the Exponential Intelligence label ([packages.md](packages.md)).
