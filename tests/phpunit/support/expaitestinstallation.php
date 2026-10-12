@@ -46,6 +46,7 @@ class expAiTestInstallation
             self::$reason = 'the installation did not start: ' . trim( strtok( $e->getMessage(), "\n" ) );
         }
         self::forceFileMail();
+        self::blockProviders();
     }
 
     /**
@@ -56,6 +57,33 @@ class expAiTestInstallation
     {
         if ( class_exists( 'eZINI' ) )
             eZINI::instance( 'site.ini' )->setVariable( 'MailSettings', 'Transport', 'file' );
+    }
+
+    /**
+     * No test reaches a real provider through the site's settings: in the site's expai.ini (the instance
+     * expAiConfig::instance() reads) every key and token is emptied and every endpoint points at a closed loopback
+     * port. A test that needs a provider sets its own in memory (a stub, or a mock server of tests/mock). Applied
+     * once at the start and again before every test (a test may reset the INI instances).
+     */
+    public static function blockProviders()
+    {
+        if ( !class_exists( 'eZINI' ) )
+            return;
+        $ini = eZINI::instance( 'expai.ini' );
+        foreach ( $ini->groups() as $group => $values )
+        {
+            if ( !preg_match( '/^(AISettings|Provider_|SearchProvider_|McpServer_)/', $group ) )
+                continue;
+            foreach ( (array) $values as $name => $value )
+            {
+                if ( !is_string( $value ) || $value === '' )
+                    continue;
+                if ( preg_match( '/(Key|Token|Secret)$/', $name ) )
+                    $ini->setVariable( $group, $name, '' );
+                elseif ( preg_match( '#^(https?|wss?)://(?!127\.0\.0\.1[:/]|localhost[:/])#i', $value ) )
+                    $ini->setVariable( $group, $name, 'http://127.0.0.1:9/blocked-by-the-expai-tests' );
+            }
+        }
     }
 
     /** @return string */
