@@ -889,9 +889,14 @@ Currency=USD
 PricesAsOf=2026-10-11
 Source=https://platform.claude.com/docs/en/about-claude/pricing
 Multiplier=1.0
-# Providers that price in another currency ([Provider_<id>] or [Model_<alias>] PriceCurrency, e.g. Melious in EUR):
-# what one unit of that currency is in Currency. Their prices and reported costs are converted with it; without a
-# rate their cost is "unknown". An approximate rate for an estimate: set your own and the day you checked it.
+# Providers that price in another currency ([Provider_<id>] or [Model_<alias>] PriceCurrency, e.g. Melious in EUR) are
+# converted into Currency with the reference rates of the European Central Bank (ecb, the default: fetched once a day
+# by the job expai.exchange.rates, the cronjob part expai_exchange_rates.php or ./console ext:expai:exchange-rates; a
+# failed fetch keeps the last rates), shown with their date on expai/models. ExchangeRates[<code>] (what one unit of
+# that currency is in Currency) is the fallback while there is no ECB rate; ExchangeRateSource=settings uses only
+# ExchangeRates[] (an override). Without any rate the cost is "unknown".
+ExchangeRateSource=ecb
+ExchangeRatesMaxAgeHours=26
 ExchangeRates[]
 ExchangeRates[EUR]=1.16
 ExchangeRatesAsOf=2026-10-12

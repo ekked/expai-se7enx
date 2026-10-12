@@ -188,6 +188,13 @@ class expAiCost
         $site = strtoupper( trim( (string) $config->get( 'Pricing', 'Currency', 'USD' ) ) );
         if ( $currency === '' || $currency === $site )
             return 1.0;
+        // #392 the reference rate of the European Central Bank (expAiExchangeRates), else [Pricing] ExchangeRates[]
+        // (a process that started before the class existed, e.g. a long-running worker, uses the settings)
+        if ( class_exists( 'expAiExchangeRates' ) )
+        {
+            $found = expAiExchangeRates::lookup( $currency, $site, $config );
+            return $found ? (float) $found['rate'] : null;
+        }
         $rates = $config->get( 'Pricing', 'ExchangeRates', array() );
         $rates = is_array( $rates ) ? array_change_key_case( $rates, CASE_UPPER ) : array();
         return isset( $rates[$currency] ) && is_numeric( $rates[$currency] ) && (float) $rates[$currency] > 0 ? (float) $rates[$currency] : null;

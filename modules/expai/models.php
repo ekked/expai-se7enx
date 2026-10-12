@@ -85,6 +85,8 @@ if ( $Module->isCurrentAction( 'TestPrompt' ) || $Module->isCurrentAction( 'Load
 
 $providers = array();
 $recentTests = expAiModelTest::recentJobs();
+// #392 the exchange rates of the currencies the models price in
+$exchange = class_exists( 'expAiExchangeRates' ) ? expAiExchangeRates::inUse( $config ) : array();
 foreach ( array_keys( $registry->providers() ) as $id )
 {
     $p = $registry->describeProvider( $id );
@@ -105,6 +107,13 @@ foreach ( array_keys( $registry->providers() ) as $id )
         if ( $test && $test['alias'] === $m['alias'] )
             $p['models'][$i]['run']['test'] = $test;
     }
+    // #392 the currency the provider's models price in and the rate they are converted with (ECB or the settings)
+    $p['exchange'] = false;
+    foreach ( $p['models'] as $m )
+        foreach ( $exchange as $row )
+            if ( !$p['exchange'] && isset( $m['price_currency'] ) && $m['price_currency'] === $row['currency'] )
+                $p['exchange'] = array( 'currency' => $row['currency'], 'site' => $row['site'], 'date' => $row['date'], 'source' => $row['source'],
+                                        'rate' => $row['rate'] !== null ? expAiCost::number( $row['rate'], 4 ) : '' );
     $providers[] = $p;
 }
 $local = array();

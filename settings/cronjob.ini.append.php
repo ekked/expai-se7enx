@@ -12,5 +12,6 @@ Scripts[]=expai_queue.php
 Scripts[]=expai_prune.php
 # threads: events, proposals and checkpoints older than expai.ini [ThreadSettings] *KeepDays (30 days)
 Scripts[]=expai_thread_prune.php
+Scripts[]=expai_exchange_rates.php
 
 */ ?>

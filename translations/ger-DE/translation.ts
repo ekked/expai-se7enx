@@ -2014,6 +2014,26 @@
 <context>
     <name>extension/expai/models</name>
     <message>
+        <source>%currency: no exchange rate, cost unknown</source>
+        <translation>%currency: kein Wechselkurs, Kosten unbekannt</translation>
+    </message>
+    <message>
+        <source>rate from the settings (%date)</source>
+        <translation>Kurs aus den Einstellungen (%date)</translation>
+    </message>
+    <message>
+        <source>ECB reference rate of %date</source>
+        <translation>EZB-Referenzkurs vom %date</translation>
+    </message>
+    <message>
+        <source>1 %currency = %rate %site</source>
+        <translation>1 %currency = %rate %site</translation>
+    </message>
+    <message>
+        <source>Prices</source>
+        <translation>Preise</translation>
+    </message>
+    <message>
         <source>context %tokens tokens</source>
         <translation>Kontext %tokens Tokens</translation>
     </message>

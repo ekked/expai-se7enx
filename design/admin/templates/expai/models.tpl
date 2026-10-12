@@ -30,6 +30,9 @@
             <div><dt>{'Region'|i18n( 'extension/expai/models' )}</dt><dd>{if $p.region}{$p.region|upcase|wash}{else}{'unknown'|i18n( 'extension/expai/models' )}{/if}</dd></div>
             <div><dt>{'Retention'|i18n( 'extension/expai/models' )}</dt><dd>{$p.retention|wash}</dd></div>
             <div><dt>{'Terms checked'|i18n( 'extension/expai/models' )}</dt><dd>{if $p.terms_checked_at}{$p.terms_checked_at|wash}{else}{'not checked'|i18n( 'extension/expai/models' )}{/if}</dd></div>
+{if $p.exchange}
+            <div><dt>{'Prices'|i18n( 'extension/expai/models' )}</dt><dd>{if $p.exchange.rate}{'1 %currency = %rate %site'|i18n( 'extension/expai/models',, hash( '%currency', $p.exchange.currency, '%rate', $p.exchange.rate, '%site', $p.exchange.site ) )|wash}<br /><small>{if eq( $p.exchange.source, 'ecb' )}{'ECB reference rate of %date'|i18n( 'extension/expai/models',, hash( '%date', $p.exchange.date ) )|wash}{else}{'rate from the settings (%date)'|i18n( 'extension/expai/models',, hash( '%date', $p.exchange.date ) )|wash}{/if}</small>{else}<span class="exp-ai-step-failed">{'%currency: no exchange rate, cost unknown'|i18n( 'extension/expai/models',, hash( '%currency', $p.exchange.currency ) )|wash}</span>{/if}</dd></div>
+{/if}
             <div><dt>{'Key'|i18n( 'extension/expai/models' )}</dt><dd>{if $p.key_present}{'present'|i18n( 'extension/expai/models' )}{elseif $p.ready}{'not needed'|i18n( 'extension/expai/models' )}{else}<span class="exp-ai-step-failed">{'missing'|i18n( 'extension/expai/models' )}</span>{/if}</dd></div>
         </dl>
         <table class="list exp-ai-draft-table" cellspacing="0">

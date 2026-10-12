@@ -114,5 +114,16 @@ Timeout=420
 RetryBase=10
 MaxBackoff=60
 Description=Test prompt or load of a model (expai/models)
+# The reference rates of the European Central Bank (#392, classes/expaiexchangerates.php): queued once a day when the
+# stored rates are older than expai.ini [Pricing] ExchangeRatesMaxAgeHours; no model call, no personal data.
+[JobType_expai.exchange.rates]
+Handler=expAiExchangeRatesHandler
+Class=system
+MaxAttempts=3
+Timeout=60
+RetryBase=300
+MaxBackoff=3600
+Description=Fetches the reference exchange rates of the European Central Bank
+
 
 */ ?>
