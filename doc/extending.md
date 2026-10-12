@@ -315,3 +315,38 @@ with an error).
 The ezjscore functions (expAiServerFunctions) are the browser's API: `load`, `history`, `chat`, `reset`, `drafts`,
 `keep`, `send`, `discard`, `field`, `fill`, `labels` (architecture.md). To add functions, register your own ezjscore
 server class in your extension's ezjscore.ini rather than changing expai's.
+
+## 7. Registries in the extension point survey
+
+The extension point survey of the kernel (Setup > RAD tools > Extension point survey, `setup/radsurvey/(show)/registries`)
+counts and checks every entry of the registries expai declares in `settings/rad.ini.append.php` (the format is described
+in the kernel's `settings/rad.ini` and in doc/bc/6.0/rad-extension-surface.md, "Registries declared in rad.ini"). A
+provider, tool or field action you add in your own settings appears there at once, and one whose class, template or
+block is missing is shown as broken.
+
+| Registry | Read from | Each entry must be |
+| --- | --- | --- |
+| `expai_provider_types` | `expAiProviderRegistry::TYPES` | a class implementing `expAiProvider` |
+| `expai_providers` | `[Provider_<id>] Type=` | a type of `expAiProviderRegistry::TYPES` |
+| `expai_models` | `[Model_<provider>.<id>] Id=` | any id |
+| `expai_batch_apis` | `expAiBatchApi::SHAPES` | a class extending `expAiBatchApi` |
+| `expai_lanes` | `[Lane_<provider>.<lane>] Type=` | `sync` or `batch` |
+| `expai_tools` | `[Tool_<name>] Class=` | a class extending `expAiTool` |
+| `expai_search_providers` | `[SearchProvider_<name>] Class=` | a class extending `expAiWebSearchProvider` |
+| `expai_mcp_servers` | `[McpSettings] Servers[]` | a block `[McpServer_<name>]` |
+| `expai_mcp_bridge_tools` | `[McpBridge] Tools[]` | a tool of `expMcpBridge` (listed, not added: counted by expmcp) |
+| `expai_service_tools` | `[ServiceTools] Services[]`, `Domains[]` | any (listed, not added: counted as remote services) |
+| `expai_chains` | `[ChainSettings] Chains[]` | a block `[Chain_<name>]` |
+| `expai_chain_steps` | `[ChainStep_<chain>.<step>] Type=` | a type of `expAiChain::TYPES` |
+| `expai_field_actions` | `[FieldAction_<name>] Handler=` | a class implementing `expAiFieldAction` |
+| `expai_presets` | `[FieldAction_preset_<name>]`, `[FieldAction_improve_<name>] Handler=` | a class implementing `expAiFieldAction` |
+| `expai_appliers` | `[QueueSettings] Appliers[<kind>]` | a class implementing `expAiRequestApplier` |
+| `expai_segmenters` | `[DiffSettings] Segmenters[<datatype>]`, `FallbackSegmenter` | a class implementing `expAiSegmenter` |
+| `expai_panes` | `[PanelSection_<name>]`, `[EditSection_<name>]`, `[VectorPane_<name>] Template=` | a template some design has |
+| `expai_history_repositories` | `[HistorySettings] Repositories[]` | a block `[HistoryRepository_<name>]` |
+| `expai_data_policy` | `[DataPolicy] SectionRegions[]`, `ClassRegions[]`, `ZeroRetentionSections[]`, `ZeroRetentionClasses[]` | any |
+| `expai_request_veto` | `[RequestVeto] Rules[]` | a block `[RequestVeto_<rule>]` |
+
+The job types of expai (`settings/expqueue.ini.append.php`) are counted by expqueue's registry `expqueue_job_types`, its
+listener of `package/install/drafts` by the kernel's registry `eventlisteners`, its server functions by the kernel's
+ezjscore registry, and its policy functions with their limitations in the survey's modules section.

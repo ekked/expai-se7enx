@@ -6201,4 +6201,167 @@
         <translation>EI: Log</translation>
     </message>
 </context>
+<context>
+    <name>extension/expai/rad</name>
+    <message>
+        <source>AI provider types</source>
+        <translation>AI provider types</translation>
+    </message>
+    <message>
+        <source>The adapters a provider block can use (Type=): each a class implementing expAiProvider.</source>
+        <translation>The adapters a provider block can use (Type=): each a class implementing expAiProvider.</translation>
+    </message>
+    <message>
+        <source>AI providers</source>
+        <translation>AI providers</translation>
+    </message>
+    <message>
+        <source>The providers of expai.ini [Provider_&lt;id&gt;], each with a Type the provider registry knows.</source>
+        <translation>The providers of expai.ini [Provider_&lt;id&gt;], each with a Type the provider registry knows.</translation>
+    </message>
+    <message>
+        <source>AI models</source>
+        <translation>AI models</translation>
+    </message>
+    <message>
+        <source>The models of expai.ini [Model_&lt;provider&gt;.&lt;id&gt;].</source>
+        <translation>The models of expai.ini [Model_&lt;provider&gt;.&lt;id&gt;].</translation>
+    </message>
+    <message>
+        <source>AI batch APIs</source>
+        <translation>AI batch APIs</translation>
+    </message>
+    <message>
+        <source>The batch interfaces a batch lane can use (BatchApi=): each a class extending expAiBatchApi.</source>
+        <translation>The batch interfaces a batch lane can use (BatchApi=): each a class extending expAiBatchApi.</translation>
+    </message>
+    <message>
+        <source>AI lanes</source>
+        <translation>AI lanes</translation>
+    </message>
+    <message>
+        <source>The lanes of expai.ini [Lane_&lt;provider&gt;.&lt;lane&gt;]: sync or batch.</source>
+        <translation>The lanes of expai.ini [Lane_&lt;provider&gt;.&lt;lane&gt;]: sync or batch.</translation>
+    </message>
+    <message>
+        <source>AI tools</source>
+        <translation>AI tools</translation>
+    </message>
+    <message>
+        <source>The tools a model can call, content, web and history tools alike (expai.ini [Tool_&lt;name&gt;] Class=, extending expAiTool).</source>
+        <translation>The tools a model can call, content, web and history tools alike (expai.ini [Tool_&lt;name&gt;] Class=, extending expAiTool).</translation>
+    </message>
+    <message>
+        <source>AI web search providers</source>
+        <translation>AI web search providers</translation>
+    </message>
+    <message>
+        <source>The search services of the tool web_search (expai.ini [SearchProvider_&lt;name&gt;] Class=, extending expAiWebSearchProvider).</source>
+        <translation>The search services of the tool web_search (expai.ini [SearchProvider_&lt;name&gt;] Class=, extending expAiWebSearchProvider).</translation>
+    </message>
+    <message>
+        <source>AI MCP servers</source>
+        <translation>AI MCP servers</translation>
+    </message>
+    <message>
+        <source>The remote MCP servers whose tools a model can call (expai.ini [McpSettings] Servers[], each with its [McpServer_&lt;name&gt;]).</source>
+        <translation>The remote MCP servers whose tools a model can call (expai.ini [McpSettings] Servers[], each with its [McpServer_&lt;name&gt;]).</translation>
+    </message>
+    <message>
+        <source>AI tools taken from the MCP bridge</source>
+        <translation>AI tools taken from the MCP bridge</translation>
+    </message>
+    <message>
+        <source>The tools of expmcp that a model can call in process (expai.ini [McpBridge] Tools[]); counted as tools of expmcp, so not added again.</source>
+        <translation>The tools of expmcp that a model can call in process (expai.ini [McpBridge] Tools[]); counted as tools of expmcp, so not added again.</translation>
+    </message>
+    <message>
+        <source>AI service tools</source>
+        <translation>AI service tools</translation>
+    </message>
+    <message>
+        <source>The remote services of expservices a model can call (expai.ini [ServiceTools] Services[] and Domains[]); counted as remote services, so not added again.</source>
+        <translation>The remote services of expservices a model can call (expai.ini [ServiceTools] Services[] and Domains[]); counted as remote services, so not added again.</translation>
+    </message>
+    <message>
+        <source>AI chains</source>
+        <translation>AI chains</translation>
+    </message>
+    <message>
+        <source>The chains of expai.ini [ChainSettings] Chains[], each with its [Chain_&lt;name&gt;].</source>
+        <translation>The chains of expai.ini [ChainSettings] Chains[], each with its [Chain_&lt;name&gt;].</translation>
+    </message>
+    <message>
+        <source>AI chain steps</source>
+        <translation>AI chain steps</translation>
+    </message>
+    <message>
+        <source>The steps of the chains (expai.ini [ChainStep_&lt;chain&gt;.&lt;step&gt;]), each of a type the chain engine runs.</source>
+        <translation>The steps of the chains (expai.ini [ChainStep_&lt;chain&gt;.&lt;step&gt;]), each of a type the chain engine runs.</translation>
+    </message>
+    <message>
+        <source>AI field actions</source>
+        <translation>AI field actions</translation>
+    </message>
+    <message>
+        <source>The actions of the edit view's fields (expai.ini [FieldAction_&lt;name&gt;] Handler=, implementing expAiFieldAction).</source>
+        <translation>The actions of the edit view's fields (expai.ini [FieldAction_&lt;name&gt;] Handler=, implementing expAiFieldAction).</translation>
+    </message>
+    <message>
+        <source>AI presets</source>
+        <translation>AI presets</translation>
+    </message>
+    <message>
+        <source>The presets and the improve actions of the edit view (expai.ini [FieldAction_preset_&lt;name&gt;] and [FieldAction_improve_&lt;name&gt;]).</source>
+        <translation>The presets and the improve actions of the edit view (expai.ini [FieldAction_preset_&lt;name&gt;] and [FieldAction_improve_&lt;name&gt;]).</translation>
+    </message>
+    <message>
+        <source>AI request appliers</source>
+        <translation>AI request appliers</translation>
+    </message>
+    <message>
+        <source>What applies the answer of a queued request (expai.ini [QueueSettings] Appliers[&lt;kind&gt;]=, implementing expAiRequestApplier).</source>
+        <translation>What applies the answer of a queued request (expai.ini [QueueSettings] Appliers[&lt;kind&gt;]=, implementing expAiRequestApplier).</translation>
+    </message>
+    <message>
+        <source>AI diff segmenters</source>
+        <translation>AI diff segmenters</translation>
+    </message>
+    <message>
+        <source>What splits a field of a datatype into segments for the diff (expai.ini [DiffSettings] Segmenters[&lt;datatype&gt;]= and FallbackSegmenter=, implementing expAiSegmenter).</source>
+        <translation>What splits a field of a datatype into segments for the diff (expai.ini [DiffSettings] Segmenters[&lt;datatype&gt;]= and FallbackSegmenter=, implementing expAiSegmenter).</translation>
+    </message>
+    <message>
+        <source>AI panel sections and panes</source>
+        <translation>AI panel sections and panes</translation>
+    </message>
+    <message>
+        <source>The templates of the panel sections, the edit view sections and the Vector panes (expai.ini [PanelSection_&lt;name&gt;], [EditSection_&lt;name&gt;], [VectorPane_&lt;name&gt;] Template=).</source>
+        <translation>The templates of the panel sections, the edit view sections and the Vector panes (expai.ini [PanelSection_&lt;name&gt;], [EditSection_&lt;name&gt;], [VectorPane_&lt;name&gt;] Template=).</translation>
+    </message>
+    <message>
+        <source>AI history repositories</source>
+        <translation>AI history repositories</translation>
+    </message>
+    <message>
+        <source>The repositories the tool project_history reads (expai.ini [HistorySettings] Repositories[], each with its [HistoryRepository_&lt;name&gt;]).</source>
+        <translation>The repositories the tool project_history reads (expai.ini [HistorySettings] Repositories[], each with its [HistoryRepository_&lt;name&gt;]).</translation>
+    </message>
+    <message>
+        <source>AI data policy rules</source>
+        <translation>AI data policy rules</translation>
+    </message>
+    <message>
+        <source>The regions and zero retention rules of sections and classes (expai.ini [DataPolicy]).</source>
+        <translation>The regions and zero retention rules of sections and classes (expai.ini [DataPolicy]).</translation>
+    </message>
+    <message>
+        <source>AI request veto rules</source>
+        <translation>AI request veto rules</translation>
+    </message>
+    <message>
+        <source>The rules that refuse a request (expai.ini [RequestVeto] Rules[], each with its [RequestVeto_&lt;rule&gt;]).</source>
+        <translation>The rules that refuse a request (expai.ini [RequestVeto] Rules[], each with its [RequestVeto_&lt;rule&gt;]).</translation>
+    </message>
+</context>
 </TS>

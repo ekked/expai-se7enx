@@ -6201,4 +6201,167 @@
         <translation>EI: Protokoll</translation>
     </message>
 </context>
+<context>
+    <name>extension/expai/rad</name>
+    <message>
+        <source>AI provider types</source>
+        <translation>KI-Anbietertypen</translation>
+    </message>
+    <message>
+        <source>The adapters a provider block can use (Type=): each a class implementing expAiProvider.</source>
+        <translation>Die Adapter, die ein Anbieter-Block verwenden kann (Type=): jeweils eine Klasse, die expAiProvider implementiert.</translation>
+    </message>
+    <message>
+        <source>AI providers</source>
+        <translation>KI-Anbieter</translation>
+    </message>
+    <message>
+        <source>The providers of expai.ini [Provider_&lt;id&gt;], each with a Type the provider registry knows.</source>
+        <translation>Die Anbieter aus expai.ini [Provider_&lt;ID&gt;], jeweils mit einem Type, den die Anbieter-Registry kennt.</translation>
+    </message>
+    <message>
+        <source>AI models</source>
+        <translation>KI-Modelle</translation>
+    </message>
+    <message>
+        <source>The models of expai.ini [Model_&lt;provider&gt;.&lt;id&gt;].</source>
+        <translation>Die Modelle aus expai.ini [Model_&lt;Anbieter&gt;.&lt;ID&gt;].</translation>
+    </message>
+    <message>
+        <source>AI batch APIs</source>
+        <translation>KI-Batch-APIs</translation>
+    </message>
+    <message>
+        <source>The batch interfaces a batch lane can use (BatchApi=): each a class extending expAiBatchApi.</source>
+        <translation>Die Batch-Schnittstellen, die eine Batch-Lane verwenden kann (BatchApi=): jeweils eine Klasse, die expAiBatchApi erweitert.</translation>
+    </message>
+    <message>
+        <source>AI lanes</source>
+        <translation>KI-Lanes</translation>
+    </message>
+    <message>
+        <source>The lanes of expai.ini [Lane_&lt;provider&gt;.&lt;lane&gt;]: sync or batch.</source>
+        <translation>Die Lanes aus expai.ini [Lane_&lt;Anbieter&gt;.&lt;Lane&gt;]: sync oder batch.</translation>
+    </message>
+    <message>
+        <source>AI tools</source>
+        <translation>KI-Werkzeuge</translation>
+    </message>
+    <message>
+        <source>The tools a model can call, content, web and history tools alike (expai.ini [Tool_&lt;name&gt;] Class=, extending expAiTool).</source>
+        <translation>Die Werkzeuge, die ein Modell aufrufen kann, Inhalts-, Web- und Verlaufswerkzeuge gleichermaßen (expai.ini [Tool_&lt;Name&gt;] Class=, erweitert expAiTool).</translation>
+    </message>
+    <message>
+        <source>AI web search providers</source>
+        <translation>KI-Websuchanbieter</translation>
+    </message>
+    <message>
+        <source>The search services of the tool web_search (expai.ini [SearchProvider_&lt;name&gt;] Class=, extending expAiWebSearchProvider).</source>
+        <translation>Die Suchdienste des Werkzeugs web_search (expai.ini [SearchProvider_&lt;Name&gt;] Class=, erweitert expAiWebSearchProvider).</translation>
+    </message>
+    <message>
+        <source>AI MCP servers</source>
+        <translation>KI-MCP-Server</translation>
+    </message>
+    <message>
+        <source>The remote MCP servers whose tools a model can call (expai.ini [McpSettings] Servers[], each with its [McpServer_&lt;name&gt;]).</source>
+        <translation>Die entfernten MCP-Server, deren Werkzeuge ein Modell aufrufen kann (expai.ini [McpSettings] Servers[], jeweils mit seinem [McpServer_&lt;Name&gt;]).</translation>
+    </message>
+    <message>
+        <source>AI tools taken from the MCP bridge</source>
+        <translation>KI-Werkzeuge aus der MCP-Brücke</translation>
+    </message>
+    <message>
+        <source>The tools of expmcp that a model can call in process (expai.ini [McpBridge] Tools[]); counted as tools of expmcp, so not added again.</source>
+        <translation>Die Werkzeuge von expmcp, die ein Modell im selben Prozess aufrufen kann (expai.ini [McpBridge] Tools[]); als Werkzeuge von expmcp gezählt, daher nicht erneut addiert.</translation>
+    </message>
+    <message>
+        <source>AI service tools</source>
+        <translation>KI-Dienstwerkzeuge</translation>
+    </message>
+    <message>
+        <source>The remote services of expservices a model can call (expai.ini [ServiceTools] Services[] and Domains[]); counted as remote services, so not added again.</source>
+        <translation>Die entfernten Dienste von expservices, die ein Modell aufrufen kann (expai.ini [ServiceTools] Services[] und Domains[]); als entfernte Dienste gezählt, daher nicht erneut addiert.</translation>
+    </message>
+    <message>
+        <source>AI chains</source>
+        <translation>KI-Ketten</translation>
+    </message>
+    <message>
+        <source>The chains of expai.ini [ChainSettings] Chains[], each with its [Chain_&lt;name&gt;].</source>
+        <translation>Die Ketten aus expai.ini [ChainSettings] Chains[], jeweils mit ihrem [Chain_&lt;Name&gt;].</translation>
+    </message>
+    <message>
+        <source>AI chain steps</source>
+        <translation>KI-Kettenschritte</translation>
+    </message>
+    <message>
+        <source>The steps of the chains (expai.ini [ChainStep_&lt;chain&gt;.&lt;step&gt;]), each of a type the chain engine runs.</source>
+        <translation>Die Schritte der Ketten (expai.ini [ChainStep_&lt;Kette&gt;.&lt;Schritt&gt;]), jeweils von einem Typ, den die Ketten-Engine ausführt.</translation>
+    </message>
+    <message>
+        <source>AI field actions</source>
+        <translation>KI-Feldaktionen</translation>
+    </message>
+    <message>
+        <source>The actions of the edit view's fields (expai.ini [FieldAction_&lt;name&gt;] Handler=, implementing expAiFieldAction).</source>
+        <translation>Die Aktionen der Felder der Bearbeitungsansicht (expai.ini [FieldAction_&lt;Name&gt;] Handler=, implementiert expAiFieldAction).</translation>
+    </message>
+    <message>
+        <source>AI presets</source>
+        <translation>KI-Vorlagen</translation>
+    </message>
+    <message>
+        <source>The presets and the improve actions of the edit view (expai.ini [FieldAction_preset_&lt;name&gt;] and [FieldAction_improve_&lt;name&gt;]).</source>
+        <translation>Die Vorlagen und die Verbesserungsaktionen der Bearbeitungsansicht (expai.ini [FieldAction_preset_&lt;Name&gt;] und [FieldAction_improve_&lt;Name&gt;]).</translation>
+    </message>
+    <message>
+        <source>AI request appliers</source>
+        <translation>KI-Anwender von Anfragen</translation>
+    </message>
+    <message>
+        <source>What applies the answer of a queued request (expai.ini [QueueSettings] Appliers[&lt;kind&gt;]=, implementing expAiRequestApplier).</source>
+        <translation>Was die Antwort einer eingereihten Anfrage anwendet (expai.ini [QueueSettings] Appliers[&lt;Art&gt;]=, implementiert expAiRequestApplier).</translation>
+    </message>
+    <message>
+        <source>AI diff segmenters</source>
+        <translation>KI-Diff-Segmentierer</translation>
+    </message>
+    <message>
+        <source>What splits a field of a datatype into segments for the diff (expai.ini [DiffSettings] Segmenters[&lt;datatype&gt;]= and FallbackSegmenter=, implementing expAiSegmenter).</source>
+        <translation>Was ein Feld eines Datentyps für den Diff in Segmente teilt (expai.ini [DiffSettings] Segmenters[&lt;Datentyp&gt;]= und FallbackSegmenter=, implementiert expAiSegmenter).</translation>
+    </message>
+    <message>
+        <source>AI panel sections and panes</source>
+        <translation>KI-Panelbereiche und -Bereiche</translation>
+    </message>
+    <message>
+        <source>The templates of the panel sections, the edit view sections and the Vector panes (expai.ini [PanelSection_&lt;name&gt;], [EditSection_&lt;name&gt;], [VectorPane_&lt;name&gt;] Template=).</source>
+        <translation>Die Templates der Panelbereiche, der Bereiche der Bearbeitungsansicht und der Vector-Bereiche (expai.ini [PanelSection_&lt;Name&gt;], [EditSection_&lt;Name&gt;], [VectorPane_&lt;Name&gt;] Template=).</translation>
+    </message>
+    <message>
+        <source>AI history repositories</source>
+        <translation>KI-Verlaufs-Repositories</translation>
+    </message>
+    <message>
+        <source>The repositories the tool project_history reads (expai.ini [HistorySettings] Repositories[], each with its [HistoryRepository_&lt;name&gt;]).</source>
+        <translation>Die Repositories, die das Werkzeug project_history liest (expai.ini [HistorySettings] Repositories[], jeweils mit seinem [HistoryRepository_&lt;Name&gt;]).</translation>
+    </message>
+    <message>
+        <source>AI data policy rules</source>
+        <translation>KI-Datenrichtlinien-Regeln</translation>
+    </message>
+    <message>
+        <source>The regions and zero retention rules of sections and classes (expai.ini [DataPolicy]).</source>
+        <translation>Die Regionen und Regeln ohne Speicherung für Bereiche und Klassen (expai.ini [DataPolicy]).</translation>
+    </message>
+    <message>
+        <source>AI request veto rules</source>
+        <translation>KI-Veto-Regeln für Anfragen</translation>
+    </message>
+    <message>
+        <source>The rules that refuse a request (expai.ini [RequestVeto] Rules[], each with its [RequestVeto_&lt;rule&gt;]).</source>
+        <translation>Die Regeln, die eine Anfrage ablehnen (expai.ini [RequestVeto] Rules[], jeweils mit ihrem [RequestVeto_&lt;Regel&gt;]).</translation>
+    </message>
+</context>
 </TS>
