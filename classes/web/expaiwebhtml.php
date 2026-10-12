@@ -45,6 +45,9 @@ class expAiWebHtml
             return array( 'title' => '', 'text' => '', 'links' => 0 );
         $document = new DOMDocument();
         $previous = libxml_use_internal_errors( true );
+        // the text is UTF-8 already (the fetcher converted it): a charset of the page's own meta element would make
+        // libxml decode it a second time, so it goes
+        $html = (string) preg_replace( '/<meta\b[^>]*charset\s*=[^>]*>/i', '', $html );
         // no network, no entities: LIBXML_NONET; the encoding hint makes DOMDocument read UTF-8
         $document->loadHTML( '<?xml encoding="UTF-8">' . $html, LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_COMPACT );
         libxml_clear_errors();
