@@ -79,6 +79,10 @@ class expAiChainEngine
             $label = expAiText::cut( $chain->label() . ': ' . expAiText::oneLine( $brief ), 140 ) . ( $count > 1 ? ' (' . $item . '/' . $count . ')' : '' );
             $group = expQueue::createGroup( $label, 'expai.chain', array( 'budget_micros' => $chain->maxCostMicros(),
                                                                           'user_id' => (int) $user->attribute( 'contentobject_id' ) ) );
+            // #385 an insert that failed (SQLite: "database is locked" while another process writes) leaves the object
+            // without its id; going on would queue steps into a group that does not exist and store the run as row 0
+            if ( (int) $group->attribute( 'id' ) <= 0 )
+                throw new expAiException( 'The chain could not be started. Please try again.', 'the job group of the run could not be stored' );
             $now = time();
             $run = new expAiChainRun( array(
                 'uuid' => self::uuid(), 'chain' => $chain->id(), 'chain_hash' => $chain->hash(), 'label' => $label,
@@ -89,6 +93,12 @@ class expAiChainEngine
                 'data' => json_encode( array( 'document' => new stdClass(), 'lane' => isset( $options['lane'] ) ? (string) $options['lane'] : '' ) ),
                 'created' => $now, 'modified' => $now ) );
             $run->store();
+            if ( (int) $run->attribute( 'id' ) <= 0 )
+            {
+                if ( class_exists( 'expQueueGroup' ) && method_exists( $group, 'remove' ) )
+                    $group->remove();
+                throw new expAiException( 'The chain could not be started. Please try again.', 'the run could not be stored' );
+            }
             $this->enqueueStep( $run, $chain->order()[0], 0 );
             $runs[] = expAiChainRun::fetch( (int) $run->attribute( 'id' ) );
         }

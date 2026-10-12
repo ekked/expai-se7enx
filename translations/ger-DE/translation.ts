@@ -280,6 +280,10 @@
 <context>
     <name>extension/expai/error</name>
     <message>
+        <source>The chain could not be started. Please try again.</source>
+        <translation>Die Kette konnte nicht gestartet werden. Bitte versuchen Sie es erneut.</translation>
+    </message>
+    <message>
         <source>There is no chain "%chain".</source>
         <translation>Es gibt keine Kette „%chain“.</translation>
     </message>

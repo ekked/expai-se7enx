@@ -72,6 +72,9 @@ class expAiChainRun extends eZPersistentObject
     /** @return expAiChainRun|null by id or uuid */
     public static function fetch( $idOrUuid )
     {
+        // #385 0 is no run (a run whose insert failed has no id; it must never be read as a stored row)
+        if ( is_numeric( $idOrUuid ) && (int) $idOrUuid <= 0 )
+            return null;
         $key = is_numeric( $idOrUuid ) ? array( 'id' => (int) $idOrUuid ) : array( 'uuid' => (string) $idOrUuid );
         $row = eZPersistentObject::fetchObject( self::definition(), null, $key );
         return $row instanceof self ? $row : null;
@@ -179,5 +182,22 @@ class expAiChainRun extends eZPersistentObject
     {
         $this->setAttribute( 'modified', time() );
         $this->store();
+    }
+
+    /**
+     * #385 a run is inserted once (without an id: the database gives it one) and updated by its id afterwards; a run
+     * whose insert failed keeps the id 0, and storing it again would insert the row 0 (SQLite accepts an explicit 0 in
+     * an AUTOINCREMENT key). Such a store is refused.
+     */
+    public function store( $fieldFilters = null )
+    {
+        // a new run has no id (null) until its insert; an id of 0 means that insert failed
+        $id = $this->attribute( 'id' );
+        if ( $id !== null && (string) $id !== '' && (int) $id <= 0 )
+        {
+            eZDebug::writeError( 'expai: the chain run ' . $this->attribute( 'uuid' ) . ' has no id (its insert failed); not stored', __METHOD__ );
+            return;
+        }
+        parent::store( $fieldFilters );
     }
 }
