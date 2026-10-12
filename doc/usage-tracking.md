@@ -52,7 +52,8 @@ another provider without prices has an unknown cost rather than a Claude price. 
   or with `expai/log` the whole site and the top users. See [dashboard.md](dashboard.md).
 - **Log** (`expai/log`): every turn and request, filtered by date, user, node, action, model and errors, sortable,
   with totals per day and per user, and a CSV export (no request texts, user ids only). `(model)/<alias>` filters by
-  the model alias, `(request)/<id>` shows one request, `(thread)/<id>` the requests of one thread.
+  the model alias, `(request)/<id>` shows one request, `(thread)/<id>` the requests of one thread. The edit form
+  links `(request)/<id>` as **View record** after each field action, preset and Improve entry.
 - **Models card** of the dashboard: per model the requests, success rate, errors by kind (timeout, unreachable,
   HTTP error, refused, limit, budget), how often the fallback replaced it, median and 95th percentile latency,
   tokens per second, time per turn, cost, latency per day, the newest test prompt and probe; each model links to its

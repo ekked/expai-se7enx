@@ -43,6 +43,12 @@ KB). The server checks that the version is the editor's own draft and editable, 
 that the action is offered for its datatype, runs the action's handler and returns `{value, note}`. expai.js puts the
 value into the field, highlights it, shows the note and an **Undo** link.
 
+The answer also carries `record` (`expAiEditForm::requestRecord()`: `usage_id`, `log` = `expai/log/(request)/<id>`,
+and `job` = `expqueue/job/<uuid>` when the request ran as a job and the user has `expqueue/view`). The note shows it
+as **View record** (and **View job**), opening in a new tab. A failure after the request was sent answers
+`{error, record}` instead of an ezjscore error, so the link is there next to the error too; a failure before anything
+was sent (no row) stays an ezjscore error. Presets and the Improve menu (`expaipreset::preset`) do the same.
+
 The version is marked in the log (action `field` or `fill`), so it carries the label.
 
 ## Getting values in and out of the fields

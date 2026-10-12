@@ -39,7 +39,7 @@ class expAiEditForm
 
     /**
      * A field action.
-     * @return array value, note, action
+     * @return array value, note, action, datatype, fallback, record (requestRecord())
      * @throws expAiException
      */
     public static function fieldAction( expAiConfig $config, array $post )
@@ -76,7 +76,8 @@ class expAiEditForm
             return $action->run( $request, $recorder );
         }, $fallback );
         self::mark( $object, $version, $language, 'field', $action->name() . ( $request->instruction !== '' ? ': ' . $request->instruction : '' ), $result['model'], $recorder->providerId() );
-        return array( 'value' => $result['value'], 'note' => $result['note'], 'action' => $action->name(), 'datatype' => $datatype, 'fallback' => $fallback );
+        return array( 'value' => $result['value'], 'note' => $result['note'], 'action' => $action->name(), 'datatype' => $datatype, 'fallback' => $fallback,
+                      'record' => self::requestRecord() );
     }
 
     /**
@@ -177,6 +178,7 @@ class expAiEditForm
         return expAiModelFallback::sendWith( $config, $alias, function ( $use ) use ( $config, $object, $action, $run, &$fallback )
         {
             $recorder = self::recorder( $config, $object, $action, $use );
+            self::$lastRecorder = $recorder;
             if ( $fallback )
                 $recorder->setContext( array( 'requested_alias' => $fallback['requested'], 'fallback_reason' => $fallback['reason'] ) );
             return array( call_user_func( $run, $recorder ), $recorder );
@@ -193,6 +195,41 @@ class expAiEditForm
         // the content of the form goes to the provider: the data policy decides first
         expAiDataPolicy::forProvider( $config, $provider->providerId() )->assertObject( $object );
         return new expAiUsageRecorder( $provider, array( 'node_id' => $main ? (int) $main->attribute( 'node_id' ) : 0, 'action' => $action ) );
+    }
+
+    /** @var expAiUsageRecorder|null the recorder of the last request of the edit form in this page request ("View record") */
+    protected static $lastRecorder = null;
+
+    /** Forgets the last request (a persistent worker keeps statics from one page request to the next) */
+    public static function resetRecord()
+    {
+        self::$lastRecorder = null;
+    }
+
+    /**
+     * The record of the last request of the edit form, for the "View record" link next to the result: its row in the
+     * usage log and, when it ran as a job, the job (only for users with expqueue/view).
+     * @return array|null usage_id, log (expai/log/(request)/<id>), job_uuid, job (expqueue/job/<uuid> or ''), texts; null without a row
+     */
+    public static function requestRecord()
+    {
+        $row = self::$lastRecorder ? self::$lastRecorder->last : null;
+        if ( !$row || !(int) $row->attribute( 'id' ) )
+            return null;
+        $id = (int) $row->attribute( 'id' );
+        $uuid = (string) $row->attribute( 'job_uuid' );
+        $job = '';
+        if ( $uuid !== '' && class_exists( 'expQueue' ) )
+        {
+            $access = eZUser::currentUser()->hasAccessTo( 'expqueue', 'view' );
+            if ( isset( $access['accessWord'] ) && $access['accessWord'] !== 'no' )
+                $job = 'expqueue/job/' . rawurlencode( $uuid );
+        }
+        return array( 'usage_id' => $id, 'log' => 'expai/log/(request)/' . $id, 'job_uuid' => $job !== '' ? $uuid : '', 'job' => $job,
+                      'texts' => array( 'log' => ezpI18n::tr( 'extension/expai/edit', 'View record' ),
+                                        'log_title' => ezpI18n::tr( 'extension/expai/edit', 'This request in the usage log (opens in a new tab)' ),
+                                        'job' => ezpI18n::tr( 'extension/expai/edit', 'View job' ),
+                                        'job_title' => ezpI18n::tr( 'extension/expai/edit', 'The job of this request in the queue (opens in a new tab)' ) ) );
     }
 
     /** @return array identifier => value from the JSON the form sent */

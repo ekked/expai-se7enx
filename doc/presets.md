@@ -10,6 +10,8 @@ The edit form has two kinds of one-click help that need no prompt:
 Both work like the other field actions ([edit-view-integration.md](edit-view-integration.md)): the answer is put
 into the field in the form, highlighted, with a note and **Undo**. Nothing is stored until the editor stores or
 publishes the draft as usual (autosave may store the draft, as it does for typed text; it never publishes).
+After the answer (or a failure after the request was sent) the note also links **View record**, the request's row
+in the usage log (`expai/log/(request)/<id>`, in a new tab, so the unsaved form stays open).
 
 ```
 Defaults in use: Claude Sonnet 5.5 (Anthropic) · region US · standard lane · about $0.01 per click · nothing is stored until you store the draft

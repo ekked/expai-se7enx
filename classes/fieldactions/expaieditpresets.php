@@ -158,7 +158,7 @@ class expAiEditPresets extends expAiEditForm
     /**
      * Runs a preset or an Improve entry on one field of the editor's draft.
      * @param array $post object_id, version, language, attribute_id, kind (preset|improve), action, part, value, context
-     * @return array value, note, action, kind, part, fallback
+     * @return array value, note, action, kind, part, datatype, fallback, record (requestRecord())
      * @throws expAiException
      */
     public static function run( expAiConfig $config, array $post )
@@ -223,6 +223,6 @@ class expAiEditPresets extends expAiEditForm
         self::mark( $object, $version, $language, 'field', $kind . ':' . $name . ( $part !== '' ? ' (' . $identifier . '.' . $part . ')' : '' ),
                     $result['model'], $recorder->providerId() );
         return array( 'value' => $result['value'], 'note' => $result['note'], 'action' => $name, 'kind' => $kind, 'part' => $part,
-                      'datatype' => $datatype, 'fallback' => $fallback );
+                      'datatype' => $datatype, 'fallback' => $fallback, 'record' => self::requestRecord() );
     }
 }

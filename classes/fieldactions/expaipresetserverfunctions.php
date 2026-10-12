@@ -31,7 +31,10 @@ class expAiPresetServerFunctions extends expAiServerFunctions
             $post = self::formPost();
             $post['kind'] = self::post( 'kind', 'preset' );
             $post['part'] = self::post( 'part' );
-            return expAiEditPresets::run( $config, $post );
+            return self::withRecord( function () use ( $config, $post )
+            {
+                return expAiEditPresets::run( $config, $post );
+            } );
         } );
     }
 }

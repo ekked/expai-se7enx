@@ -260,8 +260,32 @@ class expAiServerFunctions extends ezjscServerFunctions
         {
             if ( function_exists( 'set_time_limit' ) )
                 @set_time_limit( self::timeout( $config ) + 30 );
-            return expAiEditForm::fieldAction( $config, self::formPost() );
+            return self::withRecord( function () use ( $config )
+            {
+                return expAiEditForm::fieldAction( $config, self::formPost() );
+            } );
         } );
+    }
+
+    /**
+     * Runs a request of the edit form (a field action, a preset, an Improve entry). When it fails after a request was
+     * sent, the answer is { error, record } instead of the failure, so the form can link the request's row in the
+     * usage log next to the error; a failure before anything was sent stays a failure.
+     */
+    protected static function withRecord( $fn )
+    {
+        expAiEditForm::resetRecord();
+        try
+        {
+            return $fn();
+        }
+        catch ( expAiException $e )
+        {
+            $record = expAiEditForm::requestRecord();
+            if ( !$record )
+                throw $e;
+            return array( 'error' => $e->translatedMessage(), 'record' => $record );
+        }
     }
 
     /** fill: values for the fields of the edit form from a brief */

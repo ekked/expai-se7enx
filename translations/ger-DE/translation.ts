@@ -1353,6 +1353,22 @@
 <context>
     <name>extension/expai/edit</name>
     <message>
+        <source>View record</source>
+        <translation>Eintrag ansehen</translation>
+    </message>
+    <message>
+        <source>This request in the usage log (opens in a new tab)</source>
+        <translation>Diese Anfrage im Nutzungsprotokoll (öffnet in einem neuen Tab)</translation>
+    </message>
+    <message>
+        <source>View job</source>
+        <translation>Auftrag ansehen</translation>
+    </message>
+    <message>
+        <source>The job of this request in the queue (opens in a new tab)</source>
+        <translation>Der Auftrag dieser Anfrage in der Warteschlange (öffnet in einem neuen Tab)</translation>
+    </message>
+    <message>
         <source>Describe what to write, and Exponential Intelligence fills in the fields of this form for you to review.</source>
         <translation>Beschreiben Sie, was geschrieben werden soll, und Exponential Intelligence füllt die Felder dieses Formulars zur Prüfung für Sie aus.</translation>
     </message>

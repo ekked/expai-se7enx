@@ -173,6 +173,11 @@
                 attribute_id: ctx.attribute.id, kind: kind, action: name, part: ctx.part,
                 value: value, context: formContext()
             } ).then( function ( result ) {
+                // a failure after the request was sent: the error and the link to its record
+                if ( result && result.error ) {
+                    ctx.note.innerHTML = esc( ( S.error + ' ' + result.error ).trim() ) + recordLinks( result.record );
+                    return;
+                }
                 var previous = adapter( ctx ).get( ctx );
                 if ( !adapter( ctx ).set( ctx, result.value ) ) {
                     ctx.note.textContent = S.error;
@@ -183,7 +188,8 @@
                 ExpAi.emit( 'field:filled', { field: ctx, value: result.value, previous: previous, preset: kind + ':' + name } );
                 ctx.note.innerHTML = esc( S.filled ) + ( result.note ? ' <em>' + esc( result.note ) + '</em>' : '' )
                     + ( result.fallback ? ' <span class="exp-ai-fallback-notice">' + esc( result.fallback.notice ) + '</span>' : '' )
-                    + ' <button type="button" class="exp-ai-link exp-ai-preset-undo">' + esc( S.undo ) + '</button>';
+                    + ' <button type="button" class="exp-ai-link exp-ai-preset-undo">' + esc( S.undo ) + '</button>'
+                    + recordLinks( result.record );
             } ).catch( function ( err ) {
                 ctx.note.textContent = err && err.kind === 'timeout' ? S.timeout : ( S.error + ' ' + ( err && err.message || '' ) ).trim();
             } ).then( function () {
@@ -203,6 +209,11 @@
                 ctx.undo = null;
                 ctx.note.textContent = S.undone;
             } );
+        }
+
+        /** "View record" / "View job" after a preset or an Improve entry (ExpAi.requestLinks) */
+        function recordLinks( record ) {
+            return ExpAi.requestLinks ? ExpAi.requestLinks( record ) : '';
         }
 
         function fmt( text, args ) {

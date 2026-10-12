@@ -243,8 +243,27 @@
         },
         slowStatus: slowStatus,
         turnRecord: turnRecord,
-        watchChip: watchChip
+        watchChip: watchChip,
+        requestLinks: requestLinks
     };
+
+    /**
+     * "View record" (and "View job" when the request ran as a job) after a field action, a preset or an Improve entry:
+     * links to the request's row in the usage log and its job, in a new tab so the unsaved form stays.
+     * record: expAiEditForm::requestRecord() or null (nothing).
+     */
+    function requestLinks( record ) {
+        if ( !record || !record.log ) {
+            return '';
+        }
+        var t = record.texts || {};
+        var link = function ( path, text, title ) {
+            return '<a class="exp-ai-link exp-ai-request-link" href="' + esc( url( path ) ) + '" target="_blank" rel="noopener" title="' + esc( title || '' )
+                 + '" aria-label="' + esc( ( text || '' ) + ( title ? ' - ' + title : '' ) ) + '">' + esc( text || 'View record' ) + '</a>';
+        };
+        return ' <span class="exp-ai-request-links">' + link( record.log, t.log, t.log_title )
+             + ( record.job ? ' · ' + link( record.job, t.job || 'View job', t.job_title ) : '' ) + '</span>';
+    }
 
     /**
      * The record of a turn (expAiTurnRecord, doc/parallel-runs.md "The record of a turn"), collapsed to one line: the
@@ -1003,6 +1022,11 @@
                 }
                 busy( true );
                 api( 'field', data ).then( function ( result ) {
+                    // a failure after the request was sent: the error and the link to its record
+                    if ( result && result.error ) {
+                        note.innerHTML = esc( ( S.error + ' ' + result.error ).trim() ) + requestLinks( result.record );
+                        return;
+                    }
                     if ( hooks.after && hooks.after( ctx, result ) === false ) {
                         note.textContent = '';
                         return;
@@ -1011,7 +1035,8 @@
                     undo = done.previous;
                     note.innerHTML = esc( S.filled ) + ( result.note ? ' <em>' + esc( result.note ) + '</em>' : '' )
                         + ( result.fallback ? ' <span class="exp-ai-fallback-notice">' + esc( result.fallback.notice ) + '</span>' : '' )
-                        + ' <button type="button" class="exp-ai-link exp-ai-undo">' + esc( S.undo ) + '</button>';
+                        + ' <button type="button" class="exp-ai-link exp-ai-undo">' + esc( S.undo ) + '</button>'
+                        + requestLinks( result.record );
                 } ).catch( function ( err ) {
                     note.textContent = err.kind === 'timeout' ? S.timeout : ( S.error + ' ' + ( err.message || '' ) ).trim();
                 } ).then( function () {
