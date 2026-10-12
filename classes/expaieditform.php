@@ -187,6 +187,8 @@ class expAiEditForm
     protected static function recorder( expAiConfig $config, eZContentObject $object, $action, $alias = '' )
     {
         $main = $object->mainNode();
+        // the web budget (expAiWebBudget): a model too slow to answer within one page request is refused, not left to a 504
+        expAiWebBudget::assertFits( $config->registry()->resolveAlias( $alias !== '' ? $alias : $config->effectiveModel() ), 'field', $config );
         $provider = $config->registry()->providerFor( $alias !== '' ? $alias : $config->effectiveModel() );
         // the content of the form goes to the provider: the data policy decides first
         expAiDataPolicy::forProvider( $config, $provider->providerId() )->assertObject( $object );

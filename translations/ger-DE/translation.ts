@@ -331,6 +331,38 @@
         <source>The field is empty: there is nothing to improve.</source>
         <translation>Das Feld ist leer: Es gibt nichts zu verbessern.</translation>
     </message>
+    <message>
+        <source>Only models of a local model server can be loaded.</source>
+        <translation>Nur Modelle eines lokalen Modellservers können geladen werden.</translation>
+    </message>
+    <message>
+        <source>The job could not be queued: %reason</source>
+        <translation>Der Auftrag konnte nicht eingereiht werden: %reason</translation>
+    </message>
+    <message>
+        <source>The local model server refused the request: %reason</source>
+        <translation>Der lokale Modellserver hat die Anfrage abgelehnt: %reason</translation>
+    </message>
+    <message>
+        <source>The model %model is too slow to be tested within one page request, and the job queue is not available.</source>
+        <translation>Das Modell %model ist zu langsam, um innerhalb einer Seitenanfrage getestet zu werden, und die Auftragswarteschlange ist nicht verfügbar.</translation>
+    </message>
+    <message>
+        <source>The model %model is too slow for field actions here (more than %seconds seconds per request). Choose another model in the model menu, or use the Intelligence tab, which runs slow models in the background.</source>
+        <translation>Das Modell %model ist für Feldaktionen hier zu langsam (mehr als %seconds Sekunden pro Anfrage). Wählen Sie im Modellmenü ein anderes Modell, oder nutzen Sie den Intelligence-Reiter, der langsame Modelle im Hintergrund ausführt.</translation>
+    </message>
+    <message>
+        <source>This model is not available.</source>
+        <translation>Dieses Modell ist nicht verfügbar.</translation>
+    </message>
+    <message>
+        <source>Unknown action.</source>
+        <translation>Unbekannte Aktion.</translation>
+    </message>
+    <message>
+        <source>The job queue is not available.</source>
+        <translation>Die Auftragswarteschlange ist nicht verfügbar.</translation>
+    </message>
 </context>
 <!-- expai chains: end -->
 <!-- expai lanes/budgets/packages: begin -->
@@ -5430,6 +5462,157 @@
     <message>
         <source>Content packages</source>
         <translation>Inhaltspakete</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/modeltest</name>
+    <message>
+        <source>Queueing…</source>
+        <translation>Wird eingereiht…</translation>
+    </message>
+    <message>
+        <source>The request failed: %error</source>
+        <translation>Die Anfrage ist fehlgeschlagen: %error</translation>
+    </message>
+    <message>
+        <source>Load model</source>
+        <translation>Modell laden</translation>
+    </message>
+    <message>
+        <source>Loads the model into memory, so the next request does not wait for it</source>
+        <translation>Lädt das Modell in den Speicher, damit die nächste Anfrage nicht darauf warten muss</translation>
+    </message>
+    <message>
+        <source>Loading the model…</source>
+        <translation>Modell wird geladen…</translation>
+    </message>
+    <message>
+        <source>Testing… (loading the model can take a minute)</source>
+        <translation>Test läuft… (das Laden des Modells kann eine Minute dauern)</translation>
+    </message>
+    <message>
+        <source>Testing…</source>
+        <translation>Test läuft…</translation>
+    </message>
+    <message>
+        <source>held: %reason</source>
+        <translation>angehalten: %reason</translation>
+    </message>
+    <message>
+        <source>waiting for a worker, %seconds s</source>
+        <translation>wartet auf einen Worker, %seconds s</translation>
+    </message>
+    <message>
+        <source>%seconds s</source>
+        <translation>%seconds s</translation>
+    </message>
+    <message>
+        <source>loaded until %time</source>
+        <translation>geladen bis %time</translation>
+    </message>
+    <message>
+        <source>loaded</source>
+        <translation>geladen</translation>
+    </message>
+    <message>
+        <source>not loaded</source>
+        <translation>nicht geladen</translation>
+    </message>
+    <message>
+        <source>server not reachable</source>
+        <translation>Server nicht erreichbar</translation>
+    </message>
+    <message>
+        <source>Loading the model failed: %error</source>
+        <translation>Das Laden des Modells ist fehlgeschlagen: %error</translation>
+    </message>
+    <message>
+        <source>The test failed: %error</source>
+        <translation>Der Test ist fehlgeschlagen: %error</translation>
+    </message>
+    <message>
+        <source>Model loaded at %time</source>
+        <translation>Modell geladen um %time</translation>
+    </message>
+    <message>
+        <source>loading took %seconds s</source>
+        <translation>das Laden dauerte %seconds s</translation>
+    </message>
+    <message>
+        <source>it was already in memory</source>
+        <translation>es war bereits im Speicher</translation>
+    </message>
+    <message>
+        <source>kept until %time</source>
+        <translation>bleibt bis %time im Speicher</translation>
+    </message>
+    <message>
+        <source>Test at %time</source>
+        <translation>Test um %time</translation>
+    </message>
+    <message>
+        <source>time to first token</source>
+        <translation>Zeit bis zum ersten Token</translation>
+    </message>
+    <message>
+        <source>model load %seconds s</source>
+        <translation>Laden des Modells %seconds s</translation>
+    </message>
+    <message>
+        <source>The provider answers in one piece, so the first token is not measured.</source>
+        <translation>Der Anbieter antwortet in einem Stück, daher wird das erste Token nicht gemessen.</translation>
+    </message>
+    <message>
+        <source>not measured</source>
+        <translation>nicht gemessen</translation>
+    </message>
+    <message>
+        <source>in: %count tokens</source>
+        <translation>Eingabe: %count Token</translation>
+    </message>
+    <message>
+        <source>%rate tokens/s</source>
+        <translation>%rate Token/s</translation>
+    </message>
+    <message>
+        <source>out: %count tokens</source>
+        <translation>Ausgabe: %count Token</translation>
+    </message>
+    <message>
+        <source>total %seconds s</source>
+        <translation>insgesamt %seconds s</translation>
+    </message>
+    <message>
+        <source>cost</source>
+        <translation>Kosten</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>unbekannt</translation>
+    </message>
+    <message>
+        <source>The job was cancelled.</source>
+        <translation>Der Auftrag wurde abgebrochen.</translation>
+    </message>
+    <message>
+        <source>The job failed: %reason</source>
+        <translation>Der Auftrag ist fehlgeschlagen: %reason</translation>
+    </message>
+    <message>
+        <source>The model %model is already being loaded.</source>
+        <translation>Das Modell %model wird bereits geladen.</translation>
+    </message>
+    <message>
+        <source>A test of %model is already waiting or running.</source>
+        <translation>Ein Test von %model wartet oder läuft bereits.</translation>
+    </message>
+    <message>
+        <source>The model %model is being loaded in the background.</source>
+        <translation>Das Modell %model wird im Hintergrund geladen.</translation>
+    </message>
+    <message>
+        <source>The test of %model runs in the background.</source>
+        <translation>Der Test von %model läuft im Hintergrund.</translation>
     </message>
 </context>
 </TS>

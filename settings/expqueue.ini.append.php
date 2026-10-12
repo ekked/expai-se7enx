@@ -101,4 +101,17 @@ RetryBase=60
 MaxBackoff=1800
 Description=Writes the alt text of an image into a new draft (a vision model looks at the image)
 
+# Test prompt and Load model of expai/models (doc/local-models.md "Test prompt and Load model"): one short prompt to
+# a model, or loading a model of a local server, run by the worker as the user who clicked. The class interactive:
+# the page starts a worker for it when none runs. One attempt: a failed test is a result. Timeout: a local model
+# may load for a minute and then write a few tokens per second.
+[JobType_expai.model.test]
+Handler=expAiModelTestHandler
+Class=interactive
+MaxAttempts=1
+Timeout=420
+RetryBase=10
+MaxBackoff=60
+Description=Test prompt or load of a model (expai/models)
+
 */ ?>

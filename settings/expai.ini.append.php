@@ -1455,4 +1455,27 @@ Contact=
 # A note printed under the title (e.g. the reference of the record of processing activities)
 Note=
 
+# Test prompt and Load model of expai/models (doc/local-models.md "Test prompt and Load model"): both run as jobs of
+# the job queue (expai.model.test), never in the page request; the page asks for the state every PollSeconds.
+[ModelTest]
+# Seconds between two questions of the page while a job waits or runs (2 to 30)
+PollSeconds=3
+# How long a finished test or load is shown on the page (minutes; 0: only while the page is open)
+ShowResultMinutes=60
+# How long Ollama keeps a model in memory after "Load model" (an Ollama duration: 30m, 2h, or seconds)
+LoadKeepAlive=30m
+
+# The web budget (doc/troubleshooting.md "504 Gateway Timeout"): what one model call from a web request may take.
+# A web server ends a request after its own limit and the browser sees a 504; a model that cannot answer within
+# Seconds is not called from a web request. The field actions and the fill of the edit form refuse it with a message;
+# the test prompt and Vector turns run it as a job.
+[WebBudget]
+Seconds=25
+# queue: slow models (Slow=true, a local server with Managed=ollama) never run in a web request; allow: they do,
+# e.g. behind a web server with a long timeout. [Model_<alias>] RunInBackground=always|never decides for one model.
+SlowModels=queue
+# A model counts as slow by measurement when at least this many of its last 20 successful requests took longer than
+# Seconds on average
+MinSamples=5
+
 */ ?>

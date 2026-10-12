@@ -1,5 +1,9 @@
 {* expai/models: providers, models, probe results, MCP and the local model server (policy expai/model_manage). Never shows a key. *}
-<div class="exp-ai exp-ai-models-page">
+{ezscript_require( array( 'expai_models.js' ) )}
+<div class="exp-ai exp-ai-models-page" data-exp-ai-models="1" data-poll="{$poll_ms|wash}">
+    <script type="application/json" class="exp-ai-models-strings">{json_encode( hash(
+        'starting', 'Queueing…'|i18n( 'extension/expai/modeltest' ),
+        'failed', 'The request failed: %error'|i18n( 'extension/expai/modeltest' ) ) )}</script>
     <header class="exp-ai-head">
         <span class="exp-ai-mark" aria-hidden="true"></span>
         <div>
@@ -9,6 +13,7 @@
     </header>
 {if $notice}<p class="exp-ai-notice" role="status">{$notice|wash}</p>{/if}
 {if $error}<p class="exp-ai-error" role="alert">{$error|wash}</p>{/if}
+<p class="exp-ai-models-live exp-ai-notice" role="status" hidden></p>
 {if $key_problems|count}
     <section class="exp-ai-card exp-ai-warning" aria-labelledby="exp-ai-keys-title">
         <h2 id="exp-ai-keys-title">{'Keys in the wrong place'|i18n( 'extension/expai/models' )}</h2>
@@ -38,11 +43,12 @@
                     <td>{if $m.writes}{'may write'|i18n( 'extension/expai/models' )}{if eq( $m.write_gate, 'trusted' )} ({'trusted'|i18n( 'extension/expai/models' )}){/if}{else}{'read only'|i18n( 'extension/expai/models' )}<br /><small>{$m.write_refusal|wash}</small>{/if}</td>
                     <td>{if $m.probe_live}{'live %rate% (%passed/%tasks)'|i18n( 'extension/expai/models',, hash( '%rate', $m.probe_live.pass_rate, '%passed', $m.probe_live.passed, '%tasks', $m.probe_live.tasks ) )}<br /><small>{$m.probe_live.created|l10n( 'shortdatetime' )}</small>{else}{'no live probe'|i18n( 'extension/expai/models' )}{/if}{if $m.probe_mock}<br /><small>{'mock %rate%'|i18n( 'extension/expai/models',, hash( '%rate', $m.probe_mock.pass_rate ) )}</small>{/if}</td>
                     <td>{$m.cost|wash}</td>
-                    <td>{if $p.ready}<form method="post" action={'expai/models'|ezurl}><input type="hidden" name="ExpAiTestModel" value="{$m.alias|wash}" /><input type="submit" class="button exp-ai-btn" name="ExpAiTestPromptButton" value="{'Test prompt'|i18n( 'extension/expai/models' )}" /></form>{/if}</td>
+                    <td>{if $p.ready}<form class="exp-ai-model-actions" method="post" action={'expai/models'|ezurl} data-alias="{$m.alias|wash}" data-active="{if $m.run.active}1{else}0{/if}"><input type="hidden" name="ExpAiTestModel" value="{$m.alias|wash}" /><input type="submit" class="button exp-ai-btn" name="ExpAiTestPromptButton" value="{'Test prompt'|i18n( 'extension/expai/models' )}"{if $m.run.active} disabled="disabled"{/if} />{if and( $m.run.managed, $m.run.queue )} <input type="submit" class="button exp-ai-btn" name="ExpAiLoadModelButton" value="{'Load model'|i18n( 'extension/expai/modeltest' )}" title="{'Loads the model into memory, so the next request does not wait for it'|i18n( 'extension/expai/modeltest' )|wash}"{if $m.run.active} disabled="disabled"{/if} />{/if}</form>
+                        <div class="exp-ai-model-state" data-alias="{$m.alias|wash}">{include uri='design:expai/parts/model_test.tpl' t=$m.run part='state'}</div>{/if}</td>
                 </tr>
-{if and( $test, eq( $test.alias, $m.alias ) )}
-                <tr><td colspan="7" class="exp-ai-test-result">{'%output tokens in %seconds s (%tps tokens/s), model %model:'|i18n( 'extension/expai/models',, hash( '%output', $test.output, '%seconds', $test.seconds, '%tps', $test.tps, '%model', $test.model ) )} <q>{$test.text|wash}</q></td></tr>
-{/if}
+{def $has_result = and( $p.ready, or( and( $m.run.test, $m.run.test.active|not ), and( $m.run.load, $m.run.load.active|not ) ) )}
+                <tr class="exp-ai-test-row" data-alias="{$m.alias|wash}"{if $has_result|not} hidden="hidden"{/if}><td colspan="7" class="exp-ai-test-result" aria-live="polite">{if $has_result}{include uri='design:expai/parts/model_test.tpl' t=$m.run part='result'}{/if}</td></tr>
+{undef $has_result}
 {/foreach}
             </tbody>
         </table>

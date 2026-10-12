@@ -331,6 +331,38 @@
         <source>The field is empty: there is nothing to improve.</source>
         <translation>The field is empty: there is nothing to improve.</translation>
     </message>
+    <message>
+        <source>Only models of a local model server can be loaded.</source>
+        <translation>Only models of a local model server can be loaded.</translation>
+    </message>
+    <message>
+        <source>The job could not be queued: %reason</source>
+        <translation>The job could not be queued: %reason</translation>
+    </message>
+    <message>
+        <source>The local model server refused the request: %reason</source>
+        <translation>The local model server refused the request: %reason</translation>
+    </message>
+    <message>
+        <source>The model %model is too slow to be tested within one page request, and the job queue is not available.</source>
+        <translation>The model %model is too slow to be tested within one page request, and the job queue is not available.</translation>
+    </message>
+    <message>
+        <source>The model %model is too slow for field actions here (more than %seconds seconds per request). Choose another model in the model menu, or use the Intelligence tab, which runs slow models in the background.</source>
+        <translation>The model %model is too slow for field actions here (more than %seconds seconds per request). Choose another model in the model menu, or use the Intelligence tab, which runs slow models in the background.</translation>
+    </message>
+    <message>
+        <source>This model is not available.</source>
+        <translation>This model is not available.</translation>
+    </message>
+    <message>
+        <source>Unknown action.</source>
+        <translation>Unknown action.</translation>
+    </message>
+    <message>
+        <source>The job queue is not available.</source>
+        <translation>The job queue is not available.</translation>
+    </message>
 </context>
 <!-- expai chains: end -->
 <!-- expai lanes/budgets/packages: begin -->
@@ -5430,6 +5462,157 @@
     <message>
         <source>Content packages</source>
         <translation>Content packages</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/modeltest</name>
+    <message>
+        <source>Queueing…</source>
+        <translation>Queueing…</translation>
+    </message>
+    <message>
+        <source>The request failed: %error</source>
+        <translation>The request failed: %error</translation>
+    </message>
+    <message>
+        <source>Load model</source>
+        <translation>Load model</translation>
+    </message>
+    <message>
+        <source>Loads the model into memory, so the next request does not wait for it</source>
+        <translation>Loads the model into memory, so the next request does not wait for it</translation>
+    </message>
+    <message>
+        <source>Loading the model…</source>
+        <translation>Loading the model…</translation>
+    </message>
+    <message>
+        <source>Testing… (loading the model can take a minute)</source>
+        <translation>Testing… (loading the model can take a minute)</translation>
+    </message>
+    <message>
+        <source>Testing…</source>
+        <translation>Testing…</translation>
+    </message>
+    <message>
+        <source>held: %reason</source>
+        <translation>held: %reason</translation>
+    </message>
+    <message>
+        <source>waiting for a worker, %seconds s</source>
+        <translation>waiting for a worker, %seconds s</translation>
+    </message>
+    <message>
+        <source>%seconds s</source>
+        <translation>%seconds s</translation>
+    </message>
+    <message>
+        <source>loaded until %time</source>
+        <translation>loaded until %time</translation>
+    </message>
+    <message>
+        <source>loaded</source>
+        <translation>loaded</translation>
+    </message>
+    <message>
+        <source>not loaded</source>
+        <translation>not loaded</translation>
+    </message>
+    <message>
+        <source>server not reachable</source>
+        <translation>server not reachable</translation>
+    </message>
+    <message>
+        <source>Loading the model failed: %error</source>
+        <translation>Loading the model failed: %error</translation>
+    </message>
+    <message>
+        <source>The test failed: %error</source>
+        <translation>The test failed: %error</translation>
+    </message>
+    <message>
+        <source>Model loaded at %time</source>
+        <translation>Model loaded at %time</translation>
+    </message>
+    <message>
+        <source>loading took %seconds s</source>
+        <translation>loading took %seconds s</translation>
+    </message>
+    <message>
+        <source>it was already in memory</source>
+        <translation>it was already in memory</translation>
+    </message>
+    <message>
+        <source>kept until %time</source>
+        <translation>kept until %time</translation>
+    </message>
+    <message>
+        <source>Test at %time</source>
+        <translation>Test at %time</translation>
+    </message>
+    <message>
+        <source>time to first token</source>
+        <translation>time to first token</translation>
+    </message>
+    <message>
+        <source>model load %seconds s</source>
+        <translation>model load %seconds s</translation>
+    </message>
+    <message>
+        <source>The provider answers in one piece, so the first token is not measured.</source>
+        <translation>The provider answers in one piece, so the first token is not measured.</translation>
+    </message>
+    <message>
+        <source>not measured</source>
+        <translation>not measured</translation>
+    </message>
+    <message>
+        <source>in: %count tokens</source>
+        <translation>in: %count tokens</translation>
+    </message>
+    <message>
+        <source>%rate tokens/s</source>
+        <translation>%rate tokens/s</translation>
+    </message>
+    <message>
+        <source>out: %count tokens</source>
+        <translation>out: %count tokens</translation>
+    </message>
+    <message>
+        <source>total %seconds s</source>
+        <translation>total %seconds s</translation>
+    </message>
+    <message>
+        <source>cost</source>
+        <translation>cost</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>unknown</translation>
+    </message>
+    <message>
+        <source>The job was cancelled.</source>
+        <translation>The job was cancelled.</translation>
+    </message>
+    <message>
+        <source>The job failed: %reason</source>
+        <translation>The job failed: %reason</translation>
+    </message>
+    <message>
+        <source>The model %model is already being loaded.</source>
+        <translation>The model %model is already being loaded.</translation>
+    </message>
+    <message>
+        <source>A test of %model is already waiting or running.</source>
+        <translation>A test of %model is already waiting or running.</translation>
+    </message>
+    <message>
+        <source>The model %model is being loaded in the background.</source>
+        <translation>The model %model is being loaded in the background.</translation>
+    </message>
+    <message>
+        <source>The test of %model runs in the background.</source>
+        <translation>The test of %model runs in the background.</translation>
     </message>
 </context>
 </TS>

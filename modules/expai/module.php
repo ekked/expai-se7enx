@@ -13,7 +13,7 @@
  *   expai/model_use     choosing models of providers outside [ProviderSettings] ProvidersWithoutPolicy[]
  *                       (limitation Provider)
  *   expai/model_manage  the view expai/models: providers, key presence, probe results, the local model (start,
- *                       stop, pull, remove, test prompt)
+ *                       stop, pull, remove, test prompt, load model)
  *   expai/mcp           MCP tools in the panel (limitation Server: "exp" for the in-process bridge, or a server id)
  *   expai/vector        the Vector workspace and its functions (expaivector::*), with expai/write; limitations
  *                       Subtree, Section (the scope must lie inside), Scope (node, subtree, class), Review (staged, direct)
@@ -88,9 +88,9 @@ $ViewList['models'] = array(
     'script' => 'models.php',
     'functions' => array( 'model_manage' ),
     'params' => array(),
-    'single_post_actions' => array( 'ExpAiLocalActionButton' => 'LocalAction', 'ExpAiTestPromptButton' => 'TestPrompt' ),
+    'single_post_actions' => array( 'ExpAiLocalActionButton' => 'LocalAction', 'ExpAiTestPromptButton' => 'TestPrompt', 'ExpAiLoadModelButton' => 'LoadModel' ),
     'post_action_parameters' => array( 'LocalAction' => array( 'Action' => 'ExpAiLocalAction', 'Model' => 'ExpAiLocalModel' ),
-                                      'TestPrompt' => array( 'Model' => 'ExpAiTestModel' ) ),
+                                      'TestPrompt' => array( 'Model' => 'ExpAiTestModel' ), 'LoadModel' => array( 'Model' => 'ExpAiTestModel' ) ),
     'unordered_params' => array( 'provider' => 'Provider' ) );
 
 // AI chains (classes/chain/, doc/chains.md): the runs, one run with its checkpoint, starting runs

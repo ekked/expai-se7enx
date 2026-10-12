@@ -3,7 +3,8 @@
  * expai/models (policy expai/model_manage): the providers and models of the registry (region, retention, key
  * present - never the key -, tool mode, write gate, the latest probe), warnings about misplaced keys, the MCP
  * settings, and per local server (Managed=ollama) its state with Start / Stop / Pull / Remove (written as requests
- * for the root-owned helper, never run by the web process) and a test prompt that measures tokens per second.
+ * for the root-owned helper, never run by the web process). "Test prompt" (time to the first token, tokens per
+ * second) and "Load model" run as jobs (expAiModelTest), never in this request.
  * The POST forms carry the form token (ezformtoken).
  *
  * @copyright Copyright (C) 1998 - 2026 7x & Exponential Foundation. All rights reserved.
@@ -36,25 +37,37 @@ if ( $Module->isCurrentAction( 'LocalAction' ) )
         $error = $e->translatedMessage();
     }
 }
-if ( $Module->isCurrentAction( 'TestPrompt' ) )
+// Test prompt and Load model (doc/local-models.md "Test prompt and Load model"): queued as a job of expai.model.test,
+// never run in this request, which the web server would end long before a local model has loaded. expai_models.js
+// does the same through expaimodel::test|load and follows the job; this is the form without JavaScript.
+if ( $Module->isCurrentAction( 'TestPrompt' ) || $Module->isCurrentAction( 'LoadModel' ) )
 {
+    $action = $Module->isCurrentAction( 'LoadModel' ) ? 'load' : 'test';
     $alias = $registry->resolveAlias( (string) $Module->actionParameter( 'Model' ) );
     try
     {
         if ( $alias === '' )
             throw new expAiException( 'This model is not available.' );
-        $recorder = new expAiUsageRecorder( $registry->providerFor( $alias ), array( 'action' => 'test' ) );
-        $start = microtime( true );
-        $answer = $recorder->send( array( 'system' => 'You are a test of the connection. Answer briefly.',
-                                          'messages' => array( array( 'role' => 'user', 'content' => 'Write one short sentence about the sea.' ) ), 'max_tokens' => 120 ) );
-        $seconds = microtime( true ) - $start;
-        $text = '';
-        foreach ( $answer['content'] as $block )
-            if ( isset( $block['type'] ) && $block['type'] === 'text' )
-                $text .= $block['text'];
-        $output = isset( $answer['tokens']['output'] ) ? (int) $answer['tokens']['output'] : 0;
-        $test = array( 'alias' => $alias, 'text' => expAiText::cut( $text, 300 ), 'seconds' => round( $seconds, 1 ), 'output' => $output,
-                       'tps' => $seconds > 0 ? round( $output / $seconds, 1 ) : 0, 'model' => (string) $answer['model'] );
+        if ( expAiModelTest::queueAvailable() )
+        {
+            $started = expAiModelTest::start( $alias, $action, $config );
+            $notice = expAiModelServerFunctions::notice( $config, $alias, $action, $started['duplicate'] );
+        }
+        elseif ( $action === 'test' )
+        {
+            // without the queue only a model that answers within the web budget is tested here
+            expAiWebBudget::assertFits( $alias, 'test', $config );
+            $result = expAiModelTest::run( $alias, 'test', array(), $config );
+            $test = array( 'alias' => $alias, 'phase' => !empty( $result['ok'] ) ? 'done' : 'failed', 'action' => 'test', 'active' => false,
+                           'finished' => time(), 'seconds' => isset( $result['total_ms'] ) ? (int) round( $result['total_ms'] / 1000 ) : 0,
+                           'result' => $result, 'error' => empty( $result['ok'] ) ? ezpI18n::tr( 'extension/expai/error', $result['error'], null, $result['error_args'] ) : '' );
+            if ( array_key_exists( 'cost_amount', $result ) )
+                $test['result']['cost'] = $result['cost_amount'] !== null ? expAiCost::money( $result['cost_amount'] ) : '';
+            foreach ( array( 'ttft', 'total', 'load' ) as $name )
+                $test['result'][$name . '_s'] = isset( $result[$name . '_ms'] ) ? round( $result[$name . '_ms'] / 1000, 1 ) : null;
+        }
+        else
+            throw new expAiException( 'The job queue is not available.' );
     }
     catch ( expAiException $e )
     {
@@ -63,6 +76,7 @@ if ( $Module->isCurrentAction( 'TestPrompt' ) )
 }
 
 $providers = array();
+$recentTests = expAiModelTest::recentJobs();
 foreach ( array_keys( $registry->providers() ) as $id )
 {
     $p = $registry->describeProvider( $id );
@@ -76,6 +90,10 @@ foreach ( array_keys( $registry->providers() ) as $id )
         $p['models'][$i]['writes'] = expAiProbe::writeAllowed( $m['alias'], $config );
         $p['models'][$i]['write_refusal'] = expAiProbe::writeRefusal( $m['alias'], $config );
         $p['models'][$i]['cost'] = expAiCost::costClass( $m['alias'], $config );
+        // the newest test and load of the model (expai.model.test jobs), and whether a local model is loaded
+        $p['models'][$i]['run'] = expAiModelTest::forModel( $m['alias'], $config, null, $recentTests );
+        if ( $test && $test['alias'] === $m['alias'] )
+            $p['models'][$i]['run']['test'] = $test;
     }
     $providers[] = $p;
 }
@@ -105,7 +123,7 @@ $tpl->setVariable( 'mcp_servers', $mcpServers );
 $tpl->setVariable( 'policy_active', ( new expAiDataPolicy( $config, array() ) )->active() );
 $tpl->setVariable( 'notice', $notice );
 $tpl->setVariable( 'error', $error );
-$tpl->setVariable( 'test', $test );
+$tpl->setVariable( 'poll_ms', 1000 * $config->int( 'ModelTest', 'PollSeconds', 3, 2, 30 ) );
 
 $Result = array();
 $Result['content'] = $tpl->fetch( 'design:expai/models.tpl' );

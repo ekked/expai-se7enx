@@ -331,6 +331,38 @@
         <source>The field is empty: there is nothing to improve.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Only models of a local model server can be loaded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The job could not be queued: %reason</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The local model server refused the request: %reason</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The model %model is too slow to be tested within one page request, and the job queue is not available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The model %model is too slow for field actions here (more than %seconds seconds per request). Choose another model in the model menu, or use the Intelligence tab, which runs slow models in the background.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This model is not available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown action.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The job queue is not available.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <!-- expai chains: end -->
 <!-- expai lanes/budgets/packages: begin -->
@@ -5429,6 +5461,157 @@
     </message>
     <message>
         <source>Content packages</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/modeltest</name>
+    <message>
+        <source>Queueing…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The request failed: %error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loads the model into memory, so the next request does not wait for it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loading the model…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Testing… (loading the model can take a minute)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Testing…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>held: %reason</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>waiting for a worker, %seconds s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%seconds s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>loaded until %time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>not loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>server not reachable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loading the model failed: %error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The test failed: %error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model loaded at %time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>loading took %seconds s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>it was already in memory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>kept until %time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test at %time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>time to first token</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>model load %seconds s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The provider answers in one piece, so the first token is not measured.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>not measured</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>in: %count tokens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%rate tokens/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>out: %count tokens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>total %seconds s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cost</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The job was cancelled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The job failed: %reason</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The model %model is already being loaded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A test of %model is already waiting or running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The model %model is being loaded in the background.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The test of %model runs in the background.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

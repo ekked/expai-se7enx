@@ -37,4 +37,10 @@ Functions[]=expai
 Class=expAiPresetServerFunctions
 Functions[]=expai
 
+# Test prompt and Load model of expai/models: expaimodel::status|test|load (classes/expaimodelserverfunctions.php).
+# The function list "expai"; each function checks the policy expai/model_manage.
+[ezjscServer_expaimodel]
+Class=expAiModelServerFunctions
+Functions[]=expai
+
 */ ?>
