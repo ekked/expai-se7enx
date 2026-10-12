@@ -110,6 +110,10 @@ result of the job, shown in the row; nothing is retried. The result stays on the
 queues the same job; reload the page to see the state. Without the job queue only a model that fits into the web
 budget ([troubleshooting.md](troubleshooting.md), "504 Gateway Timeout") is tested in the page request.
 
+The result links to its live record: **Request in the log** (`expai/log/(request)/<id>`, the usage row of the test)
+and, with `expqueue/view`, **Job** (`expqueue/job/<uuid>`); a job that waits or runs links to its job page too. The
+dashboard's Models card shows the newest test result of each model ([dashboard.md](dashboard.md), "Models").
+
 The jobs are listed in the job queue's admin pages like any other (`expqueue/list`, type `expai.model.test`).
 
 ## When the server is stopped

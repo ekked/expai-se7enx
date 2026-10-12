@@ -126,7 +126,8 @@ expqueue) in one job group, with an optional group budget:
   an empty alt text is only ever the editor's choice.
 
 At most `MaxQueuePerRequest` jobs per click; queueing the same image twice is recognized (idempotency key per object,
-version, language and field).
+version, language and field). After queueing, the notice links to the job group (**Watch the jobs →**,
+`expqueue/group/<uuid>`, with `expqueue/view`), where every job of the request can be followed.
 
 ## Usage and cost
 

@@ -295,6 +295,9 @@ are used). The chain and step groups are described above; every setting is liste
 - Starting a run needs `expai/chain` for that chain, `expai/write`, read access to the location and content/create of
   the chain's class there (checked before anything is queued). The draft is written with the starting user's own
   permissions, as everything expai writes.
+- One run started opens its page (`expai/chain/(run)/<id>`, with its job group and the job of every step); several
+  started at once open the list, which names each of them with a link to the run and to its job group
+  (`expqueue/group/<uuid>`, with `expqueue/view`).
 - Seeing a run: the user who started it, users with `expai/log`, and users with `expai/chain` who can read the run's
   location.
 - Acting on a run (approve, ask for changes, stop, continue): the user who started it, or a user with `expai/chain`

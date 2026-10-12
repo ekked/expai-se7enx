@@ -271,6 +271,17 @@ policy `expai/model_manage`).
 | `[WebBudget] SlowModels` | `queue` | `queue`: slow models (`Slow=true`, a provider with `Managed=ollama`) are never called from a web request: the field actions and the fill of the edit form refuse them with a message, the test prompt and Vector turns run them as jobs. `allow`: they are called anyway (a web server with a long timeout). `[Model_<alias>] RunInBackground=always` or `never` decides for one model. |
 | `[WebBudget] MinSamples` | `5` | Another model counts as too slow when at least this many of its last 20 successful requests took longer than `Seconds` on average. |
 
+## [ModelStats]: the Models card of the dashboard
+
+The "Models" card of expai/dashboard ([dashboard.md](dashboard.md), "Models") shows the track record of each model in
+the period and scope of the page. Its figures are computed once per request (`expAiModelStats::forPeriod()`) and kept
+in a small cache file per period, scope and siteaccess (`var/<site>/cache/expai/model-stats/`). A model is flagged
+slow by the same threshold as the web budget, `[WebBudget] Seconds`.
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `[ModelStats] CacheSeconds` | `60` | How long the figures of a period are kept (0 to 3600 seconds); `0` computes them on every view. |
+
 ## Lanes
 
 ### [Lane_<provider>.<lane>]: one lane
