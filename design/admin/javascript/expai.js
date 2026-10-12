@@ -1175,6 +1175,42 @@
         }
     }
 
+    /* ----------------------------------------------------------------- chains */
+
+    /**
+     * #392 The chain pickers (the Intelligence tab, the dashboard's Start writing): the hint names the budget of the
+     * chosen chain and the item count is capped by its MaxItems, also after the select changes.
+     */
+    function chainPickers() {
+        [ [ 'exp-ai-chain-pick', 'exp-ai-chain-count' ], [ 'exp-ai-dash-chain', 'exp-ai-dash-count' ] ].forEach( function ( ids ) {
+            var select = document.getElementById( ids[ 0 ] );
+            if ( !select ) {
+                return;
+            }
+            var count = document.getElementById( ids[ 1 ] );
+            var form = select.form;
+            var hint = form ? form.querySelector( '.exp-ai-chain-hint' ) : null;
+            var apply = function () {
+                var option = select.options[ select.selectedIndex ];
+                if ( !option ) {
+                    return;
+                }
+                var items = parseInt( option.getAttribute( 'data-max-items' ) || '', 10 );
+                if ( count && items > 0 ) {
+                    count.max = String( items );
+                    if ( parseInt( count.value, 10 ) > items ) {
+                        count.value = String( items );
+                    }
+                }
+                if ( hint && hint.getAttribute( 'data-template' ) && option.hasAttribute( 'data-max-cost' ) ) {
+                    hint.textContent = hint.getAttribute( 'data-template' ).split( '%max' ).join( option.getAttribute( 'data-max-cost' ) );
+                }
+            };
+            select.addEventListener( 'change', apply );
+            apply();
+        } );
+    }
+
     /* ----------------------------------------------------------------- model */
 
     /** The model selects (panel, edit form, dashboard): a change is saved as the user's choice (expai::model) */
@@ -1454,6 +1490,7 @@
         }
         models();
         modelStatesHook();
+        chainPickers();
         surfaces();
         labels();
         paletteHook();

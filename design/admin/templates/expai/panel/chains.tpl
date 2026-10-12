@@ -11,7 +11,7 @@
             <label class="exp-ai-label" for="exp-ai-chain-pick">{'Use chain'|i18n( 'extension/expai/chain' )}</label>
             <select id="exp-ai-chain-pick" name="ExpAiChain" class="exp-ai-select">
 {foreach $exp_ai_chains as $exp_ai_chain}
-                <option value="{$exp_ai_chain.id|wash}" title="{$exp_ai_chain.steps|implode( ' > ' )|wash}">{$exp_ai_chain.label|wash}</option>
+                <option value="{$exp_ai_chain.id|wash}" title="{$exp_ai_chain.steps|implode( ' > ' )|wash}" data-max-cost="{$exp_ai_chain.max_cost|wash}" data-max-items="{$exp_ai_chain.max_items|wash}">{$exp_ai_chain.label|wash}</option>
 {/foreach}
             </select>
             <label class="exp-ai-label" for="exp-ai-chain-count">{'Items'|i18n( 'extension/expai/chain' )}</label>
@@ -24,7 +24,7 @@
             <input type="submit" class="button exp-ai-btn" name="ExpAiChainStartButton" value="{'Start the chain'|i18n( 'extension/expai/chain' )}" />
             <a href={'expai/chain'|ezurl}>{'Runs and checkpoints'|i18n( 'extension/expai/chain' )}</a>
         </div>
-        <p class="exp-ai-hint">{'Each item is one run in the background: written, reviewed and revised until it passes, then title and summary; the draft waits for you to approve it before anything else happens. Under "%name"; at most %max per run.'|i18n( 'extension/expai/chain',, hash( '%name', $node.name, '%max', $exp_ai_chains[0].max_cost ) )|wash}</p>
+        <p class="exp-ai-hint exp-ai-chain-hint" data-template="{'Each item is one run in the background: written, reviewed and revised until it passes, then title and summary; the draft waits for you to approve it before anything else happens. Under "%name"; at most %max per run.'|i18n( 'extension/expai/chain',, hash( '%name', $node.name, '%max', '%max' ) )|wash}">{'Each item is one run in the background: written, reviewed and revised until it passes, then title and summary; the draft waits for you to approve it before anything else happens. Under "%name"; at most %max per run.'|i18n( 'extension/expai/chain',, hash( '%name', $node.name, '%max', $exp_ai_chains[0].max_cost ) )|wash}</p>
     </form>
 </div>
 {/if}

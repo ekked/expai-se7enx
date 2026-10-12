@@ -7,7 +7,7 @@
                         <label class="exp-ai-visually-hidden" for="exp-ai-dash-chain">{'Use chain'|i18n( 'extension/expai/chain' )}</label>
                         <select id="exp-ai-dash-chain" name="ExpAiChain" class="exp-ai-select">
 {foreach $exp_ai_chains as $exp_ai_chain}
-                            <option value="{$exp_ai_chain.id|wash}">{'Use chain: %label'|i18n( 'extension/expai/chain',, hash( '%label', $exp_ai_chain.label ) )|wash}</option>
+                            <option value="{$exp_ai_chain.id|wash}" data-max-items="{$exp_ai_chain.max_items|wash}">{'Use chain: %label'|i18n( 'extension/expai/chain',, hash( '%label', $exp_ai_chain.label ) )|wash}</option>
 {/foreach}
                         </select>
                         <label class="exp-ai-visually-hidden" for="exp-ai-dash-count">{'Items'|i18n( 'extension/expai/chain' )}</label>
