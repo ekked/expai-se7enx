@@ -41,3 +41,16 @@ nothing is read or written: the probe grades the call the model makes.
 
 `[ProbeSettings] NodeID` and `ClassIdentifier` set the node and class the tasks name (default: the content root and
 `folder`).
+
+## A lookup before the write (follow_ok)
+
+The tasks `create_draft` and `update_draft` are marked `follow_ok`: a careful model reads first (the class definition,
+the list of creatable classes, the object) before it writes, as it would in the panel. When the answer to such a task
+has only lookups and no call of the task's write tool, the probe answers each lookup with a scripted result (the
+probe class with its fields `name` and `short_description`, the creatable class, the node of the probe location; the
+tools are never run) and grades the next answer. This happens at most `[ProbeSettings] FollowRounds` times (default
+2, 0 grades the first call as before); a call of another write tool, an MCP or a web tool ends it. The other tasks are
+graded on their first answer (or their scripted follow-up), so a model that wrote at once is graded as before.
+
+Each row of the stored result (`expai_probe_result.details`) has `followed`: how many lookups were answered before
+the graded call; the command line prints "(after 1 answered lookup)".

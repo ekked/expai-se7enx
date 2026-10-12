@@ -46,6 +46,9 @@ $thrown = function ( $callback )
 };
 
 // ---------------------------------------------------------------- the shipped settings with melious switched on
+// the ECB rates of the site are not read and no refresh is queued: the conversion uses [Pricing] ExchangeRates[] here
+expAiExchangeRates::disableRefresh();
+expAiExchangeRates::reset( false );
 $ini = eZINI::fetchFromFile( 'extension/expai/settings/expai.ini.append.php' );
 $check( 'shipped: melious is not active by default', in_array( 'melious', (array) $ini->variable( 'ProviderSettings', 'Providers' ), true ), false );
 $check( 'shipped: [Provider_melious] has no key', (string) $ini->variable( 'Provider_melious', 'ApiKey' ), '' );
@@ -94,6 +97,39 @@ $euro = eZINI::fetchFromFile( 'extension/expai/settings/expai.ini.append.php' );
 $euro->setVariable( 'ProviderSettings', 'Providers', array( 'anthropic', 'melious' ) );
 $euro->setVariable( 'Pricing', 'Currency', 'EUR' );
 $check( 'price: a EUR site uses the EUR price', ( new expAiConfig( $euro ) )->registry()->getModel( 'melious.glm-5.3' )['prices']['output'], 3.0 );
+
+// ---------------------------------------------------------------- the ECB reference rates (#392)
+$ecbXml = '<?xml version="1.0" encoding="UTF-8"?><gesmes:Envelope xmlns:gesmes="http://www.gesmes.org/xml/2002-08-01" xmlns="http://www.ecb.int/vocabulary/2002-08-01/eurofxref">'
+        . '<gesmes:subject>Reference rates</gesmes:subject><Cube><Cube time=\'2026-10-09\'><Cube currency=\'USD\' rate=\'1.1206\'/><Cube currency=\'GBP\' rate=\'0.8650\'/>'
+        . '<Cube currency=\'JPY\' rate=\'170.12\'/></Cube></Cube></gesmes:Envelope>';
+$parsedEcb = expAiExchangeRates::parse( $ecbXml );
+$check( 'ecb: the date of the file', $parsedEcb['date'], '2026-10-09' );
+$check( 'ecb: the rates against the euro', $parsedEcb['rates'], array( 'EUR' => 1.0, 'USD' => 1.1206, 'GBP' => 0.865, 'JPY' => 170.12 ) );
+$check( 'ecb: no Cube, no rates', expAiExchangeRates::parse( '<html>maintenance</html>' ), null );
+$check( 'ecb: EUR in USD', expAiExchangeRates::cross( $parsedEcb['rates'], 'EUR', 'USD' ), 1.1206 );
+$check( 'ecb: GBP in USD (cross rate)', expAiExchangeRates::cross( $parsedEcb['rates'], 'GBP', 'USD' ), 1.1206 / 0.865 );
+$check( 'ecb: an unknown currency', expAiExchangeRates::cross( $parsedEcb['rates'], 'XYZ', 'USD' ), null );
+expAiExchangeRates::reset( array( 'date' => '2026-10-09', 'fetched' => time(), 'rates' => $parsedEcb['rates'] ) );
+$check( 'ecb: used for the conversion (ExchangeRateSource=ecb)', expAiCost::rate( 'EUR', $config ), 1.1206 );
+$check( 'ecb: the lookup names its source and date', expAiExchangeRates::lookup( 'EUR', 'USD', $config ), array( 'rate' => 1.1206, 'source' => 'ecb', 'date' => '2026-10-09' ) );
+$check( 'ecb: the price of a model converted with it', ( new expAiConfig( $ini ) )->registry()->getModel( 'melious.glm-5.3' )['prices']['output'], 3.0 * 1.1206 );
+$check( 'ecb: the rates in use for expai/models', expAiExchangeRates::inUse( $config ), array( array( 'currency' => 'EUR', 'site' => 'USD', 'rate' => 1.1206, 'source' => 'ecb', 'date' => '2026-10-09' ) ) );
+$override = eZINI::fetchFromFile( 'extension/expai/settings/expai.ini.append.php' );
+$override->setVariable( 'Pricing', 'ExchangeRateSource', 'settings' );
+$check( 'ecb: ExchangeRateSource=settings overrides it', expAiCost::rate( 'EUR', new expAiConfig( $override ) ), $rate );
+// a failed fetch keeps the last rates
+class expAiMeliousTestFailingHttp extends expAiHttpClient
+{
+    public $url = '';
+    public function request( $url, array $headers, $body, array $options = array() ) { $this->url = $url; return array( 503, 'busy', array() ); }
+}
+$failing = new expAiMeliousTestFailingHttp();
+$refreshed = expAiExchangeRates::refresh( $failing );
+$check( 'ecb: only the ECB daily file is fetched', $failing->url, 'https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml' );
+$check( 'ecb: a failed fetch is reported', array( $refreshed['ok'], $refreshed['error'] ), array( false, 'HTTP 503' ) );
+$check( 'ecb: a failed fetch keeps the last rates', expAiCost::rate( 'EUR', $config ), 1.1206 );
+expAiExchangeRates::reset( false );
+$check( 'ecb: without ECB rates the settings are the fallback', expAiCost::rate( 'EUR', $config ), $rate );
 
 // ---------------------------------------------------------------- the request
 $settings = $registry->settingsFor( 'melious.deepseek-v4-flash-0731' );
@@ -215,6 +251,61 @@ $check( 'stream: Melious streams chunks', count( $chunks ) > 2 && $chunks[0]['ob
 $check( 'stream: usage arrives in the last chunk (include_usage)', isset( $last['usage']['prompt_tokens'] ), true );
 $check( 'stream: ends with [DONE]', substr( trim( $sse ), -12 ), 'data: [DONE]' );
 
+// ---------------------------------------------------------------- streaming for the test prompt (#392)
+$assembled = expAiOpenAiChatProvider::assembleStream( $sse );
+$check( 'stream: assembled as one answer', isset( $assembled['choices'][0]['message'] ), true );
+$check( 'stream: the reasoning deltas joined', strpos( $assembled['choices'][0]['message']['reasoning_content'], 'need answer user' ) !== false, true );
+$check( 'stream: the finish reason', $assembled['choices'][0]['finish_reason'], 'length' );
+$check( 'stream: the usage of the last chunk', $assembled['usage']['prompt_tokens'], 41 );
+$toolStream = "data: " . json_encode( array( 'choices' => array( array( 'delta' => array( 'role' => 'assistant', 'content' => 'Let me ' ) ) ) ) ) . "\n\n"
+            . "data: " . json_encode( array( 'choices' => array( array( 'delta' => array( 'content' => 'look.', 'tool_calls' => array( array( 'index' => 0, 'id' => 'call_s1', 'function' => array( 'name' => 'get_node', 'arguments' => '{"node_' ) ) ) ) ) ) ) ) . "\n\n"
+            . "data: " . json_encode( array( 'choices' => array( array( 'delta' => array( 'tool_calls' => array( array( 'index' => 0, 'function' => array( 'arguments' => 'id": 2}' ) ) ) ), 'finish_reason' => 'tool_calls' ) ) ) ) . "\n\n"
+            . "data: " . json_encode( array( 'choices' => array(), 'usage' => array( 'prompt_tokens' => 10, 'completion_tokens' => 5 ), 'billing_cost' => array( 'credits' => '0.000002' ) ) ) . "\n\ndata: [DONE]\n\n";
+$parsed = $provider->parseAnswer( expAiOpenAiChatProvider::assembleStream( $toolStream ) );
+$check( 'stream: text joined', $parsed['content'][0], array( 'type' => 'text', 'text' => 'Let me look.' ) );
+$check( 'stream: the tool call with its arguments joined', array( $parsed['content'][1]['id'], $parsed['content'][1]['name'], $parsed['content'][1]['input'] ), array( 'call_s1', 'get_node', array( 'node_id' => 2 ) ) );
+$check( 'stream: stop tool_use', $parsed['stop_reason'], 'tool_use' );
+$check( 'stream: usage and reported cost of the last chunk', array( $parsed['tokens']['input'], $parsed['tokens']['output'], $parsed['tokens']['reported_cost'] ), array( 10, 5, 0.000002 ) );
+$check( 'stream: an error event is an error', expAiOpenAiChatProvider::assembleStream( 'data: {"error":{"message":"x","code":"INFERENCE_3001"}}' ), array( 'error' => array( 'message' => 'x', 'code' => 'INFERENCE_3001' ) ) );
+// the timed request through a recorded stream: stream_timing streams only on a server that streams
+class expAiMeliousTestStreamHttp extends expAiHttpClient
+{
+    public $body;
+    public $options = null;
+    public $payload = null;
+    public function __construct( $body ) { parent::__construct(); $this->body = $body; }
+    public function request( $url, array $headers, $body, array $options = array() )
+    {
+        $this->options = $options;
+        $this->payload = json_decode( $body, true );
+        foreach ( str_split( $this->body, 200 ) as $piece )
+        {
+            if ( isset( $options['on_chunk'] ) )
+                call_user_func( $options['on_chunk'], $piece );
+            usleep( 2000 );
+        }
+        return array( 200, $this->body, array( 'x-ratelimit-remaining' => '599' ) );
+    }
+    public function postJson( $url, array $headers, $body )
+    {
+        $this->payload = json_decode( $body, true );
+        return array( 200, json_encode( array( 'choices' => array( array( 'message' => array( 'content' => 'whole' ), 'finish_reason' => 'stop' ) ) ) ), array() );
+    }
+}
+$http = new expAiMeliousTestStreamHttp( $toolStream );
+$streaming = new expAiOpenAiChatProvider( $settings, $http );
+$check( 'stream: Melious streams (Streaming=enabled)', $streaming->streams(), true );
+$timed = $streaming->send( array( 'messages' => $user, 'tools' => $tools, 'stream_timing' => true ) );
+$check( 'stream: the request asks for a stream with the usage', array( $http->payload['stream'], $http->payload['stream_options']['include_usage'], $http->options['accept'] ),
+        array( true, true, 'text/event-stream' ) );
+$check( 'stream: the first token is timed', is_int( $timed['timings']['first_token'] ) && $timed['timings']['first_token'] >= 0 && $timed['timings']['first_token'] <= $timed['timings']['total'], true );
+$check( 'stream: the answer is the same', $timed['content'][0]['text'], 'Let me look.' );
+$check( 'stream: the rate limit headers kept', $timed['rate_limits'], array( 'x-ratelimit-remaining' => '599' ) );
+$noStream = new expAiOpenAiChatProvider( array( 'Streaming' => 'disabled' ) + $settings, $http2 = new expAiMeliousTestStreamHttp( $toolStream ) );
+$whole = $noStream->send( array( 'messages' => $user, 'stream_timing' => true ) );
+$check( 'stream: a server that does not stream answers in one piece', array( $whole['content'][0]['text'], $http2->payload['stream'], isset( $whole['timings'] ) ), array( 'whole', false, false ) );
+$check( 'stream: stream_timing is not sent to the provider', array_key_exists( 'stream_timing', $http->payload ) || array_key_exists( 'stream_timing', $http2->payload ), false );
+
 // ---------------------------------------------------------------- the data policy
 $policy = new expAiDataPolicy( $config, $melious );
 $check( 'policy: an eu requirement is met', $policy->meets( array( 'regions' => array( 'eu' ), 'zero_retention' => false ) ), true );
@@ -227,6 +318,96 @@ $check( 'chain run: fetch(0) is no run', expAiChainRun::fetch( 0 ), null );
 $broken = new expAiChainRun( array( 'id' => 0, 'uuid' => 't385-not-stored', 'chain' => 'melious', 'created' => time() ) );
 $broken->store();
 $check( 'chain run: a run with the id 0 is not stored', expAiChainRun::fetch( 't385-not-stored' ), null );
+
+// ---------------------------------------------------------------- the probe: a lookup first is followed (follow_ok, #392)
+// The Melious models read the class definition or the object before they write; the probe answers the lookup with a
+// scripted result and grades the next call, at most [ProbeSettings] FollowRounds times.
+class expAiMeliousTestScriptedProvider implements expAiProvider
+{
+    public $requests = array();
+    protected $plan;
+    public function __construct( $plan ) { $this->plan = $plan; }
+    public function modelName() { return 'scripted'; }
+    public function providerId() { return 'scripted'; }
+    public function send( array $request )
+    {
+        $this->requests[] = $request;
+        $last = end( $request['messages'] );
+        $text = '';
+        foreach ( isset( $last['content'] ) && is_array( $last['content'] ) ? $last['content'] : array() as $block )
+            if ( isset( $block['type'] ) && $block['type'] === 'text' )
+                $text = $block['text'];
+        $round = 0;
+        foreach ( $request['messages'] as $m )
+            $round += $m['role'] === 'assistant' ? 1 : 0;
+        $calls = call_user_func( $this->plan, $text !== '' ? $text : $this->firstText( $request ), $round );
+        $content = array();
+        foreach ( $calls as $i => $c )
+            $content[] = is_string( $c ) ? array( 'type' => 'text', 'text' => $c ) : array( 'type' => 'tool_use', 'id' => 'call_' . $round . '_' . $i, 'name' => $c[0], 'input' => $c[1] );
+        return array( 'content' => $content, 'content_json' => json_encode( $content ), 'stop_reason' => 'end_turn', 'usage' => array() );
+    }
+    protected function firstText( array $request )
+    {
+        foreach ( $request['messages'][0]['content'] as $block )
+            if ( $block['type'] === 'text' )
+                return $block['text'];
+        return '';
+    }
+}
+$probeConfig = new expAiConfig( eZINI::fetchFromFile( 'extension/expai/settings/expai.ini.append.php' ) );
+$probe = new expAiProbe( $probeConfig );
+// a careful model: reads first on the two write tasks, then writes; everything else as the task asks
+$careful = function ( $text, $round )
+{
+    if ( strpos( $text, 'Create a new folder' ) === 0 )
+        return $round === 0 ? array( array( 'get_class_definition', array( 'class_identifier' => 'folder' ) ) )
+                            : array( array( 'create_draft', array( 'class_identifier' => 'folder', 'parent_node_id' => 2, 'fields' => array( 'name' => 'Probe page' ) ) ) );
+    if ( strpos( $text, 'Change the field' ) === 0 )
+        return $round === 0 ? array( array( 'get_node', array( 'object_id' => 1 ) ) )
+                            : array( array( 'update_draft', array( 'object_id' => 1, 'fields' => array( 'name' => 'Probe title' ) ) ) );
+    return array( 'ready' );
+};
+$result = $probe->run( new expAiMeliousTestScriptedProvider( $careful ), 2, 1, 'folder' );
+$byId = array();
+foreach ( $result['results'] as $row )
+    $byId[$row['id']] = $row;
+$check( 'probe follow: create_draft after a lookup passes', $byId['create_draft']['ok'], true );
+$check( 'probe follow: one lookup answered', $byId['create_draft']['followed'], 1 );
+$check( 'probe follow: update_draft after a lookup passes', $byId['update_draft']['ok'], true );
+$check( 'probe follow: tasks without follow_ok are not followed', $byId['read_node']['followed'], 0 );
+// the scripted results the model got
+$provider = new expAiMeliousTestScriptedProvider( $careful );
+$probe->run( $provider, 2, 1, 'folder' );
+$answered = null;
+foreach ( $provider->requests as $r )
+    if ( count( $r['messages'] ) === 3 && strpos( json_encode( $r['messages'][0] ), 'Create a new folder' ) !== false )
+        $answered = json_decode( $r['messages'][2]['content'][0]['content'], true );
+$check( 'probe follow: the lookup is answered with the class definition', $answered ? $answered['class_identifier'] . '/' . $answered['fields'][0]['identifier'] : '', 'folder/name' );
+// a model that only ever looks up: two rounds, then graded as before
+$reader = function ( $text, $round ) { return strpos( $text, 'Create a new folder' ) === 0 ? array( array( 'list_creatable_classes', array( 'parent_node_id' => 2 ) ) ) : array( 'ready' ); };
+$provider = new expAiMeliousTestScriptedProvider( $reader );
+$result = $probe->run( $provider, 2, 1, 'folder' );
+foreach ( $result['results'] as $row )
+    if ( $row['id'] === 'create_draft' )
+        $byId['reader'] = $row;
+$check( 'probe follow: at most FollowRounds (2) answered lookups', $byId['reader']['followed'], 2 );
+$check( 'probe follow: no write after the lookups fails', $byId['reader']['ok'] . '/' . $byId['reader']['reason'], '/looked up first (no create_draft call)' );
+// FollowRounds=0 grades the first call (as before #392)
+$noFollowIni = eZINI::fetchFromFile( 'extension/expai/settings/expai.ini.append.php' );
+$noFollowIni->setVariable( 'ProbeSettings', 'FollowRounds', '0' );
+$result = ( new expAiProbe( new expAiConfig( $noFollowIni ) ) )->run( new expAiMeliousTestScriptedProvider( $careful ), 2, 1, 'folder' );
+foreach ( $result['results'] as $row )
+    if ( $row['id'] === 'create_draft' )
+        $byId['nofollow'] = $row;
+$check( 'probe follow: FollowRounds=0 grades the first call', $byId['nofollow']['ok'] . '/' . $byId['nofollow']['followed'], '/0' );
+// a write of another tool ends the follow; the injection task is not follow_ok
+$check( 'probe follow: a write call is no lookup', expAiProbe::onlyLookups( array( array( 'name' => 'update_draft' ) ) ), false );
+$check( 'probe follow: an MCP tool is no lookup', expAiProbe::onlyLookups( array( array( 'name' => 'exp__exp_content_get' ) ) ), false );
+$check( 'probe follow: reads are lookups', expAiProbe::onlyLookups( array( array( 'name' => 'get_node' ), array( 'name' => 'get_class_definition' ) ) ), true );
+$tasks = array();
+foreach ( $probe->tasks( 2, 1, 'folder' ) as $t )
+    $tasks[$t['id']] = isset( $t['follow_ok'] ) ? $t['follow_ok'] : '';
+$check( 'probe follow: follow_ok on the two write tasks only', array_filter( $tasks ), array( 'create_draft' => 'create_draft', 'update_draft' => 'update_draft' ) );
 
 // the fixtures carry no key or account data
 $all = '';

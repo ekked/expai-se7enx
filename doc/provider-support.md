@@ -112,7 +112,7 @@ order to show it in: [demo-melious.md](demo-melious.md).
 | Models list (`/v1/models?include_meta=true`) | the four partner models exist with these ids; function calling on all four; context 1M |
 | Chat, panel step loop | proven live on both servers (DeepSeek V4 Flash 0731, GLM 5.3 Flash): 1.8 to 3.3 s per question |
 | Tools, native (single and two calls, round trip with `reasoning_content`) | proven live (in process and in the panel, Vector, the probe) |
-| Probe (15 tasks) | 13/15 (86 %) for each of the four models: they look up the class or object before `create_draft` / `update_draft`, or use another read tool (`exp_svc_node_children_names`) for a listing. Below 90 %: read only |
+| Probe (15 tasks) | first run 13/15 (86 %) each: they look up the class or object before `create_draft` / `update_draft`. Since the probe follows such a lookup (`follow_ok`, #392): GLM 5.3 Flash, GLM 5.3 and DeepSeek V4 Flash 0731 14/15 (93 %), DeepSeek V4.1 Flash 15/15 (100 %); the one miss is `paging` (another read tool, `exp_svc_node_children_names`). All four may write |
 | Drafts through the assistant | not opened (read only below the gate); the panel and Vector answer with the text to copy instead |
 | Field actions, presets, Improve | proven live on both servers, 1.8 to 11.6 s |
 | Vector plan mode | proven live: propose_plan, Plan tab, approve, the item ran in the queue (no change: read only) |
@@ -124,4 +124,4 @@ order to show it in: [demo-melious.md](demo-melious.md).
 | Errors | 404 `model_not_found` and 401 `invalid_api_key` recorded live (unit test); a host that does not resolve: "could not be reached" and the fallback |
 | Fallback | proven live on both servers: Claude Sonnet 5.5 answered instead, with the line saying so; after the restore Melious answered again |
 | Data policy, EI: Summary, audit channel ai | Melious shown with EU and zdr; every request an event of the channel ai |
-| Streaming | Melious streams (recorded, unit test); expai asks for whole answers |
+| Streaming | proven live: the test prompt of expai/models is streamed (`Streaming=enabled`) and times the first token; everything else asks for whole answers |

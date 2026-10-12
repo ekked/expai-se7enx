@@ -76,7 +76,8 @@ settings keep working unchanged). More providers: the next three sections and [p
 | `RetryOnServerError` | `enabled` (default): one retry after a second on 500/502/504 or a failed connection (never after a timeout). |
 | `AnthropicExtras` | `anthropic` only: `disabled` leaves out prompt caching, the refusal fallback, the workspace header and the beta headers (for an Anthropic-compatible server such as Ollama's `/v1/messages`). |
 | `Managed` | `ollama`: a local Ollama that expai/models can start, stop and pull models for ([local-models.md](local-models.md)). |
-| `PriceCurrency` | The currency of the prices of its models and of the cost it reports (Melious: `EUR`); empty: `[Pricing] Currency`. Converted with `[Pricing] ExchangeRates[]`; without a rate the cost is unknown. A `[Model_<alias>] PriceCurrency` wins. |
+| `PriceCurrency` | The currency of the prices of its models and of the cost it reports (Melious: `EUR`); empty: `[Pricing] Currency`. Converted with the ECB reference rate (or `[Pricing] ExchangeRates[]`); without a rate the cost is unknown. A `[Model_<alias>] PriceCurrency` wins. |
+| `Streaming` | `enabled`: the server streams answers (SSE); the test prompt of expai/models is then streamed to measure the time to the first token (Melious). Everything else asks for whole answers. |
 
 ## [Model_<alias>]: one model
 
@@ -201,7 +202,9 @@ reported) and the spend limit of the organization, set in the Claude Console.
 | `Currency` | `USD` | The currency of the prices; shown with its symbol. |
 | `PricesAsOf`, `Source` | the release date, Anthropic's pricing page | Shown under the cost so readers know how old the table is. |
 | `Multiplier` | `1.0` | Applied to every price (regional inference, fast mode, a reseller's margin). |
-| `ExchangeRates[<code>]`, `ExchangeRatesAsOf` | `EUR`: 1.16, 2026-10-12 | What one unit of another currency is in `Currency`, for providers with `PriceCurrency` (Melious prices in EUR): their prices and reported costs are converted with it. An approximate rate for an estimate; without a rate their cost is unknown. |
+| `ExchangeRateSource` | `ecb` | `ecb`: providers with `PriceCurrency` (Melious prices in EUR) are converted with the reference rates of the European Central Bank (https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml), fetched once a day by the job `expai.exchange.rates`, the cronjob part `expai_exchange_rates.php` or `./console ext:expai:exchange-rates`, kept with their date in ezsite_data and shown on expai/models; a failed fetch keeps the last rates and logs a warning. `settings`: only `ExchangeRates[]`. |
+| `ExchangeRatesMaxAgeHours` | `26` | Stored ECB rates older than this are refreshed (the job is queued at most once a day). |
+| `ExchangeRates[<code>]`, `ExchangeRatesAsOf` | `EUR`: 1.16, 2026-10-12 | The fallback while there is no ECB rate (and the override with `ExchangeRateSource=settings`): what one unit of the currency is in `Currency`. Without any rate the cost is unknown. |
 | `Default*PerMTok` | Claude Sonnet 5.5 | Prices for a model without an entry; such costs are shown as approximate (`≈`). |
 | `InputPerMTok[<model>]`, `CacheWritePerMTok[...]`, `CacheReadPerMTok[...]`, `OutputPerMTok[...]` | the shipped table | Prices per million tokens. Cache write is the 5-minute cache price. |
 | `LongContextThreshold[<model>]` and `*PerMTokLong[<model>]` | Claude Haiku 5.5 | A request whose prompt (input + cache write + cache read) is above the threshold uses the `Long` prices. |
@@ -255,6 +258,7 @@ See [service-tools.md](service-tools.md). The read services of expservices the a
 | `WritePassRate` | `90` | The pass rate (percent) of a live probe a model needs to write drafts ([probe.md](probe.md)). |
 | `NodeID` | (empty) | The node the probe tasks name (nothing is read or written); empty: the content root. |
 | `ClassIdentifier` | `folder` | The class the probe tasks name. |
+| `FollowRounds` | `2` | How often a lookup before the write of the tasks create_draft and update_draft is answered with a scripted result before the next call is graded (0 to 5; [probe.md](probe.md), "A lookup before the write"). |
 
 ## [LocalModelSettings]: a local Ollama
 
