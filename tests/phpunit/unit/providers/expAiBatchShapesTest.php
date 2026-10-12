@@ -10,25 +10,25 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expait386ehelpers.php';
+require_once __DIR__ . '/expaiprovidertesthelpers.php';
 
-class expAiBatchShapesTest extends expAiT386ETestCase
+class expAiBatchShapesTest extends expAiProviderTestCase
 {
     private function laneConfig( $type, $api, array $provider = array(), array $lane = array() )
     {
         return $this->config( array(
-            'ProviderSettings' => array( 'Providers' => array( 't386eb' ) ),
-            'Provider_t386eb' => $provider + array( 'Type' => $type, 'BaseURL' => 'https://batch.example/v1', 'ApiKey' => 'test-not-a-key', 'Label' => 'Batch T' ),
-            'Model_t386eb.m' => array( 'Provider' => 't386eb', 'Id' => 'models/m-1' ),
-            'Lane_t386eb.batch' => $lane + array( 'Enabled' => 'true', 'Type' => 'batch', 'BatchApi' => $api, 'PriceMultiplier' => '0.5' ),
+            'ProviderSettings' => array( 'Providers' => array( 'xteb' ) ),
+            'Provider_xteb' => $provider + array( 'Type' => $type, 'BaseURL' => 'https://batch.example/v1', 'ApiKey' => 'test-not-a-key', 'Label' => 'Batch T' ),
+            'Model_xteb.m' => array( 'Provider' => 'xteb', 'Id' => 'models/m-1' ),
+            'Lane_xteb.batch' => $lane + array( 'Enabled' => 'true', 'Type' => 'batch', 'BatchApi' => $api, 'PriceMultiplier' => '0.5' ),
         ) );
     }
 
     private function api( $type, $api, array $answers, array $provider = array(), array $lane = array() )
     {
         $config = $this->laneConfig( $type, $api, $provider, $lane );
-        $http = new expAiT386EHttp( $answers );
-        return array( expAiBatchApi::forLane( expAiLane::fetch( 't386eb', 'batch', $config ), 't386eb.m', $config, $http ), $http );
+        $http = new expAiProviderTestHttp( $answers );
+        return array( expAiBatchApi::forLane( expAiLane::fetch( 'xteb', 'batch', $config ), 'xteb.m', $config, $http ), $http );
     }
 
     private static function batch( array $row = array() )
@@ -65,12 +65,12 @@ class expAiBatchShapesTest extends expAiT386ETestCase
     {
         $this->requireDatabase();
         $config = $this->laneConfig( 'openai_chat', 'openai' );
-        $this->expectDetail( function () use ( $config ) { expAiBatchApi::forLane( expAiLane::fetch( 't386eb', 'standard', $config ), 't386eb.m', $config ); },
-                             'lane t386eb:standard has no known BatchApi ()' );
-        $this->expectDetail( function () use ( $config ) { expAiBatchApi::forLane( expAiLane::fetch( 't386eb', 'batch', $config ), 'nothing', $config ); },
+        $this->expectDetail( function () use ( $config ) { expAiBatchApi::forLane( expAiLane::fetch( 'xteb', 'standard', $config ), 'xteb.m', $config ); },
+                             'lane xteb:standard has no known BatchApi ()' );
+        $this->expectDetail( function () use ( $config ) { expAiBatchApi::forLane( expAiLane::fetch( 'xteb', 'batch', $config ), 'nothing', $config ); },
                              'no model nothing in the provider registry' );
         list( $api ) = $this->api( 'openai_chat', 'openai', array() );
-        $this->assertSame( array( 'openai', 't386eb', 'models/m-1' ), array( $api->shape(), $api->providerId(), $api->modelId() ) );
+        $this->assertSame( array( 'openai', 'xteb', 'models/m-1' ), array( $api->shape(), $api->providerId(), $api->modelId() ) );
         $this->assertTrue( expAiBatchApi::permanentItemError( 422, '' ) );
         $this->assertTrue( expAiBatchApi::permanentItemError( 500, 'invalid_request_error: x' ) );
         $this->assertFalse( expAiBatchApi::permanentItemError( 500, 'overloaded' ) );
@@ -80,11 +80,11 @@ class expAiBatchShapesTest extends expAiT386ETestCase
     {
         $this->requireDatabase();
         list( $api, $http ) = $this->api( 'openai_chat', 'openai', array( array( 200, '{"id":"b9","status":"completed"}' ) ),
-                                          array( 'ApiKeyHeader' => 'none', 'Headers' => array( 'X-Run: t386e', 'Authorization: stolen', "X-Bad: a\nb" ) ) );
+                                          array( 'ApiKeyHeader' => 'none', 'Headers' => array( 'X-Run: xte', 'Authorization: stolen', "X-Bad: a\nb" ) ) );
         $api->status( self::batch() );
-        $this->assertSame( array( 'X-Run: t386e' ), $http->requests[0][1] );
+        $this->assertSame( array( 'X-Run: xte' ), $http->requests[0][1] );
         list( $api ) = $this->api( 'openai_chat', 'openai', array(), array( 'ApiKey' => '' ) );
-        $this->expectDetail( function () use ( $api ) { $api->status( self::batch() ); }, 'ApiKey of provider t386eb is not set' );
+        $this->expectDetail( function () use ( $api ) { $api->status( self::batch() ); }, 'ApiKey of provider xteb is not set' );
         list( $api ) = $this->api( 'openai_chat', 'openai', array(), array( 'ApiKeyHeader' => 'bad header' ) );
         $this->expectDetail( function () use ( $api ) { $api->status( self::batch() ); }, 'ApiKeyHeader is not a header name' );
         list( $api ) = $this->api( 'openai_chat', 'openai', array(), array( 'ApiKeyHeader' => 'api-key' ) );
@@ -96,13 +96,13 @@ class expAiBatchShapesTest extends expAiT386ETestCase
         }
         catch ( expAiException $e )
         {
-            $this->assertSame( 'provider t386eb batch GET /v1/batches/b%201: HTTP 429: slow down [redacted]', $e->detail() );
+            $this->assertSame( 'provider xteb batch GET /v1/batches/b%201: HTTP 429: slow down [redacted]', $e->detail() );
             $this->assertSame( array( '%provider' => 'Batch T' ), $e->arguments() );
             $this->assertSame( array( 'retry-after' => '9' ), $e->rateLimits );
             $this->assertContains( 'api-key: test-not-a-key', $http->requests[0][1] );
         }
         list( $api ) = $this->api( 'openai_chat', 'openai', array( array( 500, '{"error":"plain text error"}' ) ) );
-        $this->expectDetail( function () use ( $api ) { $api->cancel( self::batch() ); }, 'provider t386eb batch POST /v1/batches/b1/cancel: HTTP 500: plain text error' );
+        $this->expectDetail( function () use ( $api ) { $api->cancel( self::batch() ); }, 'provider xteb batch POST /v1/batches/b1/cancel: HTTP 500: plain text error' );
     }
 
     public function testOpenAiUploadsAFileAndRemovesItWhenTheBatchIsRefused(): void
@@ -118,7 +118,7 @@ class expAiBatchShapesTest extends expAiT386ETestCase
         list( $api ) = $this->api( 'openai_chat', 'openai', array( array( 200, '{}' ) ) );
         $this->expectDetail( function () use ( $api ) { $api->submit( self::items() ); }, 'no file id in the answer' );
         list( $api, $http ) = $this->api( 'openai_chat', 'openai', array( array( 200, '{"id":"file-2"}' ), array( 400, '{"error":{"message":"bad batch"}}' ), array( 200, '{}' ) ) );
-        $this->expectDetail( function () use ( $api ) { $api->submit( self::items() ); }, 'provider t386eb batch POST /v1/batches: HTTP 400: bad batch' );
+        $this->expectDetail( function () use ( $api ) { $api->submit( self::items() ); }, 'provider xteb batch POST /v1/batches: HTTP 400: bad batch' );
         $this->assertSame( array( 'DELETE', 'https://batch.example/v1/files/file-2' ), array( $http->requests[2][3]['method'], $http->requests[2][0] ), 'the uploaded file is removed again' );
         list( $api ) = $this->api( 'openai_chat', 'openai', array( array( 200, '{"id":"file-3"}' ), array( 200, '{}' ) ) );
         $this->expectDetail( function () use ( $api ) { $api->submit( self::items() ); }, 'no batch id in the answer' );
@@ -169,7 +169,7 @@ class expAiBatchShapesTest extends expAiT386ETestCase
         list( $api ) = $this->api( 'openai_chat', 'gemini', array( array( 200, '{"name":"operations/x"}' ) ) );
         $this->expectDetail( function () use ( $api ) { $api->submit( self::items() ); }, 'no batch name in the answer' );
         list( $api ) = $this->api( 'openai_chat', 'gemini', array(), array( 'ApiKey' => '' ) );
-        $this->expectDetail( function () use ( $api ) { $api->submit( self::items() ); }, 'ApiKey of provider t386eb is not set' );
+        $this->expectDetail( function () use ( $api ) { $api->submit( self::items() ); }, 'ApiKey of provider xteb is not set' );
 
         $done = array( 'done' => true, 'metadata' => array( 'endTime' => '2026-10-12T10:00:00Z', 'batchStats' => array( 'pendingRequestCount' => 0 ) ),
                        'response' => array( 'inlinedResponses' => array( 'inlinedResponses' => array(
@@ -271,12 +271,12 @@ class expAiBatchShapesTest extends expAiT386ETestCase
     {
         $this->requireDatabase();
         list( $api, $http ) = $this->api( 'anthropic', 'anthropic', array( array( 200, '{"id":"msgbatch_1","processing_status":"in_progress","expires_at":"2026-10-13T10:00:00Z"}' ) ),
-                                          array( 'BaseURL' => '', 'Endpoint' => 'https://anthropic.example/v1/messages', 'AnthropicWorkspaceId' => 'ws_t386e',
+                                          array( 'BaseURL' => '', 'Endpoint' => 'https://anthropic.example/v1/messages', 'AnthropicWorkspaceId' => 'ws_xte',
                                                  'RefusalFallback' => 'enabled', 'AnthropicExtras' => 'enabled' ) );
         $submitted = $api->submit( self::items() );
         $this->assertSame( array( 'msgbatch_1', 'in_progress', strtotime( '2026-10-13T10:00:00Z' ) ), array( $submitted['remote_id'], $submitted['state'], $submitted['expires_at'] ) );
         $this->assertSame( 'https://anthropic.example/v1/messages/batches', $http->requests[0][0] );
-        $this->assertContains( 'anthropic-workspace-id: ws_t386e', $http->requests[0][1] );
+        $this->assertContains( 'anthropic-workspace-id: ws_xte', $http->requests[0][1] );
         $this->assertArrayNotHasKey( 'fallbacks', $http->json()['requests'][0]['params'], 'the refusal fallback is a beta of the synchronous API' );
         list( $api ) = $this->api( 'anthropic', 'anthropic', array( array( 200, '{}' ) ), array( 'BaseURL' => '' ) );
         $this->expectDetail( function () use ( $api ) { $api->submit( self::items() ); }, 'no batch id in the answer' );

@@ -10,7 +10,7 @@
 
 require_once __DIR__ . '/expaicoretestcase.php';
 
-class expAiHelpTest extends expAiT386DCoreTestCase
+class expAiHelpTest extends expAiCoreTestCase
 {
     public function testRulesAndHeadingIds(): void
     {

@@ -34,7 +34,7 @@ class expAiProjectHistoryTest extends expAiTestCase
     private function git( array $arguments )
     {
         $env = array( 'PATH' => '/usr/bin:/bin', 'HOME' => $this->dir, 'GIT_CONFIG_NOSYSTEM' => '1', 'GIT_CONFIG_GLOBAL' => '/dev/null',
-                      'GIT_AUTHOR_NAME' => 'T386 Author', 'GIT_AUTHOR_EMAIL' => 'author@example.invalid', 'GIT_COMMITTER_NAME' => 'T386',
+                      'GIT_AUTHOR_NAME' => 'XT Author', 'GIT_AUTHOR_EMAIL' => 'author@example.invalid', 'GIT_COMMITTER_NAME' => 'XT',
                       'GIT_COMMITTER_EMAIL' => 'committer@example.invalid', 'GIT_AUTHOR_DATE' => '2026-10-01T10:00:00', 'GIT_COMMITTER_DATE' => '2026-10-01T10:00:00' );
         $process = proc_open( array_merge( array( '/usr/bin/git', '-C', $this->dir . '/repo' ), $arguments ),
                               array( 0 => array( 'file', '/dev/null', 'r' ), 1 => array( 'pipe', 'w' ), 2 => array( 'pipe', 'w' ) ), $pipes, $this->dir, $env );
@@ -94,7 +94,7 @@ class expAiProjectHistoryTest extends expAiTestCase
         $this->assertCount( 1, $history->commits( $repos['test'], array( 'limit' => 1 ) ) );
 
         $withAuthors = new expAiProjectHistory( $this->historyConfig( $repo, array( 'ShowAuthors' => 'enabled' ) ) );
-        $this->assertSame( 'T386 Author', $withAuthors->commits( $repos['test'], array( 'limit' => 1 ) )[0]['author'] );
+        $this->assertSame( 'XT Author', $withAuthors->commits( $repos['test'], array( 'limit' => 1 ) )[0]['author'] );
 
         $this->assertRefused( function () use ( $history, $repos ) { $history->commits( array( 'branch' => '--all' ) + $repos['test'], array() ); }, 'invalid Branch setting' );
         $this->assertSame( 'Added: README.md', $history->commits( array( 'branch' => 'main' ) + $repos['test'], array( 'limit' => 1 ) )[0]['title'] );

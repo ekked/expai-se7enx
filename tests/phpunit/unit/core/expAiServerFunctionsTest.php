@@ -12,7 +12,7 @@
 
 require_once __DIR__ . '/expaicoretestcase.php';
 
-class expAiServerFunctionsTest extends expAiT386DCoreTestCase
+class expAiServerFunctionsTest extends expAiCoreTestCase
 {
     protected function setUp(): void
     {
@@ -94,7 +94,7 @@ class expAiServerFunctionsTest extends expAiT386DCoreTestCase
         $model = expAiServerFunctions::model( array() );
         $this->assertSame( self::TEST_PROVIDER . '.e2e', $model['model'] );
         $this->assertSame( self::TEST_PROVIDER . '.e2e', $model['default'] );
-        $this->assertSame( 'T386D e2e', $model['label'] );
+        $this->assertSame( 'XTD e2e', $model['label'] );
         $this->useMockProvider( array( 'AISettings' => array( 'AllowUserModelChoice' => 'disabled' ) ) );
         $this->assertStringContainsString( 'switched off', $this->expectFailure( function () { expAiServerFunctions::model( array() ); } )->getMessage() );
         $this->useMockProvider();
@@ -150,8 +150,8 @@ class expAiServerFunctionsTest extends expAiT386DCoreTestCase
                                           'node_id' => $nodeID, 'parent_node_id' => $nodeID, 'action' => 'create', 'source' => 'panel', 'model' => 'mock' ) );
             return $object;
         };
-        $kept = $make( 'T386D kept' );
-        $sent = $make( 'T386D sent' );
+        $kept = $make( 'XTD kept' );
+        $sent = $make( 'XTD sent' );
 
         // node_id 0: the dashboard's call, no list back
         $this->post( array( 'node_id' => '0', 'drafts' => $kept->attribute( 'id' ) . ':1' ) );
@@ -209,13 +209,13 @@ class expAiServerFunctionsTest extends expAiT386DCoreTestCase
         $node = $this->workFolder();
         $nodeID = (int) $node->attribute( 'node_id' );
         $adminID = (int) $admin->attribute( 'contentobject_id' );
-        $thread = expAiThread::create( array( 'user_id' => $adminID, 'node_id' => $nodeID, 'title' => 'T386D settle', 'state' => 'review' ) );
+        $thread = expAiThread::create( array( 'user_id' => $adminID, 'node_id' => $nodeID, 'title' => 'XTD settle', 'state' => 'review' ) );
         $threadID = (int) $thread->attribute( 'id' );
         $writer = new expAiContentWriter();
         $drafts = array();
         foreach ( array( 'one', 'two' ) as $name )
         {
-            list( $object ) = $writer->createDraft( $node, 'folder', array( 'name' => "T386D $name" ) );
+            list( $object ) = $writer->createDraft( $node, 'folder', array( 'name' => "XTD $name" ) );
             expAiDraftLog::record( array( 'contentobject_id' => (int) $object->attribute( 'id' ), 'version' => 1, 'user_id' => $adminID, 'node_id' => $nodeID,
                                           'thread_id' => $threadID, 'source' => 'vector', 'action' => 'create', 'model' => 'mock' ) );
             $drafts[] = (int) $object->attribute( 'id' );
@@ -235,13 +235,13 @@ class expAiServerFunctionsTest extends expAiT386DCoreTestCase
         $config = $this->useMockProvider( array( 'ToolSettings' => array( 'WritableDatatypes' => array( 'ezstring', 'eztext', 'ezxmltext', 'ezkeyword', 'ezboolean' ) ) ) );
         $node = $this->workFolder();
         $writer = new expAiContentWriter( $config );
-        list( $object, $version ) = $writer->createDraft( $node, 'folder', array( 'name' => 'T386D field test', 'short_description' => '<p>Short</p>' ) );
+        list( $object, $version ) = $writer->createDraft( $node, 'folder', array( 'name' => 'XTD field test', 'short_description' => '<p>Short</p>' ) );
         $objectID = (int) $object->attribute( 'id' );
         $nameAttribute = $object->fetchDataMap( 1 )['name'];
         $language = $version->initialLanguageCode();
         $form = array( 'object_id' => $objectID, 'version' => 1, 'language' => $language, 'attribute_id' => (int) $nameAttribute->attribute( 'id' ),
-                       'action' => 'rewrite', 'value' => 'T386D field test', 'instruction' => 'make it friendlier', 'target_language' => '',
-                       'context' => json_encode( array( 'name' => 'T386D field test', 'tags' => array( 'not', 'scalar' ) ) ) );
+                       'action' => 'rewrite', 'value' => 'XTD field test', 'instruction' => 'make it friendlier', 'target_language' => '',
+                       'context' => json_encode( array( 'name' => 'XTD field test', 'tags' => array( 'not', 'scalar' ) ) ) );
 
         $this->post( $form );
         $field = expAiServerFunctions::field( array() );
@@ -347,7 +347,7 @@ class expAiServerFunctionsTest extends expAiT386DCoreTestCase
         $draft->removeThis();
 
         // a link: ezurl with text, and a scheme that is refused
-        list( $link ) = $writer->createDraft( $node, 'link', array( 'name' => 'T386D link', 'location' => 'https://example.invalid/page | The page' ) );
+        list( $link ) = $writer->createDraft( $node, 'link', array( 'name' => 'XTD link', 'location' => 'https://example.invalid/page | The page' ) );
         $this->assertSame( 'https://example.invalid/page|The page', $link->fetchDataMap( 1 )['location']->toString() );
         $refused = $writer->writeFields( $link, $link->version( 1 ), $link->version( 1 )->initialLanguageCode(), array( 'location' => 'javascript:alert(1)' ) );
         $this->assertSame( 'not an http(s) or mailto URL', $refused['errors']['location'] );
@@ -369,7 +369,7 @@ class expAiServerFunctionsTest extends expAiT386DCoreTestCase
         $object = new eZContentObject( array( 'id' => 0 ) );
         $write = function ( $datatype, $value, $max = 0 ) use ( $writer, $object )
         {
-            $attribute = new expAiT386DFakeAttribute( $datatype, $max );
+            $attribute = new expAiCoreTestFakeAttribute( $datatype, $max );
             $result = self::invoke( $writer, 'writeValue', array( $object, $attribute, $datatype, $value ) );
             return array( $result, $attribute );
         };
@@ -391,7 +391,7 @@ class expAiServerFunctionsTest extends expAiT386DCoreTestCase
         $this->assertSame( 'someone@example.invalid', $attribute->attribute( 'data_text' ) );
         list( $ok, $attribute ) = $write( 'ezboolean', false );
         $this->assertSame( 0, (int) $attribute->attribute( 'data_int' ) );
-        $this->assertSame( 'the value was refused by the datatype', $write( 'ezt386dnosuchtype', 'x' )[0] );
+        $this->assertSame( 'the value was refused by the datatype', $write( 'ezxtdnosuchtype', 'x' )[0] );
     }
 
     public function testContentReaderValuesClassesAndChildren(): void
@@ -400,8 +400,8 @@ class expAiServerFunctionsTest extends expAiT386DCoreTestCase
         $config = $this->useSettings( array( 'ToolSettings' => array( 'FieldValueMaxLength' => '100' ) ) );
         $reader = new expAiContentReader( $config );
         $node = $this->workFolder();
-        $this->publish( $node->attribute( 'node_id' ), array( 'name' => 'T386D child' ), 'folder' );
-        $this->publish( $node->attribute( 'node_id' ), array( 'name' => 'T386D link child', 'location' => 'https://example.invalid/' ), 'link' );
+        $this->publish( $node->attribute( 'node_id' ), array( 'name' => 'XTD child' ), 'folder' );
+        $this->publish( $node->attribute( 'node_id' ), array( 'name' => 'XTD link child', 'location' => 'https://example.invalid/' ), 'link' );
 
         $this->assertNull( $reader->policy() );
         $this->assertStringContainsString( 'does not exist', $this->expectFailure( function () use ( $reader ) { $reader->readableNode( 999999999 ); } )->getMessage() );
@@ -428,9 +428,9 @@ class expAiServerFunctionsTest extends expAiT386DCoreTestCase
         // values of each datatype
         $value = function ( $datatype, array $data ) use ( $reader )
         {
-            return $reader->value( new expAiT386DFakeAttribute( $datatype, 0, $data, true ) );
+            return $reader->value( new expAiCoreTestFakeAttribute( $datatype, 0, $data, true ) );
         };
-        $this->assertNull( $reader->value( new expAiT386DFakeAttribute( 'ezstring', 0, array(), false ) ), 'no content, no value' );
+        $this->assertNull( $reader->value( new expAiCoreTestFakeAttribute( 'ezstring', 0, array(), false ) ), 'no content, no value' );
         $this->assertTrue( $value( 'ezboolean', array( 'data_int' => 1 ) ) );
         $this->assertSame( 7, $value( 'ezinteger', array( 'data_int' => 7 ) ) );
         $this->assertSame( '2023-11-14', $value( 'ezdate', array( 'data_int' => 1700000000 ) ) );
@@ -447,7 +447,7 @@ class expAiServerFunctionsTest extends expAiT386DCoreTestCase
         $this->assertStringStartsWith( 'expai unit test core', $fields['name']['value'] );
 
         // the data policy keeps objects away: children are counted, a node is refused
-        $policy = new expAiT386DRefusingPolicy( $config );
+        $policy = new expAiCoreTestRefusingPolicy( $config );
         $reader->setPolicy( $policy );
         $this->assertSame( $policy, $reader->policy() );
         $this->assertSame( array(), $reader->children( $node, 10 ) );
@@ -459,7 +459,7 @@ class expAiServerFunctionsTest extends expAiT386DCoreTestCase
 }
 
 /** An attribute that is not stored: its datatype and class attribute are what the test says */
-class expAiT386DFakeAttribute extends eZContentObjectAttribute
+class expAiCoreTestFakeAttribute extends eZContentObjectAttribute
 {
     public $stored = 0;
     private $classAttribute;
@@ -470,7 +470,7 @@ class expAiT386DFakeAttribute extends eZContentObjectAttribute
         parent::__construct( $data + array( 'id' => 0, 'contentobject_id' => 0, 'version' => 1, 'data_type_string' => $datatype,
                                             'data_text' => '', 'data_int' => 0, 'data_float' => 0, 'sort_key_int' => 0, 'sort_key_string' => '',
                                             'language_code' => 'eng-GB', 'contentclassattribute_id' => 0 ) );
-        $this->classAttribute = new eZContentClassAttribute( array( 'data_int1' => $max, 'data_type_string' => $datatype, 'name' => 'T386D', 'is_required' => 0 ) );
+        $this->classAttribute = new eZContentClassAttribute( array( 'data_int1' => $max, 'data_type_string' => $datatype, 'name' => 'XTD', 'is_required' => 0 ) );
         $this->content = $content;
     }
 
@@ -501,7 +501,7 @@ class expAiT386DFakeAttribute extends eZContentObjectAttribute
 }
 
 /** A data policy that keeps every object away */
-class expAiT386DRefusingPolicy extends expAiDataPolicy
+class expAiCoreTestRefusingPolicy extends expAiDataPolicy
 {
     public function __construct( expAiConfig $config )
     {

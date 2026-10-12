@@ -9,9 +9,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expaivbfixture.php';
+require_once __DIR__ . '/expaivectorcoretestcase.php';
 
-class expAiThreadFanoutTest extends expAiT386VbCase
+class expAiThreadFanoutTest extends expAiVectorCoreTestCase
 {
     private static function item( $index, array $more = array() )
     {
@@ -23,7 +23,7 @@ class expAiThreadFanoutTest extends expAiT386VbCase
     /** @return array( thread, plan, runs ) a plan fanned out by start() into real jobs (inside the test's transaction) */
     private function started( array $items, $title )
     {
-        $thread = $this->thread( array( 'title' => $title, 'model_alias' => 't386b.stub', 'scope' => array( 'nodes' => array( 2 ) ) ) );
+        $thread = $this->thread( array( 'title' => $title, 'model_alias' => 'xtb.stub', 'scope' => array( 'nodes' => array( 2 ) ) ) );
         $this->inTransaction();
         $plan = new expAiPlan( array( 'thread_id' => (int) $thread->attribute( 'id' ), 'state' => 'running', 'created' => time(), 'modified' => time() ) );
         $plan->setItems( $items );
@@ -61,7 +61,7 @@ class expAiThreadFanoutTest extends expAiT386VbCase
         $this->assertSame( 'Translate: Main Street (ger-DE, fre-FR)', expAiThreadFanout::label( array( 'action' => 'translate', 'target_name' => 'Main Street', 'languages' => array( 'ger-DE', 'fre-FR' ) ) ) );
         $this->assertSame( 'merge: X', expAiThreadFanout::label( array( 'action' => 'merge', 'target_name' => 'X', 'languages' => array() ) ) );
 
-        $article = $this->article( 'T386B node of' );
+        $article = $this->article( 'XTB node of' );
         $this->assertSame( 55, expAiThreadFanout::nodeOf( array( 'action' => 'create', 'target' => array( 'parent_node_id' => 55 ) ), 9 ) );
         $this->assertSame( 66, expAiThreadFanout::nodeOf( array( 'action' => 'update', 'target' => array( 'node_id' => 66 ) ), 9 ) );
         $this->assertSame( (int) $article->mainNodeID(), expAiThreadFanout::nodeOf( array( 'action' => 'update', 'target' => array( 'object_id' => (int) $article->attribute( 'id' ) ) ), 9 ) );

@@ -7,9 +7,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expait386ehelpers.php';
+require_once __DIR__ . '/expaiprovidertesthelpers.php';
 
-class expAiTranslationCheckHandlerTest extends expAiT386ETestCase
+class expAiTranslationCheckHandlerTest extends expAiProviderTestCase
 {
     private static function job( array $payload )
     {
@@ -32,7 +32,7 @@ class expAiTranslationCheckHandlerTest extends expAiT386ETestCase
         $job = self::job( array( 'object_id' => 999999999 ) );
         try
         {
-            ( new expAiTranslationCheckHandler() )->run( $job, new expQueueContext( $job, 't386e' ) );
+            ( new expAiTranslationCheckHandler() )->run( $job, new expQueueContext( $job, 'xte' ) );
             $this->fail( 'no exception' );
         }
         catch ( expQueuePermanentException $e )
@@ -46,7 +46,7 @@ class expAiTranslationCheckHandlerTest extends expAiT386ETestCase
         $this->requireDatabase();
         $folder = $this->folder( 'expai unit test translation check' );
         $job = self::job( array( 'object_id' => (int) $folder->attribute( 'contentobject_id' ) ) );
-        $context = new expQueueContext( $job, 't386e' );
+        $context = new expQueueContext( $job, 'xte' );
 
         $this->site( array( 'TranslationSync' => array( 'Enabled' => 'false' ) ) );
         $this->assertSame( array( 'skipped' => 'disabled' ), ( new expAiTranslationCheckHandler() )->run( $job, $context ) );

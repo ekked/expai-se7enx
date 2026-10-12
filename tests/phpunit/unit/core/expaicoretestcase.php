@@ -1,6 +1,6 @@
 <?php
 /**
- * File containing the expAiT386DCoreTestCase class: the base of the unit tests of the classes in extension/expai/classes
+ * File containing the expAiCoreTestCase class: the base of the unit tests of the classes in extension/expai/classes
  * (not its subdirectories). Loaded by the tests of this directory with require_once; not a test itself.
  *
  *  - useSettings(): the code under test reads expai.ini through expAiConfig::instance(). For the test, the settings
@@ -15,13 +15,13 @@
  * @package expai
  */
 
-abstract class expAiT386DCoreTestCase extends expAiTestCase
+abstract class expAiCoreTestCase extends expAiTestCase
 {
     /** an id no real user has: rows of the tests are found by it */
     const TEST_USER = 987654321;
 
     /** the provider id of the rows the tests write (no real provider has it) */
-    const TEST_PROVIDER = 't386d';
+    const TEST_PROVIDER = 'xtd';
 
     protected function tearDown(): void
     {
@@ -65,10 +65,10 @@ abstract class expAiT386DCoreTestCase extends expAiTestCase
             // the user's own model choice (a preference row) is not used: the site default answers
             'AISettings' => array( 'Enabled' => 'true', 'AllowUserModelChoice' => 'disabled' ),
             'ProviderSettings' => array( 'Providers' => array( 'anthropic', self::TEST_PROVIDER ), 'DefaultModel' => self::TEST_PROVIDER . '.e2e' ),
-            'Provider_' . self::TEST_PROVIDER => array( 'Type' => 'openai_chat', 'Flavor' => 'huggingface', 'Label' => 'T386D mock',
+            'Provider_' . self::TEST_PROVIDER => array( 'Type' => 'openai_chat', 'Flavor' => 'huggingface', 'Label' => 'XTD mock',
                 'BaseURL' => $mock['url'] . '/hf/v1', 'ApiKey' => 'hf_mock_not_a_key', 'Region' => 'us', 'Retention' => 'unknown',
                 'Timeout' => 5, 'RetryAfterMax' => 1 ),
-            'Model_' . self::TEST_PROVIDER . '.e2e' => array( 'Provider' => self::TEST_PROVIDER, 'Id' => $model, 'Label' => 'T386D e2e',
+            'Model_' . self::TEST_PROVIDER . '.e2e' => array( 'Provider' => self::TEST_PROVIDER, 'Id' => $model, 'Label' => 'XTD e2e',
                 'ToolUse' => 'native', 'WriteTools' => 'enabled', 'WriteGate' => 'trusted', 'MaxOutput' => 800,
                 'InputPerMTok' => '1', 'OutputPerMTok' => '2' ),
             'McpBridge' => array( 'Enabled' => 'disabled' ),

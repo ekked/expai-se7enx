@@ -9,15 +9,15 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expait386ccontenttestcase.php';
+require_once __DIR__ . '/expaicontenttestcase.php';
 
-class expAiBudgetStatusTest extends expAiT386CContentTestCase
+class expAiBudgetStatusTest extends expAiContentTestCase
 {
     public function testSiteAndGroupBudgetsHoldAndResume(): void
     {
         $config = $this->siteSettings( array( 'Budgets' => array( 'SiteMonthly' => '' ) ) );
         $this->asUser( 'admin' );
-        $group = expQueue::createGroup( 'T386 budget group', 'expai.test', array( 'budget_micros' => 1000 ) );
+        $group = expQueue::createGroup( 'XT budget group', 'expai.test', array( 'budget_micros' => 1000 ) );
         $groupID = (int) $group->attribute( 'id' );
         $this->cleanup( static function () use ( $groupID )
         {
@@ -30,7 +30,7 @@ class expAiBudgetStatusTest extends expAiT386CContentTestCase
         $this->assertNull( $budget->refusal( 500, $groupID ) );
 
         $queued = expAiQueue::request( self::ALIAS, array( 'messages' => array( array( 'role' => 'user', 'content' => 'Hello' ) ), 'max_tokens' => 100 ),
-                                       array( 'purpose' => 'test', 'group' => (string) $group->attribute( 'uuid' ), 'lane' => 'standard', 'label' => 'T386 budget job' ) );
+                                       array( 'purpose' => 'test', 'group' => (string) $group->attribute( 'uuid' ), 'lane' => 'standard', 'label' => 'XT budget job' ) );
         $job = $queued['job'];
         $budget->reserve( $job, 300 );
         $this->assertSame( 300, (int) expQueue::fetch( (string) $job->attribute( 'uuid' ) )->attribute( 'cost_reserved_micros' ) );
@@ -39,12 +39,12 @@ class expAiBudgetStatusTest extends expAiT386CContentTestCase
         $this->assertSame( array( 0, 900 ), array( (int) $fresh->attribute( 'cost_reserved_micros' ), (int) $fresh->attribute( 'cost_actual_micros' ) ) );
         $refusal = $budget->refusal( 200, $groupID );
         $this->assertSame( 'group', $refusal['scope'] );
-        $this->assertStringContainsString( 'the budget of the job group "T386 budget group"', $refusal['message'] );
+        $this->assertStringContainsString( 'the budget of the job group "XT budget group"', $refusal['message'] );
 
         // held while the budget does not allow it, resumed when it does
-        $this->assertTrue( $budget->hold( $fresh, 'T386 test hold' ) );
+        $this->assertTrue( $budget->hold( $fresh, 'XT test hold' ) );
         $held = expQueue::fetch( (string) $job->attribute( 'uuid' ) );
-        $this->assertSame( array( 'held', 'budget: T386 test hold' ), array( (string) $held->attribute( 'state' ), (string) $held->attribute( 'last_error' ) ) );
+        $this->assertSame( array( 'held', 'budget: XT test hold' ), array( (string) $held->attribute( 'state' ), (string) $held->attribute( 'last_error' ) ) );
         $this->assertFalse( $budget->hold( $held, 'again' ), 'a held job is not held twice' );
         $this->assertGreaterThanOrEqual( 1, expAiBudget::heldCount() );
         eZDB::instance()->query( 'UPDATE expqueue_job SET cost_reserved_micros = 500 WHERE id = ' . (int) $job->attribute( 'id' ) );

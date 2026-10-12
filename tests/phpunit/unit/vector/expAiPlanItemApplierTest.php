@@ -8,9 +8,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expAiT386VaVectorTestCase.php';
+require_once __DIR__ . '/expaivectortestcase.php';
 
-class expAiPlanItemApplierTest extends expAiT386VaVectorTestCase
+class expAiPlanItemApplierTest extends expAiVectorTestCase
 {
     /** @var eZContentObjectTreeNode */
     private $folderNode;

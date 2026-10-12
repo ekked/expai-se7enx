@@ -10,9 +10,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expAiT386VaVectorTestCase.php';
+require_once __DIR__ . '/expaivectortestcase.php';
 
-class expAiVectorSmallPartsTest extends expAiT386VaVectorTestCase
+class expAiVectorSmallPartsTest extends expAiVectorTestCase
 {
     /* ------------------------------------------------------------------ expAiThreadPrompts */
 

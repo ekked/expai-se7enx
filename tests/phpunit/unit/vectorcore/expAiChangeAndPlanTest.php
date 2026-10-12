@@ -8,9 +8,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expaivbfixture.php';
+require_once __DIR__ . '/expaivectorcoretestcase.php';
 
-class expAiChangeAndPlanTest extends expAiT386VbCase
+class expAiChangeAndPlanTest extends expAiVectorCoreTestCase
 {
     private static function change( array $row, array $hunks = array() )
     {
@@ -104,7 +104,7 @@ class expAiChangeAndPlanTest extends expAiT386VbCase
         $this->assertGreaterThan( 500, $tokens );
         $this->assertLessThan( 4000, $tokens );
 
-        $article = $this->article( 'T386B estimate article', array( str_repeat( 'A long paragraph. ', 100 ) ) );
+        $article = $this->article( 'XTB estimate article', array( str_repeat( 'A long paragraph. ', 100 ) ) );
         $byObject = $estimate->contextTokens( array( 'target' => array( 'object_id' => (int) $article->attribute( 'id' ) ) ) );
         $byNode = $estimate->contextTokens( array( 'target' => array( 'node_id' => (int) $article->mainNodeID() ) ) );
         $this->assertSame( $byObject, $byNode, 'the object of a node' );
@@ -143,7 +143,7 @@ class expAiChangeAndPlanTest extends expAiT386VbCase
 
     public function testTheApplierSkipsOtherChangesAndReportsWhatItCannotWrite(): void
     {
-        $article = $this->article( 'T386B applier article' );
+        $article = $this->article( 'XTB applier article' );
         $thread = $this->thread( array( 'title' => 'applier', 'scope' => array( 'nodes' => array( (int) $article->mainNodeID() ) ) ) );
         $id = (int) $thread->attribute( 'id' );
         $accepted = array( array( 'id' => 'a', 'decision' => 'accepted', 'prop' => array( 0 ), 'base' => array( 0 ) ) );

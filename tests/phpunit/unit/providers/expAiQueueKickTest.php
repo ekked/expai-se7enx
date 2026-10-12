@@ -9,9 +9,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expait386ehelpers.php';
+require_once __DIR__ . '/expaiprovidertesthelpers.php';
 
-class expAiQueueKickTest extends expAiT386ETestCase
+class expAiQueueKickTest extends expAiProviderTestCase
 {
     /** @var string */
     private $record;
@@ -54,7 +54,7 @@ class expAiQueueKickTest extends expAiT386ETestCase
         $this->assertSame( array( $live + 2, $idle + 2 ), array( $live2, $idle2 ), 'two starts in the future: no worker of them beats yet' );
         $this->assertSame( 2, self::invoke( 'expAiQueueKick', 'startedSince', array( array( array( 'started' => 100 ), array( 'started' => 99 ), array( 'started' => 50 ) ), 100 ) ) );
         $this->assertGreaterThanOrEqual( 0, expAiQueueKick::readyJobs( 'interactive' ) );
-        $this->assertSame( 0, expAiQueueKick::readyJobs( 't386e-no-such-class' ) );
+        $this->assertSame( 0, expAiQueueKick::readyJobs( 'xte-no-such-class' ) );
     }
 
     public function testKickDoesNothingWhenSwitchedOff(): void
@@ -88,12 +88,12 @@ class expAiQueueKickTest extends expAiT386ETestCase
     public function testAMissingBinaryIsRecordedAsTheError(): void
     {
         $this->requireDatabase();
-        $this->site( array( 'VectorSettings' => array( 'KickWorker' => 'true', 'PhpCli' => '/nonexistent/t386e/php', 'MaxKickedWorkers' => 16 ) ) );
+        $this->site( array( 'VectorSettings' => array( 'KickWorker' => 'true', 'PhpCli' => '/nonexistent/xte/php', 'MaxKickedWorkers' => 16 ) ) );
         @mkdir( dirname( $this->record ), 0775, true );
         file_put_contents( $this->record, '{}' );
         $this->assertSame( 0, expAiQueueKick::kick( 16 ) );
         $record = json_decode( file_get_contents( $this->record ), true );
-        $this->assertStringStartsWith( 'no PHP binary or worker script (/nonexistent/t386e/php', $record['error'] );
+        $this->assertStringStartsWith( 'no PHP binary or worker script (/nonexistent/xte/php', $record['error'] );
     }
 
     public function testLaunchRunsTheCommandInTheBackground(): void

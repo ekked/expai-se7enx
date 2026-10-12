@@ -11,7 +11,7 @@
 
 require_once __DIR__ . '/expaicoretestcase.php';
 
-class expAiAuditTest extends expAiT386DCoreTestCase
+class expAiAuditTest extends expAiCoreTestCase
 {
     protected function setUp(): void
     {
@@ -78,13 +78,13 @@ class expAiAuditTest extends expAiT386DCoreTestCase
         $this->useSettings();
         $log = new expAiUsageLog( array( 'id' => 77, 'provider' => 'anthropic', 'model' => 'claude-sonnet-5-5', 'model_alias' => '', 'error_class' => 'timeout',
                                          'http_status' => 504, 'user_id' => self::TEST_USER, 'node_id' => 0, 'input_tokens' => 1, 'output_tokens' => 1,
-                                         'error_message' => 'SECRET T386D provider text', 'price_factor' => 0 ) );
+                                         'error_message' => 'SECRET XTD provider text', 'price_factor' => 0 ) );
         expAiAudit::request( $log );
         $failed = $this->last( 'system.expai.request.failed' );
         $this->assertSame( 'error', $failed['reason'] );
         $this->assertSame( 'HTTP 504', $failed['error']['message'], 'the status, never the provider\'s text' );
         $this->assertSame( self::TEST_USER, (int) $failed['after']['user_id'], 'made for another user' );
-        $this->assertStringNotContainsString( 'SECRET T386D', json_encode( $failed ) );
+        $this->assertStringNotContainsString( 'SECRET XTD', json_encode( $failed ) );
         $this->assertSame( 'claude-sonnet-5-5', $failed['object']['name'] );
 
         $draft = new expAiDraftLog( array( 'id' => 5, 'contentobject_id' => 9, 'version' => 2, 'node_id' => 0, 'source' => 'panel', 'status' => 'draft' ) );
@@ -160,7 +160,7 @@ class expAiAuditTest extends expAiT386DCoreTestCase
         $this->useSettings();
         $this->removeTestRows();
         $this->usage( array( 'created' => time(), 'reported_cost_micros' => 1000000 ) );
-        $query = new expAiT386DAuditQuery( array( 'system.expai.request.*' => 9, 'system.expai.request.failed' => 2, 'system.expai.budget.hold' => 1 ),
+        $query = new expAiCoreTestAuditQuery( array( 'system.expai.request.*' => 9, 'system.expai.request.failed' => 2, 'system.expai.budget.hold' => 1 ),
                                            array( array( 'login' => 'admin', 'n' => 4 ), array( 'login' => '', 'n' => 1 ), array( 'object_name' => 'anthropic.claude', 'n' => 3 ),
                                                   array( 'object_name' => 'a model with spaces', 'n' => 1 ) ) );
         $now = (int) ( microtime( true ) * 1000 );
@@ -183,7 +183,7 @@ class expAiAuditTest extends expAiT386DCoreTestCase
 }
 
 /** An audit index that answers what the test says */
-class expAiT386DAuditQuery extends expAuditQuery
+class expAiCoreTestAuditQuery extends expAuditQuery
 {
     private $counts;
     private $groups;

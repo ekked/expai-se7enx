@@ -9,9 +9,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expAiT386VaVectorTestCase.php';
+require_once __DIR__ . '/expaivectortestcase.php';
 
-class expAiThreadAccessTest extends expAiT386VaVectorTestCase
+class expAiThreadAccessTest extends expAiVectorTestCase
 {
     protected function setUp(): void
     {

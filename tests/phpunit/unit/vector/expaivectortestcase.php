@@ -8,7 +8,7 @@
  * @package expai
  */
 
-abstract class expAiT386VaVectorTestCase extends expAiTestCase
+abstract class expAiVectorTestCase extends expAiTestCase
 {
     /** @var array request globals before the test */
     private $savedGlobals = null;

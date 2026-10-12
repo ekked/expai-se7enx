@@ -10,7 +10,7 @@
 
 require_once __DIR__ . '/expaicoretestcase.php';
 
-class expAiSchemaTest extends expAiT386DCoreTestCase
+class expAiSchemaTest extends expAiCoreTestCase
 {
     /** @return eZDBInterface a new SQLite database in memory; the installation's connection stays the instance */
     private function memoryDatabase()
@@ -83,10 +83,10 @@ class expAiSchemaTest extends expAiT386DCoreTestCase
     {
         $names = array( 'mysql' => 'mysql', 'postgresql' => 'postgresql', 'pgsql' => 'postgresql', 'sqlite3' => 'sqlite', 'mongodb' => 'mongodb', 'oracle' => 'oracle' );
         foreach ( $names as $name => $engine )
-            $this->assertSame( $engine, expAiSchema::engineOf( new expAiT386DNamedDb( $name ) ) );
-        $this->assertSame( 'db2', expAiSchema::engineOf( new expAiT386DNamedDb( 'DB2' ) ) );
-        $this->assertNull( expAiSchema::existingColumns( 'expai_usage_log', new expAiT386DNamedDb( 'db2' ) ), 'an engine that cannot tell' );
-        $this->assertNull( expAiSchema::existingIndexes( 'expai_usage_log', new expAiT386DNamedDb( 'db2' ) ) );
+            $this->assertSame( $engine, expAiSchema::engineOf( new expAiCoreTestNamedDb( $name ) ) );
+        $this->assertSame( 'db2', expAiSchema::engineOf( new expAiCoreTestNamedDb( 'DB2' ) ) );
+        $this->assertNull( expAiSchema::existingColumns( 'expai_usage_log', new expAiCoreTestNamedDb( 'db2' ) ), 'an engine that cannot tell' );
+        $this->assertNull( expAiSchema::existingIndexes( 'expai_usage_log', new expAiCoreTestNamedDb( 'db2' ) ) );
     }
 
     public function testEnsureCreatesUpgradesAndDrops(): void
@@ -148,29 +148,29 @@ class expAiSchemaTest extends expAiT386DCoreTestCase
         $rows = array( array( 'NAME' => 'EXPAI_USAGE_LOG' ), array( 'name' => 'expai_package' ) );
         foreach ( array( 'mysql' => 'information_schema.tables', 'postgresql' => 'pg_class', 'oracle' => 'user_tables' ) as $engine => $catalog )
         {
-            $db = new expAiT386DNamedDb( $engine, array( '/expai%/i' => $rows ) );
+            $db = new expAiCoreTestNamedDb( $engine, array( '/expai%/i' => $rows ) );
             $this->assertSame( array( 'expai_usage_log', 'expai_package' ), expAiSchema::databaseTables( $db ), $engine );
             $this->assertStringContainsString( $catalog, $db->statements[0] );
             $this->assertSame( array( 'expai_usage_log' ), expAiSchema::existingTables( $db ) );
         }
-        $this->assertSame( array( 'expai_usage_log', 'ezuser' ), expAiSchema::databaseTables( new expAiT386DNamedDb( 'db2' ) ), 'another engine: the driver\'s table list' );
-        $this->assertSame( array( 'expai_usage_log' ), expAiSchema::existingTables( new expAiT386DNamedDb( 'db2' ) ) );
-        $this->assertSame( array( 'expai_usage_log', 'expai_package', 'other' ), expAiSchema::databaseTables( new expAiT386DMongoDb( 'mongodb' ) ) );
+        $this->assertSame( array( 'expai_usage_log', 'ezuser' ), expAiSchema::databaseTables( new expAiCoreTestNamedDb( 'db2' ) ), 'another engine: the driver\'s table list' );
+        $this->assertSame( array( 'expai_usage_log' ), expAiSchema::existingTables( new expAiCoreTestNamedDb( 'db2' ) ) );
+        $this->assertSame( array( 'expai_usage_log', 'expai_package', 'other' ), expAiSchema::databaseTables( new expAiCoreTestMongoDb( 'mongodb' ) ) );
 
         foreach ( array( 'mysql' => 'information_schema.columns', 'postgresql' => 'information_schema.columns', 'oracle' => 'user_tab_columns' ) as $engine => $catalog )
         {
-            $db = new expAiT386DNamedDb( $engine, array( '/column/i' => array( array( 'NAME' => 'ID' ), array( 'name' => 'created' ), array( 'other' => 'x' ) ) ) );
+            $db = new expAiCoreTestNamedDb( $engine, array( '/column/i' => array( array( 'NAME' => 'ID' ), array( 'name' => 'created' ), array( 'other' => 'x' ) ) ) );
             $this->assertSame( array( 'id', 'created' ), expAiSchema::existingColumns( 'expai_usage_log; DROP', $db ), $engine );
             $this->assertStringContainsString( $catalog, $db->statements[0] );
             $this->assertStringNotContainsString( 'DROP', $db->statements[0], 'the table name is cleaned' );
         }
         foreach ( array( 'mysql' => 'information_schema.statistics', 'postgresql' => 'pg_indexes', 'oracle' => 'user_indexes' ) as $engine => $catalog )
         {
-            $db = new expAiT386DNamedDb( $engine, array( '/index/i' => array( array( 'NAME' => 'EXPAI_USAGE_LOG_CREATED' ) ) ) );
+            $db = new expAiCoreTestNamedDb( $engine, array( '/index/i' => array( array( 'NAME' => 'EXPAI_USAGE_LOG_CREATED' ) ) ) );
             $this->assertSame( array( 'expai_usage_log_created' ), expAiSchema::existingIndexes( 'expai_usage_log', $db ), $engine );
             $this->assertStringContainsString( $catalog, $db->statements[0] );
         }
-        $mongo = new expAiT386DMongoDb( 'mongodb' );
+        $mongo = new expAiCoreTestMongoDb( 'mongodb' );
         $this->assertNull( expAiSchema::existingColumns( 'expai_usage_log', $mongo ), 'MongoDB has no fixed columns' );
         $this->assertSame( array(), expAiSchema::missingColumns( $mongo ) );
     }
@@ -178,33 +178,33 @@ class expAiSchemaTest extends expAiT386DCoreTestCase
     public function testRemovedTablesOfEachEngine(): void
     {
         $package = array( '/expai%/i' => array( array( 'name' => 'expai_package' ) ) );
-        $pg = new expAiT386DNamedDb( 'postgresql', $package );
+        $pg = new expAiCoreTestNamedDb( 'postgresql', $package );
         $this->assertSame( array( array( 'expai_package' ), array() ), expAiSchema::dropRemoved( $pg ) );
         $this->assertContains( 'DROP SEQUENCE IF EXISTS expai_package_id_seq', $pg->statements );
-        $oracle = new expAiT386DNamedDb( 'oracle', $package );
+        $oracle = new expAiCoreTestNamedDb( 'oracle', $package );
         expAiSchema::dropRemoved( $oracle );
         $this->assertNotEmpty( array_filter( $oracle->statements, function ( $s ) { return strpos( $s, 'DROP SEQUENCE se_expai_package' ) !== false; } ) );
-        $refused = new expAiT386DNamedDb( 'mysql', $package, array( '/^DROP TABLE/' ) );
+        $refused = new expAiCoreTestNamedDb( 'mysql', $package, array( '/^DROP TABLE/' ) );
         $this->assertSame( array( array(), array( 'mysql: DROP TABLE expai_package' ) ), expAiSchema::dropRemoved( $refused ) );
 
-        $mongo = new expAiT386DMongoDb( 'mongodb' );
+        $mongo = new expAiCoreTestMongoDb( 'mongodb' );
         $this->assertSame( array( array( 'expai_package' ), array() ), expAiSchema::dropRemoved( $mongo ) );
         $this->assertSame( array( 'expai_package' ), $mongo->dropped );
     }
 
     public function testEnsureWithoutAHandlerAndWithFailingStatements(): void
     {
-        list( $created, $errors ) = expAiSchema::ensure( new expAiT386DNamedDb( 'db2' ) );
+        list( $created, $errors ) = expAiSchema::ensure( new expAiCoreTestNamedDb( 'db2' ) );
         $this->assertSame( array(), $created );
         $this->assertSame( array( 'no schema handler for the engine db2' ), $errors );
 
         // MySQL: every table missing, every CREATE refused by the database
-        $db = new expAiT386DNamedDb( 'mysql', array(), array( '/^CREATE/i' ) );
+        $db = new expAiCoreTestNamedDb( 'mysql', array(), array( '/^CREATE/i' ) );
         list( $created, $errors ) = expAiSchema::ensure( $db );
         $this->assertSame( array(), $created );
         $this->assertNotEmpty( $errors );
         $this->assertStringStartsWith( 'mysql: CREATE TABLE', $errors[0] );
-        $this->assertSame( array(), expAiSchema::upgradeStatements( new expAiT386DNamedDb( 'db2' ) ), 'no handler, no upgrade' );
+        $this->assertSame( array(), expAiSchema::upgradeStatements( new expAiCoreTestNamedDb( 'db2' ) ), 'no handler, no upgrade' );
     }
 }
 
@@ -214,7 +214,7 @@ class expAiSchemaTest extends expAiT386DCoreTestCase
  * the statements are recorded, a query matching a pattern of $answers gets its rows, query() fails for the patterns
  * of $failing.
  */
-class expAiT386DNamedDb extends eZDBInterface
+class expAiCoreTestNamedDb extends eZDBInterface
 {
     public $statements = array();
     private $name;
@@ -258,7 +258,7 @@ class expAiT386DNamedDb extends eZDBInterface
 }
 
 /** A MongoDB connection: collections instead of tables */
-class expAiT386DMongoDb extends expAiT386DNamedDb
+class expAiCoreTestMongoDb extends expAiCoreTestNamedDb
 {
     public $dropped = array();
 

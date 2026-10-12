@@ -9,9 +9,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expaivbfixture.php';
+require_once __DIR__ . '/expaivectorcoretestcase.php';
 
-class expAiThreadRunnerTest extends expAiT386VbCase
+class expAiThreadRunnerTest extends expAiVectorCoreTestCase
 {
     protected function setUp(): void
     {
@@ -23,21 +23,21 @@ class expAiThreadRunnerTest extends expAiT386VbCase
     public function testInBackgroundFollowsTheSettingAndTheModel(): void
     {
         $this->ini( 'VectorSettings', 'Background', 'never' );
-        $this->assertFalse( expAiThreadRunner::inBackground( 't386b.stub' ) );
+        $this->assertFalse( expAiThreadRunner::inBackground( 'xtb.stub' ) );
         $this->ini( 'VectorSettings', 'Background', 'always' );
-        $this->assertTrue( expAiThreadRunner::inBackground( 't386b.stub' ) );
+        $this->assertTrue( expAiThreadRunner::inBackground( 'xtb.stub' ) );
 
         $this->ini( 'VectorSettings', 'Background', 'auto' );
         $this->assertFalse( expAiThreadRunner::inBackground( 'no.such.model' ), 'an unknown model runs in the request' );
-        $this->assertFalse( expAiThreadRunner::inBackground( 't386b.stub' ), 'a remote model is not slow' );
+        $this->assertFalse( expAiThreadRunner::inBackground( 'xtb.stub' ), 'a remote model is not slow' );
         foreach ( array( 'always' => true, 'enabled' => true, 'true' => true, 'never' => false, 'disabled' => false, 'false' => false ) as $value => $expected )
         {
-            $this->ini( 'Model_t386b.stub', 'RunInBackground', $value );
-            $this->assertSame( $expected, expAiThreadRunner::inBackground( 't386b.stub' ), "RunInBackground=$value" );
+            $this->ini( 'Model_xtb.stub', 'RunInBackground', $value );
+            $this->assertSame( $expected, expAiThreadRunner::inBackground( 'xtb.stub' ), "RunInBackground=$value" );
         }
-        $this->ini( 'Model_t386b.stub', 'RunInBackground', 'auto' );
-        $this->ini( 'Model_t386b.stub', 'Slow', 'true' );
-        $this->assertTrue( expAiThreadRunner::inBackground( 't386b.stub' ), 'a slow model' );
+        $this->ini( 'Model_xtb.stub', 'RunInBackground', 'auto' );
+        $this->ini( 'Model_xtb.stub', 'Slow', 'true' );
+        $this->assertTrue( expAiThreadRunner::inBackground( 'xtb.stub' ), 'a slow model' );
         $this->assertTrue( expAiThreadRunner::inBackground( '' ), 'no alias: the effective model' );
     }
 
@@ -50,13 +50,13 @@ class expAiThreadRunnerTest extends expAiT386VbCase
     {
         $thread = $this->thread( array( 'title' => 'enqueue' ) );
         $this->inTransaction();
-        $job = expAiThreadRunner::enqueue( $thread, 2, 'Write a summary.', array( 'alias' => 't386b.stub', 'mode' => 'write' ) );
+        $job = expAiThreadRunner::enqueue( $thread, 2, 'Write a summary.', array( 'alias' => 'xtb.stub', 'mode' => 'write' ) );
         $this->assertInstanceOf( 'expQueueJob', $job );
         $payload = $job->payloadArray();
         $this->assertSame( (int) $thread->attribute( 'id' ), $payload['thread_id'] );
         $this->assertSame( (int) $thread->attribute( 'lead_run_id' ), $payload['run_id'] );
         $this->assertSame( 'Write a summary.', $payload['message'] );
-        $this->assertSame( array( 'alias' => 't386b.stub', 'mode' => 'write' ), $payload['options'] );
+        $this->assertSame( array( 'alias' => 'xtb.stub', 'mode' => 'write' ), $payload['options'] );
         $this->assertSame( expAiThreadRunner::JOB_TYPE, $job->attribute( 'type' ) );
         $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) );
         $this->assertSame( 'queued', $fresh->attribute( 'state' ) );
@@ -107,7 +107,7 @@ class expAiThreadRunnerTest extends expAiT386VbCase
 
     public function testThePanelQueuesTheTurnOfASlowModel(): void
     {
-        $article = $this->article( 'T386B panel turn' );
+        $article = $this->article( 'XTB panel turn' );
         $nodeID = (int) $article->mainNodeID();
         $this->ini( 'VectorSettings', 'Background', 'never' );
         $this->assertNull( expAiThreadRunner::panelTurn( $nodeID, 'Hello' ), 'a turn that runs in the request' );
@@ -145,6 +145,6 @@ class expAiThreadRunnerTest extends expAiT386VbCase
         $job = expQueue::fetch( $out['job'] );
         $this->assertTrue( $job->payloadArray()['options']['panel'] );
         $this->assertSame( 'Summarize it.', $job->payloadArray()['message'] );
-        $this->assertSame( array(), expAiT386VbStubProvider::$requests, 'nothing was sent in the request' );
+        $this->assertSame( array(), expAiVectorCoreStubProvider::$requests, 'nothing was sent in the request' );
     }
 }

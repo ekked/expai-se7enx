@@ -4,7 +4,7 @@
  *
  *  - every test runs as admin with the settings of expai.ini changed in memory only (restored after the test): the
  *    queue's workers are never started (KickWorker=disabled)
- *  - stubModel(): the model t386b.stub of the in-memory provider t386b (Type=custom, expAiT386VbStubProvider), which
+ *  - stubModel(): the model xtb.stub of the in-memory provider xtb (Type=custom, expAiVectorCoreStubProvider), which
  *    answers with the replies a test queues and never leaves the process
  *  - threads made by a test are removed after it, with their runs, events, conversations and the usage rows of the
  *    stub provider, also when a code path under test ended a transaction itself
@@ -15,9 +15,9 @@
  */
 
 /**
- * A provider that answers from a list of replies (expAiT386VbStubProvider::$replies), else in words ("Done.").
+ * A provider that answers from a list of replies (expAiVectorCoreStubProvider::$replies), else in words ("Done.").
  */
-class expAiT386VbStubProvider implements expAiProvider
+class expAiVectorCoreStubProvider implements expAiProvider
 {
     /** @var array list of content block lists, or callables( array $request ) returning a content list */
     public static $replies = array();
@@ -66,7 +66,7 @@ class expAiT386VbStubProvider implements expAiProvider
 
     public function providerId()
     {
-        return 't386b';
+        return 'xtb';
     }
 }
 
@@ -74,7 +74,7 @@ class expAiT386VbStubProvider implements expAiProvider
  * A queue context for a job that exists in memory only: the checkpoint and the progress stay in the object, and a
  * test decides whether the job counts as cancelled. Nothing is written to the queue's tables.
  */
-class expAiT386VbContext extends expQueueContext
+class expAiVectorCoreQueueContext extends expQueueContext
 {
     public $cancelled = false;
     public $saved = null;
@@ -82,7 +82,7 @@ class expAiT386VbContext extends expQueueContext
 
     public function __construct( expQueueJob $job, $checkpoint = null )
     {
-        parent::__construct( $job, 't386b' );
+        parent::__construct( $job, 'xtb' );
         $this->saved = $checkpoint;
     }
 
@@ -107,7 +107,7 @@ class expAiT386VbContext extends expQueueContext
     }
 }
 
-abstract class expAiT386VbCase extends expAiTestCase
+abstract class expAiVectorCoreTestCase extends expAiTestCase
 {
     /** @var int the admin's content object id */
     protected $userID = 0;
@@ -120,7 +120,7 @@ abstract class expAiT386VbCase extends expAiTestCase
             $this->markTestSkipped( 'the thread tables are not installed' );
         $user = $this->asUser( 'admin' );
         $this->userID = (int) $user->attribute( 'contentobject_id' );
-        expAiT386VbStubProvider::reset();
+        expAiVectorCoreStubProvider::reset();
         $max = eZDB::instance()->arrayQuery( 'SELECT MAX(id) AS m FROM expai_usage_log' );
         $this->usageBefore = (int) ( isset( $max[0]['m'] ) ? $max[0]['m'] : 0 );
         $ini = eZINI::instance( 'expai.ini' );
@@ -137,8 +137,8 @@ abstract class expAiT386VbCase extends expAiTestCase
         $this->stubModel();
         $config = expAiConfig::instance();
         $effective = $config->effectiveModel();
-        if ( $effective !== 't386b.stub' || !$config->registry()->providerFor( $effective ) instanceof expAiT386VbStubProvider
-             || $config->registry()->providerIds() !== array( 't386b' ) )
+        if ( $effective !== 'xtb.stub' || !$config->registry()->providerFor( $effective ) instanceof expAiVectorCoreStubProvider
+             || $config->registry()->providerIds() !== array( 'xtb' ) )
             $this->fail( "the stub provider is not the only one (effective model '$effective'): not running a test that could reach a real provider" );
     }
 
@@ -153,7 +153,7 @@ abstract class expAiT386VbCase extends expAiTestCase
         while ( $db->transactionCounter() > 0 )
             $db->rollback();
         $rows = $db->arrayQuery( 'SELECT u.id, u.provider FROM expai_usage_log u, expai_thread t WHERE u.thread_id = t.id AND u.id > ' . (int) $this->usageBefore
-                                 . " AND t.title LIKE 'T386B %' AND u.provider <> 't386b'" );
+                                 . " AND t.title LIKE 'XTB %' AND u.provider <> 'xtb'" );
         foreach ( (array) $rows as $row )
             $foreign[] = implode( ':', $row );
         parent::tearDown();
@@ -167,8 +167,8 @@ abstract class expAiT386VbCase extends expAiTestCase
     }
 
     /**
-     * Makes t386b.stub the default model, answered by expAiT386VbStubProvider.
-     * @param array $model more settings of [Model_t386b.stub]
+     * Makes xtb.stub the default model, answered by expAiVectorCoreStubProvider.
+     * @param array $model more settings of [Model_xtb.stub]
      * @return string the alias
      */
     protected function stubModel( array $model = array() )
@@ -177,26 +177,26 @@ abstract class expAiT386VbCase extends expAiTestCase
         $ini->setVariable( 'AISettings', 'Enabled', 'true' );
         // the stub is the only provider and the user's own model choice is off: no request can reach a real provider
         $ini->setVariable( 'AISettings', 'AllowUserModelChoice', 'disabled' );
-        $ini->setVariable( 'AISettings', 'Model', 't386b.stub' );
+        $ini->setVariable( 'AISettings', 'Model', 'xtb.stub' );
         $ini->setVariable( 'AISettings', 'ApiKey', '' );
-        $ini->setVariable( 'ProviderSettings', 'Providers', array( 't386b' ) );
-        $ini->setVariable( 'ProviderSettings', 'DefaultModel', 't386b.stub' );
-        foreach ( array( 'Type' => 'custom', 'Class' => 'expAiT386VbStubProvider', 'Label' => 'T386B stub', 'Region' => 'eu', 'Retention' => 'none' ) as $name => $value )
-            $ini->setVariable( 'Provider_t386b', $name, $value );
-        foreach ( $model + array( 'Provider' => 't386b', 'Id' => 'stub', 'Label' => 'Stub', 'ToolUse' => 'native', 'WriteTools' => 'enabled',
+        $ini->setVariable( 'ProviderSettings', 'Providers', array( 'xtb' ) );
+        $ini->setVariable( 'ProviderSettings', 'DefaultModel', 'xtb.stub' );
+        foreach ( array( 'Type' => 'custom', 'Class' => 'expAiVectorCoreStubProvider', 'Label' => 'XTB stub', 'Region' => 'eu', 'Retention' => 'none' ) as $name => $value )
+            $ini->setVariable( 'Provider_xtb', $name, $value );
+        foreach ( $model + array( 'Provider' => 'xtb', 'Id' => 'stub', 'Label' => 'Stub', 'ToolUse' => 'native', 'WriteTools' => 'enabled',
                                   'WriteGate' => 'trusted', 'MaxOutput' => 400 ) as $name => $value )
-            $ini->setVariable( 'Model_t386b.stub', $name, $value );
-        return 't386b.stub';
+            $ini->setVariable( 'Model_xtb.stub', $name, $value );
+        return 'xtb.stub';
     }
 
     /**
-     * @param array $row fields (title gets the prefix T386B)
+     * @param array $row fields (title gets the prefix XTB)
      * @return expAiThread a thread of the admin, removed after the test
      */
     protected function thread( array $row = array() )
     {
         $row += array( 'user_id' => $this->userID, 'title' => 'thread', 'run_mode' => 'write', 'review_policy' => 'staged' );
-        $row['title'] = 'T386B ' . $row['title'];
+        $row['title'] = 'XTB ' . $row['title'];
         return expAiThread::create( $row );
     }
 
@@ -221,7 +221,7 @@ abstract class expAiT386VbCase extends expAiTestCase
             $conversation->store();
             $run = new expAiThreadRun( array( 'thread_id' => (int) $thread->attribute( 'id' ), 'parent_run_id' => (int) $thread->attribute( 'lead_run_id' ),
                                               'plan_item' => $index, 'conversation_id' => (int) $conversation->attribute( 'id' ), 'kind' => 'item',
-                                              'state' => $item['state'], 'label' => 'T386B item ' . $index, 'lane' => 'standard', 'created' => $now, 'modified' => $now ) );
+                                              'state' => $item['state'], 'label' => 'XTB item ' . $index, 'lane' => 'standard', 'created' => $now, 'modified' => $now ) );
             $run->store();
             $conversation->setAttribute( 'run_id', (int) $run->attribute( 'id' ) );
             $conversation->store();
@@ -240,13 +240,13 @@ abstract class expAiT386VbCase extends expAiTestCase
         return array( $plan, $runs );
     }
 
-    /** Removes what the tests of this directory wrote: threads titled T386B..., stub usage rows, their queue rows */
+    /** Removes what the tests of this directory wrote: threads titled XTB..., stub usage rows, their queue rows */
     public function removeOwnRows()
     {
         $db = eZDB::instance();
         while ( $db->transactionCounter() > 0 )
             $db->rollback();
-        foreach ( (array) $db->arrayQuery( "SELECT id FROM expai_thread WHERE title LIKE 'T386B %'" ) as $row )
+        foreach ( (array) $db->arrayQuery( "SELECT id FROM expai_thread WHERE title LIKE 'XTB %'" ) as $row )
         {
             $id = (int) array_change_key_case( $row, CASE_LOWER )['id'];
             $thread = expAiThread::fetchByID( $id );
@@ -264,7 +264,7 @@ abstract class expAiT386VbCase extends expAiTestCase
             }
             $thread->removeAll( true );
         }
-        eZPersistentObject::removeObject( expAiUsageLog::definition(), array( 'provider' => 't386b' ) );
+        eZPersistentObject::removeObject( expAiUsageLog::definition(), array( 'provider' => 'xtb' ) );
     }
 
     /**
@@ -280,7 +280,7 @@ abstract class expAiT386VbCase extends expAiTestCase
     }
 
     /** @return eZContentObject an article below a new hidden folder (both removed after the test) */
-    protected function article( $title = 'T386B article', array $paragraphs = array( 'One.', 'Two.' ) )
+    protected function article( $title = 'XTB article', array $paragraphs = array( 'One.', 'Two.' ) )
     {
         $folder = $this->folder( 'expai unit test vector' );
         return $this->publish( (int) $folder->attribute( 'node_id' ), array( 'title' => $title, 'intro' => self::xml( $paragraphs ) ) );

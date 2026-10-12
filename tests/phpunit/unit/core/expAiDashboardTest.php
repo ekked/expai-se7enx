@@ -11,7 +11,7 @@
 
 require_once __DIR__ . '/expaicoretestcase.php';
 
-class expAiDashboardTest extends expAiT386DCoreTestCase
+class expAiDashboardTest extends expAiCoreTestCase
 {
     protected function setUp(): void
     {
@@ -30,7 +30,7 @@ class expAiDashboardTest extends expAiT386DCoreTestCase
         $this->useSettings( array( 'UsageSettings' => array( 'LogRequests' => 'enabled' ) ) );
         $node = $this->workFolder();
         $nodeID = (int) $node->attribute( 'node_id' );
-        list( $draft ) = ( new expAiContentWriter() )->createDraft( $node, 'folder', array( 'name' => 'T386D dashboard draft' ) );
+        list( $draft ) = ( new expAiContentWriter() )->createDraft( $node, 'folder', array( 'name' => 'XTD dashboard draft' ) );
         $gone = $this->draftLog( array( 'contentobject_id' => 999999999, 'version' => 1, 'user_id' => $adminID, 'node_id' => $nodeID, 'created' => time() - 5 ) );
         $mine = $this->draftLog( array( 'contentobject_id' => (int) $draft->attribute( 'id' ), 'version' => 1, 'user_id' => $adminID, 'node_id' => $nodeID,
                                         'parent_node_id' => $nodeID, 'prompt_summary' => 'Write about spring', 'source' => 'panel', 'model' => 'mock' ) );
@@ -80,7 +80,7 @@ class expAiDashboardTest extends expAiT386DCoreTestCase
         $this->assertStringStartsWith( 'content/edit/' . $node->attribute( 'contentobject_id' ) . '/f/', $links['edit'] );
         $this->assertSame( 'expai/dashboard/(node)/' . $nodeID, $links['prompt'], 'no "again" while requests are not logged' );
 
-        $child = $this->publish( $nodeID, array( 'name' => 'T386D trashed' ), 'folder' );
+        $child = $this->publish( $nodeID, array( 'name' => 'XTD trashed' ), 'folder' );
         eZContentObjectTreeNode::removeSubtrees( array( (int) $child->attribute( 'main_node_id' ) ), true );
         $this->assertSame( 'trash', expAiLinks::build( (int) $child->attribute( 'id' ) )['state'] );
 
@@ -185,23 +185,23 @@ class expAiDashboardTest extends expAiT386DCoreTestCase
         $admin = $this->asUser( 'admin' );
         $this->useSettings();
         $node = $this->workFolder();
-        list( $draft ) = ( new expAiContentWriter() )->createDraft( $node, 'folder', array( 'name' => 'T386D package draft' ) );
+        list( $draft ) = ( new expAiContentWriter() )->createDraft( $node, 'folder', array( 'name' => 'XTD package draft' ) );
         $objectID = (int) $draft->attribute( 'id' );
         $result = array( 'drafts' => array( array( 'object_id' => $objectID, 'version' => 1 ), array( 'object_id' => 0, 'version' => 1 ),
                                             array( 'object_id' => 999999999, 'version' => 1 ) ) );
 
-        $plain = new eZPackage( array( 'name' => 't386d-plain' ) );
+        $plain = new eZPackage( array( 'name' => 'xtd-plain' ) );
         $this->assertSame( 0, expAiPackageDraftListener::installed( $plain, $result ), 'a package not written with Exponential Intelligence' );
         $this->assertSame( 0, expAiPackageDraftListener::installed( 'not a package', $result ) );
 
-        $package = new eZPackage( array( 'name' => 't386d-ai' ) );
+        $package = new eZPackage( array( 'name' => 'xtd-ai' ) );
         $package->setMetadata( expAiPackageDraftListener::META_AI_GENERATED, 'true' );
         $package->setMetadata( expAiPackageDraftListener::META_MODELS, ' claude-sonnet-5-5 , other ' );
         $this->assertSame( 1, expAiPackageDraftListener::installed( $package, $result, array( 'user_id' => self::TEST_USER, 'job' => 'job-uuid' ) ) );
         $log = expAiDraftLog::fetchByVersion( $objectID, 1 );
         $this->assertSame( 'package', $log->attribute( 'source' ) );
         $this->assertSame( 'claude-sonnet-5-5', $log->attribute( 'model' ) );
-        $this->assertSame( 'package t386d-ai', $log->attribute( 'prompt_summary' ) );
+        $this->assertSame( 'package xtd-ai', $log->attribute( 'prompt_summary' ) );
         $this->assertSame( self::TEST_USER, (int) $log->attribute( 'user_id' ) );
         $this->assertSame( 'job-uuid', $log->attribute( 'job_uuid' ) );
         $this->assertSame( 0, expAiPackageDraftListener::installed( $package, $result ), 'a version already in the log is not logged twice' );

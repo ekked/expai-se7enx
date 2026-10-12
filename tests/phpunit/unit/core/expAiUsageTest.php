@@ -11,7 +11,7 @@
 
 require_once __DIR__ . '/expaicoretestcase.php';
 
-class expAiUsageTest extends expAiT386DCoreTestCase
+class expAiUsageTest extends expAiCoreTestCase
 {
     protected function setUp(): void
     {
@@ -73,9 +73,9 @@ class expAiUsageTest extends expAiT386DCoreTestCase
         $this->assertSame( array( 'created' => array( false, array( 0, 99 ) ) ), expAiUsage::conditions( array( 'to' => 99 ) ) );
 
         // unpriced: the models without a price; none at all is a filter that matches nothing
-        $this->usage( array( 'model' => 't386d-mystery', 'model_alias' => self::TEST_PROVIDER . '.mystery' ) );
+        $this->usage( array( 'model' => 'xtd-mystery', 'model_alias' => self::TEST_PROVIDER . '.mystery' ) );
         $unpriced = expAiUsage::conditions( array( 'unpriced' => 1 ) );
-        $this->assertContains( 't386d-mystery', $unpriced['model'][0] );
+        $this->assertContains( 'xtd-mystery', $unpriced['model'][0] );
         $this->assertSame( 0, $unpriced['reported_cost_micros'] );
     }
 
@@ -88,7 +88,7 @@ class expAiUsageTest extends expAiT386DCoreTestCase
                                   'tool_count' => 2, 'region' => 'us', 'created' => $now - 30, 'reasoning_tokens' => 5 ) );
         $b = $this->usage( array( 'conversation_id' => 987650001, 'turn' => 1, 'input_tokens' => 200, 'output_tokens' => 20, 'latency_ms' => 3000,
                                   'reported_cost_micros' => 1000000, 'drafts_written' => 1, 'error_class' => 'timeout', 'created' => $now - 20 ) );
-        $c = $this->usage( array( 'input_tokens' => 50, 'output_tokens' => 5, 'latency_ms' => 500, 'model' => 't386d-mystery',
+        $c = $this->usage( array( 'input_tokens' => 50, 'output_tokens' => 5, 'latency_ms' => 500, 'model' => 'xtd-mystery',
                                   'model_alias' => self::TEST_PROVIDER . '.mystery', 'created' => $now - 10, 'action' => 'field:write' ) );
 
         $filters = array( 'user_id' => self::TEST_USER );
@@ -113,7 +113,7 @@ class expAiUsageTest extends expAiT386DCoreTestCase
         $this->assertEqualsWithDelta( 3.0, $t['cost'], 1e-9, 'the reported costs' );
         $this->assertFalse( $t['cost_known'], 'one model has no price' );
         $this->assertSame( 1, $t['unpriced'] );
-        $this->assertSame( array( 't386d-mystery' => 1 ), $t['unpriced_models'] );
+        $this->assertSame( array( 'xtd-mystery' => 1 ), $t['unpriced_models'] );
         $this->assertTrue( $t['cost_partial'] );
         $this->assertFalse( $agg['truncated'] );
         $this->assertCount( 1, $agg['per_user'] );
@@ -190,13 +190,13 @@ class expAiUsageTest extends expAiT386DCoreTestCase
 
     public function testSlowNoticeAndPrune(): void
     {
-        $config = $this->useSettings( array( 'Model_anthropic.t386d-slow' => array( 'Provider' => 'anthropic', 'Id' => 'slow-model', 'Slow' => 'true' ) ) );
+        $config = $this->useSettings( array( 'Model_anthropic.xtd-slow' => array( 'Provider' => 'anthropic', 'Id' => 'slow-model', 'Slow' => 'true' ) ) );
         $this->assertSame( '', expAiUsage::slowNotice( 'anthropic.claude-sonnet-5-5', $config ) );
         $this->assertSame( '', expAiUsage::slowNotice( 'no.such', $config ) );
-        $this->assertStringContainsString( 'several minutes', expAiUsage::slowNotice( 'anthropic.t386d-slow', $config ) );
-        $this->usage( array( 'model_alias' => 'anthropic.t386d-slow', 'latency_ms' => 40000 ) );
-        $this->usage( array( 'model_alias' => 'anthropic.t386d-slow', 'latency_ms' => 80000 ) );
-        $this->assertStringContainsString( '60', expAiUsage::slowNotice( 'anthropic.t386d-slow', $config ), 'the measured average in seconds' );
+        $this->assertStringContainsString( 'several minutes', expAiUsage::slowNotice( 'anthropic.xtd-slow', $config ) );
+        $this->usage( array( 'model_alias' => 'anthropic.xtd-slow', 'latency_ms' => 40000 ) );
+        $this->usage( array( 'model_alias' => 'anthropic.xtd-slow', 'latency_ms' => 80000 ) );
+        $this->assertStringContainsString( '60', expAiUsage::slowNotice( 'anthropic.xtd-slow', $config ), 'the measured average in seconds' );
 
         $this->assertSame( 0, expAiUsage::prune( 0 ), 'retention 0 keeps everything' );
         // a row from the first minutes of 1970: older than any real row

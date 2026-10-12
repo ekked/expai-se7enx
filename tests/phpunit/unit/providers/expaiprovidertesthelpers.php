@@ -12,7 +12,7 @@
  * An HTTP client that never goes on the network: it answers from a queue of canned answers (array( status, body,
  * headers ) or an exception to throw) and records every request.
  */
-class expAiT386EHttp extends expAiHttpClient
+class expAiProviderTestHttp extends expAiHttpClient
 {
     /** @var array */
     public $answers = array();
@@ -38,7 +38,7 @@ class expAiT386EHttp extends expAiHttpClient
     {
         $this->requests[] = array( $url, $headers, $body, $options );
         if ( !$this->answers )
-            throw new RuntimeException( 'expAiT386EHttp: no answer left for ' . $url );
+            throw new RuntimeException( 'expAiProviderTestHttp: no answer left for ' . $url );
         $answer = array_shift( $this->answers );
         if ( $answer instanceof Throwable )
             throw $answer;
@@ -57,7 +57,7 @@ class expAiT386EHttp extends expAiHttpClient
 /**
  * Settings of eZINI::instance( <file> ) changed in memory for one test and restored afterwards.
  */
-class expAiT386EIni
+class expAiProviderTestIni
 {
     /** @var array list of array( file, group, name, had, value ) */
     private $saved = array();
@@ -107,9 +107,9 @@ class expAiT386EIni
 /**
  * Base class of the tests of this directory: in-memory settings of the site's expai.ini (restored after the test).
  */
-abstract class expAiT386ETestCase extends expAiTestCase
+abstract class expAiProviderTestCase extends expAiTestCase
 {
-    /** @var expAiT386EIni|null */
+    /** @var expAiProviderTestIni|null */
     private $ini = null;
 
 
@@ -123,7 +123,7 @@ abstract class expAiT386ETestCase extends expAiTestCase
     {
         if ( $this->ini === null )
         {
-            $this->ini = new expAiT386EIni();
+            $this->ini = new expAiProviderTestIni();
             $ini = $this->ini;
             $this->cleanup( static function () use ( $ini ) { $ini->restore(); } );
         }

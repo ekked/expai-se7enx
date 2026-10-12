@@ -10,22 +10,22 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expait386ccontenttestcase.php';
+require_once __DIR__ . '/expaicontenttestcase.php';
 
-class expAiChainRunsTest extends expAiT386CContentTestCase
+class expAiChainRunsTest extends expAiContentTestCase
 {
-    /** @return array the settings of the chain t386: write, review, an editor's checkpoint, translate */
+    /** @return array the settings of the chain xt: write, review, an editor's checkpoint, translate */
     private static function chainSettings( $maxCost = '1.00', $class = 'article' )
     {
         return array(
-            'ChainSettings' => array( 'Chains' => array( 't386' ), 'MaxBriefLength' => '200', 'TranslateHandler' => 'expAiChainTranslateSync' ),
-            'Chain_t386' => array( 'Label' => 'T386 chain', 'Description' => 'Writes a test article', 'Class' => $class, 'Fields' => array( 'title', 'intro', 'body' ),
+            'ChainSettings' => array( 'Chains' => array( 'xt' ), 'MaxBriefLength' => '200', 'TranslateHandler' => 'expAiChainTranslateSync' ),
+            'Chain_xt' => array( 'Label' => 'XT chain', 'Description' => 'Writes a test article', 'Class' => $class, 'Fields' => array( 'title', 'intro', 'body' ),
                                    'Steps' => array( 'write', 'review', 'checkpoint', 'translate' ), 'MaxCostPerRun' => $maxCost, 'MaxItems' => '2' ),
-            'ChainStep_t386.write' => array( 'Type' => 'generate', 'Label' => 'Write', 'Model' => self::ALIAS, 'PromptText' => 'Write about {brief}.', 'MaxTokens' => '1000' ),
-            'ChainStep_t386.review' => array( 'Type' => 'review', 'Label' => 'Review', 'Model' => self::ALIAS, 'PromptText' => 'Review it.', 'PassCriteria' => array( 'score>=80' ),
+            'ChainStep_xt.write' => array( 'Type' => 'generate', 'Label' => 'Write', 'Model' => self::ALIAS, 'PromptText' => 'Write about {brief}.', 'MaxTokens' => '1000' ),
+            'ChainStep_xt.review' => array( 'Type' => 'review', 'Label' => 'Review', 'Model' => self::ALIAS, 'PromptText' => 'Review it.', 'PassCriteria' => array( 'score>=80' ),
                                               'OnFail' => 'revise', 'ReviseStep' => 'write', 'MaxIterations' => '2', 'Checklist' => array( 'Clear' ) ),
-            'ChainStep_t386.checkpoint' => array( 'Type' => 'human', 'Label' => 'Approve' ),
-            'ChainStep_t386.translate' => array( 'Type' => 'translate', 'Label' => 'Translate', 'Languages' => array( 'all' ) ),
+            'ChainStep_xt.checkpoint' => array( 'Type' => 'human', 'Label' => 'Approve' ),
+            'ChainStep_xt.translate' => array( 'Type' => 'translate', 'Label' => 'Translate', 'Languages' => array( 'all' ) ),
         );
     }
 
@@ -59,11 +59,11 @@ class expAiChainRunsTest extends expAiT386CContentTestCase
         $nodeID = (int) $folder->attribute( 'node_id' );
         $engine = new expAiChainEngine( $config );
 
-        $this->assertRefused( function () use ( $engine, $nodeID ) { $engine->start( 't386', $nodeID, '   ' ); }, 'Write a brief' );
-        $this->assertRefused( function () use ( $engine ) { $engine->start( 't386', 0, 'A brief' ); }, 'does not exist' );
+        $this->assertRefused( function () use ( $engine, $nodeID ) { $engine->start( 'xt', $nodeID, '   ' ); }, 'Write a brief' );
+        $this->assertRefused( function () use ( $engine ) { $engine->start( 'xt', 0, 'A brief' ); }, 'does not exist' );
         $this->assertRefused( function () use ( $engine, $nodeID ) { $engine->start( 'nochain', $nodeID, 'A brief' ); }, 'There is no chain' );
 
-        $runs = $engine->start( 't386', $nodeID, str_repeat( 'Bread and rolls. ', 30 ), 5 );
+        $runs = $engine->start( 'xt', $nodeID, str_repeat( 'Bread and rolls. ', 30 ), 5 );
         $this->assertCount( 2, $runs, 'MaxItems caps the count' );
         $run = $runs[0];
         $this->assertSame( array( 'running', 'write', 200 ), array( $run->attribute( 'state' ), $run->attribute( 'current_step' ), mb_strlen( $run->attribute( 'brief' ) ) ) );
@@ -113,7 +113,7 @@ class expAiChainRunsTest extends expAiT386CContentTestCase
         // the template fetches
         $fetch = new expAiChainFunctionCollection();
         $chains = $fetch->fetchChains()['result'];
-        $this->assertSame( array( 't386', 'T386 chain', 'article', 2, array( 'Write', 'Review', 'Approve', 'Translate' ), '$1.00' ),
+        $this->assertSame( array( 'xt', 'XT chain', 'article', 2, array( 'Write', 'Review', 'Approve', 'Translate' ), '$1.00' ),
                            array( $chains[0]['id'], $chains[0]['label'], $chains[0]['class'], $chains[0]['max_items'], $chains[0]['steps'], $chains[0]['max_cost'] ) );
         $this->assertTrue( expAiChainFunctionCollection::installed() );
         $list = $fetch->fetchRuns( 5, $nodeID )['result'];
@@ -128,10 +128,10 @@ class expAiChainRunsTest extends expAiT386CContentTestCase
         $this->assertFalse( expAiChainPolicy::maySee( $failed, $anonymous ) );
         $this->assertFalse( expAiChainPolicy::mayAct( $failed, $anonymous ) );
         $policy = new expAiChainPolicy();
-        $this->assertSame( array( array( 'id' => 't386', 'name' => 'T386 chain (t386)' ) ), $policy->chains() );
+        $this->assertSame( array( array( 'id' => 'xt', 'name' => 'XT chain (xt)' ) ), $policy->chains() );
         $this->assertRefused( function () use ( $engine, $nodeID, $anonymous ) {
             eZUser::setCurrentlyLoggedInUser( $anonymous, (int) $anonymous->attribute( 'contentobject_id' ), eZUser::NO_SESSION_REGENERATE );
-            $engine->start( 't386', $nodeID, 'A brief' ); }, 'You may not start the chain' );
+            $engine->start( 'xt', $nodeID, 'A brief' ); }, 'You may not start the chain' );
         $this->asUser( 'admin' );
     }
 
@@ -142,7 +142,7 @@ class expAiChainRunsTest extends expAiT386CContentTestCase
         $this->forgetRuns( $folder );
         $this->asUser( 'admin' );
         $engine = new expAiChainEngine( $config );
-        $run = $engine->start( 't386', (int) $folder->attribute( 'node_id' ), 'A brief' )[0];
+        $run = $engine->start( 'xt', (int) $folder->attribute( 'node_id' ), 'A brief' )[0];
         $this->assertSame( 'held', $run->attribute( 'state' ) );
         $this->assertStringContainsString( 'the run budget of', $run->attribute( 'last_error' ) );
         $this->assertSame( 'write', $run->dataArray()['pending']['step'] );
@@ -151,10 +151,10 @@ class expAiChainRunsTest extends expAiT386CContentTestCase
         $again = $engine->resume( $run );
         $this->assertNotNull( $again );
         $this->assertSame( 'held', expAiChainRun::fetch( (int) $run->attribute( 'id' ) )->attribute( 'state' ) );
-        $config->ini()->setVariable( 'Chain_t386', 'MaxCostPerRun', '100' );
+        $config->ini()->setVariable( 'Chain_xt', 'MaxCostPerRun', '100' );
         $data = $run->dataArray();
-        $stopped = $engine->stop( expAiChainRun::fetch( (int) $run->attribute( 'id' ) ), 'T386 stop' );
-        $this->assertSame( array( 'stopped', 'T386 stop' ), array( $stopped->attribute( 'state' ), $stopped->attribute( 'last_error' ) ) );
+        $stopped = $engine->stop( expAiChainRun::fetch( (int) $run->attribute( 'id' ) ), 'XT stop' );
+        $this->assertSame( array( 'stopped', 'XT stop' ), array( $stopped->attribute( 'state' ), $stopped->attribute( 'last_error' ) ) );
         $this->assertSame( $stopped, $engine->stop( $stopped ), 'a final run is not stopped again' );
         $this->assertArrayHasKey( 'pending', $data );
 
@@ -170,7 +170,7 @@ class expAiChainRunsTest extends expAiT386CContentTestCase
         $this->assertSame( 'the run is gone', $engine->onAnswer( $job, array(), array( 'run' => 0 ) )['chain'] );
 
         // the policy for someone else's run
-        $other = new expAiChainRun( array( 'chain' => 't386', 'user_id' => 999999999, 'node_id' => 2, 'object_id' => 0 ) );
+        $other = new expAiChainRun( array( 'chain' => 'xt', 'user_id' => 999999999, 'node_id' => 2, 'object_id' => 0 ) );
         $this->assertTrue( expAiChainPolicy::maySee( $other ), 'expai/log sees every run' );
         $this->assertFalse( expAiChainPolicy::mayAct( $other ), 'without a draft to edit nobody else acts on it' );
 
@@ -186,32 +186,32 @@ class expAiChainRunsTest extends expAiT386CContentTestCase
     public function testAStepWithAnUnknownModelEndsTheRun(): void
     {
         $settings = self::chainSettings();
-        $settings['ChainStep_t386.write']['Model'] = 't386nosuch.model';
+        $settings['ChainStep_xt.write']['Model'] = 'xtnosuch.model';
         $config = $this->siteSettings( $settings );
         $folder = $this->folder();
         $this->forgetRuns( $folder );
         $this->asUser( 'admin' );
-        $run = ( new expAiChainEngine( $config ) )->start( 't386', (int) $folder->attribute( 'node_id' ), 'A brief' )[0];
+        $run = ( new expAiChainEngine( $config ) )->start( 'xt', (int) $folder->attribute( 'node_id' ), 'A brief' )[0];
         $this->assertSame( 'failed', $run->attribute( 'state' ) );
-        $this->assertStringContainsString( 'the model t386nosuch.model of the step write is not in the provider registry', $run->attribute( 'last_error' ) );
+        $this->assertStringContainsString( 'the model xtnosuch.model of the step write is not in the provider registry', $run->attribute( 'last_error' ) );
     }
 
     public function testAChainWithAMissingClassIsRefused(): void
     {
-        $config = $this->siteSettings( self::chainSettings( '1.00', 't386_no_such_class' ) );
+        $config = $this->siteSettings( self::chainSettings( '1.00', 'xt_no_such_class' ) );
         $folder = $this->folder();
         $this->asUser( 'admin' );
         $engine = new expAiChainEngine( $config );
-        $this->assertRefused( function () use ( $engine, $folder ) { $engine->start( 't386', (int) $folder->attribute( 'node_id' ), 'A brief' ); }, 'There is no content class' );
+        $this->assertRefused( function () use ( $engine, $folder ) { $engine->start( 'xt', (int) $folder->attribute( 'node_id' ), 'A brief' ); }, 'There is no content class' );
         $config->ini()->setVariable( 'AISettings', 'Enabled', 'false' );
-        $this->assertRefused( function () use ( $engine, $folder ) { $engine->start( 't386', (int) $folder->attribute( 'node_id' ), 'A brief' ); }, 'expai is disabled' );
+        $this->assertRefused( function () use ( $engine, $folder ) { $engine->start( 'xt', (int) $folder->attribute( 'node_id' ), 'A brief' ); }, 'expai is disabled' );
     }
 
     public function testRunAndStepRows(): void
     {
         $this->siteSettings( array( 'ChainSettings' => array( 'MaxStoredOutputBytes' => '2000' ) ) );
         $this->inTransaction();
-        $run = new expAiChainRun( array( 'uuid' => expAiChainEngine::uuid(), 'chain' => 't386', 'state' => expAiChainRun::STATE_WAITING, 'node_id' => 2,
+        $run = new expAiChainRun( array( 'uuid' => expAiChainEngine::uuid(), 'chain' => 'xt', 'state' => expAiChainRun::STATE_WAITING, 'node_id' => 2,
                                          'user_id' => 14, 'cost_micros' => 1234567, 'data' => '' ) );
         $run->store();
         $this->assertMatchesRegularExpression( '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $run->attribute( 'uuid' ) );
@@ -243,12 +243,12 @@ class expAiChainRunsTest extends expAiT386CContentTestCase
                                                                            'AutoQueuePatch' => 'disabled' ) ) );
         $folder = $this->folder();
         $this->asUser( 'admin' );
-        $run = new expAiChainRun( array( 'uuid' => expAiChainEngine::uuid(), 'chain' => 't386', 'user_id' => 14, 'object_id' => 0 ) );
+        $run = new expAiChainRun( array( 'uuid' => expAiChainEngine::uuid(), 'chain' => 'xt', 'user_id' => 14, 'object_id' => 0 ) );
         $this->assertStringContainsString( 'not published yet', expAiChainTranslateSync::chainTranslate( $run, array( self::TARGET ) )['skipped'] );
-        $single = $this->article( (int) $folder->attribute( 'node_id' ), 'T386 hand-off', '<paragraph>Intro</paragraph>', '<paragraph>Body</paragraph>' );
+        $single = $this->article( (int) $folder->attribute( 'node_id' ), 'XT hand-off', '<paragraph>Intro</paragraph>', '<paragraph>Body</paragraph>' );
         $run->setAttribute( 'object_id', (int) $single->attribute( 'id' ) );
         $this->assertStringContainsString( 'has no translation in ger-DE', expAiChainTranslateSync::chainTranslate( $run, array( self::TARGET ) )['skipped'] );
-        self::publishVersion( eZContentObject::fetch( (int) $single->attribute( 'id' ) ), self::TARGET, array( 'title' => 'T386 Übergabe' ) );
+        self::publishVersion( eZContentObject::fetch( (int) $single->attribute( 'id' ) ), self::TARGET, array( 'title' => 'XT Übergabe' ) );
         $handed = expAiChainTranslateSync::chainTranslate( $run, array( self::TARGET ) );
         $this->assertSame( array( 'noop', 'up_to_date' ), array( $handed['languages'][self::TARGET]['decision'], $handed['languages'][self::TARGET]['state'] ) );
         $config->ini()->setVariable( 'TranslationSync', 'Enabled', 'disabled' );
@@ -257,7 +257,7 @@ class expAiChainRunsTest extends expAiT386CContentTestCase
 
     public function testTheOfflineLinkCheckAndTheCleaning(): void
     {
-        $url = eZURL::registerURL( 'https://example.org/t386-chain' );
+        $url = eZURL::registerURL( 'https://example.org/xt-chain' );
         $links = expAiChainEngine::checkLinks( array(
             'body' => '<a href="https://example.org/ok">a</a> <a href="http://nohost">b</a> <a href="mailto:info@example.org">c</a> <a href="mailto:nobody">d</a>'
                     . ' <a href="eznode://2">e</a> <a href="eznode://999999999">f</a> <a href="ezobject://1">g</a> <a href="ezobject://999999999">h</a>'

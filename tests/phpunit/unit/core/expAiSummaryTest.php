@@ -11,7 +11,7 @@
 
 require_once __DIR__ . '/expaicoretestcase.php';
 
-class expAiSummaryTest extends expAiT386DCoreTestCase
+class expAiSummaryTest extends expAiCoreTestCase
 {
     public function testTheSummaryOfASite(): void
     {
@@ -20,7 +20,7 @@ class expAiSummaryTest extends expAiT386DCoreTestCase
         $config = $this->useSettings( array(
             'AISettings' => array( 'Enabled' => 'true' ),
             'ProviderSettings' => array( 'Providers' => array( 'anthropic', 'huggingface', 'local' ), 'ProvidersWithoutPolicy' => array( 'local' ) ),
-            'Provider_huggingface' => array( 'ApiKey' => 'hf_not_a_key_t386d' ),
+            'Provider_huggingface' => array( 'ApiKey' => 'hf_not_a_key_xtd' ),
             'Limits' => array( 'ProviderMaxTokensPerMonth' => array( 'huggingface' => '1000' ), 'MaxTokensPerSitePerMonth' => '999999999999',
                                'MaxCostPerUserPerDay' => '3' ),
             'DataPolicy' => array( 'DefaultRegions' => array( 'eu' ), 'SectionRegions' => array( '1' => 'eu;us', '987654' => 'eu', '2' => '' ),
@@ -28,12 +28,12 @@ class expAiSummaryTest extends expAiT386DCoreTestCase
                                    'ZeroRetentionClasses' => array( 'article' ) ),
             'ToolSettings' => array( 'Tools' => array( 'get_node', 'web_fetch', 'web_search', 'project_history' ) ),
             'WebSettings' => array( 'AllowedDomains' => array( 'example.invalid' ) ),
-            'SearchSettings' => array( 'Provider' => 't386d' ),
-            'SearchProvider_t386d' => array( 'Label' => 'T386D search', 'Region' => 'EU', 'Retention' => 'none', 'ApiKey' => 'not-a-key' ),
+            'SearchSettings' => array( 'Provider' => 'xtd' ),
+            'SearchProvider_xtd' => array( 'Label' => 'XTD search', 'Region' => 'EU', 'Retention' => 'none', 'ApiKey' => 'not-a-key' ),
             'SummarySettings' => array( 'Contact' => ' ai@example.invalid ', 'Note' => 'Test note' ),
         ) );
         // a role that may use the models of one provider, and one that may write
-        $role = eZRole::create( 'expai t386d summary role ' . mt_rand() );
+        $role = eZRole::create( 'expai xtd summary role ' . mt_rand() );
         $role->store();
         $role->appendPolicy( 'expai', 'model_use', array( 'Provider' => array( 'huggingface' ) ) );
         $role->appendPolicy( 'expai', 'write' );
@@ -47,7 +47,7 @@ class expAiSummaryTest extends expAiT386DCoreTestCase
         $this->assertSame( 'Test note', $facts['note'] );
         $this->assertTrue( $facts['switches']['master'] );
         $this->assertSame( 'USD', $facts['currency'] );
-        $this->assertStringNotContainsString( 'hf_not_a_key_t386d', json_encode( $facts ), 'never a key' );
+        $this->assertStringNotContainsString( 'hf_not_a_key_xtd', json_encode( $facts ), 'never a key' );
         $this->assertStringNotContainsString( 'not-a-key', json_encode( $facts ) );
 
         $providers = array_column( $facts['providers'], null, 'id' );
@@ -93,7 +93,7 @@ class expAiSummaryTest extends expAiT386DCoreTestCase
         $tools = $facts['tools'];
         $this->assertTrue( $tools['web_fetch']['listed'] );
         $this->assertSame( array( 'example.invalid' ), $tools['web_fetch']['domains'] );
-        $this->assertSame( 'T386D search', $tools['web_search']['provider'] );
+        $this->assertSame( 'XTD search', $tools['web_search']['provider'] );
         $this->assertSame( 'eu', $tools['web_search']['region'] );
         $this->assertSame( 'EU', $tools['web_search']['region_label'] );
         $this->assertTrue( $tools['web_search']['key']['set'] );
@@ -124,20 +124,20 @@ class expAiSummaryTest extends expAiT386DCoreTestCase
 
     public function testToolsRegistryAndContext(): void
     {
-        $config = $this->useSettings( array( 'ToolSettings' => array( 'Tools' => array( 'get_node', 't386d_broken' ) ), 'Tool_t386d_broken' => array( 'Class' => 'expAiT386DNoSuchTool' ),
+        $config = $this->useSettings( array( 'ToolSettings' => array( 'Tools' => array( 'get_node', 'xtd_broken' ) ), 'Tool_xtd_broken' => array( 'Class' => 'expAiCoreTestNoSuchTool' ),
                                              'AssistantSettings' => array( 'MaxDraftsPerConversation' => '1' ), 'McpSettings' => array( 'Servers' => array() ),
                                              'McpBridge' => array( 'Enabled' => 'disabled' ) ) );
         $registry = new expAiToolRegistry( $config, false );
         $this->assertArrayHasKey( 'get_node', $registry->tools() );
-        $this->assertArrayNotHasKey( 't386d_broken', $registry->tools(), 'a tool without a usable class is left out' );
-        $this->assertNull( $registry->get( 't386d_broken' ) );
-        $plain = new expAiT386DPlainTool( 't386d_plain' );
+        $this->assertArrayNotHasKey( 'xtd_broken', $registry->tools(), 'a tool without a usable class is left out' );
+        $this->assertNull( $registry->get( 'xtd_broken' ) );
+        $plain = new expAiCoreTestPlainTool( 'xtd_plain' );
         $registry->add( $plain );
-        $this->assertSame( $plain, $registry->get( 't386d_plain' ) );
+        $this->assertSame( $plain, $registry->get( 'xtd_plain' ) );
         $this->assertSame( 'Used the tool %tool', $plain->stepText( array() ) );
-        $this->assertSame( array( '%tool' => 't386d_plain' ), $plain->stepArguments( array(), null ) );
+        $this->assertSame( array( '%tool' => 'xtd_plain' ), $plain->stepArguments( array(), null ) );
         $this->assertFalse( $plain->writes() );
-        $this->assertSame( array( 'name' => 't386d_plain', 'description' => 'A tool of the test', 'input_schema' => array( 'type' => 'object' ) ), $plain->definition() );
+        $this->assertSame( array( 'name' => 'xtd_plain', 'description' => 'A tool of the test', 'input_schema' => array( 'type' => 'object' ) ), $plain->definition() );
 
         $context = new expAiToolContext( $config, 2 );
         $context->checkDraftLimit();
@@ -169,7 +169,7 @@ class expAiSummaryTest extends expAiT386DCoreTestCase
 }
 
 /** A tool with the defaults of expAiTool */
-class expAiT386DPlainTool extends expAiTool
+class expAiCoreTestPlainTool extends expAiTool
 {
     public function description()
     {

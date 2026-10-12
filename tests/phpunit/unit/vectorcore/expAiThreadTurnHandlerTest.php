@@ -8,9 +8,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expaivbfixture.php';
+require_once __DIR__ . '/expaivectorcoretestcase.php';
 
-class expAiThreadTurnHandlerTest extends expAiT386VbCase
+class expAiThreadTurnHandlerTest extends expAiVectorCoreTestCase
 {
     /** @return expQueueJob a turn job that exists in memory only */
     private function job( array $payload )
@@ -22,7 +22,7 @@ class expAiThreadTurnHandlerTest extends expAiT386VbCase
     /** @return array thread, node id */
     private function threadOnArticle( $title )
     {
-        $article = $this->article( 'T386B turn ' . $title );
+        $article = $this->article( 'XTB turn ' . $title );
         $alias = $this->stubModel();
         $nodeID = (int) $article->mainNodeID();
         $thread = $this->thread( array( 'title' => $title, 'model_alias' => $alias, 'scope' => array( 'nodes' => array( $nodeID ) ) ) );
@@ -49,7 +49,7 @@ class expAiThreadTurnHandlerTest extends expAiT386VbCase
         $this->expectException( expQueuePermanentException::class );
         $this->expectExceptionMessage( 'the thread is gone' );
         $job = $this->job( array( 'thread_id' => 2147483000, 'node_id' => 2 ) );
-        ( new expAiThreadTurnHandler() )->run( $job, new expAiT386VbContext( $job ) );
+        ( new expAiThreadTurnHandler() )->run( $job, new expAiVectorCoreQueueContext( $job ) );
     }
 
     public function testAnOwnerWithoutAccessEndsTheThreadFailed(): void
@@ -60,7 +60,7 @@ class expAiThreadTurnHandlerTest extends expAiT386VbCase
         $job = $this->job( array( 'thread_id' => (int) $thread->attribute( 'id' ), 'node_id' => $nodeID, 'message' => 'Hello' ) );
         try
         {
-            ( new expAiThreadTurnHandler() )->run( $job, new expAiT386VbContext( $job ) );
+            ( new expAiThreadTurnHandler() )->run( $job, new expAiVectorCoreQueueContext( $job ) );
             $this->fail( 'ran for another user' );
         }
         catch ( expQueuePermanentException $e )
@@ -72,7 +72,7 @@ class expAiThreadTurnHandlerTest extends expAiT386VbCase
         $this->assertSame( 'failed', $fresh->leadRun()->attribute( 'state' ) );
         $error = self::events( $fresh, 'error' );
         $this->assertStringContainsString( 'no longer has access', $error[0]->payload()['message'] );
-        $this->assertSame( 0, count( expAiT386VbStubProvider::$requests ), 'no model call' );
+        $this->assertSame( 0, count( expAiVectorCoreStubProvider::$requests ), 'no model call' );
     }
 
     public function testAThreadWithoutConversationFailsForGood(): void
@@ -84,7 +84,7 @@ class expAiThreadTurnHandlerTest extends expAiT386VbCase
         $this->expectException( expQueuePermanentException::class );
         $this->expectExceptionMessage( 'the thread has no conversation' );
         $job = $this->job( array( 'thread_id' => (int) $thread->attribute( 'id' ), 'node_id' => $nodeID ) );
-        ( new expAiThreadTurnHandler() )->run( $job, new expAiT386VbContext( $job ) );
+        ( new expAiThreadTurnHandler() )->run( $job, new expAiVectorCoreQueueContext( $job ) );
     }
 
     public function testSwitchedOffTheTurnIsHeldWithTheReason(): void
@@ -92,7 +92,7 @@ class expAiThreadTurnHandlerTest extends expAiT386VbCase
         list( $thread, $nodeID ) = $this->threadOnArticle( 'switched off' );
         $this->ini( 'AISettings', 'Enabled', 'false' );
         $job = $this->job( array( 'thread_id' => (int) $thread->attribute( 'id' ), 'node_id' => $nodeID, 'message' => 'Hello' ) );
-        $result = expQueueResult::from( ( new expAiThreadTurnHandler() )->run( $job, new expAiT386VbContext( $job ) ) );
+        $result = expQueueResult::from( ( new expAiThreadTurnHandler() )->run( $job, new expAiVectorCoreQueueContext( $job ) ) );
         $this->assertSame( expQueueResult::HOLD, $result->outcome );
         $this->assertStringStartsWith( expAiGate::HELD_PREFIX, $result->message );
         $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) );
@@ -100,21 +100,21 @@ class expAiThreadTurnHandlerTest extends expAiT386VbCase
         $this->assertSame( 'queued', $fresh->leadRun()->attribute( 'state' ) );
         $status = self::events( $fresh, 'status' );
         $this->assertNotEmpty( end( $status )->payload()['held'] );
-        $this->assertSame( array(), expAiT386VbStubProvider::$requests );
+        $this->assertSame( array(), expAiVectorCoreStubProvider::$requests );
     }
 
     public function testATurnRunsUntilTheModelAnswersInWords(): void
     {
         list( $thread, $nodeID ) = $this->threadOnArticle( 'full turn' );
-        expAiT386VbStubProvider::$replies = array(
-            array( array( 'type' => 'tool_use', 'id' => 'toolu_t386b1', 'name' => 'get_node', 'input' => array( 'node_id' => $nodeID ) ) ),
+        expAiVectorCoreStubProvider::$replies = array(
+            array( array( 'type' => 'tool_use', 'id' => 'toolu_xtb1', 'name' => 'get_node', 'input' => array( 'node_id' => $nodeID ) ) ),
             array( array( 'type' => 'text', 'text' => 'The article has two paragraphs.' ) ) );
         $job = $this->job( array( 'thread_id' => (int) $thread->attribute( 'id' ), 'run_id' => (int) $thread->attribute( 'lead_run_id' ), 'node_id' => $nodeID,
                                   'message' => 'What is in it?', 'options' => array( 'alias' => '', 'read_only' => true, 'mode' => 'plan', 'action' => 'vector' ) ) );
-        $context = new expAiT386VbContext( $job );
+        $context = new expAiVectorCoreQueueContext( $job );
         $out = ( new expAiThreadTurnHandler() )->run( $job, $context );
         $this->assertSame( array( 'steps' => 2, 'status' => 'done', 'turns' => 1 ), $out );
-        $this->assertCount( 2, expAiT386VbStubProvider::$requests );
+        $this->assertCount( 2, expAiVectorCoreStubProvider::$requests );
         $this->assertSame( array( 'index' => 0, 'sent' => 1 ), $context->saved, 'the message is marked sent before the first call' );
         $this->assertCount( 2, $context->progress );
         $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) );
@@ -129,10 +129,10 @@ class expAiThreadTurnHandlerTest extends expAiT386VbCase
         $job = $this->job( array( 'thread_id' => (int) $thread->attribute( 'id' ), 'node_id' => $nodeID, 'message' => 'First run.',
                                   'options' => array( 'alias' => '', 'read_only' => true, 'mode' => 'plan', 'action' => 'vector' ) ) );
         // the first attempt sent the message, then the model call failed
-        expAiT386VbStubProvider::$throw = new expAiException( 'The model is not available.', 'stub failure' );
+        expAiVectorCoreStubProvider::$throw = new expAiException( 'The model is not available.', 'stub failure' );
         try
         {
-            ( new expAiThreadTurnHandler() )->run( $job, new expAiT386VbContext( $job ) );
+            ( new expAiThreadTurnHandler() )->run( $job, new expAiVectorCoreQueueContext( $job ) );
             $this->fail( 'a failing model call did not fail the job' );
         }
         catch ( expQueuePermanentException $e )
@@ -143,9 +143,9 @@ class expAiThreadTurnHandlerTest extends expAiT386VbCase
         $conversation = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) )->conversation();
         $sent = substr_count( json_encode( $conversation->messages() ), 'First run.' );
         // the rerun with the checkpoint of the first attempt goes on without the message
-        $out = ( new expAiThreadTurnHandler() )->run( $job, new expAiT386VbContext( $job, array( 'index' => 0, 'sent' => 1 ) ) );
+        $out = ( new expAiThreadTurnHandler() )->run( $job, new expAiVectorCoreQueueContext( $job, array( 'index' => 0, 'sent' => 1 ) ) );
         $this->assertSame( 'done', $out['status'] );
-        $last = end( expAiT386VbStubProvider::$requests );
+        $last = end( expAiVectorCoreStubProvider::$requests );
         $this->assertSame( $sent, substr_count( json_encode( $last['messages'] ), 'First run.' ), 'the message is in the request as often as in the conversation' );
     }
 
@@ -153,7 +153,7 @@ class expAiThreadTurnHandlerTest extends expAiT386VbCase
     {
         list( $thread, $nodeID ) = $this->threadOnArticle( 'cancelled' );
         $job = $this->job( array( 'thread_id' => (int) $thread->attribute( 'id' ), 'run_id' => (int) $thread->attribute( 'lead_run_id' ), 'node_id' => $nodeID, 'message' => 'Hi' ) );
-        $context = new expAiT386VbContext( $job );
+        $context = new expAiVectorCoreQueueContext( $job );
         $context->cancelled = true;
         try
         {
@@ -165,14 +165,14 @@ class expAiThreadTurnHandlerTest extends expAiT386VbCase
             $this->assertSame( 'stopped by the editor', $e->getMessage() );
         }
         $this->assertSame( 'stopped', expAiThread::fetchByID( (int) $thread->attribute( 'id' ) )->attribute( 'state' ) );
-        $this->assertSame( array(), expAiT386VbStubProvider::$requests );
+        $this->assertSame( array(), expAiVectorCoreStubProvider::$requests );
 
         // the turn went on with another model meanwhile: the job ends without touching the thread
         $thread = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) );
         $thread->setState( 'running' );
         $thread->store();
         $job = $this->job( array( 'thread_id' => (int) $thread->attribute( 'id' ), 'run_id' => (int) $thread->attribute( 'lead_run_id' ) + 99999, 'node_id' => $nodeID, 'message' => 'Hi' ) );
-        $context = new expAiT386VbContext( $job );
+        $context = new expAiVectorCoreQueueContext( $job );
         $context->cancelled = true;
         try
         {
@@ -196,13 +196,13 @@ class expAiThreadTurnHandlerTest extends expAiT386VbCase
         $thread->setState( 'running' );
         $thread->store();
         $states = array();
-        expAiT386VbStubProvider::$replies = array(
+        expAiVectorCoreStubProvider::$replies = array(
             function ( $request ) use ( $thread, &$states ) { $states[] = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) )->attribute( 'state' ); return array( array( 'type' => 'text', 'text' => 'Item one done.' ) ); },
             function ( $request ) use ( $thread, &$states ) { $states[] = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) )->attribute( 'state' ); return array( array( 'type' => 'text', 'text' => 'Item two done.' ) ); } );
         $job = $this->job( array( 'thread_id' => (int) $thread->attribute( 'id' ), 'node_id' => $nodeID, 'message' => '',
                                   'options' => array( 'alias' => '', 'read_only' => true, 'mode' => 'write', 'action' => 'vector',
                                                       'messages' => array( 'Item one.', '', 'Item two.' ), 'plan_id' => (int) $plan->attribute( 'id' ) ) ) );
-        $context = new expAiT386VbContext( $job );
+        $context = new expAiVectorCoreQueueContext( $job );
         $out = ( new expAiThreadTurnHandler() )->run( $job, $context );
         $this->assertSame( array( 'steps' => 2, 'status' => 'done', 'turns' => 2 ), $out, 'an empty message is no item' );
         $this->assertSame( array( 'index' => 1, 'sent' => 1 ), $context->saved );
@@ -216,15 +216,15 @@ class expAiThreadTurnHandlerTest extends expAiT386VbCase
     public function testAVetoFailsTheTurn(): void
     {
         list( $thread, $nodeID ) = $this->threadOnArticle( 'veto' );
-        $this->ini( 'RequestVeto', 'Rules', array( 't386b' ) );
-        $this->ini( 'RequestVeto_t386b', 'Reason', 'No AI in this test.' );
+        $this->ini( 'RequestVeto', 'Rules', array( 'xtb' ) );
+        $this->ini( 'RequestVeto_xtb', 'Reason', 'No AI in this test.' );
         $job = $this->job( array( 'thread_id' => (int) $thread->attribute( 'id' ), 'node_id' => $nodeID, 'message' => 'Hi',
                                   'options' => array( 'alias' => '', 'read_only' => true, 'mode' => 'plan', 'action' => 'vector' ) ) );
-        $result = expQueueResult::from( ( new expAiThreadTurnHandler() )->run( $job, new expAiT386VbContext( $job ) ) );
+        $result = expQueueResult::from( ( new expAiThreadTurnHandler() )->run( $job, new expAiVectorCoreQueueContext( $job ) ) );
         $this->assertSame( expQueueResult::FAIL, $result->outcome );
         $this->assertSame( 'veto', $result->errorClass );
         $this->assertStringContainsString( 'No AI in this test.', $result->message );
-        $this->assertSame( array(), expAiT386VbStubProvider::$requests );
+        $this->assertSame( array(), expAiVectorCoreStubProvider::$requests );
     }
 
     public function testHoldAndFinishIgnoreAMissingThread(): void

@@ -9,9 +9,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expait386ehelpers.php';
+require_once __DIR__ . '/expaiprovidertesthelpers.php';
 
-class expAiLocalModelTest extends expAiT386ETestCase
+class expAiLocalModelTest extends expAiProviderTestCase
 {
     /** @var string */
     private $dir;
@@ -19,7 +19,7 @@ class expAiLocalModelTest extends expAiT386ETestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->dir = expAiTestMockServer::tmp( 't386e-local' );
+        $this->dir = expAiTestMockServer::tmp( 'xte-local' );
         $dir = $this->dir;
         $this->cleanup( static function () use ( $dir ) { expAiTestMockServer::removeTree( $dir ); } );
     }
@@ -27,24 +27,24 @@ class expAiLocalModelTest extends expAiT386ETestCase
     private function localConfig( $baseUrl, array $more = array() )
     {
         return parent::config( array(
-            'ProviderSettings' => array( 'Providers' => array( 't386elocal', 't386eremote' ) ),
-            'Provider_t386elocal' => array( 'Type' => 'openai_chat', 'Flavor' => 'ollama', 'Managed' => 'Ollama', 'BaseURL' => $baseUrl, 'KeyOptional' => 'true' ),
-            'Provider_t386eremote' => array( 'Type' => 'openai_chat', 'BaseURL' => 'https://example.invalid/v1', 'ApiKey' => 'k' ),
-            'Model_t386elocal.q' => array( 'Provider' => 't386elocal', 'Id' => 'qwen3:4b' ),
+            'ProviderSettings' => array( 'Providers' => array( 'xtelocal', 'xteremote' ) ),
+            'Provider_xtelocal' => array( 'Type' => 'openai_chat', 'Flavor' => 'ollama', 'Managed' => 'Ollama', 'BaseURL' => $baseUrl, 'KeyOptional' => 'true' ),
+            'Provider_xteremote' => array( 'Type' => 'openai_chat', 'BaseURL' => 'https://example.invalid/v1', 'ApiKey' => 'k' ),
+            'Model_xtelocal.q' => array( 'Provider' => 'xtelocal', 'Id' => 'qwen3:4b' ),
             'LocalModelSettings' => $more + array( 'Models' => array( 'qwen3:4b', 'Bad Name!', 'llama3.2' ), 'StatusFile' => '', 'SpoolDirectory' => '' ),
         ) );
     }
 
     public function testOnlyProvidersManagedByOllamaAreLocal(): void
     {
-        $this->assertSame( array( 't386elocal' ), expAiLocalModel::managedProviders( $this->localConfig( 'http://127.0.0.1:1/v1' ) ) );
+        $this->assertSame( array( 'xtelocal' ), expAiLocalModel::managedProviders( $this->localConfig( 'http://127.0.0.1:1/v1' ) ) );
     }
 
     public function testTheRootUrlIsTheLoopbackServerWithoutTheApiPath(): void
     {
-        $this->assertSame( 'http://127.0.0.1:11434', ( new expAiLocalModel( $this->localConfig( 'http://127.0.0.1:11434/v1/chat/completions' ), 't386elocal' ) )->rootUrl() );
-        $this->assertSame( 'http://localhost:11434', ( new expAiLocalModel( $this->localConfig( 'http://localhost:11434/v1/' ), 't386elocal' ) )->rootUrl() );
-        $this->assertSame( '', ( new expAiLocalModel( $this->localConfig( 'http://127.0.0.1:1/v1' ), 't386eremote' ) )->rootUrl(), 'not on this server' );
+        $this->assertSame( 'http://127.0.0.1:11434', ( new expAiLocalModel( $this->localConfig( 'http://127.0.0.1:11434/v1/chat/completions' ), 'xtelocal' ) )->rootUrl() );
+        $this->assertSame( 'http://localhost:11434', ( new expAiLocalModel( $this->localConfig( 'http://localhost:11434/v1/' ), 'xtelocal' ) )->rootUrl() );
+        $this->assertSame( '', ( new expAiLocalModel( $this->localConfig( 'http://127.0.0.1:1/v1' ), 'xteremote' ) )->rootUrl(), 'not on this server' );
         $this->assertSame( '', ( new expAiLocalModel( $this->localConfig( 'http://127.0.0.1:1/v1' ), 'none' ) )->rootUrl() );
     }
 
@@ -60,7 +60,7 @@ class expAiLocalModelTest extends expAiT386ETestCase
         mkdir( $this->dir . '/spool' );
         file_put_contents( $this->dir . '/spool/a.json', '{}' );
 
-        $status = ( new expAiLocalModel( $this->localConfig( $server['url'] . '/v1', array( 'StatusFile' => $this->dir . '/status.json', 'SpoolDirectory' => $this->dir . '/spool/' ) ), 't386elocal' ) )->status();
+        $status = ( new expAiLocalModel( $this->localConfig( $server['url'] . '/v1', array( 'StatusFile' => $this->dir . '/status.json', 'SpoolDirectory' => $this->dir . '/spool/' ) ), 'xtelocal' ) )->status();
         $this->assertTrue( $status['running'] );
         $this->assertSame( '0.12.3', $status['version'] );
         $this->assertSame( array( array( 'name' => 'qwen3:4b', 'size_mb' => 3, 'until' => '2026-10-12T10:00:00Z' ) ), $status['loaded'] );
@@ -75,7 +75,7 @@ class expAiLocalModelTest extends expAiT386ETestCase
         $probe = stream_socket_server( 'tcp://127.0.0.1:0' );
         $port = (int) substr( strrchr( stream_socket_get_name( $probe, false ), ':' ), 1 );
         fclose( $probe );
-        $status = ( new expAiLocalModel( $this->localConfig( 'http://127.0.0.1:' . $port . '/v1' ), 't386elocal' ) )->status();
+        $status = ( new expAiLocalModel( $this->localConfig( 'http://127.0.0.1:' . $port . '/v1' ), 'xtelocal' ) )->status();
         $this->assertFalse( $status['running'] );
         $this->assertSame( array(), $status['loaded'] );
         $this->assertNull( $status['helper'] );
@@ -87,14 +87,14 @@ class expAiLocalModelTest extends expAiT386ETestCase
         mkdir( $www . '/api', 0775, true );
         file_put_contents( $www . '/api/version', 'hello' );
         $server = expAiTestMockServer::start( '', $www );
-        $this->assertFalse( ( new expAiLocalModel( $this->localConfig( $server['url'] ), 't386elocal' ) )->status()['running'] );
+        $this->assertFalse( ( new expAiLocalModel( $this->localConfig( $server['url'] ), 'xtelocal' ) )->status()['running'] );
         // a provider that is not on this server is never asked
-        $this->assertFalse( ( new expAiLocalModel( $this->localConfig( 'http://127.0.0.1:1/v1' ), 't386eremote' ) )->status()['running'] );
+        $this->assertFalse( ( new expAiLocalModel( $this->localConfig( 'http://127.0.0.1:1/v1' ), 'xteremote' ) )->status()['running'] );
     }
 
     public function testOnlyValidModelNamesAreAllowed(): void
     {
-        $this->assertSame( array( 'qwen3:4b', 'llama3.2' ), ( new expAiLocalModel( $this->localConfig( 'http://127.0.0.1:1' ), 't386elocal' ) )->allowedModels() );
+        $this->assertSame( array( 'qwen3:4b', 'llama3.2' ), ( new expAiLocalModel( $this->localConfig( 'http://127.0.0.1:1' ), 'xtelocal' ) )->allowedModels() );
     }
 
     public function testRequestsAreWrittenToTheSpoolForTheHelper(): void
@@ -102,7 +102,7 @@ class expAiLocalModelTest extends expAiT386ETestCase
         $this->requireDatabase();
         $user = $this->asUser( 'admin' );
         mkdir( $this->dir . '/spool' );
-        $local = new expAiLocalModel( $this->localConfig( 'http://127.0.0.1:1', array( 'SpoolDirectory' => $this->dir . '/spool' ) ), 't386elocal' );
+        $local = new expAiLocalModel( $this->localConfig( 'http://127.0.0.1:1', array( 'SpoolDirectory' => $this->dir . '/spool' ) ), 'xtelocal' );
         $id = $local->request( 'pull', 'llama3.2' );
         $this->assertMatchesRegularExpression( '/^[0-9a-f]{32}$/', $id );
         $request = json_decode( file_get_contents( $this->dir . '/spool/' . $id . '.json' ), true );
@@ -115,7 +115,7 @@ class expAiLocalModelTest extends expAiT386ETestCase
 
     public function testRequestsThatAreRefused(): void
     {
-        $local = new expAiLocalModel( $this->localConfig( 'http://127.0.0.1:1', array( 'SpoolDirectory' => $this->dir . '/missing' ) ), 't386elocal' );
+        $local = new expAiLocalModel( $this->localConfig( 'http://127.0.0.1:1', array( 'SpoolDirectory' => $this->dir . '/missing' ) ), 'xtelocal' );
         foreach ( array( array( 'format_disk', '', 'Unknown action.' ), array( 'pull', 'evil-model', 'This model is not on the list of allowed local models.' ),
                          array( 'remove', '', 'Please choose a model.' ),
                          array( 'start', '', 'The local model helper is not installed (the spool directory is missing or not writable).' ) ) as $case )

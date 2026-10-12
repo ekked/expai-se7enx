@@ -8,9 +8,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expaivbfixture.php';
+require_once __DIR__ . '/expaivectorcoretestcase.php';
 
-class expAiThreadItemHandlerTest extends expAiT386VbCase
+class expAiThreadItemHandlerTest extends expAiVectorCoreTestCase
 {
     /** @var int */
     private $nodeID = 0;
@@ -24,9 +24,9 @@ class expAiThreadItemHandlerTest extends expAiT386VbCase
     /** @return array( thread, plan, runs ) a plan of two items, the second waiting for the first */
     private function plan( array $states, $title )
     {
-        $article = $this->article( 'T386B item ' . $title );
+        $article = $this->article( 'XTB item ' . $title );
         $this->nodeID = (int) $article->mainNodeID();
-        $thread = $this->thread( array( 'title' => $title, 'model_alias' => 't386b.stub', 'scope' => array( 'nodes' => array( $this->nodeID ) ) ) );
+        $thread = $this->thread( array( 'title' => $title, 'model_alias' => 'xtb.stub', 'scope' => array( 'nodes' => array( $this->nodeID ) ) ) );
         list( $plan, $runs ) = $this->planWithRuns( $thread, array(
             array( 'state' => $states[0], 'target' => array( 'object_id' => (int) $article->attribute( 'id' ) ) ),
             array( 'state' => $states[1], 'depends_on' => array( 0 ), 'action' => 'translate', 'languages' => array( 'ger-DE' ) ) ) );
@@ -37,13 +37,13 @@ class expAiThreadItemHandlerTest extends expAiT386VbCase
     {
         return $more + array( 'thread_id' => (int) $thread->attribute( 'id' ), 'run_id' => (int) $run->attribute( 'id' ), 'plan_id' => (int) $plan->attribute( 'id' ),
                               'item' => (int) $run->attribute( 'plan_item' ), 'node_id' => $this->nodeID, 'message' => 'Do the item.',
-                              'options' => array( 'alias' => 't386b.stub', 'read_only' => true, 'mode' => 'write', 'staged' => true, 'action' => 'vector' ) );
+                              'options' => array( 'alias' => 'xtb.stub', 'read_only' => true, 'mode' => 'write', 'staged' => true, 'action' => 'vector' ) );
     }
 
-    private function runItem( array $payload, ?expAiT386VbContext &$context = null )
+    private function runItem( array $payload, ?expAiVectorCoreQueueContext &$context = null )
     {
         $job = $this->job( $payload );
-        $context = $context ?: new expAiT386VbContext( $job );
+        $context = $context ?: new expAiVectorCoreQueueContext( $job );
         return ( new expAiThreadItemHandler() )->run( $job, $context );
     }
 
@@ -127,7 +127,7 @@ class expAiThreadItemHandlerTest extends expAiT386VbCase
         $this->assertSame( expQueueResult::CANCELLED, $result->outcome );
         $this->assertSame( 'a dependency did not finish', $result->message );
         $this->assertSame( 'stopped', expAiThreadRun::fetchByID( (int) $runs[1]->attribute( 'id' ) )->attribute( 'state' ) );
-        $this->assertSame( array(), expAiT386VbStubProvider::$requests );
+        $this->assertSame( array(), expAiVectorCoreStubProvider::$requests );
     }
 
     public function testAnItemRunsWithTheChangesOfItsDependencyAsSource(): void
@@ -135,16 +135,16 @@ class expAiThreadItemHandlerTest extends expAiT386VbCase
         list( $thread, $plan, $runs ) = $this->plan( array( 'done', 'queued' ), 'source' );
         $change = new expAiChange( array( 'thread_id' => (int) $thread->attribute( 'id' ), 'run_id' => (int) $runs[0]->attribute( 'id' ), 'contentobject_id' => 4242,
                                           'language_code' => 'eng-GB', 'attribute_identifier' => 'title', 'datatype' => 'ezstring',
-                                          'proposed' => 'T386B the staged title', 'decision' => 'pending', 'created' => time(), 'modified' => time() ) );
+                                          'proposed' => 'XTB the staged title', 'decision' => 'pending', 'created' => time(), 'modified' => time() ) );
         $change->store();
-        expAiT386VbStubProvider::$replies = array(
-            array( array( 'type' => 'tool_use', 'id' => 'toolu_t386b2', 'name' => 'get_node', 'input' => array( 'node_id' => $this->nodeID ) ) ),
+        expAiVectorCoreStubProvider::$replies = array(
+            array( array( 'type' => 'tool_use', 'id' => 'toolu_xtb2', 'name' => 'get_node', 'input' => array( 'node_id' => $this->nodeID ) ) ),
             array( array( 'type' => 'text', 'text' => 'Translated.' ) ) );
         $context = null;
         $out = $this->runItem( $this->payload( $thread, $plan, $runs[1] ), $context );
         $this->assertSame( array( 'steps' => 2, 'status' => 'done', 'run_id' => (int) $runs[1]->attribute( 'id' ) ), $out );
-        $first = json_encode( expAiT386VbStubProvider::$requests[0]['messages'] );
-        $this->assertStringContainsString( 'T386B the staged title', $first, 'the staged value of the item it waits for is the source' );
+        $first = json_encode( expAiVectorCoreStubProvider::$requests[0]['messages'] );
+        $this->assertStringContainsString( 'XTB the staged title', $first, 'the staged value of the item it waits for is the source' );
         $this->assertStringContainsString( 'field title', $first );
         $this->assertSame( array( 'sent' => 1 ), $context->saved );
         $run = expAiThreadRun::fetchByID( (int) $runs[1]->attribute( 'id' ) );
@@ -161,7 +161,7 @@ class expAiThreadItemHandlerTest extends expAiT386VbCase
     {
         list( $thread, $plan, $runs ) = $this->plan( array( 'queued', 'queued' ), 'end' );
         $job = $this->job( $this->payload( $thread, $plan, $runs[0] ) );
-        $context = new expAiT386VbContext( $job );
+        $context = new expAiVectorCoreQueueContext( $job );
         $context->cancelled = true;
         try
         {
@@ -179,8 +179,8 @@ class expAiThreadItemHandlerTest extends expAiT386VbCase
         $plan->store();
         $runs[1]->setAttribute( 'state', 'queued' );
         $runs[1]->store();
-        $this->ini( 'RequestVeto', 'Rules', array( 't386b' ) );
-        $this->ini( 'RequestVeto_t386b', 'Reason', 'No AI for items.' );
+        $this->ini( 'RequestVeto', 'Rules', array( 'xtb' ) );
+        $this->ini( 'RequestVeto_xtb', 'Reason', 'No AI for items.' );
         $result = expQueueResult::from( $this->runItem( $this->payload( $thread, $plan, $runs[1] ) ) );
         $this->assertSame( expQueueResult::FAIL, $result->outcome );
         $this->assertSame( 'veto', $result->errorClass );
@@ -189,7 +189,7 @@ class expAiThreadItemHandlerTest extends expAiT386VbCase
         $this->ini( 'RequestVeto', 'Rules', array() );
         $runs[1]->setAttribute( 'state', 'queued' );
         $runs[1]->store();
-        expAiT386VbStubProvider::$throw = new expAiException( 'The stub refuses.', 'stub' );
+        expAiVectorCoreStubProvider::$throw = new expAiException( 'The stub refuses.', 'stub' );
         try
         {
             $this->runItem( $this->payload( $thread, $plan, $runs[1] ) );

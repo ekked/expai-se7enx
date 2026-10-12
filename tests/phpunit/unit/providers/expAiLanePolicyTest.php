@@ -8,28 +8,28 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expait386ehelpers.php';
+require_once __DIR__ . '/expaiprovidertesthelpers.php';
 
-class expAiLanePolicyTest extends expAiT386ETestCase
+class expAiLanePolicyTest extends expAiProviderTestCase
 {
     private function lanes( array $more = array() )
     {
         return $this->config( $more + array(
-            'ProviderSettings' => array( 'Providers' => array( 't386el', 't386ec', 't386ex' ) ),
-            'Provider_t386el' => array( 'Type' => 'openai_chat', 'BaseURL' => 'https://lanes.example/v1', 'ApiKey' => 'k', 'Retention' => 'zdr', 'Lanes' => array( 'flex', 'batch', 'fast', ' ' ) ),
-            'Provider_t386ec' => array( 'Type' => 'custom', 'Class' => 'expAiOpenAiChatProvider' ),
-            'Provider_t386ex' => array( 'Type' => 'mystery' ),
-            'Model_t386el.a' => array( 'Provider' => 't386el', 'Id' => 'model-a', 'Lanes' => array( 'flex' ) ),
-            'Model_t386el.b' => array( 'Provider' => 't386el', 'Id' => 'model-b' ),
-            'Model_t386ec.c' => array( 'Provider' => 't386ec', 'Id' => 'model-c' ),
-            'Model_t386ex.x' => array( 'Provider' => 't386ex', 'Id' => 'model-x' ),
-            'Lane_t386el.flex' => array( 'Enabled' => 'true', 'PriceMultiplier' => '0.5', 'Retention' => '6w', 'Timeout' => 30, 'RequestParams' => array( 'service_tier' => 'flex', 'model' => 'never', 'n' => '2' ),
+            'ProviderSettings' => array( 'Providers' => array( 'xtel', 'xtec', 'xtex' ) ),
+            'Provider_xtel' => array( 'Type' => 'openai_chat', 'BaseURL' => 'https://lanes.example/v1', 'ApiKey' => 'k', 'Retention' => 'zdr', 'Lanes' => array( 'flex', 'batch', 'fast', ' ' ) ),
+            'Provider_xtec' => array( 'Type' => 'custom', 'Class' => 'expAiOpenAiChatProvider' ),
+            'Provider_xtex' => array( 'Type' => 'mystery' ),
+            'Model_xtel.a' => array( 'Provider' => 'xtel', 'Id' => 'model-a', 'Lanes' => array( 'flex' ) ),
+            'Model_xtel.b' => array( 'Provider' => 'xtel', 'Id' => 'model-b' ),
+            'Model_xtec.c' => array( 'Provider' => 'xtec', 'Id' => 'model-c' ),
+            'Model_xtex.x' => array( 'Provider' => 'xtex', 'Id' => 'model-x' ),
+            'Lane_xtel.flex' => array( 'Enabled' => 'true', 'PriceMultiplier' => '0.5', 'Retention' => '6w', 'Timeout' => 30, 'RequestParams' => array( 'service_tier' => 'flex', 'model' => 'never', 'n' => '2' ),
                                          'Headers' => array( 'X-Lane: flex', 'Authorization: no' ) ),
-            'Lane_t386el.batch' => array( 'Enabled' => 'true', 'PriceMultiplier' => '0.5', 'BatchApi' => 'openaichat', 'Models' => array( 'model-b' ), 'Retention' => 'forever' ),
-            'Lane_t386el.fast' => array( 'Enabled' => 'true', 'PriceMultiplier' => '6' ),
-            'Lane_t386el.priority' => array( 'Enabled' => 'true', 'PriceMultiplier' => '2' ),
-            'Lane_t386el.Bad' => array( 'Enabled' => 'true' ),
-            'Lane_t386ec.flex' => array( 'Enabled' => 'true', 'PriceMultiplier' => '0.5' ),
+            'Lane_xtel.batch' => array( 'Enabled' => 'true', 'PriceMultiplier' => '0.5', 'BatchApi' => 'openaichat', 'Models' => array( 'model-b' ), 'Retention' => 'forever' ),
+            'Lane_xtel.fast' => array( 'Enabled' => 'true', 'PriceMultiplier' => '6' ),
+            'Lane_xtel.priority' => array( 'Enabled' => 'true', 'PriceMultiplier' => '2' ),
+            'Lane_xtel.Bad' => array( 'Enabled' => 'true' ),
+            'Lane_xtec.flex' => array( 'Enabled' => 'true', 'PriceMultiplier' => '0.5' ),
         ) );
     }
 
@@ -37,37 +37,37 @@ class expAiLanePolicyTest extends expAiT386ETestCase
     {
         $config = $this->lanes();
         $this->assertSame( array(), expAiLane::forProvider( 'nothing', $config ) );
-        $this->assertSame( array( 'standard', 'flex', 'batch', 'fast' ), array_keys( expAiLane::forProvider( 't386el', $config ) ), 'Lanes[] limits them; priority is not listed' );
-        $this->assertSame( array( 'standard', 'flex' ), array_keys( expAiLane::forModel( 't386el.a', $config ) ), 'the model limits them too' );
-        $this->assertSame( array( 'standard', 'flex', 'batch', 'fast' ), array_keys( expAiLane::forModel( 't386el.b', $config ) ), 'without Lanes[] of its own a model has every lane of its provider' );
+        $this->assertSame( array( 'standard', 'flex', 'batch', 'fast' ), array_keys( expAiLane::forProvider( 'xtel', $config ) ), 'Lanes[] limits them; priority is not listed' );
+        $this->assertSame( array( 'standard', 'flex' ), array_keys( expAiLane::forModel( 'xtel.a', $config ) ), 'the model limits them too' );
+        $this->assertSame( array( 'standard', 'flex', 'batch', 'fast' ), array_keys( expAiLane::forModel( 'xtel.b', $config ) ), 'without Lanes[] of its own a model has every lane of its provider' );
         $this->assertSame( array(), expAiLane::forModel( 'nothing', $config ) );
-        $this->assertNull( expAiLane::forModelLane( 't386el.a', 'batch', $config ) );
-        $this->assertSame( 'flex', expAiLane::forModelLane( 't386el.a', 'flex', $config )->name() );
+        $this->assertNull( expAiLane::forModelLane( 'xtel.a', 'batch', $config ) );
+        $this->assertSame( 'flex', expAiLane::forModelLane( 'xtel.a', 'flex', $config )->name() );
 
-        $flex = expAiLane::fetch( 't386el', 'flex', $config );
+        $flex = expAiLane::fetch( 'xtel', 'flex', $config );
         $this->assertSame( array( '6w', 50, 30 ), array( $flex->retention(), $flex->factorPercent(), $flex->get( 'timeout' ) ) );
         $this->assertFalse( $flex->zeroRetention() );
         $this->assertSame( array( 'service_tier' => 'flex', 'n' => 2 ), $flex->get( 'params' ) );
         $this->assertSame( array( 'X-Lane: flex' ), $flex->get( 'headers' ) );
         $this->assertSame( 100, $flex->billedFactor( 'default' ), 'served at the default tier: billed as standard' );
         $this->assertSame( 50, $flex->billedFactor( 'flex' ) );
-        $batch = expAiLane::fetch( 't386el', 'batch', $config );
+        $batch = expAiLane::fetch( 'xtel', 'batch', $config );
         $this->assertSame( array( 'openai', 'unknown', true ), array( $batch->get( 'batch_api' ), $batch->retention(), $batch->isBatch() ) );
-        $standard = expAiLane::fetch( 't386el', 'standard', $config );
+        $standard = expAiLane::fetch( 'xtel', 'standard', $config );
         $this->assertSame( array( 'zdr', 100, true ), array( $standard->retention(), $standard->factorPercent(), $standard->zeroRetention() ) );
-        $this->assertSame( 't386el:standard', $standard->key() );
-        $this->assertSame( 't386el', $standard->toArray()['provider'] );
+        $this->assertSame( 'xtel:standard', $standard->key() );
+        $this->assertSame( 'xtel', $standard->toArray()['provider'] );
     }
 
     public function testTheProviderOfALane(): void
     {
         $config = $this->lanes();
-        $flex = expAiLane::fetch( 't386el', 'flex', $config );
-        $settings = $flex->providerSettings( 't386el.a', $config );
+        $flex = expAiLane::fetch( 'xtel', 'flex', $config );
+        $settings = $flex->providerSettings( 'xtel.a', $config );
         $this->assertSame( array( 30, 'flex' ), array( $settings['Timeout'], $settings['Lane'] ) );
         $this->assertSame( array( 'service_tier' => 'flex', 'n' => 2 ), json_decode( $settings['ExtraBody'], true ) );
         $this->assertContains( 'X-Lane: flex', $settings['Headers'] );
-        $this->assertInstanceOf( 'expAiOpenAiChatProvider', $flex->provider( 't386el.a', $config ) );
+        $this->assertInstanceOf( 'expAiOpenAiChatProvider', $flex->provider( 'xtel.a', $config ) );
         $this->assertSame( array(), $flex->providerSettings( 'nothing', $config ) );
         try
         {
@@ -78,8 +78,8 @@ class expAiLanePolicyTest extends expAiT386ETestCase
         {
             $this->assertSame( 'no model nothing in the provider registry', $e->detail() );
         }
-        $this->assertInstanceOf( 'expAiOpenAiChatProvider', expAiLane::fetch( 't386ec', 'standard', $config )->provider( 't386ec.c', $config ), 'a custom provider on its standard lane' );
-        foreach ( array( array( 't386ec', 'flex', 't386ec.c', 'a custom provider has only the lane standard' ), array( 't386ex', 'standard', 't386ex.x', 'unknown provider Type mystery' ) ) as $case )
+        $this->assertInstanceOf( 'expAiOpenAiChatProvider', expAiLane::fetch( 'xtec', 'standard', $config )->provider( 'xtec.c', $config ), 'a custom provider on its standard lane' );
+        foreach ( array( array( 'xtec', 'flex', 'xtec.c', 'a custom provider has only the lane standard' ), array( 'xtex', 'standard', 'xtex.x', 'unknown provider Type mystery' ) ) as $case )
         {
             try
             {
@@ -110,35 +110,35 @@ class expAiLanePolicyTest extends expAiT386ETestCase
         $this->asUser( 'admin' );
         $config = $this->lanes( array( 'LanePolicy' => array( 'Order' => array( 'default' => 'batch fast flex standard' ), 'UrgentPriority' => 80, 'StrictDeadline' => 'enabled' ) ) );
         $policy = new expAiLanePolicy( $config );
-        $choice = $policy->choose( 't386el.b' );
+        $choice = $policy->choose( 'xtel.b' );
         $this->assertSame( 'batch', $choice['lane']->name() );
-        $urgent = $policy->choose( 't386el.b', array( 'priority' => 90 ) );
+        $urgent = $policy->choose( 'xtel.b', array( 'priority' => 90 ) );
         $this->assertSame( 'standard', $urgent['lane']->name() );
         $this->assertSame( array( 'batch' => 'too slow for an urgent request', 'fast' => 'only on request', 'flex' => 'too slow for an urgent request' ), $urgent['tried'] );
-        $this->assertSame( 'fast', $policy->choose( 't386el.b', array( 'priority' => 90, 'allow_fast' => true ) )['lane']->name() );
-        $soon = $policy->choose( 't386el.b', array( 'deadline' => time() + 600 ) );
+        $this->assertSame( 'fast', $policy->choose( 'xtel.b', array( 'priority' => 90, 'allow_fast' => true ) )['lane']->name() );
+        $soon = $policy->choose( 'xtel.b', array( 'deadline' => time() + 600 ) );
         $this->assertStringStartsWith( 'expected to take 86400 s, the deadline is in ', $soon['tried']['batch'] );
-        $this->assertSame( 'standard', $policy->choose( 't386el.b', array( 'lane' => 'standard' ) )['lane']->name() );
+        $this->assertSame( 'standard', $policy->choose( 'xtel.b', array( 'lane' => 'standard' ) )['lane']->name() );
 
         $this->asUser( 'anonymous' );
-        $this->assertSame( 'needs the policy expai/lane_fast', $policy->refusal( expAiLane::fetch( 't386el', 'fast', $config ), array( 'priority' => 50, 'deadline' => 0, 'user' => null,
+        $this->assertSame( 'needs the policy expai/lane_fast', $policy->refusal( expAiLane::fetch( 'xtel', 'fast', $config ), array( 'priority' => 50, 'deadline' => 0, 'user' => null,
                                                                                                                                          'requirements' => array() ), true ) );
         $this->asUser( 'admin' );
-        $off = $this->lanes( array( 'Lane_t386el.batch' => array( 'Enabled' => 'false', 'PriceMultiplier' => '0.5', 'Models' => array( 'model-b' ) ),
-                                    'Lane_t386el.fast' => array( 'Enabled' => 'true' ) ) );
+        $off = $this->lanes( array( 'Lane_xtel.batch' => array( 'Enabled' => 'false', 'PriceMultiplier' => '0.5', 'Models' => array( 'model-b' ) ),
+                                    'Lane_xtel.fast' => array( 'Enabled' => 'true' ) ) );
         $policy = new expAiLanePolicy( $off );
         $request = array( 'priority' => 50, 'deadline' => 0, 'user' => null, 'requirements' => array(), 'allow_fast' => true );
-        $this->assertSame( 'disabled', $policy->refusal( expAiLane::fetch( 't386el', 'batch', $off ), $request ) );
-        $this->assertSame( 'no confirmed price', $policy->refusal( expAiLane::fetch( 't386el', 'fast', $off ), $request ) );
+        $this->assertSame( 'disabled', $policy->refusal( expAiLane::fetch( 'xtel', 'batch', $off ), $request ) );
+        $this->assertSame( 'no confirmed price', $policy->refusal( expAiLane::fetch( 'xtel', 'fast', $off ), $request ) );
         try
         {
-            $policy->choose( 't386el.b', array( 'lane' => 'batch' ) );
+            $policy->choose( 'xtel.b', array( 'lane' => 'batch' ) );
             $this->fail( 'chose a disabled lane' );
         }
         catch ( expAiException $e )
         {
             $this->assertSame( 'batch: disabled', $e->detail() );
-            $this->assertSame( array( '%model' => 't386el.b' ), $e->arguments() );
+            $this->assertSame( array( '%model' => 'xtel.b' ), $e->arguments() );
         }
         try
         {

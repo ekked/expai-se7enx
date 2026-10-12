@@ -7,9 +7,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expaivbfixture.php';
+require_once __DIR__ . '/expaivectorcoretestcase.php';
 
-class expAiVectorTest extends expAiT386VbCase
+class expAiVectorTest extends expAiVectorCoreTestCase
 {
     public function testAllowedFollowsTheSwitchAndThePolicies(): void
     {
@@ -163,10 +163,10 @@ class expAiVectorTest extends expAiT386VbCase
         $this->assertSame( '', $row['progress'] );
 
         $thread->setAttribute( 'modified', time() );
-        $thread->setAttribute( 'title', 'T386B fresh' );
+        $thread->setAttribute( 'title', 'XTB fresh' );
         $row = expAiVector::listRow( $thread, $this->userID );
         $this->assertSame( 'running', $row['state'] );
-        $this->assertSame( 'T386B fresh', $row['title'] );
+        $this->assertSame( 'XTB fresh', $row['title'] );
         $this->assertFalse( $row['untitled'] );
     }
 
@@ -198,7 +198,7 @@ class expAiVectorTest extends expAiT386VbCase
 
     public function testDetailNamesTheScopeAndTheModel(): void
     {
-        $article = $this->article( 'T386B detail article' );
+        $article = $this->article( 'XTB detail article' );
         $nodeID = (int) $article->mainNodeID();
         $alias = $this->stubModel();
         $language = (string) $article->attribute( 'initial_language_code' );
@@ -206,7 +206,7 @@ class expAiVectorTest extends expAiT386VbCase
                                         'scope' => array( 'nodes' => array( $nodeID, 999999999 ), 'subtrees' => array( 2 ), 'classes' => array( 'article', 'noclass' ),
                                                           'languages' => array( $language, 'xxx-XX' ) ) ) );
         $detail = expAiVector::detail( $thread, $this->userID, expAiConfig::instance() );
-        $this->assertSame( 'T386B detail article', $detail['scope']['nodes'][0]['name'] );
+        $this->assertSame( 'XTB detail article', $detail['scope']['nodes'][0]['name'] );
         $this->assertTrue( $detail['scope']['nodes'][0]['readable'] );
         $this->assertSame( 'article', $detail['scope']['nodes'][0]['class'] );
         $this->assertSame( array( 'id' => 999999999, 'name' => '#999999999', 'class' => '', 'readable' => false ), $detail['scope']['nodes'][1] );
@@ -247,7 +247,7 @@ class expAiVectorTest extends expAiT386VbCase
 
     public function testChangeGroupsAndDraftsOfAThread(): void
     {
-        $article = $this->article( 'T386B change groups', array( 'First sentence.', 'Second sentence.' ) );
+        $article = $this->article( 'XTB change groups', array( 'First sentence.', 'Second sentence.' ) );
         $folderNodeID = (int) eZContentObjectTreeNode::fetch( $article->mainNodeID() )->attribute( 'parent_node_id' );
         $alias = $this->stubModel();
         $thread = $this->thread( array( 'title' => 'changes', 'model_alias' => $alias, 'scope' => array( 'nodes' => array( (int) $article->mainNodeID() ) ) ) );
@@ -255,14 +255,14 @@ class expAiVectorTest extends expAiT386VbCase
         $context->staged = true;
         $update = new expAiToolUpdateDraft( 'update_draft' );
         $result = $update->execute( array( 'object_id' => (int) $article->attribute( 'id' ), 'fields' => array(
-            'title' => 'T386B change groups (new)', 'intro' => '<p>First sentence, changed.</p><p>Second sentence.</p>' ) ), $context );
+            'title' => 'XTB change groups (new)', 'intro' => '<p>First sentence, changed.</p><p>Second sentence.</p>' ) ), $context );
         $this->assertCount( 2, $result['change_ids'] );
         $groups = expAiVector::changeGroups( $thread );
         $this->assertCount( 1, $groups );
         $existing = $groups[0];
         $this->assertFalse( $existing['is_new'] );
         $this->assertSame( (int) $article->attribute( 'id' ), $existing['object_id'] );
-        $this->assertSame( 'T386B change groups', $existing['name'] );
+        $this->assertSame( 'XTB change groups', $existing['name'] );
         $this->assertSame( 'content/view/full/' . (int) $article->mainNodeID(), $existing['url'] );
         $this->assertFalse( $existing['conflict'] );
         $this->assertCount( 2, $existing['fields'] );
@@ -275,17 +275,17 @@ class expAiVectorTest extends expAiT386VbCase
         $context2 = new expAiToolContext( expAiConfig::instance(), $folderNodeID, $other->conversation() );
         $context2->staged = true;
         $create = new expAiToolCreateDraft( 'create_draft' );
-        $create->execute( array( 'parent_node_id' => $folderNodeID, 'class_identifier' => 'article', 'fields' => array( 'title' => 'T386B proposed article' ) ), $context2 );
+        $create->execute( array( 'parent_node_id' => $folderNodeID, 'class_identifier' => 'article', 'fields' => array( 'title' => 'XTB proposed article' ) ), $context2 );
         $groups = expAiVector::changeGroups( $other );
         $this->assertCount( 1, $groups );
         $this->assertTrue( $groups[0]['is_new'] );
-        $this->assertSame( 'T386B proposed article', $groups[0]['name'], 'a new object is named after its proposed title' );
+        $this->assertSame( 'XTB proposed article', $groups[0]['name'], 'a new object is named after its proposed title' );
         $this->assertSame( '', $groups[0]['url'] );
         $this->assertNotSame( '', $groups[0]['parent_name'] );
 
         // the published version changes after staging: the group shows a conflict
         $published = eZContentObject::fetch( (int) $article->attribute( 'id' ) );
-        eZContentFunctions::updateAndPublishObject( $published, array( 'attributes' => array( 'title' => 'T386B changed meanwhile' ) ) );
+        eZContentFunctions::updateAndPublishObject( $published, array( 'attributes' => array( 'title' => 'XTB changed meanwhile' ) ) );
         $groups = expAiVector::changeGroups( expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ) );
         $this->assertTrue( $groups[0]['conflict'] );
         $this->assertTrue( (bool) array_filter( $groups[0]['fields'], function ( $f ) { return $f['base_changed']; } ) );
@@ -293,7 +293,7 @@ class expAiVectorTest extends expAiT386VbCase
 
     public function testDraftsListTheLoggedVersionsOnceAndNeverDiscardedOnes(): void
     {
-        $article = $this->article( 'T386B drafts' );
+        $article = $this->article( 'XTB drafts' );
         $objectID = (int) $article->attribute( 'id' );
         $this->cleanup( static function () use ( $objectID ) { eZPersistentObject::removeObject( expAiDraftLog::definition(), array( 'contentobject_id' => $objectID ) ); } );
         $thread = $this->thread( array( 'title' => 'drafts' ) );

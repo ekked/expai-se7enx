@@ -10,22 +10,22 @@
 
 require_once __DIR__ . '/expaicoretestcase.php';
 
-class expAiConfigTest extends expAiT386DCoreTestCase
+class expAiConfigTest extends expAiCoreTestCase
 {
     public function testFlagsListsAndNumbers(): void
     {
-        $config = $this->config( array( 'T386D' => array( 'On' => ' Yes ', 'Off' => 'no', 'One' => 'x', 'Empty' => '', 'List' => array( 'a', '', null, 'b' ),
+        $config = $this->config( array( 'XTD' => array( 'On' => ' Yes ', 'Off' => 'no', 'One' => 'x', 'Empty' => '', 'List' => array( 'a', '', null, 'b' ),
                                                           'Num' => '700', 'Bad' => 'many' ) ) );
-        $this->assertTrue( $config->flag( 'T386D', 'On' ) );
-        $this->assertFalse( $config->flag( 'T386D', 'Off', true ) );
-        $this->assertTrue( $config->flag( 'T386D', 'Missing', true ), 'a missing flag is its default' );
-        $this->assertSame( array( 'x' ), $config->arr( 'T386D', 'One' ), 'a single value is a list of one' );
-        $this->assertSame( array(), $config->arr( 'T386D', 'Empty' ) );
-        $this->assertSame( array( 'a', 'b' ), $config->arr( 'T386D', 'List' ) );
-        $this->assertSame( 600, $config->int( 'T386D', 'Num', 5, 1, 600 ) );
-        $this->assertSame( 5, $config->int( 'T386D', 'Bad', 5 ) );
-        $this->assertSame( 10, $config->int( 'T386D', 'Missing', 3, 10 ) );
-        $this->assertSame( 'fallback', $config->get( 'T386D', 'Missing', 'fallback' ) );
+        $this->assertTrue( $config->flag( 'XTD', 'On' ) );
+        $this->assertFalse( $config->flag( 'XTD', 'Off', true ) );
+        $this->assertTrue( $config->flag( 'XTD', 'Missing', true ), 'a missing flag is its default' );
+        $this->assertSame( array( 'x' ), $config->arr( 'XTD', 'One' ), 'a single value is a list of one' );
+        $this->assertSame( array(), $config->arr( 'XTD', 'Empty' ) );
+        $this->assertSame( array( 'a', 'b' ), $config->arr( 'XTD', 'List' ) );
+        $this->assertSame( 600, $config->int( 'XTD', 'Num', 5, 1, 600 ) );
+        $this->assertSame( 5, $config->int( 'XTD', 'Bad', 5 ) );
+        $this->assertSame( 10, $config->int( 'XTD', 'Missing', 3, 10 ) );
+        $this->assertSame( 'fallback', $config->get( 'XTD', 'Missing', 'fallback' ) );
     }
 
     public function testWritableDatatypesAndPlacement(): void
@@ -82,17 +82,17 @@ class expAiConfigTest extends expAiT386DCoreTestCase
         $this->assertTrue( expAiPolicy::allows( 'model_use', 'Provider', 'anything', $admin ) );
 
         // a user with a limited policy: a stub with the access the kernel would report
-        $limited = new expAiT386DAccessUser( array( 'accessWord' => 'limited', 'policies' => array(
+        $limited = new expAiCoreTestAccessUser( array( 'accessWord' => 'limited', 'policies' => array(
             array( 'Provider' => array( 'huggingface', 'local' ) ), array( 'Provider' => array( 'local' ) ) ) ) );
         $this->assertSame( array( 'huggingface', 'local' ), expAiPolicy::limitationValues( 'model_use', 'Provider', $limited ) );
         $this->assertTrue( expAiPolicy::allows( 'model_use', 'Provider', 'local', $limited ) );
         $this->assertFalse( expAiPolicy::allows( 'model_use', 'Provider', 'openrouter', $limited ) );
-        $open = new expAiT386DAccessUser( array( 'accessWord' => 'limited', 'policies' => array( array( 'Provider' => array( 'local' ) ), array( 'Node' => array( 2 ) ) ) ) );
+        $open = new expAiCoreTestAccessUser( array( 'accessWord' => 'limited', 'policies' => array( array( 'Provider' => array( 'local' ) ), array( 'Node' => array( 2 ) ) ) ) );
         $this->assertTrue( expAiPolicy::limitationValues( 'model_use', 'Provider', $open ), 'a policy without the limitation allows every value' );
-        $none = new expAiT386DAccessUser( array( 'accessWord' => 'no' ) );
+        $none = new expAiCoreTestAccessUser( array( 'accessWord' => 'no' ) );
         $this->assertFalse( expAiPolicy::limitationValues( 'model_use', 'Provider', $none ) );
         $this->assertFalse( expAiPolicy::allows( 'model_use', 'Provider', 'local', $none ) );
-        $emptyLimited = new expAiT386DAccessUser( array( 'accessWord' => 'limited', 'policies' => array() ) );
+        $emptyLimited = new expAiCoreTestAccessUser( array( 'accessWord' => 'limited', 'policies' => array() ) );
         $this->assertFalse( expAiPolicy::limitationValues( 'model_use', 'Provider', $emptyLimited ) );
     }
 
@@ -114,7 +114,7 @@ class expAiConfigTest extends expAiT386DCoreTestCase
     public function testPolicyMigrationRenamesOldFunctionNames(): void
     {
         $this->inTransaction();
-        $role = eZRole::create( 'expai t386d migration test ' . mt_rand() );
+        $role = eZRole::create( 'expai xtd migration test ' . mt_rand() );
         $role->store();
         $role->appendPolicy( 'expai', 'facts', array( 'Node' => array( 2 ) ) );
         $roleID = (int) $role->attribute( 'id' );
@@ -144,56 +144,56 @@ class expAiConfigTest extends expAiT386DCoreTestCase
     {
         $config = $this->useSettings( array(
             'WebBudget' => array( 'Seconds' => '2', 'MinSamples' => '3' ),
-            'ProviderSettings' => array( 'Providers' => array( 'anthropic', 't386dlocal' ) ),
-            'Provider_t386dlocal' => array( 'Type' => 'openai_chat', 'BaseURL' => 'http://127.0.0.1:9/v1', 'Managed' => 'ollama', 'ApiKey' => '' ),
-            'Model_t386dlocal.small' => array( 'Provider' => 't386dlocal', 'Id' => 'small', 'Label' => 'Small local' ),
-            'Model_anthropic.t386d-always' => array( 'Provider' => 'anthropic', 'Id' => 'x', 'RunInBackground' => 'always' ),
-            'Model_anthropic.t386d-never' => array( 'Provider' => 'anthropic', 'Id' => 'y', 'RunInBackground' => 'never', 'Slow' => 'true' ),
-            'Model_anthropic.t386d-measured' => array( 'Provider' => 'anthropic', 'Id' => 'z', 'Label' => 'Measured' ),
+            'ProviderSettings' => array( 'Providers' => array( 'anthropic', 'xtdlocal' ) ),
+            'Provider_xtdlocal' => array( 'Type' => 'openai_chat', 'BaseURL' => 'http://127.0.0.1:9/v1', 'Managed' => 'ollama', 'ApiKey' => '' ),
+            'Model_xtdlocal.small' => array( 'Provider' => 'xtdlocal', 'Id' => 'small', 'Label' => 'Small local' ),
+            'Model_anthropic.xtd-always' => array( 'Provider' => 'anthropic', 'Id' => 'x', 'RunInBackground' => 'always' ),
+            'Model_anthropic.xtd-never' => array( 'Provider' => 'anthropic', 'Id' => 'y', 'RunInBackground' => 'never', 'Slow' => 'true' ),
+            'Model_anthropic.xtd-measured' => array( 'Provider' => 'anthropic', 'Id' => 'z', 'Label' => 'Measured' ),
         ) );
         $this->assertSame( 2, expAiWebBudget::seconds( $config ) );
         $this->assertSame( '', expAiWebBudget::reason( 'no.such.model', $config ) );
-        $this->assertSame( 'setting', expAiWebBudget::reason( 'anthropic.t386d-always', $config ) );
-        $this->assertSame( '', expAiWebBudget::reason( 'anthropic.t386d-never', $config ), 'the model\'s own setting wins over Slow' );
-        $this->assertSame( 'slow', expAiWebBudget::reason( 't386dlocal.small', $config ), 'a managed local server is slow' );
-        $this->assertSame( 'measured', expAiWebBudget::reason( 'anthropic.t386d-measured', $config, 5.0 ) );
-        $this->assertSame( '', expAiWebBudget::reason( 'anthropic.t386d-measured', $config, 1.0 ) );
+        $this->assertSame( 'setting', expAiWebBudget::reason( 'anthropic.xtd-always', $config ) );
+        $this->assertSame( '', expAiWebBudget::reason( 'anthropic.xtd-never', $config ), 'the model\'s own setting wins over Slow' );
+        $this->assertSame( 'slow', expAiWebBudget::reason( 'xtdlocal.small', $config ), 'a managed local server is slow' );
+        $this->assertSame( 'measured', expAiWebBudget::reason( 'anthropic.xtd-measured', $config, 5.0 ) );
+        $this->assertSame( '', expAiWebBudget::reason( 'anthropic.xtd-measured', $config, 1.0 ) );
 
         // measured from the usage log: at least MinSamples successful requests
-        $this->assertNull( expAiWebBudget::measuredSeconds( 'anthropic.t386d-measured', $config ) );
+        $this->assertNull( expAiWebBudget::measuredSeconds( 'anthropic.xtd-measured', $config ) );
         foreach ( array( 4000, 5000, 6000 ) as $ms )
-            $this->usage( array( 'model_alias' => 'anthropic.t386d-measured', 'latency_ms' => $ms ) );
-        $this->usage( array( 'model_alias' => 'anthropic.t386d-measured', 'latency_ms' => 99000, 'error_class' => 'timeout' ) );
-        $this->assertEqualsWithDelta( 5.0, expAiWebBudget::measuredSeconds( 'anthropic.t386d-measured', $config ), 0.001, 'failed requests do not count' );
-        $this->assertFalse( expAiWebBudget::fits( 'anthropic.t386d-measured', $config ) );
+            $this->usage( array( 'model_alias' => 'anthropic.xtd-measured', 'latency_ms' => $ms ) );
+        $this->usage( array( 'model_alias' => 'anthropic.xtd-measured', 'latency_ms' => 99000, 'error_class' => 'timeout' ) );
+        $this->assertEqualsWithDelta( 5.0, expAiWebBudget::measuredSeconds( 'anthropic.xtd-measured', $config ), 0.001, 'failed requests do not count' );
+        $this->assertFalse( expAiWebBudget::fits( 'anthropic.xtd-measured', $config ) );
 
         // a web request refuses, the command line does not
         $method = isset( $_SERVER['REQUEST_METHOD'] ) ? $_SERVER['REQUEST_METHOD'] : null;
         $this->cleanup( static function () use ( $method ) { if ( $method === null ) unset( $_SERVER['REQUEST_METHOD'] ); else $_SERVER['REQUEST_METHOD'] = $method; } );
         unset( $_SERVER['REQUEST_METHOD'] );
         $this->assertFalse( expAiWebBudget::inWebRequest() );
-        expAiWebBudget::assertFits( 'anthropic.t386d-measured', 'field', $config );
+        expAiWebBudget::assertFits( 'anthropic.xtd-measured', 'field', $config );
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $this->assertTrue( expAiWebBudget::inWebRequest() );
-        expAiWebBudget::assertFits( 'anthropic.t386d-never', 'field', $config );
-        $field = $this->expectFailure( function () use ( $config ) { expAiWebBudget::assertFits( 'anthropic.t386d-measured', 'field', $config ); } );
+        expAiWebBudget::assertFits( 'anthropic.xtd-never', 'field', $config );
+        $field = $this->expectFailure( function () use ( $config ) { expAiWebBudget::assertFits( 'anthropic.xtd-measured', 'field', $config ); } );
         $this->assertStringContainsString( 'too slow for field actions', $field->getMessage() );
         $this->assertSame( array( '%model' => 'Measured', '%seconds' => 2 ), $field->arguments() );
         $this->assertSame( 'web budget: measured', $field->detail() );
-        $test = $this->expectFailure( function () use ( $config ) { expAiWebBudget::assertFits( 't386dlocal.small', 'test', $config ); } );
+        $test = $this->expectFailure( function () use ( $config ) { expAiWebBudget::assertFits( 'xtdlocal.small', 'test', $config ); } );
         $this->assertStringContainsString( 'too slow to be tested', $test->getMessage() );
         $this->assertSame( 'web budget: slow', $test->detail() );
     }
 }
 
 /** A user whose access to expai is what the test says (the kernel's hasAccessTo() answer) */
-class expAiT386DAccessUser extends eZUser
+class expAiCoreTestAccessUser extends eZUser
 {
     private $access;
 
     public function __construct( array $access )
     {
-        parent::__construct( array( 'contentobject_id' => 987654321, 'login' => 't386d' ) );
+        parent::__construct( array( 'contentobject_id' => 987654321, 'login' => 'xtd' ) );
         $this->access = $access;
     }
 

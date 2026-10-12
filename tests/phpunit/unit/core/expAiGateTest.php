@@ -10,7 +10,7 @@
 
 require_once __DIR__ . '/expaicoretestcase.php';
 
-class expAiGateTest extends expAiT386DCoreTestCase
+class expAiGateTest extends expAiCoreTestCase
 {
     /** @var array listener ids of ezpEvent */
     private $listeners = array();
@@ -25,11 +25,11 @@ class expAiGateTest extends expAiT386DCoreTestCase
 
     public function testTheMasterSwitch(): void
     {
-        $config = $this->useSettings( array( 'AISettings' => array( 'Enabled' => 'true', 'DisabledSiteAccesses' => array( 't386d_site' ) ) ) );
+        $config = $this->useSettings( array( 'AISettings' => array( 'Enabled' => 'true', 'DisabledSiteAccesses' => array( 'xtd_site' ) ) ) );
         $this->assertSame( '', expAiGate::switchedOff( $config, 'admin' ) );
-        $this->assertSame( 'Exponential Intelligence is switched off on this site.', expAiGate::switchedOff( $config, 't386d_site' ) );
+        $this->assertSame( 'Exponential Intelligence is switched off on this site.', expAiGate::switchedOff( $config, 'xtd_site' ) );
         $this->assertTrue( ( new expAiGate() )->fetchSwitchedOn()['result'] === ( expAiGate::switchedOff() === '' ) );
-        $e = $this->expectFailure( function () use ( $config ) { expAiGate::check( array( 'siteaccess' => 't386d_site', 'purpose' => 'test' ), $config ); } );
+        $e = $this->expectFailure( function () use ( $config ) { expAiGate::check( array( 'siteaccess' => 'xtd_site', 'purpose' => 'test' ), $config ); } );
         $this->assertSame( 'master switch: [AISettings] DisabledSiteAccesses[]', $e->detail() );
         $off = $this->config( array( 'AISettings' => array( 'Enabled' => 'false' ) ) );
         $e = $this->expectFailure( function () use ( $off ) { expAiGate::check( array( 'purpose' => 'test' ), $off ); } );
@@ -147,9 +147,9 @@ class expAiGateTest extends expAiT386DCoreTestCase
             $job->store();
             return $job;
         };
-        $make( 't386d_off' );
+        $make( 'xtd_off' );
         $make( 'admin' );
-        $config = $this->config( array( 'AISettings' => array( 'Enabled' => 'true', 'DisabledSiteAccesses' => array( 't386d_off' ) ) ) );
+        $config = $this->config( array( 'AISettings' => array( 'Enabled' => 'true', 'DisabledSiteAccesses' => array( 'xtd_off' ) ) ) );
         $result = expAiGate::resumeHeld( $config, 500 );
         $this->assertSame( array( 'resumed' => 1, 'still_held' => 1 ), $result, 'the job of the siteaccess that is still off stays held' );
         $this->assertSame( array( 'resumed' => 0, 'still_held' => 1 ), expAiGate::resumeHeld( $config, 500 ), 'the resumed job is no longer held' );

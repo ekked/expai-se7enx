@@ -9,13 +9,13 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expait386ccontenttestcase.php';
+require_once __DIR__ . '/expaicontenttestcase.php';
 
-class expAiAltTextTest extends expAiT386CContentTestCase
+class expAiAltTextTest extends expAiContentTestCase
 {
     private static function answer( $alt, $decorative = false, $note = 'looks red' )
     {
-        return expAiT386CStubProvider::text( json_encode( array( 'alt_text' => $alt, 'decorative' => $decorative, 'note' => $note ) ) );
+        return expAiContentStubProvider::text( json_encode( array( 'alt_text' => $alt, 'decorative' => $decorative, 'note' => $note ) ) );
     }
 
     public function testAskTheModelAboutAStoredImage(): void
@@ -24,7 +24,7 @@ class expAiAltTextTest extends expAiT386CContentTestCase
                                                                            'MaxLength' => '150', 'ExtraInstructions' => 'Mention the brand colours.' ) ) );
         $folder = $this->folder();
         $this->asUser( 'admin' );
-        $image = $this->image( (int) $folder->attribute( 'node_id' ), 'T386 red square' );
+        $image = $this->image( (int) $folder->attribute( 'node_id' ), 'XT red square' );
         $this->assertTrue( expAiAltText::enabled( $config ) );
         $this->assertSame( array( self::ALIAS ), expAiAltText::visionModels( $config ) );
         $choice = expAiAltText::chooseModel( $config, $image );
@@ -37,26 +37,26 @@ class expAiAltTextTest extends expAiT386CContentTestCase
         $input = expAiImageInput::fromAttribute( $attribute, expAiImageInput::limitsFor( $config, self::PROVIDER ), 'original' );
         $this->assertSame( array( 64, 48 ), array( $input->facts()['width'], $input->facts()['height'] ) );
 
-        expAiT386CStubProvider::$answers = array( self::answer( 'Image of a red square on white' ) );
-        $result = expAiAltText::suggest( $config, $image, $attribute, self::SOURCE, array( 'name' => 'T386 red square' ), 'old alt' );
+        expAiContentStubProvider::$answers = array( self::answer( 'Image of a red square on white' ) );
+        $result = expAiAltText::suggest( $config, $image, $attribute, self::SOURCE, array( 'name' => 'XT red square' ), 'old alt' );
         $this->assertSame( array( 'A red square on white', false, 'looks red', self::ALIAS ), array( $result['value'], $result['decorative'], $result['note'], $result['alias'] ) );
         $this->assertGreaterThan( 0, $result['tokens']['image'] );
         $this->assertGreaterThan( 0, $result['usage_log_id'] );
-        $request = expAiT386CStubProvider::$requests[0];
+        $request = expAiContentStubProvider::$requests[0];
         $this->assertSame( 'image', $request['messages'][0]['content'][0]['type'] );
         $this->assertStringContainsString( 'The current alt text (improve it if it breaks the rules): old alt', $request['messages'][0]['content'][1]['text'] );
         $row = eZPersistentObject::fetchObject( expAiUsageLog::definition(), null, array( 'id' => $result['usage_log_id'] ) );
         $this->assertSame( array( 'field:alt_text', self::PROVIDER ), array( (string) $row->attribute( 'action' ), (string) $row->attribute( 'provider' ) ) );
         $this->assertStringContainsString( 'image_tokens', (string) $row->attribute( 'tool_calls' ), 'the log shows the image by its facts, not its pixels' );
 
-        expAiT386CStubProvider::$answers = array( expAiT386CStubProvider::text( 'no', 'refusal' ) );
+        expAiContentStubProvider::$answers = array( expAiContentStubProvider::text( 'no', 'refusal' ) );
         $this->assertRefused( function () use ( $config, $image, $attribute ) { expAiAltText::suggest( $config, $image, $attribute, self::SOURCE, array() ); }, 'declined' );
-        expAiT386CStubProvider::$answers = array( expAiT386CStubProvider::text( 'a red square' ) );
+        expAiContentStubProvider::$answers = array( expAiContentStubProvider::text( 'a red square' ) );
         $this->assertRefused( function () use ( $config, $image, $attribute ) { expAiAltText::suggest( $config, $image, $attribute, self::SOURCE, array() ); }, 'could not be read' );
 
         $config->ini()->setVariable( 'AltTextSettings', 'ImageZeroRetention', 'enabled' );
         $config->ini()->setVariable( 'Provider_' . self::PROVIDER, 'Retention', '30d' );
-        $this->assertRefused( function () use ( $config, $image ) { expAiAltText::chooseModel( $config, $image ); }, 'keeps the image of "T386 red square"' );
+        $this->assertRefused( function () use ( $config, $image ) { expAiAltText::chooseModel( $config, $image ); }, 'keeps the image of "XT red square"' );
         $config->ini()->setVariable( 'AltTextSettings', 'Enabled', 'disabled' );
         $this->assertRefused( function () use ( $config, $image, $attribute ) { expAiAltText::suggest( $config, $image, $attribute, self::SOURCE, array() ); }, 'switched off' );
     }
@@ -109,10 +109,10 @@ class expAiAltTextTest extends expAiT386CContentTestCase
         $this->assertStringContainsString( '(' . self::SOURCE . ')', $handler->describe( $job ) );
 
         // the job as a worker runs it: claimed, the model asked, the draft written
-        eZDB::instance()->query( "UPDATE expqueue_job SET state = 'running', lease_owner = 't386c', lease_until = " . ( time() + 600 ) . ' WHERE id = ' . (int) $job->attribute( 'id' ) );
+        eZDB::instance()->query( "UPDATE expqueue_job SET state = 'running', lease_owner = 'xtc', lease_until = " . ( time() + 600 ) . ' WHERE id = ' . (int) $job->attribute( 'id' ) );
         $job = expQueue::fetch( $jobRow[0]['uuid'] );
-        $context = new expQueueContext( $job, 't386c' );
-        expAiT386CStubProvider::$answers = array( self::answer( 'Photo of a red square' ) );
+        $context = new expQueueContext( $job, 'xtc' );
+        expAiContentStubProvider::$answers = array( self::answer( 'Photo of a red square' ) );
         $result = $handler->run( $job, $context );
         $this->assertSame( 'done', $result->outcome, $result->message );
         $this->assertSame( 'A red square', $result->data['value'] );
@@ -124,10 +124,10 @@ class expAiAltTextTest extends expAiT386CContentTestCase
         $this->assertSame( 'A red square', $context->checkpoint()['answer']['value'], 'the answer is kept before the draft is written' );
 
         // a rerun after a crash: the checkpoint is written again, the model is not asked
-        $requests = count( expAiT386CStubProvider::$requests );
+        $requests = count( expAiContentStubProvider::$requests );
         $rerun = $handler->run( $job, $context );
         $this->assertSame( 'done', $rerun->outcome );
-        $this->assertSame( $requests, count( expAiT386CStubProvider::$requests ) );
+        $this->assertSame( $requests, count( expAiContentStubProvider::$requests ) );
 
         // a decorative image gets no draft
         $context->saveCheckpoint( array( 'answer' => array( 'value' => '', 'decorative' => true, 'note' => '', 'model' => 'm', 'cost_micros' => 0, 'image' => array( 'image_tokens' => 1 ) ) ) );
@@ -136,9 +136,9 @@ class expAiAltTextTest extends expAiT386CContentTestCase
         $context->saveCheckpoint( array() );
 
         // the model fails: retry on 429, fail otherwise
-        expAiT386CStubProvider::$answers = array( new expAiException( 'Too many requests', 'rate limit', 429 ) );
+        expAiContentStubProvider::$answers = array( new expAiException( 'Too many requests', 'rate limit', 429 ) );
         $this->assertSame( 'retry', $handler->run( $job, $context )->outcome );
-        expAiT386CStubProvider::$answers = array( new expAiException( 'Bad request', 'broken', 400 ) );
+        expAiContentStubProvider::$answers = array( new expAiException( 'Bad request', 'broken', 400 ) );
         $failed = $handler->run( $job, $context );
         $this->assertSame( array( 'fail', 'alttext' ), array( $failed->outcome, $failed->errorClass ) );
 
@@ -189,7 +189,7 @@ class expAiAltTextTest extends expAiT386CContentTestCase
                                               'EditViewSettings' => array( 'Enabled' => 'enabled' ) ) );
         $folder = $this->folder();
         $this->asUser( 'admin' );
-        $image = $this->image( (int) $folder->attribute( 'node_id' ), 'T386 edit form' );
+        $image = $this->image( (int) $folder->attribute( 'node_id' ), 'XT edit form' );
         $imageID = (int) $image->attribute( 'id' );
         $draft = $image->createNewVersion();
         $versionNo = (int) $draft->attribute( 'version' );
@@ -201,9 +201,9 @@ class expAiAltTextTest extends expAiT386CContentTestCase
         $this->assertFalse( expAiAltTextFunctionCollection::fetchModel( null )['result']['available'] );
 
         // the ezjscore function of the button
-        expAiT386CStubProvider::$answers = array( self::answer( 'A red square', true, 'maybe a divider' ) );
+        expAiContentStubProvider::$answers = array( self::answer( 'A red square', true, 'maybe a divider' ) );
         self::post( array( 'object_id' => $imageID, 'version' => $versionNo, 'language' => self::SOURCE, 'attribute_id' => (int) $attribute->attribute( 'id' ),
-                           'value' => '', 'context' => json_encode( array( 'name' => 'T386 edit form' ) ) ) );
+                           'value' => '', 'context' => json_encode( array( 'name' => 'XT edit form' ) ) ) );
         $answer = expAiAltTextServerFunctions::suggest( array() );
         $this->assertSame( array( 'A red square', true, 'maybe a divider', 'Stub model' ), array( $answer['value'], $answer['decorative'], $answer['note'], $answer['model_label'] ) );
         $this->assertSame( 64, $answer['image']['width'] );
@@ -226,7 +226,7 @@ class expAiAltTextTest extends expAiT386CContentTestCase
         $request->language = self::SOURCE;
         $request->context = array();
         $request->value = '';
-        expAiT386CStubProvider::$answers = array( self::answer( 'Picture of a red square' ) );
+        expAiContentStubProvider::$answers = array( self::answer( 'Picture of a red square' ) );
         $run = $action->run( $request, $config->registry()->providerFor( self::ALIAS ) );
         $this->assertSame( 'A red square', $run['value'] );
         $config->ini()->setVariable( 'Provider_' . self::PROVIDER, 'Region', 'us' );

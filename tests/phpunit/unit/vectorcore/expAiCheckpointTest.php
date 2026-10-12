@@ -8,9 +8,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expaivbfixture.php';
+require_once __DIR__ . '/expaivectorcoretestcase.php';
 
-class expAiCheckpointTest extends expAiT386VbCase
+class expAiCheckpointTest extends expAiVectorCoreTestCase
 {
     public function testNoCheckpointWhenSwitchedOffOrWithoutConversation(): void
     {

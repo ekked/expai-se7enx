@@ -7,9 +7,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expait386ehelpers.php';
+require_once __DIR__ . '/expaiprovidertesthelpers.php';
 
-class expAiHttpClientTest extends expAiT386ETestCase
+class expAiHttpClientTest extends expAiProviderTestCase
 {
     /** @var string */
     private static $url;
@@ -24,7 +24,7 @@ class expAiHttpClientTest extends expAiT386ETestCase
 
     public static function setUpBeforeClass(): void
     {
-        $docroot = self::$docroot = expAiTestMockServer::tmp( 't386e-http' );
+        $docroot = self::$docroot = expAiTestMockServer::tmp( 'xte-http' );
         file_put_contents( $docroot . '/echo.php', '<?php header( "X-Ratelimit-Remaining: 7" ); header( "X-Other: no" ); header( "Content-Type: application/json" );'
             . ' echo json_encode( array( "method" => $_SERVER["REQUEST_METHOD"], "type" => isset( $_SERVER["CONTENT_TYPE"] ) ? $_SERVER["CONTENT_TYPE"] : "",'
             . ' "accept" => $_SERVER["HTTP_ACCEPT"], "body" => file_get_contents( "php://input" ), "agent" => $_SERVER["HTTP_USER_AGENT"] ) );' );

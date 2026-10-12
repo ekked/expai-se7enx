@@ -8,16 +8,16 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expaivbfixture.php';
+require_once __DIR__ . '/expaivectorcoretestcase.php';
 
-class expAiChangeStagerTest extends expAiT386VbCase
+class expAiChangeStagerTest extends expAiVectorCoreTestCase
 {
     /** @return array( expAiChangeStager, expAiThread, eZContentObject article, int folder node ) */
     private function stager( array $scope = array(), $title = 'stager' )
     {
-        $article = $this->article( 'T386B stager article', array( 'Alpha sentence.', 'Beta sentence.' ) );
+        $article = $this->article( 'XTB stager article', array( 'Alpha sentence.', 'Beta sentence.' ) );
         $folderNodeID = (int) eZContentObjectTreeNode::fetch( $article->mainNodeID() )->attribute( 'parent_node_id' );
-        $thread = $this->thread( array( 'title' => $title, 'model_alias' => 't386b.stub',
+        $thread = $this->thread( array( 'title' => $title, 'model_alias' => 'xtb.stub',
                                         'scope' => $scope ?: array( 'nodes' => array( (int) $article->mainNodeID() ) ) ) );
         $context = new expAiToolContext( expAiConfig::instance(), $folderNodeID, $thread->conversation() );
         $context->staged = true;
@@ -66,7 +66,7 @@ class expAiChangeStagerTest extends expAiT386VbCase
 
     public function testScopeOfNodesObjectsAndLanguages(): void
     {
-        $article = $this->article( 'T386B scope article' );
+        $article = $this->article( 'XTB scope article' );
         $node = $article->mainNode();
         $folderNodeID = (int) $node->attribute( 'parent_node_id' );
         $any = $this->thread( array( 'title' => 'any scope' ) );
@@ -132,14 +132,14 @@ class expAiChangeStagerTest extends expAiT386VbCase
     public function testStageUpdateRefusals(): void
     {
         list( $stager, $thread, $article ) = $this->stager( array(), 'refusals' );
-        $other = $this->publish( (int) $article->mainNode()->attribute( 'parent_node_id' ), array( 'title' => 'T386B other article' ) );
+        $other = $this->publish( (int) $article->mainNode()->attribute( 'parent_node_id' ), array( 'title' => 'XTB other article' ) );
         $this->assertSame( 'Object ' . (int) $other->attribute( 'id' ) . ' lies outside the scope of this thread.',
                            self::error( function () use ( $stager, $other ) { $stager->stageUpdate( $other, '', array( 'title' => 'X' ) ); } ) );
         $this->assertSame( 'Give the fields to write.', self::error( function () use ( $stager, $article ) { $stager->stageUpdate( $article, '', array() ); } ) );
         $this->assertStringStartsWith( 'Unknown field(s) nofield.', self::error( function () use ( $stager, $article ) { $stager->stageUpdate( $article, '', array( 'nofield' => 'x' ) ); } ) );
         $this->assertStringStartsWith( 'Nothing was staged: title:', self::error( function () use ( $stager, $article ) {
             $stager->stageUpdate( $article, '', array( 'title' => array( 'not', 'a string' ) ) ); } ) );
-        $result = $stager->stageUpdate( $article, '', array( 'image' => '12', 'title' => 'T386B stager article' ) );
+        $result = $stager->stageUpdate( $article, '', array( 'image' => '12', 'title' => 'XTB stager article' ) );
         $this->assertArrayHasKey( 'image', $result['skipped'] );
         $this->assertSame( array( 'title' ), $result['unchanged'] );
         $this->assertSame( 'nothing to stage: the values equal the published version', $result['status'] );
@@ -155,15 +155,15 @@ class expAiChangeStagerTest extends expAiT386VbCase
     public function testTheLimitOfStagedChangesAndAProposalEqualToThePublishedValue(): void
     {
         list( $stager, $thread, $article ) = $this->stager( array(), 'limit' );
-        $first = $stager->stageUpdate( $article, '', array( 'title' => 'T386B stager article (new)' ) );
+        $first = $stager->stageUpdate( $article, '', array( 'title' => 'XTB stager article (new)' ) );
         $this->assertCount( 1, $first['change_ids'] );
         $this->assertStringStartsWith( 'staged for the editor', $first['status'] );
         // the same proposal as the published value again: the earlier proposal of the field goes stale
-        $back = $stager->stageUpdate( $article, '', array( 'title' => 'T386B stager article' ) );
+        $back = $stager->stageUpdate( $article, '', array( 'title' => 'XTB stager article' ) );
         $this->assertSame( array( 'title' ), $back['unchanged'] );
         $this->assertSame( 'stale', expAiChange::fetchByID( $first['change_ids'][0] )->attribute( 'decision' ) );
 
-        $stager->stageUpdate( $article, '', array( 'title' => 'T386B stager article (again)' ) );
+        $stager->stageUpdate( $article, '', array( 'title' => 'XTB stager article (again)' ) );
         $this->ini( 'VectorSettings', 'MaxStagedChanges', '1' );
         $this->assertSame( 'This thread has 1 staged changes waiting. Ask the editor to review them first.',
                            self::error( function () use ( $stager, $article ) { $stager->stageUpdate( $article, '', array( 'short_title' => 'Short' ) ); } ) );
@@ -223,22 +223,22 @@ class expAiChangeStagerTest extends expAiT386VbCase
         $context = new expAiToolContext( expAiConfig::instance(), $folderNodeID, $open->conversation() );
         $context->staged = true;
         $create = expAiChangeStager::forContext( $context );
-        $first = $create->stageCreate( $folder, 'article', array( 'title' => 'T386B new one' ), '' );
+        $first = $create->stageCreate( $folder, 'article', array( 'title' => 'XTB new one' ), '' );
         $this->assertMatchesRegularExpression( '/^[a-f0-9]{16}$/', $first['new_key'] );
-        $again = $create->stageCreate( $folder, 'article', array( 'title' => 'T386B new one, renamed' ), '', $first['new_key'] );
+        $again = $create->stageCreate( $folder, 'article', array( 'title' => 'XTB new one, renamed' ), '', $first['new_key'] );
         $this->assertSame( $first['new_key'], $again['new_key'] );
         $this->assertSame( $first['change_ids'], $again['change_ids'], 'the same change is updated' );
-        $this->assertSame( 'T386B new one, renamed', expAiChange::fetchByID( $again['change_ids'][0] )->attribute( 'proposed' ) );
-        $this->assertStringStartsWith( 'This is bulk work', self::error( function () use ( $create, $folder ) { $create->stageCreate( $folder, 'article', array( 'title' => 'T386B' ), '', 'abcdef0123456789' ); } ), 'an unknown key is a second new object' );
+        $this->assertSame( 'XTB new one, renamed', expAiChange::fetchByID( $again['change_ids'][0] )->attribute( 'proposed' ) );
+        $this->assertStringStartsWith( 'This is bulk work', self::error( function () use ( $create, $folder ) { $create->stageCreate( $folder, 'article', array( 'title' => 'XTB' ), '', 'abcdef0123456789' ); } ), 'an unknown key is a second new object' );
         $this->ini( 'VectorSettings', 'BulkObjectThreshold', '5' );
-        $unknownKey = $create->stageCreate( $folder, 'article', array( 'title' => 'T386B' ), '', 'abcdef0123456789' );
+        $unknownKey = $create->stageCreate( $folder, 'article', array( 'title' => 'XTB' ), '', 'abcdef0123456789' );
         $this->assertNotSame( 'abcdef0123456789', $unknownKey['new_key'] );
     }
 
     public function testRestageAndEditHunk(): void
     {
         list( $stager, $thread, $article ) = $this->stager( array(), 'restage' );
-        $result = $stager->stageUpdate( $article, '', array( 'title' => 'T386B stager article, new', 'intro' => '<p>Alpha sentence, new.</p><p>Beta sentence.</p>' ) );
+        $result = $stager->stageUpdate( $article, '', array( 'title' => 'XTB stager article, new', 'intro' => '<p>Alpha sentence, new.</p><p>Beta sentence.</p>' ) );
         $changes = array();
         foreach ( $result['change_ids'] as $id )
         {
@@ -250,10 +250,10 @@ class expAiChangeStagerTest extends expAiT386VbCase
         $title = $changes['title'];
         $this->assertSame( 'This part of the change cannot be edited.', self::error( function () use ( $title ) { expAiChangeStager::editHunk( $title, 'nohunk', 'y' ); } ) );
         $hunk = $title->hunks()[0];
-        $edited = expAiChangeStager::editHunk( $title, $hunk['id'], "T386B stager article,\n edited" );
-        $this->assertSame( 'T386B stager article, edited', $edited->attribute( 'proposed' ) );
+        $edited = expAiChangeStager::editHunk( $title, $hunk['id'], "XTB stager article,\n edited" );
+        $this->assertSame( 'XTB stager article, edited', $edited->attribute( 'proposed' ) );
         $this->assertTrue( (bool) array_filter( $edited->hunks(), function ( $h ) { return $h['edited'] && $h['decision'] === 'accepted'; } ) );
-        $back = expAiChangeStager::editHunk( $edited, $edited->hunks()[0]['id'], 'T386B stager article' );
+        $back = expAiChangeStager::editHunk( $edited, $edited->hunks()[0]['id'], 'XTB stager article' );
         $this->assertSame( 'stale', $back->attribute( 'decision' ), 'edited back to the published value: nothing left' );
 
         $applied = expAiChange::fetchByID( (int) $title->attribute( 'id' ) );
@@ -261,9 +261,9 @@ class expAiChangeStagerTest extends expAiT386VbCase
         $this->assertSame( 'This change can no longer be edited.', self::error( function () use ( $applied ) { expAiChangeStager::editHunk( $applied, 'x', 'y' ); } ) );
 
         // the published version changes: editing is refused until it is restaged against it
-        $fresh = $stager->stageUpdate( $article, '', array( 'title' => 'T386B stager article, third' ) );
+        $fresh = $stager->stageUpdate( $article, '', array( 'title' => 'XTB stager article, third' ) );
         $title = expAiChange::fetchByID( $fresh['change_ids'][0] );
-        eZContentFunctions::updateAndPublishObject( eZContentObject::fetch( (int) $article->attribute( 'id' ) ), array( 'attributes' => array( 'title' => 'T386B changed elsewhere' ) ) );
+        eZContentFunctions::updateAndPublishObject( eZContentObject::fetch( (int) $article->attribute( 'id' ) ), array( 'attributes' => array( 'title' => 'XTB changed elsewhere' ) ) );
         $this->assertTrue( $title->baseChanged() );
         $this->assertSame( 'The content changed since this was proposed. Review it against the current version first.',
                            self::error( function () use ( $title ) { expAiChangeStager::editHunk( $title, 'x', 'y' ); } ) );

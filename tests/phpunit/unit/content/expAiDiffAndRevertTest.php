@@ -8,9 +8,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expait386ccontenttestcase.php';
+require_once __DIR__ . '/expaicontenttestcase.php';
 
-class expAiDiffAndRevertTest extends expAiT386CContentTestCase
+class expAiDiffAndRevertTest extends expAiContentTestCase
 {
     public function testTheResultOfAComparisonOfValues(): void
     {
@@ -59,20 +59,20 @@ class expAiDiffAndRevertTest extends expAiT386CContentTestCase
         $this->siteSettings();
         $folder = $this->folder();
         $this->asUser( 'admin' );
-        $object = $this->article( (int) $folder->attribute( 'node_id' ), 'T386 write', '<paragraph>Intro</paragraph>', '<paragraph>Body</paragraph>' );
-        $url = eZURL::registerURL( 'https://example.org/t386-write' );
+        $object = $this->article( (int) $folder->attribute( 'node_id' ), 'XT write', '<paragraph>Intro</paragraph>', '<paragraph>Body</paragraph>' );
+        $url = eZURL::registerURL( 'https://example.org/xt-write' );
         $result = expAiDiff::writeDraft( $object, self::SOURCE, array(
             'nothing' => 'x',
             'intro' => '<section><paragraph>broken',
             'body' => self::xml( '<paragraph>See <link url_id="' . (int) $url . '">our page</link>.</paragraph>' ),
-            'title' => 'T386 written' ), array( 'intro' => 'ezxmltext', 'body' => 'ezxmltext' ), array( 'source' => 'test', 'prompt_summary' => 'T386' ) );
+            'title' => 'XT written' ), array( 'intro' => 'ezxmltext', 'body' => 'ezxmltext' ), array( 'source' => 'test', 'prompt_summary' => 'XT' ) );
         $this->assertSame( 'no such attribute', $result['errors']['nothing'] );
         $this->assertSame( 'the rich text is not well-formed', $result['errors']['intro'] );
         $this->assertContains( 'body', $result['written'] );
         $this->assertContains( 'title', $result['written'] );
         $this->assertTrue( $result['created'] );
         $log = expAiDraftRevert::writtenBy( (int) $object->attribute( 'id' ), $result['version'] );
-        $this->assertSame( array( 'test', 'T386' ), array( (string) $log->attribute( 'source' ), (string) $log->attribute( 'prompt_summary' ) ) );
+        $this->assertSame( array( 'test', 'XT' ), array( (string) $log->attribute( 'source' ), (string) $log->attribute( 'prompt_summary' ) ) );
         $links = eZURLObjectLink::hasObjectLinkList( (int) $url );
         $this->assertTrue( (bool) $links, 'the link of the rich text is registered for the draft' );
         // the rich text only: the name is updated, no plain field written
@@ -86,9 +86,9 @@ class expAiDiffAndRevertTest extends expAiT386CContentTestCase
         $this->siteSettings();
         $folder = $this->folder();
         $admin = $this->asUser( 'admin' );
-        $object = $this->article( (int) $folder->attribute( 'node_id' ), 'T386 revert', '<paragraph>First.</paragraph><paragraph>Second.</paragraph>', '<paragraph>Body</paragraph>' );
+        $object = $this->article( (int) $folder->attribute( 'node_id' ), 'XT revert', '<paragraph>First.</paragraph><paragraph>Second.</paragraph>', '<paragraph>Body</paragraph>' );
         $objectID = (int) $object->attribute( 'id' );
-        $write = expAiDiff::writeDraft( $object, self::SOURCE, array( 'title' => 'T386 revert changed', 'intro' => self::xml( '<paragraph>First, changed.</paragraph><paragraph>Second.</paragraph>' ) ),
+        $write = expAiDiff::writeDraft( $object, self::SOURCE, array( 'title' => 'XT revert changed', 'intro' => self::xml( '<paragraph>First, changed.</paragraph><paragraph>Second.</paragraph>' ) ),
                                         array( 'title' => 'ezstring', 'intro' => 'ezxmltext' ), array( 'source' => 'panel' ) );
         $draftNo = (int) $write['version'];
 
@@ -117,7 +117,7 @@ class expAiDiffAndRevertTest extends expAiT386CContentTestCase
         $done = $revert->revert( array(), array( 'title' ), $seen );
         $this->assertSame( array( 'reverted', array( 'title' ), 1 ), array( $done['status'], $done['written'], $done['reverted'] ) );
         $map = eZContentObject::fetch( $objectID )->fetchDataMap( $draftNo, self::SOURCE );
-        $this->assertSame( 'T386 revert', $map['title']->toString() );
+        $this->assertSame( 'XT revert', $map['title']->toString() );
         $this->assertCount( 1, $done['changes']['fields'], 'only the intro is still changed' );
 
         // the draft published: no longer a draft
@@ -132,9 +132,9 @@ class expAiDiffAndRevertTest extends expAiT386CContentTestCase
         $this->siteSettings();
         $folder = $this->folder();
         $this->asUser( 'admin' );
-        $object = $this->article( (int) $folder->attribute( 'node_id' ), 'T386 new translation', '<paragraph>Intro</paragraph>', '<paragraph>Body</paragraph>' );
+        $object = $this->article( (int) $folder->attribute( 'node_id' ), 'XT new translation', '<paragraph>Intro</paragraph>', '<paragraph>Body</paragraph>' );
         $objectID = (int) $object->attribute( 'id' );
-        $write = expAiDiff::writeDraft( $object, self::TARGET, array( 'title' => 'T386 neue Übersetzung' ), array( 'title' => 'ezstring' ), array( 'source' => 'translation' ) );
+        $write = expAiDiff::writeDraft( $object, self::TARGET, array( 'title' => 'XT neue Übersetzung' ), array( 'title' => 'ezstring' ), array( 'source' => 'translation' ) );
         $revert = expAiDraftRevert::forDraft( $objectID, (int) $write['version'] );
         $changes = $revert->changes();
         $fields = array_column( $changes['fields'], 'identifier' );
@@ -152,9 +152,9 @@ class expAiDiffAndRevertTest extends expAiT386CContentTestCase
         $this->siteSettings();
         $folder = $this->folder();
         $this->asUser( 'admin' );
-        $object = $this->article( (int) $folder->attribute( 'node_id' ), 'T386 ezjscore revert', '<paragraph>Intro</paragraph>', '<paragraph>Body</paragraph>' );
+        $object = $this->article( (int) $folder->attribute( 'node_id' ), 'XT ezjscore revert', '<paragraph>Intro</paragraph>', '<paragraph>Body</paragraph>' );
         $objectID = (int) $object->attribute( 'id' );
-        $write = expAiDiff::writeDraft( $object, self::SOURCE, array( 'title' => 'T386 ezjscore changed' ), array( 'title' => 'ezstring' ), array( 'source' => 'panel' ) );
+        $write = expAiDiff::writeDraft( $object, self::SOURCE, array( 'title' => 'XT ezjscore changed' ), array( 'title' => 'ezstring' ), array( 'source' => 'panel' ) );
 
         self::post( array( 'object_id' => $objectID, 'version' => $write['version'] ), 'GET' );
         $this->assertRefused( function () { expAiDraftRevertServerFunctions::changes( array() ); }, 'only accepts POST' );

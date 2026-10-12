@@ -2,7 +2,7 @@
 /**
  * The queue side of expai (doc/lanes.md): expAiQueue::request(), the handler of a queued request on a synchronous
  * and on the batch lane, the batch submit and poll handlers, against a small Anthropic API on a loopback port whose
- * answers each test chooses (tests/phpunit/unit/providers/expait386ebatchrouter.php). Everything the queue writes
+ * answers each test chooses (tests/phpunit/unit/providers/expaiprovidertestbatchrouter.php). Everything the queue writes
  * (jobs, events, resources, batches, usage rows) is written in a transaction that is rolled back: no worker of the
  * site ever sees a job of this test.
  *
@@ -11,9 +11,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expait386ehelpers.php';
+require_once __DIR__ . '/expaiprovidertesthelpers.php';
 
-class expAiQueueHandlersTest extends expAiT386ETestCase
+class expAiQueueHandlersTest extends expAiProviderTestCase
 {
     /** @var array */
     private $mock;
@@ -24,22 +24,22 @@ class expAiQueueHandlersTest extends expAiT386ETestCase
         $this->requireDatabase();
         if ( !expAiQueue::available() )
             $this->markTestSkipped( 'the job queue is not installed' );
-        $this->mock = expAiTestMockServer::start( '../phpunit/unit/providers/expait386ebatchrouter.php' );
+        $this->mock = expAiTestMockServer::start( '../phpunit/unit/providers/expaiprovidertestbatchrouter.php' );
         $this->mode( 'ok' );
         foreach ( array( 'status.json', 'results.jsonl' ) as $file )
             if ( is_file( $this->mock['state'] . '/' . $file ) )
                 unlink( $this->mock['state'] . '/' . $file );
         $this->asUser( 'admin' );
         $this->siteProviders(
-            array( 't386eq' => array( 'Type' => 'anthropic', 'Endpoint' => $this->mock['url'] . '/v1/messages', 'ApiKey' => 'test-not-a-key', 'Label' => 'Queue T',
+            array( 'xteq' => array( 'Type' => 'anthropic', 'Endpoint' => $this->mock['url'] . '/v1/messages', 'ApiKey' => 'test-not-a-key', 'Label' => 'Queue T',
                                       'Region' => 'us', 'Retention' => '30d' ) ),
-            array( 't386eq.m' => array( 'Provider' => 't386eq', 'Id' => 'claude-t386e', 'InputPerMTok' => '1', 'OutputPerMTok' => '2' ) ),
-            't386eq.m',
-            array( 'Lane_t386eq.standard' => array( 'FallbackLane' => 'fast' ),
-                   'Lane_t386eq.fast' => array( 'Enabled' => 'true', 'PriceMultiplier' => '2' ),
-                   'Lane_t386eq.batch' => array( 'Enabled' => 'true', 'Type' => 'batch', 'BatchApi' => 'anthropic', 'PriceMultiplier' => '0.5', 'MaxRequestsPerBatch' => 2,
+            array( 'xteq.m' => array( 'Provider' => 'xteq', 'Id' => 'claude-xte', 'InputPerMTok' => '1', 'OutputPerMTok' => '2' ) ),
+            'xteq.m',
+            array( 'Lane_xteq.standard' => array( 'FallbackLane' => 'fast' ),
+                   'Lane_xteq.fast' => array( 'Enabled' => 'true', 'PriceMultiplier' => '2' ),
+                   'Lane_xteq.batch' => array( 'Enabled' => 'true', 'Type' => 'batch', 'BatchApi' => 'anthropic', 'PriceMultiplier' => '0.5', 'MaxRequestsPerBatch' => 2,
                                                  'PollSeconds' => 5, 'BatchCollectSeconds' => 0, 'ExpiredLane' => 'standard', 'DeleteAfterFetch' => 'enabled' ),
-                   'Lane_t386eq.dead' => array( 'Enabled' => 'true', 'Type' => 'batch', 'BatchApi' => 'anthropic', 'PriceMultiplier' => '0.5', 'ExpiredLane' => 'batch' ),
+                   'Lane_xteq.dead' => array( 'Enabled' => 'true', 'Type' => 'batch', 'BatchApi' => 'anthropic', 'PriceMultiplier' => '0.5', 'ExpiredLane' => 'batch' ),
                    'QueueSettings' => array( 'Appliers' => array() ),
                    'Budgets' => array( 'Enabled' => 'disabled' ) ) );
         $this->inTransaction();
@@ -53,14 +53,14 @@ class expAiQueueHandlersTest extends expAiT386ETestCase
     private static function job( array $payload, array $row = array() )
     {
         return new expQueueJob( $row + array( 'id' => 0, 'uuid' => expQueue::uuid(), 'type' => expAiQueue::TYPE_REQUEST, 'state' => 'running', 'user_id' => 14,
-                                              'resource_key' => 't386eq:' . ( isset( $payload['lane'] ) ? $payload['lane'] : 'standard' ), 'external_ref' => '', 'checkpoint' => '',
-                                              'payload' => json_encode( $payload + array( 'alias' => 't386eq.m', 'lane' => 'standard',
+                                              'resource_key' => 'xteq:' . ( isset( $payload['lane'] ) ? $payload['lane'] : 'standard' ), 'external_ref' => '', 'checkpoint' => '',
+                                              'payload' => json_encode( $payload + array( 'alias' => 'xteq.m', 'lane' => 'standard',
                                                   'request' => array( 'system' => 's', 'messages' => array( array( 'role' => 'user', 'content' => 'Say ok' ) ), 'max_tokens' => 20 ) ) ) ) );
     }
 
     private static function runJob( expQueueHandler $handler, expQueueJob $job )
     {
-        return $handler->run( $job, new expQueueContext( $job, 't386e' ) );
+        return $handler->run( $job, new expQueueContext( $job, 'xte' ) );
     }
 
     // ------------------------------------------------------------------ expAiQueue
@@ -85,14 +85,14 @@ class expAiQueueHandlersTest extends expAiT386ETestCase
                            expAiQueue::normaliseRequest( array( 'messages' => array( array( 'role' => 'user', 'content' => 'q' ) ), 'max_tokens' => 999999, 'output_schema' => array( 'type' => 'object' ) ) ) );
         try
         {
-            expAiQueue::request( 't386eq.m', array( 'messages' => array( array( 'role' => 'user', 'content' => 'q' ) ) ), array( 'apply' => 'no_such_applier' ) );
+            expAiQueue::request( 'xteq.m', array( 'messages' => array( array( 'role' => 'user', 'content' => 'q' ) ) ), array( 'apply' => 'no_such_applier' ) );
             $this->fail( 'accepted an unknown applier' );
         }
         catch ( expAiException $e )
         {
             $this->assertSame( 'unknown applier no_such_applier', $e->detail() );
         }
-        $this->site( array( 'ProviderSettings' => array( 'DefaultModel' => '' ), 'Model_t386eq.m' => array( 'Provider' => 'gone' ) ) );
+        $this->site( array( 'ProviderSettings' => array( 'DefaultModel' => '' ), 'Model_xteq.m' => array( 'Provider' => 'gone' ) ) );
         try
         {
             expAiQueue::request( 'nothing', array( 'messages' => array( array( 'role' => 'user', 'content' => 'q' ) ) ) );
@@ -107,18 +107,18 @@ class expAiQueueHandlersTest extends expAiT386ETestCase
     public function testARequestIsQueuedOnItsLaneWithTheDataPolicyOfItsObjects(): void
     {
         $folder = eZContentObjectTreeNode::fetch( 2 )->object();
-        $queued = expAiQueue::request( 't386eq.m', array( 'messages' => array( array( 'role' => 'user', 'content' => 'q' ) ), 'max_tokens' => 100 ),
-                                       array( 'purpose' => 'T386 Test!', 'lane' => 'batch', 'objects' => array( (int) $folder->attribute( 'id' ), 999999999 ), 'label' => 'label',
-                                              'group' => null, 'idempotency_key' => 't386e-' . getmypid(), 'user_id' => 14, 'tags' => array( 'test:t386e' ) ) );
+        $queued = expAiQueue::request( 'xteq.m', array( 'messages' => array( array( 'role' => 'user', 'content' => 'q' ) ), 'max_tokens' => 100 ),
+                                       array( 'purpose' => 'XT Test!', 'lane' => 'batch', 'objects' => array( (int) $folder->attribute( 'id' ), 999999999 ), 'label' => 'label',
+                                              'group' => null, 'idempotency_key' => 'xte-' . getmypid(), 'user_id' => 14, 'tags' => array( 'test:xte' ) ) );
         $job = $queued['job'];
-        $this->assertSame( array( 'batch', 't386eq:batch', 600 ), array( $queued['lane']->name(), (string) $job->attribute( 'resource_key' ), (int) $job->attribute( 'timeout' ) ) );
+        $this->assertSame( array( 'batch', 'xteq:batch', 600 ), array( $queued['lane']->name(), (string) $job->attribute( 'resource_key' ), (int) $job->attribute( 'timeout' ) ) );
         $p = $job->payloadArray();
-        $this->assertSame( array( 't386eq.m', 't386test', array( (int) $folder->attribute( 'id' ), 999999999 ) ), array( $p['alias'], $p['purpose'], $p['objects'] ) );
-        $again = expAiQueue::request( 't386eq.m', array( 'messages' => array( array( 'role' => 'user', 'content' => 'q' ) ) ), array( 'idempotency_key' => 't386e-' . getmypid() ) );
+        $this->assertSame( array( 'xteq.m', 'xttest', array( (int) $folder->attribute( 'id' ), 999999999 ) ), array( $p['alias'], $p['purpose'], $p['objects'] ) );
+        $again = expAiQueue::request( 'xteq.m', array( 'messages' => array( array( 'role' => 'user', 'content' => 'q' ) ) ), array( 'idempotency_key' => 'xte-' . getmypid() ) );
         $this->assertTrue( $again['duplicate'] );
-        $listed = expAiQueue::jobs( array( 'resource_key' => 't386eq:batch' ), 5 );
+        $listed = expAiQueue::jobs( array( 'resource_key' => 'xteq:batch' ), 5 );
         $this->assertSame( array( (string) $job->attribute( 'uuid' ) ), array_column( $listed, 'uuid' ) );
-        $this->assertSame( 't386eq.m', $listed[0]['alias'] );
+        $this->assertSame( 'xteq.m', $listed[0]['alias'] );
         $this->assertSame( 'editorial', expAiQueue::classFor( 'nothing-mapped' ) );
     }
 
@@ -129,17 +129,17 @@ class expAiQueueHandlersTest extends expAiT386ETestCase
         $handler = new expAiRequestHandler();
         $this->assertSame( 'alias, lane and request.messages are required', $handler->validate( array( 'alias' => 'x' ) ) );
         $this->assertNull( $handler->validate( array( 'alias' => 'x', 'lane' => 'standard', 'request' => array( 'messages' => array( 1 ) ) ) ) );
-        $this->assertSame( 'Spring: t386eq.m on standard (seo)', $handler->describe( self::job( array( 'label' => 'Spring', 'purpose' => 'seo' ) ) ) );
+        $this->assertSame( 'Spring: xteq.m on standard (seo)', $handler->describe( self::job( array( 'label' => 'Spring', 'purpose' => 'seo' ) ) ) );
         $result = self::runJob( $handler, self::job( array() ) );
-        $this->assertSame( array( '{"ok":true}', array( 'ok' => true ), 'standard', 'standard', 'claude-t386e' ),
+        $this->assertSame( array( '{"ok":true}', array( 'ok' => true ), 'standard', 'standard', 'claude-xte' ),
                            array( $result['text'], $result['value'], $result['lane'], $result['service_tier'], $result['model'] ) );
         $this->assertGreaterThan( 0, $result['usage_log_id'] );
         $row = eZPersistentObject::fetchObject( expAiUsageLog::definition(), null, array( 'id' => $result['usage_log_id'] ) );
-        $this->assertSame( array( 'standard', 'queue', 't386eq' ), array( (string) $row->attribute( 'lane' ), (string) $row->attribute( 'action' ), (string) $row->attribute( 'provider' ) ) );
+        $this->assertSame( array( 'standard', 'queue', 'xteq' ), array( (string) $row->attribute( 'lane' ), (string) $row->attribute( 'action' ), (string) $row->attribute( 'provider' ) ) );
 
         // a rerun after the answer came: the checkpoint is applied, nothing is sent again
         $job = $this->queued( 1 )[0];
-        ( new expQueueContext( $job, 't386e' ) )->saveCheckpoint( array( 'answer' => array( 'text' => 'kept', 'value' => null, 'stop_reason' => 'end_turn', 'model' => 'm',
+        ( new expQueueContext( $job, 'xte' ) )->saveCheckpoint( array( 'answer' => array( 'text' => 'kept', 'value' => null, 'stop_reason' => 'end_turn', 'model' => 'm',
             'lane' => 'batch', 'service_tier' => 'batch', 'tokens' => array(), 'cost_micros' => 5, 'usage_log_id' => 0, 'batch_id' => 7 ) ) );
         $sent = substr_count( (string) file_get_contents( $this->mock['state'] . '/requests.jsonl' ), "\n" );
         $kept = self::runJob( $handler, $job );
@@ -151,7 +151,7 @@ class expAiQueueHandlersTest extends expAiT386ETestCase
     {
         $handler = new expAiRequestHandler();
         foreach ( array( array( array( 'alias' => 'nothing' ), 'the model nothing is not in the provider registry' ),
-                         array( array( 'lane' => 'nope' ), 'the lane nope of t386eq.m is not configured or not enabled' ),
+                         array( array( 'lane' => 'nope' ), 'the lane nope of xteq.m is not configured or not enabled' ),
                          array( array( 'apply' => 'no_such_applier' ), 'the applier no_such_applier is not configured' ) ) as $case )
         {
             try
@@ -174,7 +174,7 @@ class expAiQueueHandlersTest extends expAiT386ETestCase
         }
         catch ( expQueuePermanentException $e )
         {
-            $this->assertStringStartsWith( 'the data policy refuses object ' . $objectID . ' on t386eq:standard: ', $e->getMessage() );
+            $this->assertStringStartsWith( 'the data policy refuses object ' . $objectID . ' on xteq:standard: ', $e->getMessage() );
         }
         // the master switch holds the job
         $this->site( array( 'DataPolicy' => array( 'DefaultRegions' => array() ), 'AISettings' => array( 'Enabled' => 'false' ) ) );
@@ -196,7 +196,7 @@ class expAiQueueHandlersTest extends expAiT386ETestCase
         $result = self::runJob( $handler, $job );
         $this->assertSame( array( expQueueResult::DEFER, 'escalated to the lane fast' ), array( $result->outcome, $result->message ) );
         $this->assertSame( 'fast', $job->payloadArray()['lane'] );
-        $this->assertSame( 't386eq:fast', (string) $job->attribute( 'resource_key' ) );
+        $this->assertSame( 'xteq:fast', (string) $job->attribute( 'resource_key' ) );
         // busy on the fast lane, which has no fallback: a retry after the retry-after of the answer
         $result = self::runJob( $handler, self::job( array( 'lane' => 'fast' ) ) );
         $this->assertSame( array( expQueueResult::RETRY, 2, 'http_503' ), array( $result->outcome, $result->seconds, $result->errorClass ) );
@@ -209,8 +209,8 @@ class expAiQueueHandlersTest extends expAiT386ETestCase
         $this->assertSame( array( expQueueResult::DEFER, 'a submit job is taking it into a batch' ), array( $result->outcome, $result->message ) );
 
         // a batch that ended without a result for it: the expired lane takes it
-        $batch = new expAiBatch( array( 'created' => time(), 'modified' => time(), 'provider' => 't386eq', 'lane' => 'batch', 'model_alias' => 't386eq.m', 'state' => 'ended',
-                                        'remote_id' => 'msgbatch_t386e', 'batch_api' => 'anthropic' ) );
+        $batch = new expAiBatch( array( 'created' => time(), 'modified' => time(), 'provider' => 'xteq', 'lane' => 'batch', 'model_alias' => 'xteq.m', 'state' => 'ended',
+                                        'remote_id' => 'msgbatch_xte', 'batch_api' => 'anthropic' ) );
         $batch->store();
         $job = self::job( array( 'lane' => 'batch' ), array( 'external_ref' => $batch->ref() ) );
         $result = self::runJob( $handler, $job );
@@ -234,8 +234,8 @@ class expAiQueueHandlersTest extends expAiT386ETestCase
 
         // a new request: a submit job collects it
         $result = self::runJob( $handler, self::job( array( 'lane' => 'batch' ) ) );
-        $this->assertSame( 'waits for a batch of t386eq:batch', $result->message );
-        $submit = expQueue::listJobs( array( 'type' => expAiQueue::TYPE_SUBMIT, 'resource_key' => 't386eq:batch-api' ), 0, 5 );
+        $this->assertSame( 'waits for a batch of xteq:batch', $result->message );
+        $submit = expQueue::listJobs( array( 'type' => expAiQueue::TYPE_SUBMIT, 'resource_key' => 'xteq:batch-api' ), 0, 5 );
         $this->assertNotEmpty( $submit );
     }
 
@@ -249,27 +249,27 @@ class expAiQueueHandlersTest extends expAiT386ETestCase
         $this->assertSame( 'priority', expAiRequestHandler::serviceTier( array( 'usage' => array( 'service_tier' => 'priority' ) ) ) );
         $this->assertSame( 'flex', expAiRequestHandler::serviceTier( array( 'service_tier' => 'flex' ) ) );
         $this->assertSame( '', expAiRequestHandler::serviceTier( array() ) );
-        expAiRequestHandler::tag( null, expAiLane::fetch( 't386eq', 'standard' ), self::job( array() ), '' );
+        expAiRequestHandler::tag( null, expAiLane::fetch( 'xteq', 'standard' ), self::job( array() ), '' );
         $stored = expAiRequestHandler::storedAnswer( array( 'content' => array( array( 'type' => 'text', 'text' => "```json\n{\"a\":1}\n```" ) ) ), 'batch' );
         $this->assertSame( array( array( 'a' => 1 ), 0, 0 ), array( $stored['value'], $stored['usage_log_id'], $stored['cost_micros'] ) );
     }
 
     // ------------------------------------------------------------------ submit and poll
 
-    private function queued( $count, $alias = 't386eq.m' )
+    private function queued( $count, $alias = 'xteq.m' )
     {
         $jobs = array();
         for ( $i = 0; $i < $count; $i++ )
             $jobs[] = expQueue::enqueue( expAiQueue::TYPE_REQUEST, array( 'alias' => $alias, 'lane' => 'batch',
                 'request' => array( 'system' => '', 'messages' => array( array( 'role' => 'user', 'content' => "item $i" ) ), 'max_tokens' => 10 ) ),
-                array( 'resource' => 't386eq:batch', 'lane' => 'batch', 'class' => 'bulk', 'user_id' => 14 ) );
+                array( 'resource' => 'xteq:batch', 'lane' => 'batch', 'class' => 'bulk', 'user_id' => 14 ) );
         return $jobs;
     }
 
     private static function submitJob()
     {
-        return expQueue::enqueue( expAiQueue::TYPE_SUBMIT, array( 'alias' => 't386eq.m', 'lane' => 'batch' ),
-                                  array( 'resource' => 't386eq:batch-api', 'class' => 'system', 'idempotency_key' => 't386e-submit-' . bin2hex( random_bytes( 4 ) ) ) );
+        return expQueue::enqueue( expAiQueue::TYPE_SUBMIT, array( 'alias' => 'xteq.m', 'lane' => 'batch' ),
+                                  array( 'resource' => 'xteq:batch-api', 'class' => 'system', 'idempotency_key' => 'xte-submit-' . bin2hex( random_bytes( 4 ) ) ) );
     }
 
     public function testSubmitTakesAsManyRequestsAsABatchHoldsAndQueuesTheNextSubmit(): void
@@ -279,12 +279,12 @@ class expAiQueueHandlersTest extends expAiT386ETestCase
         $this->assertSame( 'Submit a batch of a on b', $handler->describe( self::job( array( 'alias' => 'a', 'lane' => 'b' ) ) ) );
 
         $submit = self::submitJob();
-        $this->assertSame( 'no request waits for t386eq:batch and t386eq.m', self::runJob( $handler, $submit )['message'] );
+        $this->assertSame( 'no request waits for xteq:batch and xteq.m', self::runJob( $handler, $submit )['message'] );
 
         $jobs = $this->queued( 3 );
         $this->queued( 1, 'other.alias' );
         $result = self::runJob( $handler, $submit );
-        $this->assertSame( array( 'msgbatch_t386e', 2, 2 ), array( $result['remote_id'], $result['requests'], $result['waiting_after'] ) );
+        $this->assertSame( array( 'msgbatch_xte', 2, 2 ), array( $result['remote_id'], $result['requests'], $result['waiting_after'] ) );
         // waiting_after counts every request of the lane, also the one of another model
         $batch = expAiBatch::fetch( $result['batch_id'] );
         $this->assertSame( 2, count( $batch->customIds() ) );
@@ -321,10 +321,10 @@ class expAiQueueHandlersTest extends expAiT386ETestCase
             $this->assertStringStartsWith( 'the batch could not be submitted: ', $e->getMessage() );
         }
         $db = eZDB::instance();
-        $this->assertSame( 0, (int) $db->arrayQuery( "SELECT COUNT(*) AS c FROM expqueue_job WHERE external_ref LIKE 'expai-submit:%' AND resource_key = 't386eq:batch'" )[0]['c'],
+        $this->assertSame( 0, (int) $db->arrayQuery( "SELECT COUNT(*) AS c FROM expqueue_job WHERE external_ref LIKE 'expai-submit:%' AND resource_key = 'xteq:batch'" )[0]['c'],
                            'the taken requests are free again' );
         foreach ( array( array( array( 'alias' => 'nothing', 'lane' => 'batch' ), 'the model nothing is not in the provider registry' ),
-                         array( array( 'alias' => 't386eq.m', 'lane' => 'standard' ), 'the lane standard is not a usable batch lane' ) ) as $case )
+                         array( array( 'alias' => 'xteq.m', 'lane' => 'standard' ), 'the lane standard is not a usable batch lane' ) ) as $case )
         {
             try
             {
@@ -371,7 +371,7 @@ class expAiQueueHandlersTest extends expAiT386ETestCase
         $ids = expAiBatch::fetch( $batchID )->customIds();
         $this->assertCount( 2, $ids );
         $lines = json_encode( array( 'custom_id' => $ids[0], 'result' => array( 'type' => 'succeeded', 'message' => array( 'content' => array( array( 'type' => 'text', 'text' => 'Done' ) ),
-                    'stop_reason' => 'end_turn', 'model' => 'claude-t386e', 'usage' => array( 'input_tokens' => 3, 'output_tokens' => 1 ) ) ) ) ) . "\n"
+                    'stop_reason' => 'end_turn', 'model' => 'claude-xte', 'usage' => array( 'input_tokens' => 3, 'output_tokens' => 1 ) ) ) ) ) . "\n"
                . json_encode( array( 'custom_id' => $ids[1], 'result' => array( 'type' => 'errored', 'error' => array( 'type' => 'error', 'error' => array( 'type' => 'invalid_request_error', 'message' => 'bad' ) ) ) ) ) . "\n";
         file_put_contents( $this->mock['state'] . '/results.jsonl', $lines );
         file_put_contents( $this->mock['state'] . '/status.json', '{"processing_status":"ended","request_counts":{"succeeded":1,"errored":1},"ended_at":"2026-10-12T10:00:00Z"}' );
@@ -404,11 +404,11 @@ class expAiQueueHandlersTest extends expAiT386ETestCase
         $poll = new expAiBatchPollHandler();
         $pollJob = function () use ( $batchID ) { return self::job( array( 'batch_id' => $batchID ), array( 'type' => expAiQueue::TYPE_POLL ) ); };
         // the only request was cancelled: the batch is cancelled at the provider
-        expQueue::cancel( (string) $jobs[0]->attribute( 'uuid' ), 't386e' );
+        expQueue::cancel( (string) $jobs[0]->attribute( 'uuid' ), 'xte' );
         file_put_contents( $this->mock['state'] . '/status.json', '{"processing_status":"in_progress"}' );
         $this->assertSame( expQueueResult::DEFER, self::runJob( $poll, $pollJob() )->outcome );
         $this->assertSame( 'canceling', (string) expAiBatch::fetch( $batchID )->attribute( 'state' ) );
-        $this->assertStringContainsString( 'msgbatch_t386e\\/cancel', (string) file_get_contents( $this->mock['state'] . '/requests.jsonl' ) );
+        $this->assertStringContainsString( 'msgbatch_xte\\/cancel', (string) file_get_contents( $this->mock['state'] . '/requests.jsonl' ) );
 
         // ended, but the results cannot be fetched: a retry, the error kept on the batch
         $batch = expAiBatch::fetch( $batchID );
@@ -433,7 +433,7 @@ class expAiQueueHandlersTest extends expAiT386ETestCase
         }
         catch ( expQueuePermanentException $e )
         {
-            $this->assertSame( 'the lane t386eq:gone is not configured any more', $e->getMessage() );
+            $this->assertSame( 'the lane xteq:gone is not configured any more', $e->getMessage() );
         }
     }
 

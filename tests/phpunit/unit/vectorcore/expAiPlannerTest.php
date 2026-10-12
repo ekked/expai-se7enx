@@ -9,9 +9,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expaivbfixture.php';
+require_once __DIR__ . '/expaivectorcoretestcase.php';
 
-class expAiPlannerTest extends expAiT386VbCase
+class expAiPlannerTest extends expAiVectorCoreTestCase
 {
     /** @var eZContentObject */
     private $article;
@@ -24,7 +24,7 @@ class expAiPlannerTest extends expAiT386VbCase
 
     private function content()
     {
-        $this->article = $this->article( 'T386B planner article' );
+        $this->article = $this->article( 'XTB planner article' );
         $this->folderNodeID = (int) eZContentObjectTreeNode::fetch( $this->article->mainNodeID() )->attribute( 'parent_node_id' );
         $this->language = (string) $this->article->attribute( 'initial_language_code' );
     }
@@ -45,7 +45,7 @@ class expAiPlannerTest extends expAiT386VbCase
     public function testItemsAreCheckedAndRefusedWithTheReason(): void
     {
         $this->content();
-        $thread = $this->thread( array( 'title' => 'validate', 'model_alias' => 't386b.stub',
+        $thread = $this->thread( array( 'title' => 'validate', 'model_alias' => 'xtb.stub',
                                         'scope' => array( 'subtrees' => array( $this->folderNodeID ), 'languages' => array( $this->language ) ) ) );
         $items = expAiPlanner::validateItems( $thread, array(
             array( 'action' => 'update', 'object_id' => (int) $this->article->attribute( 'id' ), 'languages' => array( $this->language ), 'fields' => array( 'title', 'bad field' ),
@@ -64,7 +64,7 @@ class expAiPlannerTest extends expAiT386VbCase
         $this->assertSame( '', $items[0]['refused'] );
         $this->assertSame( array( 'title' ), $items[0]['fields'], 'malformed field names are dropped' );
         $this->assertSame( 'Shorter title', $items[0]['summary'] );
-        $this->assertSame( 'T386B planner article', $items[0]['target_name'] );
+        $this->assertSame( 'XTB planner article', $items[0]['target_name'] );
         $this->assertSame( 'article', $items[0]['class'] );
         $this->assertSame( (int) $this->article->mainNodeID(), $items[0]['target']['node_id'] );
         $this->assertSame( 'No language given.', $items[1]['refused'] );
@@ -113,12 +113,12 @@ class expAiPlannerTest extends expAiT386VbCase
     public function testProposeSupersedesTheEarlierProposalAndRejectEndsIt(): void
     {
         $this->content();
-        $thread = $this->thread( array( 'title' => 'propose', 'model_alias' => 't386b.stub', 'scope' => array( 'subtrees' => array( $this->folderNodeID ) ) ) );
+        $thread = $this->thread( array( 'title' => 'propose', 'model_alias' => 'xtb.stub', 'scope' => array( 'subtrees' => array( $this->folderNodeID ) ) ) );
         $this->assertSame( 'A plan needs at least one item.', self::message( function () use ( $thread ) { expAiPlanner::propose( $thread, array() ); } ) );
         $item = array( 'action' => 'update', 'object_id' => (int) $this->article->attribute( 'id' ), 'languages' => array( $this->language ) );
-        $first = expAiPlanner::propose( $thread, array( 'items' => array( $item ), 'risks' => array( 'A risk', array( 'not scalar' ), '' ) ), 't386b.stub' );
+        $first = expAiPlanner::propose( $thread, array( 'items' => array( $item ), 'risks' => array( 'A risk', array( 'not scalar' ), '' ) ), 'xtb.stub' );
         $this->assertSame( array( 'A risk' ), $first->estimate()['meta']['risks'] );
-        $this->assertSame( 't386b.stub', $first->estimate()['meta']['model'] );
+        $this->assertSame( 'xtb.stub', $first->estimate()['meta']['model'] );
         $second = expAiPlanner::propose( $thread, array( 'items' => array( $item, $item ) ) );
         $this->assertSame( 'superseded', expAiPlan::fetchByID( (int) $first->attribute( 'id' ) )->attribute( 'state' ) );
         $this->assertSame( (int) $second->attribute( 'id' ), (int) expAiPlan::fetchCurrent( (int) $thread->attribute( 'id' ) )->attribute( 'id' ) );
@@ -141,7 +141,7 @@ class expAiPlannerTest extends expAiT386VbCase
     public function testApproveRefusals(): void
     {
         $this->content();
-        $thread = $this->thread( array( 'title' => 'approve refusals', 'model_alias' => 't386b.stub', 'scope' => array( 'subtrees' => array( $this->folderNodeID ) ) ) );
+        $thread = $this->thread( array( 'title' => 'approve refusals', 'model_alias' => 'xtb.stub', 'scope' => array( 'subtrees' => array( $this->folderNodeID ) ) ) );
         $item = array( 'action' => 'update', 'object_id' => (int) $this->article->attribute( 'id' ), 'languages' => array( $this->language ) );
         $plan = expAiPlanner::propose( $thread, array( 'items' => array( $item ) ) );
         $this->assertSame( 'Choose at least one item that can run.', self::message( function () use ( $thread, $plan ) { expAiPlanner::approve( $thread, $plan, array() ); } ) );
@@ -150,9 +150,9 @@ class expAiPlannerTest extends expAiT386VbCase
         $thread->setAttribute( 'model_alias', 'gone.model' );
         $this->assertSame( 'The model of this thread is no longer available to you. Choose another model.',
                            self::message( function () use ( $thread, $plan ) { expAiPlanner::approve( $thread, $plan ); } ) );
-        $thread->setAttribute( 'model_alias', 't386b.stub' );
-        $this->ini( 'Model_t386b.stub', 'InputPerMTok', '100000' );
-        $this->ini( 'Model_t386b.stub', 'OutputPerMTok', '100000' );
+        $thread->setAttribute( 'model_alias', 'xtb.stub' );
+        $this->ini( 'Model_xtb.stub', 'InputPerMTok', '100000' );
+        $this->ini( 'Model_xtb.stub', 'OutputPerMTok', '100000' );
         $this->ini( 'Pricing', 'Enabled', 'true' );
         $this->ini( 'Limits', 'MaxCostPerUserPerDay', '0.000001' );
         $plan = expAiPlan::fetchByID( (int) $plan->attribute( 'id' ) );
@@ -163,7 +163,7 @@ class expAiPlannerTest extends expAiT386VbCase
     public function testApproveQueuesTheItemsAsOneJobAndCompleteRecordsTheCost(): void
     {
         $this->content();
-        $thread = $this->thread( array( 'title' => 'approve', 'model_alias' => 't386b.stub', 'run_mode' => 'plan', 'review_policy' => 'direct',
+        $thread = $this->thread( array( 'title' => 'approve', 'model_alias' => 'xtb.stub', 'run_mode' => 'plan', 'review_policy' => 'direct',
                                         'scope' => array( 'subtrees' => array( $this->folderNodeID ) ) ) );
         $item = array( 'action' => 'update', 'object_id' => (int) $this->article->attribute( 'id' ), 'languages' => array( $this->language ), 'summary' => 'Fix it' );
         $plan = expAiPlanner::propose( $thread, array( 'items' => array( $item, $item ) ) );
@@ -198,7 +198,7 @@ class expAiPlannerTest extends expAiT386VbCase
     public function testWithoutAQueueTheItemsWaitAsFollowUps(): void
     {
         $this->content();
-        $thread = $this->thread( array( 'title' => 'no queue', 'model_alias' => 't386b.stub', 'scope' => array( 'subtrees' => array( $this->folderNodeID ) ) ) );
+        $thread = $this->thread( array( 'title' => 'no queue', 'model_alias' => 'xtb.stub', 'scope' => array( 'subtrees' => array( $this->folderNodeID ) ) ) );
         $item = array( 'action' => 'update', 'object_id' => (int) $this->article->attribute( 'id' ), 'languages' => array( $this->language ) );
         $plan = expAiPlanner::propose( $thread, array( 'items' => array( $item, $item ) ) );
         // the job type of thread turns is unknown to the queue for this test only

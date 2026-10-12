@@ -9,30 +9,30 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expait386ehelpers.php';
+require_once __DIR__ . '/expaiprovidertesthelpers.php';
 
-class expAiProviderRequestTest extends expAiT386ETestCase
+class expAiProviderRequestTest extends expAiProviderTestCase
 {
     private static function answer( array $content, array $usage = array() )
     {
         return array( 200, json_encode( array( 'content' => $content, 'stop_reason' => 'end_turn', 'model' => 'claude-x', 'usage' => $usage ) ) );
     }
 
-    private static function anthropic( array $settings, expAiT386EHttp $http )
+    private static function anthropic( array $settings, expAiProviderTestHttp $http )
     {
         return new expAiAnthropicProvider( $settings + array( 'ApiKey' => 'test-not-a-key', 'Model' => 'claude-x', 'Endpoint' => 'http://127.0.0.1:9/v1/messages' ), $http );
     }
 
-    private static function openai( array $settings, expAiT386EHttp $http )
+    private static function openai( array $settings, expAiProviderTestHttp $http )
     {
-        return new expAiOpenAiChatProvider( $settings + array( 'ApiKey' => 'test-not-a-key', 'Model' => 'm-1', 'BaseURL' => 'http://127.0.0.1:9/v1', 'ProviderId' => 't386eoai' ), $http );
+        return new expAiOpenAiChatProvider( $settings + array( 'ApiKey' => 'test-not-a-key', 'Model' => 'm-1', 'BaseURL' => 'http://127.0.0.1:9/v1', 'ProviderId' => 'xteoai' ), $http );
     }
 
     // ------------------------------------------------------------------ Anthropic
 
     public function testAnthropicPayloadCarriesToolsEffortSchemaAndExtras(): void
     {
-        $http = new expAiT386EHttp( array( self::answer( array( array( 'type' => 'text', 'text' => 'hi' ) ),
+        $http = new expAiProviderTestHttp( array( self::answer( array( array( 'type' => 'text', 'text' => 'hi' ) ),
                                                          array( 'input_tokens' => 10, 'output_tokens' => 3, 'cache_creation_input_tokens' => 2, 'cache_read_input_tokens' => 4 ) ) ) );
         $provider = self::anthropic( array( 'Effort' => 'High', 'AnthropicExtras' => 'enabled', 'PromptCaching' => 'enabled', 'RefusalFallback' => 'enabled',
                                             'AnthropicWorkspaceId' => 'ws_1', 'LaneParams' => array( 'speed' => 'fast', 'model' => 'never' ), 'Label' => 'My Claude' ), $http );
@@ -63,7 +63,7 @@ class expAiProviderRequestTest extends expAiT386ETestCase
 
     public function testAnthropicWithoutExtrasSendsNoWorkspaceNorCaching(): void
     {
-        $http = new expAiT386EHttp( array( self::answer( array() ) ) );
+        $http = new expAiProviderTestHttp( array( self::answer( array() ) ) );
         self::anthropic( array( 'AnthropicExtras' => 'disabled', 'PromptCaching' => 'enabled', 'AnthropicWorkspaceId' => 'ws_1', 'Effort' => 'turbo' ), $http )
             ->send( array( 'system' => '', 'messages' => array() ) );
         $payload = $http->json();
@@ -76,7 +76,7 @@ class expAiProviderRequestTest extends expAiT386ETestCase
 
     public function testAnthropicRetriesOnceWhenThinkingBlocksAreBoundToAnotherStart(): void
     {
-        $http = new expAiT386EHttp( array(
+        $http = new expAiProviderTestHttp( array(
             array( 400, json_encode( array( 'error' => array( 'type' => 'invalid_request_error', 'message' => 'thinking block_binding mismatch' ) ) ) ),
             self::answer( array( array( 'type' => 'text', 'text' => 'ok' ) ) ) ) );
         $answer = self::anthropic( array( 'AnthropicExtras' => 'enabled', 'RefusalFallback' => 'enabled' ), $http )->send( array( 'system' => 's', 'messages' => array() ) );
@@ -94,7 +94,7 @@ class expAiProviderRequestTest extends expAiT386ETestCase
                         413 => 'too long', 500 => 'reported an error' );
         foreach ( $cases as $status => $text )
         {
-            $http = new expAiT386EHttp( array( array( $status, json_encode( array( 'error' => array( 'type' => 'some_error', 'message' => "line\nbreak" ) ) ), array( 'retry-after' => '3' ) ) ) );
+            $http = new expAiProviderTestHttp( array( array( $status, json_encode( array( 'error' => array( 'type' => 'some_error', 'message' => "line\nbreak" ) ) ), array( 'retry-after' => '3' ) ) ) );
             try
             {
                 self::anthropic( array(), $http )->send( array( 'system' => '', 'messages' => array() ) );
@@ -112,11 +112,11 @@ class expAiProviderRequestTest extends expAiT386ETestCase
 
     public function testAnthropicRefusesAnAnswerWithoutContentAMissingModelAndABadWorkspace(): void
     {
-        $this->expectExceptionDetail( function () { self::anthropic( array(), new expAiT386EHttp( array( array( 200, '{"id":"x"}' ) ) ) )->send( array( 'system' => '', 'messages' => array() ) ); },
+        $this->expectExceptionDetail( function () { self::anthropic( array(), new expAiProviderTestHttp( array( array( 200, '{"id":"x"}' ) ) ) )->send( array( 'system' => '', 'messages' => array() ) ); },
                                       'HTTP 200, no content[]' );
-        $this->expectExceptionDetail( function () { self::anthropic( array( 'Model' => ' ' ), new expAiT386EHttp() )->send( array( 'system' => '', 'messages' => array() ) ); },
+        $this->expectExceptionDetail( function () { self::anthropic( array( 'Model' => ' ' ), new expAiProviderTestHttp() )->send( array( 'system' => '', 'messages' => array() ) ); },
                                       'Model is not set' );
-        $this->expectExceptionDetail( function () { self::anthropic( array( 'AnthropicExtras' => 'enabled', 'AnthropicWorkspaceId' => 'bad id!' ), new expAiT386EHttp() )
+        $this->expectExceptionDetail( function () { self::anthropic( array( 'AnthropicExtras' => 'enabled', 'AnthropicWorkspaceId' => 'bad id!' ), new expAiProviderTestHttp() )
                                                         ->send( array( 'system' => '', 'messages' => array() ) ); },
                                       'AnthropicWorkspaceId is not a workspace id' );
     }
@@ -124,14 +124,14 @@ class expAiProviderRequestTest extends expAiT386ETestCase
     public function testAnthropicFromConfigBuildsTheEffectiveModel(): void
     {
         $config = $this->config( array( 'AISettings' => array( 'Enabled' => 'true', 'AllowUserModelChoice' => 'disabled' ),
-                                        'ProviderSettings' => array( 'Providers' => array( 't386ea' ), 'DefaultModel' => 't386ea.m' ),
-                                        'Provider_t386ea' => array( 'Type' => 'anthropic', 'ApiKey' => 'test-not-a-key', 'Label' => 'T' ),
-                                        'Model_t386ea.m' => array( 'Provider' => 't386ea', 'Id' => 'claude-t386' ) ) );
+                                        'ProviderSettings' => array( 'Providers' => array( 'xtea' ), 'DefaultModel' => 'xtea.m' ),
+                                        'Provider_xtea' => array( 'Type' => 'anthropic', 'ApiKey' => 'test-not-a-key', 'Label' => 'T' ),
+                                        'Model_xtea.m' => array( 'Provider' => 'xtea', 'Id' => 'claude-xt' ) ) );
         $provider = expAiAnthropicProvider::fromConfig( $config );
         $this->assertInstanceOf( 'expAiAnthropicProvider', $provider );
-        $this->assertSame( 'claude-t386', $provider->modelName() );
-        $this->assertSame( 't386ea', $provider->providerId() );
-        $this->assertSame( 't386ea.m', $provider->modelAlias() );
+        $this->assertSame( 'claude-xt', $provider->modelName() );
+        $this->assertSame( 'xtea', $provider->providerId() );
+        $this->assertSame( 'xtea.m', $provider->modelAlias() );
     }
 
     // ------------------------------------------------------------------ expAiProviderBase: keys, headers, retries, errors
@@ -140,7 +140,7 @@ class expAiProviderRequestTest extends expAiT386ETestCase
     {
         $send = function ( array $settings )
         {
-            $http = new expAiT386EHttp( array( array( 200, '{"choices":[{"message":{"content":"x"}}]}' ) ) );
+            $http = new expAiProviderTestHttp( array( array( 200, '{"choices":[{"message":{"content":"x"}}]}' ) ) );
             self::openai( $settings, $http )->send( array( 'messages' => array() ) );
             return $http->requests[0][1];
         };
@@ -153,30 +153,30 @@ class expAiProviderRequestTest extends expAiT386ETestCase
         $this->assertNotContains( 'Authorization: Bearer stolen', $headers );
         $this->assertCount( 2, $headers );
 
-        $this->expectExceptionDetail( function () use ( $send ) { $send( array( 'ApiKey' => '' ) ); }, 'ApiKey of provider t386eoai is not set' );
-        $this->expectExceptionDetail( function () use ( $send ) { $send( array( 'ApiKey' => "a\nb" ) ); }, 'ApiKey of provider t386eoai contains a line break' );
-        $this->expectExceptionDetail( function () use ( $send ) { $send( array( 'ApiKeyHeader' => 'x key' ) ); }, 'ApiKeyHeader of provider t386eoai is not a header name' );
+        $this->expectExceptionDetail( function () use ( $send ) { $send( array( 'ApiKey' => '' ) ); }, 'ApiKey of provider xteoai is not set' );
+        $this->expectExceptionDetail( function () use ( $send ) { $send( array( 'ApiKey' => "a\nb" ) ); }, 'ApiKey of provider xteoai contains a line break' );
+        $this->expectExceptionDetail( function () use ( $send ) { $send( array( 'ApiKeyHeader' => 'x key' ) ); }, 'ApiKeyHeader of provider xteoai is not a header name' );
     }
 
     public function testRateLimitHeadersCapabilitiesAndToolUseComeFromTheSettings(): void
     {
-        $provider = self::openai( array( 'RateLimitHeaders' => array( 'x-a', ' ', 'x-b' ), 'Capabilities' => array( 'JSON_Schema' ), 'ToolUse' => 'weird', 'Label' => '' ), new expAiT386EHttp() );
+        $provider = self::openai( array( 'RateLimitHeaders' => array( 'x-a', ' ', 'x-b' ), 'Capabilities' => array( 'JSON_Schema' ), 'ToolUse' => 'weird', 'Label' => '' ), new expAiProviderTestHttp() );
         $this->assertSame( array( 'x-a', 'x-b' ), $provider->rateLimitHeaders() );
         $this->assertTrue( $provider->hasCapability( 'json_schema' ) );
         $this->assertSame( 'native', $provider->toolUse() );
-        $this->assertSame( 't386eoai', $provider->providerLabel() );
-        $this->assertSame( array( 'x-ratelimit-*', 'retry-after', 'x-request-id' ), self::openai( array(), new expAiT386EHttp() )->rateLimitHeaders() );
+        $this->assertSame( 'xteoai', $provider->providerLabel() );
+        $this->assertSame( array( 'x-ratelimit-*', 'retry-after', 'x-request-id' ), self::openai( array(), new expAiProviderTestHttp() )->rateLimitHeaders() );
     }
 
     public function testA429WithAShortRetryAfterIsRetriedOnceAndALongOneIsNot(): void
     {
         $ok = array( 200, '{"choices":[{"message":{"content":"done"},"finish_reason":"stop"}]}' );
-        $http = new expAiT386EHttp( array( array( 429, '{"error":{"message":"slow down"}}', array( 'retry-after' => '0' ) ), $ok ) );
+        $http = new expAiProviderTestHttp( array( array( 429, '{"error":{"message":"slow down"}}', array( 'retry-after' => '0' ) ), $ok ) );
         $answer = self::openai( array(), $http )->send( array( 'messages' => array() ) );
         $this->assertSame( 1, $answer['retries'] );
         $this->assertSame( 'done', $answer['content'][0]['text'] );
 
-        $http = new expAiT386EHttp( array( array( 429, '{"error":{"message":"slow down"}}', array( 'retry-after' => '60' ) ) ) );
+        $http = new expAiProviderTestHttp( array( array( 429, '{"error":{"message":"slow down"}}', array( 'retry-after' => '60' ) ) ) );
         try
         {
             self::openai( array( 'RetryAfterMax' => 2 ), $http )->send( array( 'messages' => array() ) );
@@ -185,7 +185,7 @@ class expAiProviderRequestTest extends expAiT386ETestCase
         catch ( expAiException $e )
         {
             $this->assertCount( 1, $http->requests );
-            $this->assertSame( 'provider t386eoai: HTTP 429: slow down', $e->detail() );
+            $this->assertSame( 'provider xteoai: HTTP 429: slow down', $e->detail() );
             $this->assertSame( array( 'retry-after' => '60' ), $e->rateLimits );
         }
     }
@@ -193,22 +193,22 @@ class expAiProviderRequestTest extends expAiT386ETestCase
     public function testACurlErrorIsRetriedOnceAndATimeoutIsNot(): void
     {
         $ok = array( 200, '{"choices":[{"message":{"content":"done"}}]}' );
-        $http = new expAiT386EHttp( array( new expAiException( 'Exponential Intelligence could not be reached.', 'curl error 7' ), $ok ) );
+        $http = new expAiProviderTestHttp( array( new expAiException( 'Exponential Intelligence could not be reached.', 'curl error 7' ), $ok ) );
         $this->assertSame( 1, self::openai( array(), $http )->send( array( 'messages' => array() ) )['retries'] );
 
-        $http = new expAiT386EHttp( array( new expAiException( 'x', 'curl error 7' ), new expAiException( 'x', 'curl error 6' ) ) );
-        $this->expectExceptionDetail( function () use ( $http ) { self::openai( array(), $http )->send( array( 'messages' => array() ) ); }, 'provider t386eoai: curl error 6' );
+        $http = new expAiProviderTestHttp( array( new expAiException( 'x', 'curl error 7' ), new expAiException( 'x', 'curl error 6' ) ) );
+        $this->expectExceptionDetail( function () use ( $http ) { self::openai( array(), $http )->send( array( 'messages' => array() ) ); }, 'provider xteoai: curl error 6' );
 
-        $http = new expAiT386EHttp( array( new expAiException( 'x', 'timeout after 5 s' ) ) );
-        $this->expectExceptionDetail( function () use ( $http ) { self::openai( array(), $http )->send( array( 'messages' => array() ) ); }, 'provider t386eoai: timeout after 5 s' );
+        $http = new expAiProviderTestHttp( array( new expAiException( 'x', 'timeout after 5 s' ) ) );
+        $this->expectExceptionDetail( function () use ( $http ) { self::openai( array(), $http )->send( array( 'messages' => array() ) ); }, 'provider xteoai: timeout after 5 s' );
         $this->assertCount( 1, $http->requests );
 
         // a server error is retried once; the retry's failure is the answer
-        $http = new expAiT386EHttp( array( array( 502, 'bad gateway' ), new expAiException( 'x', 'curl error 52' ) ) );
-        $this->expectExceptionDetail( function () use ( $http ) { self::openai( array(), $http )->send( array( 'messages' => array() ) ); }, 'provider t386eoai: curl error 52' );
-        $http = new expAiT386EHttp( array( array( 500, '{"message":"oops sk-abcdefghijklmnop"}' ), array( 500, '{"message":"oops sk-abcdefghijklmnop"}' ) ) );
+        $http = new expAiProviderTestHttp( array( array( 502, 'bad gateway' ), new expAiException( 'x', 'curl error 52' ) ) );
+        $this->expectExceptionDetail( function () use ( $http ) { self::openai( array(), $http )->send( array( 'messages' => array() ) ); }, 'provider xteoai: curl error 52' );
+        $http = new expAiProviderTestHttp( array( array( 500, '{"message":"oops sk-abcdefghijklmnop"}' ), array( 500, '{"message":"oops sk-abcdefghijklmnop"}' ) ) );
         $this->expectExceptionDetail( function () use ( $http ) { self::openai( array(), $http )->send( array( 'messages' => array() ) ); },
-                                      'provider t386eoai: HTTP 500: oops [redacted] (after 1 retry)' );
+                                      'provider xteoai: HTTP 500: oops [redacted] (after 1 retry)' );
     }
 
     public function testHttpErrorsUseOneTextPerStatus(): void
@@ -217,7 +217,7 @@ class expAiProviderRequestTest extends expAiT386ETestCase
                         404 => 'does not know the configured model', 408 => 'did not answer in time', 504 => 'did not answer in time', 418 => 'reported an error' );
         foreach ( $cases as $status => $text )
         {
-            $http = new expAiT386EHttp( array( array( $status, json_encode( array( 'error' => array( 'code' => 'c' . $status, 'message' => 'm' ) ) ) ),
+            $http = new expAiProviderTestHttp( array( array( $status, json_encode( array( 'error' => array( 'code' => 'c' . $status, 'message' => 'm' ) ) ) ),
                                                array( $status, '{}' ) ) );
             try
             {
@@ -228,18 +228,18 @@ class expAiProviderRequestTest extends expAiT386ETestCase
             {
                 $this->assertStringContainsString( $text, $e->getMessage() );
                 $this->assertSame( array( '%provider' => 'Mock AI' ), $e->arguments() );
-                $this->assertSame( "provider t386eoai: HTTP $status c$status: m", $e->detail() );
+                $this->assertSame( "provider xteoai: HTTP $status c$status: m", $e->detail() );
             }
         }
         // an error that is only a string (the Hugging Face router's 401)
-        $http = new expAiT386EHttp( array( array( 401, '{"error":"Invalid username or password."}' ) ) );
+        $http = new expAiProviderTestHttp( array( array( 401, '{"error":"Invalid username or password."}' ) ) );
         $this->expectExceptionDetail( function () use ( $http ) { self::openai( array(), $http )->send( array( 'messages' => array() ) ); },
-                                      'provider t386eoai: HTTP 401: Invalid username or password.' );
+                                      'provider xteoai: HTTP 401: Invalid username or password.' );
     }
 
     public function testAPayloadThatCannotBeEncodedIsRefused(): void
     {
-        $provider = self::openai( array(), new expAiT386EHttp() );
+        $provider = self::openai( array(), new expAiProviderTestHttp() );
         $this->expectExceptionDetail( function () use ( $provider ) { self::invoke( $provider, 'encode', array( array( 'x' => NAN ) ) ); }, 'json_encode failed' );
     }
 
@@ -247,17 +247,17 @@ class expAiProviderRequestTest extends expAiT386ETestCase
 
     public function testTheEndpointGetsChatCompletionsAndKeepsItsQuery(): void
     {
-        $this->assertSame( 'http://h/v1/chat/completions?api-version=1', self::openai( array( 'BaseURL' => 'http://h/v1/?api-version=1' ), new expAiT386EHttp() )->endpoint() );
-        $this->assertSame( 'http://h/v1/chat/completions', self::openai( array( 'BaseURL' => 'http://h/v1/chat/completions' ), new expAiT386EHttp() )->endpoint() );
-        $provider = new expAiOpenAiChatProvider( array( 'Model' => 'm', 'ApiKey' => 'k' ), new expAiT386EHttp() );
+        $this->assertSame( 'http://h/v1/chat/completions?api-version=1', self::openai( array( 'BaseURL' => 'http://h/v1/?api-version=1' ), new expAiProviderTestHttp() )->endpoint() );
+        $this->assertSame( 'http://h/v1/chat/completions', self::openai( array( 'BaseURL' => 'http://h/v1/chat/completions' ), new expAiProviderTestHttp() )->endpoint() );
+        $provider = new expAiOpenAiChatProvider( array( 'Model' => 'm', 'ApiKey' => 'k' ), new expAiProviderTestHttp() );
         $this->assertSame( '', $provider->endpoint() );
         $this->expectExceptionDetail( function () use ( $provider ) { $provider->send( array( 'messages' => array() ) ); }, 'BaseURL of provider openai_chat is not set' );
-        $this->expectExceptionDetail( function () { self::openai( array( 'Model' => '' ), new expAiT386EHttp() )->send( array( 'messages' => array() ) ); }, 'Model is not set' );
+        $this->expectExceptionDetail( function () { self::openai( array( 'Model' => '' ), new expAiProviderTestHttp() )->send( array( 'messages' => array() ) ); }, 'Model is not set' );
     }
 
     public function testThePayloadOfAConversationWithToolsAndImages(): void
     {
-        $http = new expAiT386EHttp( array( array( 200, '{"choices":[{"message":{"content":"ok"}}]}' ) ) );
+        $http = new expAiProviderTestHttp( array( array( 200, '{"choices":[{"message":{"content":"ok"}}]}' ) ) );
         $provider = self::openai( array( 'Flavor' => 'mistral', 'StrictTools' => 'enabled', 'ParallelToolCalls' => 'disabled', 'Capabilities' => array( 'json_object', 'reasoning_effort' ),
                                          'Effort' => 'low', 'ExtraBody' => '{"safe_prompt":true,"model":"never"}' ), $http );
         $provider->send( array(
@@ -297,7 +297,7 @@ class expAiProviderRequestTest extends expAiT386ETestCase
     {
         $payload = function ( array $settings, $choice )
         {
-            return self::openai( $settings, new expAiT386EHttp() )->buildPayload( array( 'messages' => array(), 'tools' => array( array( 'name' => 't', 'description' => '' ) ),
+            return self::openai( $settings, new expAiProviderTestHttp() )->buildPayload( array( 'messages' => array(), 'tools' => array( array( 'name' => 't', 'description' => '' ) ),
                                                                                     'tool_choice' => $choice ) );
         };
         $this->assertSame( 'required', $payload( array(), array( 'type' => 'any' ) )['tool_choice'] );
@@ -311,15 +311,15 @@ class expAiProviderRequestTest extends expAiT386ETestCase
         $this->assertSame( '30m', $payload( array( 'Flavor' => 'ollama', 'KeepAlive' => '30m' ), array() )['keep_alive'] );
         $openai = $payload( array( 'Flavor' => 'openai' ), array() );
         $this->assertArrayHasKey( 'max_completion_tokens', $openai );
-        $this->assertSame( 'openai', self::openai( array( 'Flavor' => 'OpenAI' ), new expAiT386EHttp() )->flavor() );
-        $this->assertSame( 'generic', self::openai( array( 'Flavor' => 'other' ), new expAiT386EHttp() )->flavor() );
+        $this->assertSame( 'openai', self::openai( array( 'Flavor' => 'OpenAI' ), new expAiProviderTestHttp() )->flavor() );
+        $this->assertSame( 'generic', self::openai( array( 'Flavor' => 'other' ), new expAiProviderTestHttp() )->flavor() );
     }
 
     public function testOpenRouterReasoningAndSchemaAndABrokenExtraBody(): void
     {
         $build = function ( array $settings )
         {
-            return self::openai( $settings + array( 'Capabilities' => array( 'reasoning_effort', 'json_schema' ) ), new expAiT386EHttp() )
+            return self::openai( $settings + array( 'Capabilities' => array( 'reasoning_effort', 'json_schema' ) ), new expAiProviderTestHttp() )
                 ->buildPayload( array( 'messages' => array(), 'output_schema' => array( 'type' => 'object' ) ) );
         };
         $p = $build( array( 'Flavor' => 'openrouter', 'Effort' => 'none', 'ExtraBody' => 'not json' ) );
@@ -331,7 +331,7 @@ class expAiProviderRequestTest extends expAiT386ETestCase
 
     public function testAnAssistantTurnOfTheSameModelIsSentAsTheProviderWroteIt(): void
     {
-        $provider = self::openai( array(), new expAiT386EHttp() );
+        $provider = self::openai( array(), new expAiProviderTestHttp() );
         $native = array( 'role' => 'assistant', 'refusal' => null, 'annotations' => array(),
                          'tool_calls' => array( array( 'type' => 'function', 'function' => array( 'name' => 'get_node', 'arguments' => array( 'node_id' => 2 ) ) ),
                                                 array( 'id' => 'c2', 'type' => 'function', 'function' => array( 'name' => 'get_node', 'arguments' => 'not json' ) ),
@@ -355,7 +355,7 @@ class expAiProviderRequestTest extends expAiT386ETestCase
 
     public function testParseAnswerMapsCallsUsageAndStopReasons(): void
     {
-        $provider = self::openai( array( 'Flavor' => 'mistral' ), new expAiT386EHttp() );
+        $provider = self::openai( array( 'Flavor' => 'mistral' ), new expAiProviderTestHttp() );
         $answer = $provider->parseAnswer( array(
             'model' => 'served-model', 'service_tier' => 'flex',
             'choices' => array( array( 'finish_reason' => 'stop', 'message' => array(
@@ -378,27 +378,27 @@ class expAiProviderRequestTest extends expAiT386ETestCase
 
         $this->assertSame( 'max_tokens', $provider->parseAnswer( array( 'choices' => array( array( 'finish_reason' => 'length', 'message' => array( 'content' => 'x' ) ) ) ) )['stop_reason'] );
         $this->assertSame( 'custom', $provider->parseAnswer( array( 'choices' => array( array( 'finish_reason' => 'custom', 'message' => array() ) ) ) )['stop_reason'] );
-        $this->assertStringStartsWith( 'call_0_', self::openai( array(), new expAiT386EHttp() )->parseAnswer( array( 'choices' => array( array( 'message' => array(
+        $this->assertStringStartsWith( 'call_0_', self::openai( array(), new expAiProviderTestHttp() )->parseAnswer( array( 'choices' => array( array( 'message' => array(
             'tool_calls' => array( array( 'function' => array( 'name' => 'a' ) ) ) ) ) ) ) )['content'][0]['id'] );
     }
 
     public function testParseAnswerTurnsErrorsInsideAnAnswerIntoProviderErrors(): void
     {
-        $provider = self::openai( array( 'Label' => 'OR' ), new expAiT386EHttp() );
+        $provider = self::openai( array( 'Label' => 'OR' ), new expAiProviderTestHttp() );
         $this->expectExceptionDetail( function () use ( $provider ) { $provider->parseAnswer( array( 'error' => array( 'code' => 402, 'message' => 'no credits' ) ) ); },
-                                      'provider t386eoai: HTTP 402: no credits' );
+                                      'provider xteoai: HTTP 402: no credits' );
         $this->expectExceptionDetail( function () use ( $provider ) { $provider->parseAnswer( array( 'choices' => array( array( 'error' => array( 'code' => 'x', 'message' => 'upstream' ) ) ) ) ); },
-                                      'provider t386eoai: HTTP 502 x: upstream' );
+                                      'provider xteoai: HTTP 502 x: upstream' );
         $this->expectExceptionDetail( function () use ( $provider ) { $provider->parseAnswer( array( 'choices' => array( array( 'finish_reason' => 'error', 'message' => array() ) ) ) ); },
-                                      'provider t386eoai: HTTP 502: finish_reason error' );
-        $this->expectExceptionDetail( function () use ( $provider ) { $provider->parseAnswer( 'nonsense', 201 ); }, 'provider t386eoai: HTTP 201, no choices[]' );
+                                      'provider xteoai: HTTP 502: finish_reason error' );
+        $this->expectExceptionDetail( function () use ( $provider ) { $provider->parseAnswer( 'nonsense', 201 ); }, 'provider xteoai: HTTP 201, no choices[]' );
     }
 
     // ------------------------------------------------------------------ the native Ollama chat of a managed local server
 
     public function testOllamaNativeChatSendsPlainMessagesAndReadsTheTimings(): void
     {
-        $http = new expAiT386EHttp( array( array( 200, json_encode( array( 'model' => 'qwen', 'message' => array( 'content' => '<think>x</think> Hi' ), 'done_reason' => 'length',
+        $http = new expAiProviderTestHttp( array( array( 200, json_encode( array( 'model' => 'qwen', 'message' => array( 'content' => '<think>x</think> Hi' ), 'done_reason' => 'length',
             'prompt_eval_count' => 12, 'eval_count' => 5, 'total_duration' => 9000000, 'load_duration' => 2000000, 'prompt_eval_duration' => 3000000, 'eval_duration' => 4000000 ) ) ) ) );
         $provider = new expAiOllamaNativeProvider( array( 'BaseURL' => 'http://127.0.0.1:11434/v1/', 'Model' => 'qwen', 'ModelAlias' => 'local.qwen', 'ProviderId' => 'local',
                                                           'Effort' => 'none', 'Capabilities' => array( 'reasoning_effort' ) ), $http );
@@ -418,7 +418,7 @@ class expAiProviderRequestTest extends expAiT386ETestCase
 
     public function testOllamaNativeLoadsAModelAndReportsErrors(): void
     {
-        $http = new expAiT386EHttp( array( array( 200, '{"load_duration":1500000000}' ), array( 200, '{}' ), array( 500, '{"error":"model not found"}' ), array( 200, 'not json' ),
+        $http = new expAiProviderTestHttp( array( array( 200, '{"load_duration":1500000000}' ), array( 200, '{}' ), array( 500, '{"error":"model not found"}' ), array( 200, 'not json' ),
                                            array( 404, 'x' ) ) );
         $provider = new expAiOllamaNativeProvider( array( 'BaseURL' => 'http://localhost:11434', 'Model' => 'qwen' ), $http );
         $this->assertSame( 1500, $provider->load( 'forever' )['load_ms'] );
@@ -444,7 +444,7 @@ class expAiProviderRequestTest extends expAiT386ETestCase
         {
             $this->assertSame( array( '%reason' => 'HTTP 404' ), $e->arguments() );
         }
-        $this->expectExceptionDetail( function () { ( new expAiOllamaNativeProvider( array( 'BaseURL' => 'http://127.0.0.1:1' ), new expAiT386EHttp() ) )->send( array() ); }, 'Model is not set' );
+        $this->expectExceptionDetail( function () { ( new expAiOllamaNativeProvider( array( 'BaseURL' => 'http://127.0.0.1:1' ), new expAiProviderTestHttp() ) )->send( array() ); }, 'Model is not set' );
         $this->expectExceptionDetail( function () { expAiOllamaNativeProvider::parseAnswer( array( 'x' => 1 ) ); }, 'ollama /api/chat: no message' );
     }
 
@@ -452,13 +452,13 @@ class expAiProviderRequestTest extends expAiT386ETestCase
     {
         $this->expectExceptionDetail( function () { new expAiOllamaNativeProvider( array( 'BaseURL' => 'http://example.invalid:11434' ) ); },
                                       'a managed local model server must be on the loopback address' );
-        $config = $this->config( array( 'ProviderSettings' => array( 'Providers' => array( 't386el', 't386er' ) ),
-                                        'Provider_t386el' => array( 'Type' => 'openai_chat', 'Flavor' => 'ollama', 'Managed' => 'ollama', 'BaseURL' => 'http://127.0.0.1:1/v1', 'KeyOptional' => 'true' ),
-                                        'Provider_t386er' => array( 'Type' => 'openai_chat', 'BaseURL' => 'http://127.0.0.1:1/v1', 'ApiKey' => 'k' ),
-                                        'Model_t386el.q' => array( 'Provider' => 't386el', 'Id' => 'qwen' ),
-                                        'Model_t386er.q' => array( 'Provider' => 't386er', 'Id' => 'qwen' ) ) );
-        $this->assertInstanceOf( 'expAiOllamaNativeProvider', expAiOllamaNativeProvider::forAlias( $config, 't386el.q' ) );
-        $this->assertNull( expAiOllamaNativeProvider::forAlias( $config, 't386er.q' ) );
+        $config = $this->config( array( 'ProviderSettings' => array( 'Providers' => array( 'xtel', 'xter' ) ),
+                                        'Provider_xtel' => array( 'Type' => 'openai_chat', 'Flavor' => 'ollama', 'Managed' => 'ollama', 'BaseURL' => 'http://127.0.0.1:1/v1', 'KeyOptional' => 'true' ),
+                                        'Provider_xter' => array( 'Type' => 'openai_chat', 'BaseURL' => 'http://127.0.0.1:1/v1', 'ApiKey' => 'k' ),
+                                        'Model_xtel.q' => array( 'Provider' => 'xtel', 'Id' => 'qwen' ),
+                                        'Model_xter.q' => array( 'Provider' => 'xter', 'Id' => 'qwen' ) ) );
+        $this->assertInstanceOf( 'expAiOllamaNativeProvider', expAiOllamaNativeProvider::forAlias( $config, 'xtel.q' ) );
+        $this->assertNull( expAiOllamaNativeProvider::forAlias( $config, 'xter.q' ) );
         $this->assertNull( expAiOllamaNativeProvider::forAlias( $config, 'nothing' ) );
     }
 
@@ -468,7 +468,7 @@ class expAiProviderRequestTest extends expAiT386ETestCase
                            expAiOllamaNativeProvider::loadedIn( array( 'models' => array( array( 'model' => 'other' ), array( 'name' => 'qwen:latest', 'size' => 2097152, 'expires_at' => '2026-10-12T10:00:00Z' ) ) ), 'qwen' ) );
         $this->assertSame( array( 'loaded' => false, 'until' => 0, 'size_mb' => 0 ), expAiOllamaNativeProvider::loadedIn( array(), 'qwen' ) );
 
-        $docroot = expAiTestMockServer::tmp( 't386e-ollama' );
+        $docroot = expAiTestMockServer::tmp( 'xte-ollama' );
         $this->cleanup( static function () use ( $docroot ) { expAiTestMockServer::removeTree( $docroot ); } );
         mkdir( $docroot . '/api' );
         file_put_contents( $docroot . '/api/ps', json_encode( array( 'models' => array( array( 'name' => 'qwen', 'size' => 1048576 ) ) ) ) );
@@ -524,13 +524,13 @@ class expAiProviderRequestTest extends expAiT386ETestCase
 
     public function testPromptedSendRetriesOnceWithTheErrorAndThenTakesTheText(): void
     {
-        $inner = self::openai( array( 'ModelAlias' => 't386e.p' ), $http = new expAiT386EHttp( array(
+        $inner = self::openai( array( 'ModelAlias' => 'xte.p' ), $http = new expAiProviderTestHttp( array(
             array( 200, json_encode( array( 'choices' => array( array( 'message' => array( 'content' => 'no json here' ) ) ), 'usage' => array( 'prompt_tokens' => 5, 'completion_tokens' => 2 ) ) ) ),
             array( 200, json_encode( array( 'choices' => array( array( 'message' => array( 'content' => 'still {not json' ) ) ), 'usage' => array( 'prompt_tokens' => 7, 'completion_tokens' => 3 ) ) ) ),
             array( 200, json_encode( array( 'choices' => array( array( 'message' => array( 'content' => '{"tool":"get_node","input":{"node_id":2}}' ) ) ) ) ) ),
             array( 200, json_encode( array( 'choices' => array( array( 'message' => array( 'content' => '{"answer":"done"}' ), 'finish_reason' => 'length' ) ) ) ) ) ) ) );
         $provider = new expAiPromptedToolProvider( $inner );
-        $this->assertSame( array( 't386eoai', 'm-1', 't386e.p', 'prompted' ), array( $provider->providerId(), $provider->modelName(), $provider->modelAlias(), $provider->toolUse() ) );
+        $this->assertSame( array( 'xteoai', 'm-1', 'xte.p', 'prompted' ), array( $provider->providerId(), $provider->modelName(), $provider->modelAlias(), $provider->toolUse() ) );
         $this->assertSame( $inner, $provider->inner() );
         $tools = array( (object) array( 'name' => 'get_node', 'description' => 'd', 'input_schema' => array( 'type' => 'object' ) ) );
 

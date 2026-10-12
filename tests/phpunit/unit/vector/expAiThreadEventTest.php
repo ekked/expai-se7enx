@@ -7,9 +7,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expAiT386VaVectorTestCase.php';
+require_once __DIR__ . '/expaivectortestcase.php';
 
-class expAiThreadEventTest extends expAiT386VaVectorTestCase
+class expAiThreadEventTest extends expAiVectorTestCase
 {
     public function testASmallPayloadIsKeptAsItIs(): void
     {

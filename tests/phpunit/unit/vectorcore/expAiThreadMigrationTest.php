@@ -8,14 +8,14 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expaivbfixture.php';
+require_once __DIR__ . '/expaivectorcoretestcase.php';
 
-class expAiThreadMigrationTest extends expAiT386VbCase
+class expAiThreadMigrationTest extends expAiVectorCoreTestCase
 {
     private function conversation( $nodeID, $messages, $modified )
     {
         $conversation = new expAiConversation( array( 'user_id' => $this->userID, 'node_id' => (int) $nodeID, 'messages' => $messages,
-                                                      'model_alias' => 't386b.stub', 'provider' => 't386b', 'created' => $modified - 60, 'modified' => $modified ) );
+                                                      'model_alias' => 'xtb.stub', 'provider' => 'xtb', 'created' => $modified - 60, 'modified' => $modified ) );
         $conversation->store();
         return $conversation;
     }
@@ -31,7 +31,7 @@ class expAiThreadMigrationTest extends expAiT386VbCase
         $blocks = $this->conversation( 2, json_encode( array( array( 'role' => 'user', 'content' => array( array( 'type' => 'image' ), array( 'type' => 'text', 'text' => 'Shorten it' ) ) ) ) ), time() );
         $empty = $this->conversation( 2, '[]', time() );
         $vector = $this->conversation( 0, '[]', time() );
-        $usage = new expAiUsageLog( array( 'conversation_id' => (int) $old->attribute( 'id' ), 'provider' => 't386b', 'model' => 'stub', 'created' => time() ) );
+        $usage = new expAiUsageLog( array( 'conversation_id' => (int) $old->attribute( 'id' ), 'provider' => 'xtb', 'model' => 'stub', 'created' => time() ) );
         $usage->store();
         $log = expAiDraftLog::record( array( 'contentobject_id' => 1, 'version' => 1, 'user_id' => $this->userID, 'conversation_id' => (int) $old->attribute( 'id' ),
                                              'node_id' => 2, 'action' => 'update' ) );
@@ -61,7 +61,7 @@ class expAiThreadMigrationTest extends expAiT386VbCase
         $this->assertLessThanOrEqual( 20, mb_strlen( (string) $thread->attribute( 'title' ) ) );
         $this->assertStringStartsWith( 'Please fix the', (string) $thread->attribute( 'title' ), 'the first request on one line' );
         $this->assertSame( (int) $thread->attribute( 'lead_run_id' ), (int) $old->attribute( 'run_id' ) );
-        $this->assertSame( 't386b.stub', $thread->attribute( 'model_alias' ) );
+        $this->assertSame( 'xtb.stub', $thread->attribute( 'model_alias' ) );
         $usage = eZPersistentObject::fetchObject( expAiUsageLog::definition(), null, array( 'id' => (int) $usage->attribute( 'id' ) ) );
         $this->assertSame( (int) $thread->attribute( 'id' ), (int) $usage->attribute( 'thread_id' ) );
         $this->assertSame( (int) $old->attribute( 'run_id' ), (int) $usage->attribute( 'run_id' ) );

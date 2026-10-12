@@ -38,16 +38,16 @@ if ( $mode === 'e503' )
     return true;
 }
 if ( $method === 'POST' && preg_match( '~/v1/messages$~', $path ) )
-    echo json_encode( array( 'id' => 'msg_1', 'content' => array( array( 'type' => 'text', 'text' => '{"ok":true}' ) ), 'stop_reason' => 'end_turn', 'model' => 'claude-t386e',
+    echo json_encode( array( 'id' => 'msg_1', 'content' => array( array( 'type' => 'text', 'text' => '{"ok":true}' ) ), 'stop_reason' => 'end_turn', 'model' => 'claude-xte',
                              'usage' => array( 'input_tokens' => 5, 'output_tokens' => 2, 'service_tier' => 'standard' ) ) );
 elseif ( $method === 'POST' && preg_match( '~/v1/messages/batches$~', $path ) )
-    echo '{"id":"msgbatch_t386e","processing_status":"in_progress"}';
-elseif ( $method === 'GET' && preg_match( '~/batches/msgbatch_t386e/results$~', $path ) )
+    echo '{"id":"msgbatch_xte","processing_status":"in_progress"}';
+elseif ( $method === 'GET' && preg_match( '~/batches/msgbatch_xte/results$~', $path ) )
 {
     header( 'Content-Type: application/binary' );
     echo is_file( $state . '/results.jsonl' ) ? file_get_contents( $state . '/results.jsonl' ) : '';
 }
-elseif ( $method === 'GET' && preg_match( '~/batches/msgbatch_t386e$~', $path ) )
+elseif ( $method === 'GET' && preg_match( '~/batches/msgbatch_xte$~', $path ) )
     echo is_file( $state . '/status.json' ) ? file_get_contents( $state . '/status.json' ) : '{"processing_status":"in_progress"}';
 elseif ( $method === 'POST' && preg_match( '~/cancel$~', $path ) )
     echo '{"processing_status":"canceling"}';

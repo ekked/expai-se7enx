@@ -9,9 +9,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expait386ccontenttestcase.php';
+require_once __DIR__ . '/expaicontenttestcase.php';
 
-class expAiTranslationSyncTest extends expAiT386CContentTestCase
+class expAiTranslationSyncTest extends expAiContentTestCase
 {
     private static function metrics( $ratio, $hunks = 1 )
     {
@@ -73,12 +73,12 @@ class expAiTranslationSyncTest extends expAiT386CContentTestCase
     private function translatedArticle( $folder )
     {
         $this->asUser( 'admin' );
-        $object = $this->article( (int) $folder->attribute( 'node_id' ), 'T386 bakery',
+        $object = $this->article( (int) $folder->attribute( 'node_id' ), 'XT bakery',
             '<paragraph>A small bakery with a long tradition.</paragraph>',
             '<paragraph>Our bakery opened in 1998 on Main Street.</paragraph><paragraph>Every morning we bake bread and rolls.</paragraph>'
           . '<paragraph>We are open from Monday to Saturday.</paragraph><paragraph>On Sundays we are closed.</paragraph>' );
         self::publishVersion( eZContentObject::fetch( (int) $object->attribute( 'id' ) ), self::TARGET, array(
-            'title' => 'T386 Bäckerei', 'intro' => self::xml( '<paragraph>Eine kleine Bäckerei mit langer Tradition.</paragraph>' ),
+            'title' => 'XT Bäckerei', 'intro' => self::xml( '<paragraph>Eine kleine Bäckerei mit langer Tradition.</paragraph>' ),
             'body' => self::xml( '<paragraph>Unsere Bäckerei wurde 1998 in der Hauptstraße eröffnet.</paragraph><paragraph>Jeden Morgen backen wir Brot und Brötchen.</paragraph>'
                                . '<paragraph>Wir haben von Montag bis Samstag geöffnet.</paragraph><paragraph>Sonntags ist geschlossen.</paragraph>' ) ) );
         return eZContentObject::fetch( (int) $object->attribute( 'id' ) );
@@ -283,7 +283,7 @@ class expAiTranslationSyncTest extends expAiT386CContentTestCase
         }
 
         // the translation is edited after the plan: the patch does not overwrite that edit
-        self::publishVersion( eZContentObject::fetch( $objectID ), self::TARGET, array( 'title' => 'T386 Bäckerei Müller' ) );
+        self::publishVersion( eZContentObject::fetch( $objectID ), self::TARGET, array( 'title' => 'XT Bäckerei Müller' ) );
         try
         {
             $sync->applyAnswer( $job, array( 'value' => array( 'units' => array() ) ), $params );
@@ -312,7 +312,7 @@ class expAiTranslationSyncTest extends expAiT386CContentTestCase
         $params = $job->payloadArray()['apply_params'];
         $units = array();
         foreach ( $sync->plan( $object, self::TARGET, array( 'mode' => 'full', 'base_version' => $params['base_version'], 'to_version' => $params['to_version'] ) )['units'] as $unit )
-            $units[] = array( 'id' => $unit['id'], 'text' => 'T386 Bäckerei &amp; Café' );
+            $units[] = array( 'id' => $unit['id'], 'text' => 'XT Bäckerei &amp; Café' );
         $this->assertNotEmpty( $units );
         $result = $sync->applyAnswer( $job, array( 'value' => array( 'units' => $units ) ), $params );
         $this->assertContains( 'title', $result['written'] );
@@ -320,7 +320,7 @@ class expAiTranslationSyncTest extends expAiT386CContentTestCase
         foreach ( eZContentObject::fetch( $objectID )->fetchDataMap( $result['draft_version'], self::TARGET ) as $identifier => $attribute )
             if ( $identifier === 'title' )
                 $title = $attribute->toString();
-        $this->assertSame( 'T386 Bäckerei & Café', $title, 'a whole field is written as plain text' );
+        $this->assertSame( 'XT Bäckerei & Café', $title, 'a whole field is written as plain text' );
         $this->assertIsArray( $plan['units'] );
     }
 
@@ -334,7 +334,7 @@ class expAiTranslationSyncTest extends expAiT386CContentTestCase
         $this->assertSame( 'not_found', $sync->onPublish( 0, 1 ) );
         $folder = $this->folder();
         $this->asUser( 'admin' );
-        $single = $this->article( (int) $folder->attribute( 'node_id' ), 'T386 single', '<paragraph>Intro</paragraph>', '<paragraph>Body</paragraph>' );
+        $single = $this->article( (int) $folder->attribute( 'node_id' ), 'XT single', '<paragraph>Intro</paragraph>', '<paragraph>Body</paragraph>' );
         $this->assertSame( 'single_language', $sync->onPublish( (int) $single->attribute( 'id' ), 1 ) );
         $object = $this->translatedArticle( $folder );
         $this->assertSame( 'not_source', $sync->onPublish( (int) $object->attribute( 'id' ), 2 ), 'version 2 is the translation' );

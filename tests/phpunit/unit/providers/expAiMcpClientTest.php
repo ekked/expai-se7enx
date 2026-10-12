@@ -9,9 +9,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expait386ehelpers.php';
+require_once __DIR__ . '/expaiprovidertesthelpers.php';
 
-class expAiT386EMcpServer
+class expAiProviderTestMcpServer
 {
     /** @var array tools/list pages */
     public $pages = array();
@@ -19,7 +19,7 @@ class expAiT386EMcpServer
     /** @var array|null the result of tools/call, or an exception */
     public $call = null;
 
-    /** @return callable an answer for expAiT386EHttp that reads the JSON-RPC request */
+    /** @return callable an answer for expAiProviderTestHttp that reads the JSON-RPC request */
     public function answer()
     {
         return function ( $url, array $headers, $body ) {
@@ -29,7 +29,7 @@ class expAiT386EMcpServer
             {
                 case 'initialize':
                     return array( 200, json_encode( array( 'jsonrpc' => '2.0', 'id' => $id, 'result' => array( 'protocolVersion' => '2025-03-26' ) ) ),
-                                  array( 'content-type' => 'application/json', 'mcp-session-id' => 'sess-t386e' ) );
+                                  array( 'content-type' => 'application/json', 'mcp-session-id' => 'sess-xte' ) );
                 case 'notifications/initialized':
                     return array( 202, '' );
                 case 'tools/list':
@@ -45,14 +45,14 @@ class expAiT386EMcpServer
         };
     }
 
-    /** @return expAiT386EHttp a client that answers every request so */
+    /** @return expAiProviderTestHttp a client that answers every request so */
     public function http( $requests = 12 )
     {
-        return new expAiT386EHttp( array_fill( 0, $requests, $this->answer() ) );
+        return new expAiProviderTestHttp( array_fill( 0, $requests, $this->answer() ) );
     }
 }
 
-class expAiMcpClientTest extends expAiT386ETestCase
+class expAiMcpClientTest extends expAiProviderTestCase
 {
     private static function client( array $settings, $http )
     {
@@ -74,7 +74,7 @@ class expAiMcpClientTest extends expAiT386ETestCase
 
     public function testTheAddressRules(): void
     {
-        $http = new expAiT386EHttp();
+        $http = new expAiProviderTestHttp();
         $this->assertSame( 'http://127.0.0.1:9/mcp', self::client( array(), $http )->checkedUrl() );
         $this->expectDetail( function () use ( $http ) { self::client( array( 'URL' => 'mcp.example/x' ), $http )->checkedUrl(); }, 'URL is not an absolute URL without credentials' );
         $this->expectDetail( function () use ( $http ) { self::client( array( 'URL' => 'https://u:p@mcp.example/x' ), $http )->checkedUrl(); }, 'URL is not an absolute URL without credentials' );
@@ -84,7 +84,7 @@ class expAiMcpClientTest extends expAiT386ETestCase
                              'https is required (http only for a loopback address)' );
         $this->assertSame( 'https://[2606:4700::1]/mcp', self::client( array( 'URL' => 'https://[2606:4700::1]/mcp' ), $http )->checkedUrl() );
         // a host name is resolved and its address pinned for the request
-        $server = new expAiT386EMcpServer();
+        $server = new expAiProviderTestMcpServer();
         $http = $server->http();
         self::client( array( 'URL' => 'http://localhost:9/mcp' ), $http )->initialize();
         $this->assertSame( array( 'localhost:9:127.0.0.1' ), $http->requests[0][3]['resolve'] );
@@ -96,7 +96,7 @@ class expAiMcpClientTest extends expAiT386ETestCase
 
     public function testInitializeKeepsTheSessionAndTheNegotiatedVersion(): void
     {
-        $server = new expAiT386EMcpServer();
+        $server = new expAiProviderTestMcpServer();
         $server->pages = array( array( 'tools' => array( array( 'name' => 'search' ), 'junk', array( 'no' => 'name' ) ), 'nextCursor' => 'p2' ),
                                 array( 'tools' => array( array( 'name' => 'fetch' ) ) ) );
         $http = $server->http();
@@ -107,7 +107,7 @@ class expAiMcpClientTest extends expAiT386ETestCase
         $this->assertSame( array( 'initialize', 'notifications/initialized', 'tools/list', 'tools/list' ), array_map( function ( $r ) { return json_decode( $r[2], true )['method']; }, $http->requests ) );
         $this->assertContains( 'Authorization: Bearer test-token-not-real', $http->requests[0][1] );
         $this->assertNotContains( 'MCP-Protocol-Version: 2025-06-18', $http->requests[0][1], 'initialize names the version in its body' );
-        $this->assertContains( 'Mcp-Session-Id: sess-t386e', $http->requests[1][1] );
+        $this->assertContains( 'Mcp-Session-Id: sess-xte', $http->requests[1][1] );
         $this->assertContains( 'MCP-Protocol-Version: 2025-03-26', $http->requests[2][1], 'the version the server chose' );
         $this->assertSame( array( 'cursor' => 'p2' ), json_decode( $http->requests[3][2], true )['params'] );
         $this->assertArrayNotHasKey( 'id', json_decode( $http->requests[1][2], true ), 'a notification has no id' );
@@ -126,9 +126,9 @@ class expAiMcpClientTest extends expAiT386ETestCase
             array( array( array( 200, '{"jsonrpc":"2.0","id":1,"error":{"code":-32601,"message":"no such method"}}' ) ), 'mcp tmcp: initialize error -32601 no such method' ),
         );
         foreach ( $cases as $case )
-            $this->expectDetail( function () use ( $case ) { self::client( array(), new expAiT386EHttp( $case[0] ) )->initialize(); }, $case[1] );
+            $this->expectDetail( function () use ( $case ) { self::client( array(), new expAiProviderTestHttp( $case[0] ) )->initialize(); }, $case[1] );
         // a token with a line break is never sent
-        $http = new expAiT386EHttp( array( $init, array( 202, '' ) ) );
+        $http = new expAiProviderTestHttp( array( $init, array( 202, '' ) ) );
         self::client( array( 'Token' => "a\nb" ), $http )->initialize();
         $this->assertSame( array(), $http->requests[0][1] );
     }
@@ -146,15 +146,15 @@ class expAiMcpClientTest extends expAiT386ETestCase
     public function testTheToolListIsCachedForItsTime(): void
     {
         $this->requireDatabase();
-        $server = new expAiT386EMcpServer();
+        $server = new expAiProviderTestMcpServer();
         $server->pages = array( array( 'tools' => array( array( 'name' => 'search' ) ) ) );
-        $settings = array( 'ToolsCacheTTL' => 600, 'URL' => 'http://127.0.0.1:9/mcp-t386e-' . getmypid() );
+        $settings = array( 'ToolsCacheTTL' => 600, 'URL' => 'http://127.0.0.1:9/mcp-xte-' . getmypid() );
         $file = eZSys::cacheDirectory() . '/expai/mcp/tmcp-' . substr( sha1( $settings['URL'] ), 0, 12 ) . '.json';
         $this->cleanup( static function () use ( $file ) { if ( is_file( $file ) ) unlink( $file ); } );
         $http = $server->http();
         $this->assertSame( array( array( 'name' => 'search' ) ), self::client( $settings, $http )->cachedTools() );
         $this->assertFileExists( $file );
-        $again = new expAiT386EHttp();
+        $again = new expAiProviderTestHttp();
         $this->assertSame( array( array( 'name' => 'search' ) ), self::client( $settings, $again )->cachedTools() );
         $this->assertSame( array(), $again->requests, 'the second time from the cache' );
     }
@@ -165,7 +165,7 @@ class expAiMcpClientTest extends expAiT386ETestCase
         $this->asUser( 'admin' );
         $folder = $this->folder( 'expai unit test mcp' );
         $this->inTransaction();
-        $server = new expAiT386EMcpServer();
+        $server = new expAiProviderTestMcpServer();
         $http = $server->http( 30 );
         $client = self::client( array(), $http );
         $settings = array( 'ServerId' => 'tmcp', 'Label' => "Docs\nserver", 'Region' => 'eu', 'Retention' => 'none', 'MaxResultBytes' => 1000 );

@@ -10,10 +10,10 @@
  */
 
 /**
- * A provider that never leaves the process: it answers from a list the test sets (expAiT386CStubProvider::$answers,
+ * A provider that never leaves the process: it answers from a list the test sets (expAiContentStubProvider::$answers,
  * each an answer array, a text, or a Throwable to throw) and keeps every request it got.
  */
-class expAiT386CStubProvider implements expAiProvider
+class expAiContentStubProvider implements expAiProvider
 {
     /** @var array */
     public static $answers = array();
@@ -60,12 +60,12 @@ class expAiT386CStubProvider implements expAiProvider
 
     public function providerId()
     {
-        return isset( $this->settings['ProviderId'] ) ? (string) $this->settings['ProviderId'] : 't386c';
+        return isset( $this->settings['ProviderId'] ) ? (string) $this->settings['ProviderId'] : 'xtc';
     }
 
     public function modelAlias()
     {
-        return isset( $this->settings['ModelAlias'] ) ? (string) $this->settings['ModelAlias'] : 't386c.m';
+        return isset( $this->settings['ModelAlias'] ) ? (string) $this->settings['ModelAlias'] : 'xtc.m';
     }
 
     public function toolUse()
@@ -74,10 +74,10 @@ class expAiT386CStubProvider implements expAiProvider
     }
 }
 
-abstract class expAiT386CContentTestCase extends expAiTestCase
+abstract class expAiContentTestCase extends expAiTestCase
 {
-    const PROVIDER = 't386c';
-    const ALIAS = 't386c.m';
+    const PROVIDER = 'xtc';
+    const ALIAS = 'xtc.m';
     const SOURCE = 'eng-US';
     const TARGET = 'ger-DE';
 
@@ -88,13 +88,13 @@ abstract class expAiT386CContentTestCase extends expAiTestCase
     {
         parent::setUp();
         $this->globals = array( $_POST, $_GET, $_SERVER );
-        expAiT386CStubProvider::reset();
+        expAiContentStubProvider::reset();
     }
 
     protected function tearDown(): void
     {
         list( $_POST, $_GET, $_SERVER ) = $this->globals;
-        expAiT386CStubProvider::reset();
+        expAiContentStubProvider::reset();
         parent::tearDown();
     }
 
@@ -107,7 +107,7 @@ abstract class expAiT386CContentTestCase extends expAiTestCase
         $settings = array(
             'AISettings' => array( 'Enabled' => 'true', 'Model' => '', 'AllowUserModelChoice' => 'disabled', 'AllowedModels' => array(), 'DisabledSiteAccesses' => array() ),
             'ProviderSettings' => array( 'Providers' => array( self::PROVIDER ), 'DefaultModel' => self::ALIAS, 'ProvidersWithoutPolicy' => array( self::PROVIDER ) ),
-            'Provider_' . self::PROVIDER => array( 'Type' => 'custom', 'Class' => 'expAiT386CStubProvider', 'Label' => 'Stub (tests)', 'Region' => 'eu',
+            'Provider_' . self::PROVIDER => array( 'Type' => 'custom', 'Class' => 'expAiContentStubProvider', 'Label' => 'Stub (tests)', 'Region' => 'eu',
                                                    'Retention' => 'zdr', 'ApiKey' => 'stub-key' ),
             'Model_' . self::ALIAS => array( 'Provider' => self::PROVIDER, 'Id' => 'stub-model', 'Label' => 'Stub model', 'ToolUse' => 'native',
                                              'Capabilities' => array( 'json_schema', 'vision' ), 'InputPerMTok' => '1', 'OutputPerMTok' => '5' ),
@@ -223,7 +223,7 @@ abstract class expAiT386CContentTestCase extends expAiTestCase
     {
         $dir = expAiTestMockServer::tmp( 'image' );
         $this->cleanup( static function () use ( $dir ) { expAiTestMockServer::removeTree( $dir ); } );
-        $file = $dir . '/t386.png';
+        $file = $dir . '/xt.png';
         $gd = imagecreatetruecolor( (int) $width, (int) $height );
         imagefill( $gd, 0, 0, imagecolorallocate( $gd, 200, 30, 30 ) );
         imagepng( $gd, $file );

@@ -9,9 +9,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expait386ehelpers.php';
+require_once __DIR__ . '/expaiprovidertesthelpers.php';
 
-class expAiT386ESearch extends expAiWebSearchProvider
+class expAiProviderTestSearch extends expAiWebSearchProvider
 {
     public $rows = array();
 
@@ -21,7 +21,7 @@ class expAiT386ESearch extends expAiWebSearchProvider
     }
 }
 
-class expAiWebFetchTest extends expAiT386ETestCase
+class expAiWebFetchTest extends expAiProviderTestCase
 {
     protected function setUp(): void
     {
@@ -250,7 +250,7 @@ class expAiWebFetchTest extends expAiT386ETestCase
 
     public function testTheRealTransportReadsALocalPageAndStopsAtTheLimit(): void
     {
-        $www = expAiTestMockServer::tmp( 't386e-www' );
+        $www = expAiTestMockServer::tmp( 'xte-www' );
         $this->cleanup( static function () use ( $www ) { expAiTestMockServer::removeTree( $www ); } );
         file_put_contents( $www . '/page.php', '<?php header( "Content-Type: text/html; charset=utf-8" ); echo "<title>Local</title><p>" . str_repeat( "word ", 2000 ) . "</p>";' );
         file_put_contents( $www . '/move.php', '<?php header( "Location: /page.php", true, 302 );' );
@@ -275,8 +275,8 @@ class expAiWebFetchTest extends expAiT386ETestCase
         // a host name: the checked address is pinned for curl
         file_put_contents( $www . '/small.txt', 'small page' );
         expAiWebGuard::$resolver = function () { return array( '127.0.0.1' ); };
-        $named = new expAiWebFetcher( $this->webConfig( array( 'AllowedDomains' => array( 't386e.invalid' ), 'PrivateHosts' => array( 't386e.invalid' ), 'AllowedPorts' => array( $port ) ) ) );
-        $page = $named->fetch( 'http://t386e.invalid:' . $port . '/small.txt' );
+        $named = new expAiWebFetcher( $this->webConfig( array( 'AllowedDomains' => array( 'xte.invalid' ), 'PrivateHosts' => array( 'xte.invalid' ), 'AllowedPorts' => array( $port ) ) ) );
+        $page = $named->fetch( 'http://xte.invalid:' . $port . '/small.txt' );
         $this->assertSame( array( 'small page', false, 'text/plain' ), array( $page['body'], $page['truncated'], $page['content_type'] ) );
 
         $probe = stream_socket_server( 'tcp://127.0.0.1:0' );
@@ -299,7 +299,7 @@ class expAiWebFetchTest extends expAiT386ETestCase
 
     public function testTheBraveSearchRequestAndItsResults(): void
     {
-        $http = new expAiT386EHttp( array( array( 200, json_encode( array( 'web' => array( 'results' => array(
+        $http = new expAiProviderTestHttp( array( array( 200, json_encode( array( 'web' => array( 'results' => array(
             array( 'title' => '<b>Spring</b> &amp; events', 'url' => 'https://a.example/', 'description' => 'Snip <em>pet</em>' ),
             'junk', array( 'title' => 'no url' ),
             array( 'title' => 'Two', 'url' => 'https://b.example/', 'description' => '' ),
@@ -317,7 +317,7 @@ class expAiWebFetchTest extends expAiT386ETestCase
 
         foreach ( array( 401 => 'search: HTTP 401', 403 => 'search: HTTP 403', 429 => 'search: HTTP 429', 500 => 'search: HTTP 500' ) as $status => $detail )
         {
-            $brave->http = new expAiT386EHttp( array( array( $status, '' ) ) );
+            $brave->http = new expAiProviderTestHttp( array( array( $status, '' ) ) );
             try
             {
                 $brave->search( 'x', 3 );
@@ -359,15 +359,15 @@ class expAiWebFetchTest extends expAiT386ETestCase
     public function testTheSearchProviderComesFromTheSettings(): void
     {
         $this->assertNull( expAiWebSearchProvider::fromConfig( $this->config( array( 'SearchSettings' => array( 'Provider' => 'Bad Id' ) ) ) ) );
-        $this->assertNull( expAiWebSearchProvider::fromConfig( $this->config( array( 'SearchSettings' => array( 'Provider' => 't386enone' ) ) ) ) );
-        $this->assertNull( expAiWebSearchProvider::fromConfig( $this->config( array( 'SearchSettings' => array( 'Provider' => 't386e' ),
-                                                                                        'SearchProvider_t386e' => array( 'Class' => 'expAiConfig', 'ApiKey' => 'k' ) ) ) ) );
-        $this->assertNull( expAiWebSearchProvider::fromConfig( $this->config( array( 'SearchSettings' => array( 'Provider' => 't386e' ),
-                                                                                        'SearchProvider_t386e' => array( 'Class' => 'expAiT386ESearch', 'ApiKey' => '' ) ) ) ), 'no key' );
-        $provider = expAiWebSearchProvider::fromConfig( $this->config( array( 'SearchSettings' => array( 'Provider' => 't386e' ),
-                                                                              'SearchProvider_t386e' => array( 'Class' => 'expAiT386ESearch', 'ApiKey' => 'k', 'Label' => 'Test search' ) ) ) );
-        $this->assertInstanceOf( 'expAiT386ESearch', $provider );
-        $this->assertSame( array( 't386e', 'Test search' ), array( $provider->id(), $provider->label() ) );
+        $this->assertNull( expAiWebSearchProvider::fromConfig( $this->config( array( 'SearchSettings' => array( 'Provider' => 'xtenone' ) ) ) ) );
+        $this->assertNull( expAiWebSearchProvider::fromConfig( $this->config( array( 'SearchSettings' => array( 'Provider' => 'xte' ),
+                                                                                        'SearchProvider_xte' => array( 'Class' => 'expAiConfig', 'ApiKey' => 'k' ) ) ) ) );
+        $this->assertNull( expAiWebSearchProvider::fromConfig( $this->config( array( 'SearchSettings' => array( 'Provider' => 'xte' ),
+                                                                                        'SearchProvider_xte' => array( 'Class' => 'expAiProviderTestSearch', 'ApiKey' => '' ) ) ) ), 'no key' );
+        $provider = expAiWebSearchProvider::fromConfig( $this->config( array( 'SearchSettings' => array( 'Provider' => 'xte' ),
+                                                                              'SearchProvider_xte' => array( 'Class' => 'expAiProviderTestSearch', 'ApiKey' => 'k', 'Label' => 'Test search' ) ) ) );
+        $this->assertInstanceOf( 'expAiProviderTestSearch', $provider );
+        $this->assertSame( array( 'xte', 'Test search' ), array( $provider->id(), $provider->label() ) );
         $this->assertSame( array( array( 'id' => 'web_fetch', 'name' => 'Web page (web_fetch)' ), array( 'id' => 'web_search', 'name' => 'Web search (web_search)' ),
                                   array( 'id' => 'project_history', 'name' => 'Project history (project_history)' ) ), ( new expAiWebPolicy( array() ) )->tools() );
     }
@@ -391,7 +391,7 @@ class expAiWebFetchTest extends expAiT386ETestCase
         {
             $this->assertSame( 'search: no provider or no key', $e->detail() );
         }
-        $tool->provider = new expAiT386ESearch( array( 'ApiKey' => 'k', 'ProviderId' => 't386e', 'Label' => 'T', 'Region' => 'eu', 'Retention' => 'none' ) );
+        $tool->provider = new expAiProviderTestSearch( array( 'ApiKey' => 'k', 'ProviderId' => 'xte', 'Label' => 'T', 'Region' => 'eu', 'Retention' => 'none' ) );
         $tool->provider->rows = array( array( 'title' => 'A', 'url' => 'https://a.example/x', 'snippet' => '' ), array( 'title' => 'B', 'url' => 'https://b.example/', 'snippet' => '' ),
                                        array( 'title' => 'C', 'url' => 'https://c.example/', 'snippet' => '' ) );
         $this->assertTrue( $tool->configured( $config ) );
@@ -401,7 +401,7 @@ class expAiWebFetchTest extends expAiT386ETestCase
         $this->assertSame( 'spring events', $result['query'] );
         $this->assertSame( array( true, false ), array_column( $result['results'], 'fetchable' ) );
         $this->assertSame( 'web search (T)', $result['source'] );
-        $this->assertSame( array( 'host' => 'search:t386e' ), $tool->logFields() );
+        $this->assertSame( array( 'host' => 'search:xte' ), $tool->logFields() );
         $this->assertSame( array( '%query' => 'spring events' ), $tool->stepArguments( array( 'query' => "spring\nevents" ), null ) );
         $this->assertSame( 'Searched the web for "%query"', $tool->stepText( array() ) );
         try

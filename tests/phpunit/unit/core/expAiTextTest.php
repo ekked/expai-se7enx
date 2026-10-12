@@ -10,7 +10,7 @@
 
 require_once __DIR__ . '/expaicoretestcase.php';
 
-class expAiTextTest extends expAiT386DCoreTestCase
+class expAiTextTest extends expAiCoreTestCase
 {
     public function testCutIsMultibyteSafeAndMarksTheCut(): void
     {

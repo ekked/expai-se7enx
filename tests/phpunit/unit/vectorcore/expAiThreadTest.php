@@ -8,9 +8,9 @@
  * @package expai
  */
 
-require_once __DIR__ . '/expaivbfixture.php';
+require_once __DIR__ . '/expaivectorcoretestcase.php';
 
-class expAiThreadTest extends expAiT386VbCase
+class expAiThreadTest extends expAiVectorCoreTestCase
 {
     /** @var int a user id no real user has: the lists below are this test's threads only */
     private $owner = 0;
@@ -78,13 +78,13 @@ class expAiThreadTest extends expAiT386VbCase
         $earlier = $this->own( array( 'title' => 'earlier panel', 'origin' => expAiThread::ORIGIN_PANEL, 'node_id' => 2, 'scope' => array( 'nodes' => array( 2 ) ) ) );
         $conversation = new expAiConversation( array( 'user_id' => $this->owner, 'node_id' => 2, 'messages' => '[]', 'created' => time(), 'modified' => time() ) );
         $conversation->store();
-        $thread = expAiThread::forPanelConversation( $conversation, 2, 't386b.stub' );
+        $thread = expAiThread::forPanelConversation( $conversation, 2, 'xtb.stub' );
         $id = (int) $thread->attribute( 'id' );
         $this->cleanup( static function () use ( $id ) { if ( $t = expAiThread::fetchByID( $id ) ) $t->removeAll( true ); } );
         $this->assertSame( expAiThread::ORIGIN_PANEL, $thread->attribute( 'origin' ) );
         $this->assertSame( 'direct', $thread->attribute( 'review_policy' ) );
         $this->assertSame( 2, (int) $thread->attribute( 'node_id' ) );
-        $this->assertSame( 't386b.stub', $thread->attribute( 'model_alias' ) );
+        $this->assertSame( 'xtb.stub', $thread->attribute( 'model_alias' ) );
         $this->assertSame( (int) $conversation->attribute( 'id' ), (int) $thread->conversation()->attribute( 'id' ) );
         $this->assertSame( 'settled', expAiThread::fetchByID( (int) $earlier->attribute( 'id' ) )->attribute( 'shelf' ) );
 
@@ -100,18 +100,18 @@ class expAiThreadTest extends expAiT386VbCase
         $thread->setAttribute( 'title', '' );
         $thread->store();
         $conversation = $thread->conversation();
-        $conversation->setAttribute( 'model_alias', 't386b.stub' );
-        $conversation->setAttribute( 'provider', 't386b' );
+        $conversation->setAttribute( 'model_alias', 'xtb.stub' );
+        $conversation->setAttribute( 'provider', 'xtb' );
         $conversation->store();
         $this->ini( 'ThreadSettings', 'TitleLength', '20' );
         expAiThread::afterStep( $conversation, array( 'status' => 'continue', 'text' => '', 'steps' => array( array( 'text' => 'Read the node', 'ok' => true ) ),
-                                                      'exchange' => array( 'user' => "T386B what is\nin this long article about opening hours" ) ) );
+                                                      'exchange' => array( 'user' => "XTB what is\nin this long article about opening hours" ) ) );
         $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) );
         $this->assertSame( 'running', $fresh->attribute( 'state' ) );
-        $this->assertStringStartsWith( 'T386B what is in', (string) $fresh->attribute( 'title' ), 'the first request becomes the title' );
+        $this->assertStringStartsWith( 'XTB what is in', (string) $fresh->attribute( 'title' ), 'the first request becomes the title' );
         $this->assertLessThanOrEqual( 20, mb_strlen( (string) $fresh->attribute( 'title' ) ) );
-        $this->assertSame( 't386b.stub', $fresh->attribute( 'model_alias' ) );
-        $this->assertSame( 't386b', $fresh->attribute( 'provider' ) );
+        $this->assertSame( 'xtb.stub', $fresh->attribute( 'model_alias' ) );
+        $this->assertSame( 'xtb', $fresh->attribute( 'provider' ) );
         $this->assertContains( 'step_end', self::kinds( $fresh ) );
         $this->assertSame( 'running', $fresh->leadRun()->attribute( 'state' ) );
         $this->assertSame( 0, (int) $fresh->leadRun()->attribute( 'finished' ) );
@@ -146,7 +146,7 @@ class expAiThreadTest extends expAiT386VbCase
         $thread = $this->own( array( 'title' => 'child steps' ) );
         list( $plan, $runs ) = $this->planWithRuns( $thread, array( array( 'state' => 'running' ) ) );
         $child = eZPersistentObject::fetchObject( expAiConversation::definition(), null, array( 'id' => (int) $runs[0]->attribute( 'conversation_id' ) ) );
-        $child->setAttribute( 'model_alias', 't386b.stub' );
+        $child->setAttribute( 'model_alias', 'xtb.stub' );
         $log = new expAiDraftLog( array( 'contentobject_id' => 5, 'version' => 2, 'language_code' => 'eng-GB', 'action' => 'create' ) );
         expAiThread::afterStep( $child, array( 'status' => 'failed', 'error' => 'Child failed.', 'text' => 'Partial text',
                                                'steps' => array( array( 'text' => 'Step one', 'ok' => false ) ) ), array( $log ) );
@@ -163,7 +163,7 @@ class expAiThreadTest extends expAiT386VbCase
         $this->assertSame( 5, $byKind['draft']['object_id'] );
         $this->assertArrayHasKey( 'cost', $byKind );
         $run = expAiThreadRun::fetchByID( (int) $runs[0]->attribute( 'id' ) );
-        $this->assertSame( 't386b.stub', $run->attribute( 'model_alias' ) );
+        $this->assertSame( 'xtb.stub', $run->attribute( 'model_alias' ) );
         $this->assertGreaterThan( 0, (int) $run->attribute( 'started' ) );
 
         // a run that is no longer the lead (the model was switched): its late step changes nothing
