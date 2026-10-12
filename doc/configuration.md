@@ -43,7 +43,7 @@ a list, empty it where you set it: a line with only `FieldActions[]`, then the e
 | `Retention` | `30d` | How long Anthropic keeps API data: `none`, `zdr` (zero data retention agreed), `30d`, `unknown`. Check your contract. |
 | `TermsCheckedAt` | (empty) | The day you checked the terms (YYYY-MM-DD); expai/models shows "not checked" while empty. |
 
-The settings above describe the provider "anthropic" as long as there is no `[Provider_anthropic]` group (the 0.1.0
+The settings above describe the provider "anthropic" as long as there is no `[Provider_anthropic]` group (the 0.0.1.0
 settings keep working unchanged). More providers: the next three sections and [providers.md](providers.md).
 
 ## [ProviderSettings]: the providers
@@ -52,7 +52,7 @@ settings keep working unchanged). More providers: the next three sections and [p
 | --- | --- | --- |
 | `Providers[]` | `anthropic` | The active providers, in the order the model picker shows them. Each needs a `[Provider_<id>]` group, except `anthropic`, which falls back to `[AISettings]`. |
 | `DefaultModel` | (empty) | The alias of the site default model; empty: `anthropic.<[AISettings] Model>`. |
-| `ProvidersWithoutPolicy[]` | `anthropic` | The models of these providers can be chosen by everyone with `expai/write` (as in 0.1.0); every other provider's models need `expai/model_use` (limitation Provider). Empty it to require the policy for everything but the default. |
+| `ProvidersWithoutPolicy[]` | `anthropic` | The models of these providers can be chosen by everyone with `expai/write` (as in 0.0.1.0); every other provider's models need `expai/model_use` (limitation Provider). Empty it to require the policy for everything but the default. |
 
 ## [Provider_<id>]: one provider
 

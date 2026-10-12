@@ -1,6 +1,6 @@
 # Troubleshooting
 
-Each entry was met while building and testing 0.1.0. The help pages of the administration interface
+Each entry was met while building and testing 0.0.1.0. The help pages of the administration interface
 (`expai/help`) show this page too.
 
 ## The Intelligence tab is missing
@@ -133,7 +133,7 @@ Run them as the web server's user, or add `--allow-root-user`.
 
 ## PHP deprecation notices about nullable parameters
 
-PHP 8.4 deprecates implicitly nullable typed parameters; expai 0.1.0 declares them explicitly (`?expAiConfig`).
+PHP 8.4 deprecates implicitly nullable typed parameters; expai 0.0.1.0 declares them explicitly (`?expAiConfig`).
 Notices from an older copy go away with the update.
 
 ## The dashboard shows no usage, and the debug output says "a query on expai_usage_log failed"

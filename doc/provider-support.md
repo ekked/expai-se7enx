@@ -1,6 +1,6 @@
 # Provider support: what is proven
 
-State of 2026-10-11 (expai after 0.1.0, the provider registry). Three levels:
+State of 2026-10-11 (expai after 0.0.1.0, the provider registry). Three levels:
 
 - **proven live**: run against the real service with a real answer.
 - **proven against mock (docs-derived)**: run end to end against the mock servers of `tests/mock/server.php`, whose

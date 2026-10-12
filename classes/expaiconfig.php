@@ -102,7 +102,7 @@ class expAiConfig
         return new expAiProviderRegistry( $this );
     }
 
-    /** @return string the model id of [AISettings] Model (0.1.0: the only model setting) */
+    /** @return string the model id of [AISettings] Model (0.0.1.0: the only model setting) */
     public function defaultModelId()
     {
         return trim( (string) $this->get( 'AISettings', 'Model', '' ) );

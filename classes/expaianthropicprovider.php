@@ -163,7 +163,7 @@ class expAiAnthropicProvider extends expAiProviderBase
     }
 
     /**
-     * The provider of the current user's model (kept for code written for 0.1.0: the registry decides now).
+     * The provider of the current user's model (kept for code written for 0.0.1.0: the registry decides now).
      * @return expAiProvider
      * @throws expAiException
      */

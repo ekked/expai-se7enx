@@ -67,7 +67,7 @@ $pages = $help->pages();
 $check( 'pages: readme, install, usage, index first', array_slice( array_keys( $pages ), 0, 4 ) === array( 'readme', 'install', 'usage', 'index' ), implode( ',', array_slice( array_keys( $pages ), 0, 4 ) ) );
 $docCount = count( glob( 'extension/expai/doc/*.md' ) ) + count( glob( 'extension/expai/doc/changelog/*.md' ) ) + 3;
 $check( 'every document is a page', count( $pages ) === $docCount, count( $pages ) . ' of ' . $docCount );
-$check( 'the changelog is a page', isset( $pages['changelog-0.1.0'] ) );
+$check( 'the changelog is a page', isset( $pages['changelog-0.0.1.0'] ) );
 $check( 'unknown names are no page', !$help->exists( '../settings/expai.ini' ) && !$help->exists( 'LICENSE' ) && !$help->exists( 'examples' ) && $help->page( 'nope' ) === null );
 
 // every page renders, with only the renderer's markup, and its links resolve

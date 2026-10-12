@@ -17,7 +17,7 @@
  * Backward compatible: the provider "anthropic" without a [Provider_anthropic] group is built from [AISettings]
  * (Endpoint, ApiKey, Effort ...), and every model of [AISettings] Model / AllowedModels[] without a
  * [Model_anthropic.<id>] group becomes the alias anthropic.<id> (label from ModelLabels[], priced by [Pricing]). A
- * stored preference with a bare Anthropic id (0.1.0) maps to that alias.
+ * stored preference with a bare Anthropic id (0.0.1.0) maps to that alias.
  *
  * Read fresh for every instance (no static state: Velocity's workers serve many siteaccesses).
  */
@@ -87,7 +87,7 @@ class expAiProviderRegistry
         return $this->providers;
     }
 
-    /** @return array the provider anthropic from [AISettings] (0.1.0 settings) */
+    /** @return array the provider anthropic from [AISettings] (0.0.1.0 settings) */
     protected function anthropicFromAISettings()
     {
         $settings = array( 'Type' => 'anthropic', 'Label' => 'Anthropic' );
@@ -229,7 +229,7 @@ class expAiProviderRegistry
     }
 
     /**
-     * The alias a stored value means: an alias, or a bare model id of 0.1.0 (anthropic.<id>, or the alias whose Id
+     * The alias a stored value means: an alias, or a bare model id of 0.0.1.0 (anthropic.<id>, or the alias whose Id
      * it is).
      * @return string '' when it means nothing known
      */
@@ -296,7 +296,7 @@ class expAiProviderRegistry
     }
 
     /**
-     * The provider object of a model alias (a bare id of 0.1.0 is resolved).
+     * The provider object of a model alias (a bare id of 0.0.1.0 is resolved).
      * @return expAiProvider
      * @throws expAiException
      */

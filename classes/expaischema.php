@@ -305,7 +305,7 @@ class expAiSchema
 
     /**
      * Drops the tables of REMOVED_TABLES that still exist (idempotent): expai_package, the record of expai's own
-     * package view, removed in 0.1.0 (content packages are the kernel's: Setup > Packages, ezpm).
+     * package view, removed in 0.0.1.0 (content packages are the kernel's: Setup > Packages, ezpm).
      * @return array( string[] dropped, string[] errors )
      */
     public static function dropRemoved( $db = null )

@@ -41,7 +41,7 @@ class expAiHelp
     /**
      * Every help page: README, INSTALL, USAGE, then doc/*.md in the order of doc/index.md (the rest by name), then
      * the changelogs. The name is the file name without .md, lower case (readme, install, usage, providers, ...;
-     * changelog-0.1.0 for doc/changelog/0.1.0.md).
+     * changelog-0.0.1.0 for doc/changelog/0.0.1.0.md).
      *
      * @return array name => array( 'file' => ..., 'title' => ... )
      */

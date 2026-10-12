@@ -1,6 +1,6 @@
 <?php
 /**
- * Unit test of the provider layer: the registry (and its 0.1.0 compatibility), the openai_chat adapter in both
+ * Unit test of the provider layer: the registry (and its 0.0.1.0 compatibility), the openai_chat adapter in both
  * directions (golden JSON for text, single and parallel tool calls, malformed arguments, length, content filter,
  * usage with cached and reasoning tokens, OpenRouter's reported cost, Mistral's tool names and ids, Ollama without
  * tool_choice, Hugging Face's plain-string error), error mapping, the prompted tool protocol, the JSON schema check,
@@ -33,7 +33,7 @@ $config = new expAiConfig( $shipped );
 $registry = $config->registry();
 $check( 'shipped: only anthropic is active', array_keys( $registry->providers() ), array( 'anthropic' ) );
 $check( 'shipped: default alias from [AISettings] Model', $registry->defaultAlias(), 'anthropic.claude-sonnet-5-5' );
-$check( 'shipped: bare 0.1.0 id resolves', $registry->resolveAlias( 'claude-opus-5-5' ), 'anthropic.claude-opus-5-5' );
+$check( 'shipped: bare 0.0.1.0 id resolves', $registry->resolveAlias( 'claude-opus-5-5' ), 'anthropic.claude-opus-5-5' );
 $check( 'shipped: unknown id does not resolve', $registry->resolveAlias( 'gpt-unknown' ), '' );
 $check( 'shipped: anthropic region us', $registry->getProvider( 'anthropic' )['Region'], 'us' );
 $check( 'shipped: anthropic models are trusted writers', $registry->getModel( 'anthropic.claude-sonnet-5-5' )['write_gate'], 'trusted' );

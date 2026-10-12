@@ -184,7 +184,7 @@ class expAiConversation extends eZPersistentObject
         $this->storeDocument( $document );
     }
 
-    /** @return bool the history is kept (a conversation from before 0.1.0's history has none) */
+    /** @return bool the history is kept (a conversation from before 0.0.1.0's history has none) */
     public function hasHistory()
     {
         $document = $this->document();
@@ -192,7 +192,7 @@ class expAiConversation extends eZPersistentObject
     }
 
     /**
-     * The model the conversation is bound to: its alias and provider. A conversation of 0.1.0 has none (it was
+     * The model the conversation is bound to: its alias and provider. A conversation of 0.0.1.0 has none (it was
      * Anthropic's). Thinking blocks and provider state (native_json) are only ever sent back to the same model, so a
      * change of model starts a fresh window (expAiAssistant::compact()).
      * @return string alias, '' when unbound

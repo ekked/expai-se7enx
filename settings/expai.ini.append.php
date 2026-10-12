@@ -31,7 +31,7 @@ AnthropicVersion=2023-06-01
 Model=claude-sonnet-5-5
 
 # Users may choose another model from AllowedModels[] (dashboard, panel, edit form; preference expai_model).
-# The site default (Model) is always allowed. Each entry was checked against the Anthropic Models API for 0.1.0.
+# The site default (Model) is always allowed. Each entry was checked against the Anthropic Models API for 0.0.1.0.
 AllowUserModelChoice=enabled
 AllowedModels[]=claude-sonnet-5-5
 AllowedModels[]=claude-opus-5-5
@@ -86,7 +86,7 @@ TermsCheckedAt=
 
 [ProviderSettings]
 # The providers the model picker offers, in this order. "anthropic" without a [Provider_anthropic] group is built
-# from [AISettings] above (the settings of 0.1.0), with one model anthropic.<id> per [AISettings] AllowedModels[].
+# from [AISettings] above (the settings of 0.0.1.0), with one model anthropic.<id> per [AISettings] AllowedModels[].
 # Add another with Providers[]=<id> and a [Provider_<id>] group; its models are the [Model_<alias>] groups that name
 # it. The groups below are examples that are not active until listed here (and given a key in settings/override).
 Providers[]=anthropic
@@ -94,7 +94,7 @@ Providers[]=anthropic
 # The site default model alias (empty: anthropic.<[AISettings] Model>).
 DefaultModel=
 
-# The models of these providers can be chosen by every user with expai/write (as in 0.1.0). The models of every
+# The models of these providers can be chosen by every user with expai/write (as in 0.0.1.0). The models of every
 # other provider need the policy expai/model_use (limitation Provider). Empty it ("ProvidersWithoutPolicy[]" alone)
 # to require the policy for every choice but the site default.
 ProvidersWithoutPolicy[]=anthropic
@@ -1235,6 +1235,16 @@ Binding[steer]=Alt+Enter
 When[steer]=composer
 Binding[queue]=Mod+Shift+Enter
 When[queue]=composer
+
+# ---- Checkpoints (doc/checkpoints.md) ---------------------------------------------------------------------------
+[VectorSettings]
+# enabled: a checkpoint at the start of every turn of a Vector thread, before accepted changes are written and before
+# an approved plan runs; the editor restores the thread to one of them
+Checkpoints=enabled
+# The largest checkpoint in bytes; over it the checkpoint keeps the conversation and the decisions, not the values
+MaxCheckpointBytes=1048576
+# The newest checkpoints kept per thread (older ones go; all go after [ThreadSettings] CheckpointKeepDays)
+MaxCheckpointsPerThread=50
 
 # ------------------------------------------------------------------ web and history tools (#369)
 # doc/tools.md (web_fetch, web_search, project_history), doc/security.md. Each tool is offered only to users with

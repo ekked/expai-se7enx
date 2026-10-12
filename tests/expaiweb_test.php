@@ -256,7 +256,7 @@ expAiProjectHistory::$githubTransport = function ( $url )
     return array( 200, json_encode( array(
         array( 'tag_name' => 'v0.2.0', 'name' => '0.2.0', 'published_at' => '2026-10-10T10:00:00Z', 'html_url' => 'https://github.com/se7enxweb/expai/releases/tag/v0.2.0',
                'body' => "Added: web tools\nVerified with ai/bin/one/x.sh\nUpdated: docs", 'draft' => false ),
-        array( 'tag_name' => 'v0.1.0', 'name' => '0.1.0', 'published_at' => '2026-09-01T10:00:00Z', 'html_url' => 'https://github.com/se7enxweb/expai/releases/tag/v0.1.0', 'body' => 'First', 'draft' => false ),
+        array( 'tag_name' => 'v0.0.1.0', 'name' => '0.0.1.0', 'published_at' => '2026-09-01T10:00:00Z', 'html_url' => 'https://github.com/se7enxweb/expai/releases/tag/v0.0.1.0', 'body' => 'First', 'draft' => false ),
         array( 'tag_name' => 'v0.3.0', 'name' => 'draft', 'published_at' => '', 'body' => '', 'draft' => true ) ) ) );
 };
 $releases = $history->releases( $repos['expai'], array( 'limit' => 5 ) );

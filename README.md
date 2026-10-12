@@ -10,7 +10,7 @@ publishing, where an approval workflow holds them for the approver.
 Copyright (C) 1998 - 2026 7x & Exponential Foundation. All rights reserved.
 Licensed under the GNU General Public License v2.0 (or any later version), see [LICENSE](LICENSE).
 
-Version 0.1.0. What is new: [doc/changelog/0.1.0.md](doc/changelog/0.1.0.md).
+Version 0.0.1.0. What is new: [doc/changelog/0.0.1.0.md](doc/changelog/0.0.1.0.md).
 
 ## Why Exponential Intelligence
 
@@ -140,7 +140,7 @@ and its coverage: [doc/testing.md](doc/testing.md).
 
 ## Screenshots
 
-Taken at 960 px width and device scale 2 during the tests of 0.1.0 and kept outside the repository, because they show
+Taken at 960 px width and device scale 2 during the tests of 0.0.1.0 and kept outside the repository, because they show
 a real installation: the empty panel and a conversation with its steps and drafts; the history collapsed and
 expanded; the edit form with "Fill the fields", the field actions, the presets and the Improve menu; the label in My
 drafts, a version view and an approval item; the dashboard in light and dark and in German; the models page with the

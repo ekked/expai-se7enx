@@ -26,7 +26,7 @@ TermsCheckedAt=2026-10-11
 ```
 
 `anthropic` is always built from `[AISettings]` unless you add a `[Provider_anthropic]` group: an installation of
-0.1.0 keeps working without a change, its models become the aliases `anthropic.<id>`, and a stored model choice with a
+0.0.1.0 keeps working without a change, its models become the aliases `anthropic.<id>`, and a stored model choice with a
 bare id (`claude-opus-5-5`) is read as that alias. The extension ships example groups for Hugging Face, OpenRouter,
 Mistral and a local Ollama (`[Provider_huggingface]` ...) with example models; they are inactive until listed in
 `Providers[]`. Every setting is in [configuration.md](configuration.md).

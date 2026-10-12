@@ -9,7 +9,7 @@ The short version is the [checklist](#checklist-install-and-upgrade) at the end.
 - Exponential 6.0.14 or later (the legacy kernel), PHP 8.0 or later with `curl`, `dom`, `json` and `mbstring`.
 - The extensions **ezjscore** (the browser talks to expai through `ezjscore/call`) and, recommended, **ezformtoken**
   (every expai request carries the form token).
-- For queued work the extension **expqueue** (0.1.0 or later): lanes and provider batches, budgets, AI chains,
+- For queued work the extension **expqueue** (0.0.1.0 or later): lanes and provider batches, budgets, AI chains,
   translation sync, the "Missing alt text" report, large package imports and background runs of Vector. Without it
   the panel, the edit form, Vector's direct runs and the dashboard work; the queued features say that they need it.
 - Optional: **expmcp** 0.3.1 or later for the in-process MCP bridge ([doc/mcp.md](doc/mcp.md)), **expservices** for

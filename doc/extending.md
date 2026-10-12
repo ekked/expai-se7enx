@@ -2,7 +2,7 @@
 
 Everything below is added from an extension of your own, by settings and small classes; expai itself is not changed.
 The worked examples are the extension in [examples/expaiexample](examples/expaiexample), which was installed and run
-for 0.1.0 (results below each example). Its class files end in `.php.example` inside expai; rename them when you
+for 0.0.1.0 (results below each example). Its class files end in `.php.example` inside expai; rename them when you
 copy the example.
 
 ## 0. Your extension
@@ -55,7 +55,7 @@ value, the other fields of the form, your `Instruction` and the editor's input, 
 value is cleaned for the datatype. `Input` is `none`, `instruction`, `optional_instruction` or `language`. Translate
 the label in the context `extension/expai/fieldaction` (translations.md).
 
-*Run for 0.1.0*: the edit form showed `Headline, Write, Rewrite, Translate, Suggest` next to the ezstring fields;
+*Run for 0.0.1.0*: the edit form showed `Headline, Write, Rewrite, Translate, Suggest` next to the ezstring fields;
 Headline on the title of a draft filled a seven word headline with the note "Seven words, plain text. Alternative:
 ...".
 
@@ -139,7 +139,7 @@ Rules for tools:
   `stepArguments()`).
 - Conversations keep the tool definitions they started with: a new tool is offered in new conversations.
 
-*Run for 0.1.0*: asked "How many children does this folder have, per class? Use the count_children tool.", the panel
+*Run for 0.0.1.0*: asked "How many children does this folder have, per class? Use the count_children tool.", the panel
 showed the step "Counted the children of node 32303" and the answer "... 2 children in this folder, both of class
 article".
 
@@ -232,7 +232,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 | `ExpAi.panelSections.register( name, init( panel ) )` | runs when the panel starts |
 | `ExpAi.esc`, `ExpAi.format`, `ExpAi.renderText`, `ExpAi.url` | escaping, `%placeholder` replacement, the panel's text rendering, a URL below the siteaccess root |
 
-*Run for 0.1.0*: the section showed "3 draft(s) in this panel" after the panel loaded.
+*Run for 0.0.1.0*: the section showed "3 draft(s) in this panel" after the panel loaded.
 
 ## 5. A provider
 
@@ -295,7 +295,7 @@ For the usage log and the limits, a provider returns optionally `tokens` — the
 is stored with every row, so the log and the dashboard can tell providers apart. Costs come from the `[Pricing]`
 table by model id; add the provider's models there, or they are estimated with the `Default*` prices (shown as `≈`).
 
-*Run for 0.1.0*: with the settings above (switched on in-process), a plain request answered "Echo: Hello provider
+*Run for 0.0.1.0*: with the settings above (switched on in-process), a plain request answered "Echo: Hello provider
 (model echo, stop_reason end_turn)" and a structured one `{"value":"Echo: Make a headline","note":"expAiExampleEchoProvider"}`.
 
 **Another Anthropic model** needs no code: `[AISettings] Model=<model id>` (and `Effort=` as that model supports).
