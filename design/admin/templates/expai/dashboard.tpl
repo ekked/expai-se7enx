@@ -53,7 +53,7 @@
                 <div><dt>{'Models and providers'|i18n( 'extension/expai/models' )}</dt><dd><a href={'expai/models'|ezurl}>{'Providers, regions, probe results and the local model'|i18n( 'extension/expai/models' )}</a></dd></div>
 {/if}
 {if fetch( 'user', 'has_access_to', hash( 'module', 'expai', 'function', 'facts' ) )}
-                <div><dt>{'AI facts'|i18n( 'extension/expai/facts' )}</dt><dd><a href={'expai/facts'|ezurl}>{'What goes where, kept how long, used by whom, at what cost (printable)'|i18n( 'extension/expai/facts' )}</a></dd></div>
+                <div><dt>{'EI: Summary'|i18n( 'extension/expai/facts' )}</dt><dd><a href={'expai/summary'|ezurl}>{'What goes where, kept how long, used by whom, at what cost (printable)'|i18n( 'extension/expai/facts' )}</a></dd></div>
 {/if}
                 <div class="exp-ai-help-row"><dt>{'Missing alt text'|i18n( 'extension/expai/alttext' )}</dt><dd><a href={'expai/alttext'|ezurl}>{'Images without alt text, and suggestions as drafts'|i18n( 'extension/expai/help' )}</a></dd></div>
                 <div class="exp-ai-help-row"><dt>{'Help'|i18n( 'extension/expai/help' )}</dt><dd><a href={'expai/help'|ezurl}>{'The documentation of Exponential Intelligence'|i18n( 'extension/expai/help' )}</a></dd></div>

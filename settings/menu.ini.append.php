@@ -25,20 +25,24 @@ Links[expai_help]=expai/help
 LinkNames[expai_help]=EI: Help
 PolicyList_expai_help[]=expai/write
 
-# Setup > AI facts: the printable "AI facts" page for a data protection officer (doc/ai-facts.md), shown only to users
+# Setup > EI: Summary (expai/summary, formerly "AI facts"): the printable page for a data protection officer (doc/ai-facts.md), shown only to users
 # with the policy expai/facts (the Administrator role holds every policy).
 [Leftmenu_setup]
-Links[expai_facts]=expai/facts
-LinkNames[expai_facts]=AI facts
+Links[expai_facts]=expai/summary
+LinkNames[expai_facts]=EI: Summary
 PolicyList_expai_facts[]=expai/facts
-# Setup > AI models: providers, key presence, probe results, the local model (doc/local-models.md, expai/model_manage)
+# Setup > EI: Models: providers, key presence, probe results, the local model (doc/local-models.md, expai/model_manage)
 Links[expai_models]=expai/models
-LinkNames[expai_models]=AI models
+LinkNames[expai_models]=EI: Models
 PolicyList_expai_models[]=expai/model_manage
-# Setup > Budgets and lanes: the monthly budget of queued requests, job groups, lanes, batches (doc/budgets.md)
+# Setup > EI: Budgets: the monthly budget of queued requests, job groups, lanes, batches (doc/budgets.md)
 Links[expai_budgets]=expai/budgets
-LinkNames[expai_budgets]=Budgets and lanes
+LinkNames[expai_budgets]=EI: Budgets
 PolicyList_expai_budgets[]=expai/log
+# Setup > Job queue (extension expqueue), listed right after EI: Budgets
+Links[expqueue]=expqueue/dashboard
+LinkNames[expqueue]=Job queue
+PolicyList_expqueue[]=expqueue/view
 # Setup > Content packages: upload, validate, dry run, import as drafts (doc/packages.md)
 Links[expai_packages]=expai/packages
 LinkNames[expai_packages]=Content packages

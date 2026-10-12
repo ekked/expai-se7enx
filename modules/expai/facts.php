@@ -14,10 +14,14 @@
 /** @var eZModule $Module */
 $Module = $Params['Module'];
 
+// The page is called EI: Summary and lives at expai/summary; the old address expai/facts goes there.
+if ( isset( $Params['FunctionName'] ) && $Params['FunctionName'] === 'facts' )
+    return $Module->redirectTo( '/expai/summary' );
+
 $tpl = eZTemplate::factory();
 $tpl->setVariable( 'facts', ( new expAiFacts() )->collect() );
 
 $Result = array();
 $Result['content'] = $tpl->fetch( 'design:expai/facts.tpl' );
 $Result['path'] = array( array( 'url' => 'expai/dashboard', 'text' => ezpI18n::tr( 'extension/expai/facts', 'Exponential Intelligence' ) ),
-                         array( 'url' => false, 'text' => ezpI18n::tr( 'extension/expai/facts', 'AI facts' ) ) );
+                         array( 'url' => false, 'text' => ezpI18n::tr( 'extension/expai/facts', 'EI: Summary' ) ) );

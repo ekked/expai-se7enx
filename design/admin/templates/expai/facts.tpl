@@ -8,7 +8,7 @@
     <header class="exp-ai-head">
         <span class="exp-ai-mark" aria-hidden="true"></span>
         <div>
-            <h1 class="context-title">{'AI facts'|i18n( 'extension/expai/facts' )}</h1>
+            <h1 class="context-title">{'EI: Summary'|i18n( 'extension/expai/facts' )}</h1>
             <p class="exp-ai-sub">{'What Exponential Intelligence sends where, how long it is kept, who may use it and what it costs. As of %date, %site, expai %version.'|i18n( 'extension/expai/facts',, hash( '%date', $facts.generated|l10n( 'shortdatetime' ), '%site', $facts.site, '%version', $facts.version ) )|wash}</p>
 {if $facts.note}            <p class="exp-ai-facts-note">{$facts.note|wash}</p>{/if}
 {if $facts.contact}            <p class="exp-ai-facts-note">{'Contact for questions about this processing: %contact'|i18n( 'extension/expai/facts',, hash( '%contact', $facts.contact ) )|wash}</p>{/if}

@@ -4959,6 +4959,10 @@
         <source>No role has a policy of Exponential Intelligence.</source>
         <translation>Keine Rolle hat eine Richtlinie für Exponential Intelligence.</translation>
     </message>
+    <message>
+        <source>EI: Summary</source>
+        <translation>EI: Übersicht</translation>
+    </message>
 </context>
 <!-- expai vector review/plan: begin -->
 <context>
@@ -5522,6 +5526,18 @@
     <message>
         <source>Content packages</source>
         <translation>Inhaltspakete</translation>
+    </message>
+    <message>
+        <source>EI: Summary</source>
+        <translation>EI: Übersicht</translation>
+    </message>
+    <message>
+        <source>EI: Models</source>
+        <translation>EI: Modelle</translation>
+    </message>
+    <message>
+        <source>EI: Budgets</source>
+        <translation>EI: Budgets</translation>
     </message>
 </context>
 <context>

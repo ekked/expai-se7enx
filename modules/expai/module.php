@@ -120,7 +120,15 @@ $ViewList['stream'] = array(
     'params' => array(),
     'unordered_params' => array( 'thread' => 'Thread', 'after' => 'After' ) );
 
-// the "AI facts" page (classes/expaifacts.php, doc/ai-facts.md): one printable page for a data protection officer
+// the "EI: Summary" page (classes/expaifacts.php, doc/ai-facts.md): one printable page for a data protection officer
+$ViewList['summary'] = array(
+    'default_navigation_part' => 'ezsetupnavigationpart',
+    'script' => 'facts.php',
+    'functions' => array( 'facts' ),
+    'params' => array(),
+    'unordered_params' => array() );
+
+// the old address of that page, expai/facts, answers with a redirect to expai/summary
 $ViewList['facts'] = array(
     'default_navigation_part' => 'ezsetupnavigationpart',
     'script' => 'facts.php',
@@ -165,6 +173,8 @@ $FunctionList['translation_sync'] = array();
 $FunctionList['services'] = array(
     'Domain' => array( 'name' => 'Domain', 'values' => array(), 'class' => 'expAiPolicy', 'function' => 'serviceDomains', 'parameter' => array() ) );
 
+// the "AI facts" page expai/facts (read-only: providers, regions, key sources, roles, limits, tools)
+$FunctionList['facts'] = array();
 
 // Alt text for images (#370 M5 alt text, doc/alt-text.md): the "Missing alt text" report of a subtree, and queueing
 // suggestions as drafts; (node)/<node id>
@@ -174,9 +184,6 @@ $ViewList['alttext'] = array(
     'functions' => array( 'write' ),
     'params' => array(),
     'unordered_params' => array( 'node' => 'Node' ) );
-
-// the "AI facts" page expai/facts (read-only: providers, regions, key sources, roles, limits, tools)
-$FunctionList['facts'] = array();
 
 // Help (classes/expaihelp.php, doc/index.md): the extension's documentation in the administration interface,
 // (page)/<name>; for editors (expai/write) and for a data protection officer with only expai/facts
