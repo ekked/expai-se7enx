@@ -167,7 +167,7 @@ class expAiChainRunsTest extends expAiContentTestCase
         $this->assertSame( array( 'done', 15, 3, array( 'fields' => array( 'title' => 'Late' ) ) ),
                            array( $row->attribute( 'state' ), (int) $row->attribute( 'input_tokens' ), (int) $row->attribute( 'output_tokens' ), $row->outputArray() ) );
         $this->assertSame( 'already recorded', $engine->onAnswer( $job, array(), $params )['chain'] );
-        $this->assertSame( 'the run is gone', $engine->onAnswer( $job, array(), array( 'run' => 0 ) )['chain'] );
+        $this->assertSame( 'the run is gone', $engine->onAnswer( $job, array(), array( 'run' => 2147483646 ) )['chain'] );
 
         // the policy for someone else's run
         $other = new expAiChainRun( array( 'chain' => 'xt', 'user_id' => 999999999, 'node_id' => 2, 'object_id' => 0 ) );

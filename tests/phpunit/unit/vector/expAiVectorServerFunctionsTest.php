@@ -630,6 +630,8 @@ class expAiVectorServerFunctionsTest extends expAiVectorTestCase
 
     public function testPlanEstimateAndReject(): void
     {
+        // a configured provider (the mock): plan_decide refuses on a site without one
+        $this->mockModels();
         $this->content();
         $thread = $this->thread( array( 'scope' => array( 'subtrees' => array( (int) $this->folderNode->attribute( 'node_id' ) ) ), 'run_mode' => 'plan' ) );
         $plan = $this->proposePlan( $thread );

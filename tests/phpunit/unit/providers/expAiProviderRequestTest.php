@@ -372,7 +372,9 @@ class expAiProviderRequestTest extends expAiProviderTestCase
         $this->assertSame( array(), $answer['content'][2]['input'] );
         $this->assertSame( array( 'c1' => '[1,2]' ), $answer['invalid_tool_input'] );
         $this->assertSame( 'tool_use', $answer['stop_reason'], 'calls with "stop" end in tool_use' );
-        $this->assertSame( array( 'input' => 60, 'output' => 7, 'cache_write' => 10, 'cache_read' => 30, 'reasoning' => 4, 'reported_cost' => 0.25 ), $answer['tokens'] );
+        $tokens = array( 'input' => 60, 'output' => 7, 'cache_write' => 10, 'cache_read' => 30, 'reasoning' => 4, 'reported_cost' => 0.25 );
+        // the counts this test knows; an adapter may report more (the currency of the reported cost)
+        $this->assertSame( $tokens, array_intersect_key( $answer['tokens'], $tokens ) );
         $this->assertSame( 'served-model', $answer['model'] );
         $this->assertSame( 'flex', $answer['service_tier'] );
 
