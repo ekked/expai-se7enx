@@ -26,6 +26,26 @@ $param = function ( $name ) use ( $viewParameters )
 };
 
 $thread = $param( 'thread' );
+// #389 the address of a thread that was deleted (or that the user may not open: the same answer, so another
+// editor's thread ids reveal nothing) is a 404 with a way back to Vector, not the workspace with an error in it
+if ( $thread !== '' && expAiThread::available() )
+{
+    $found = expAiThread::fetchByUuid( $thread );
+    if ( !$found || !expAiThreadAccess::canRead( $found ) )
+    {
+        $status = '404 Not Found';
+        header( eZSys::serverVariable( 'SERVER_PROTOCOL' ) . ' ' . $status );
+        header( 'Status: ' . $status );
+        $tpl = eZTemplate::factory();
+        $Result = array();
+        $Result['content'] = $tpl->fetch( 'design:expai/vector_gone.tpl' );
+        $Result['path'] = array( array( 'url' => 'content/dashboard', 'text' => ezpI18n::tr( 'extension/expai/dashboard', 'Dashboard' ) ),
+                                 array( 'url' => 'expai/dashboard', 'text' => ezpI18n::tr( 'extension/expai/dashboard', 'Exponential Intelligence' ) ),
+                                 array( 'url' => 'expai/vector', 'text' => ezpI18n::tr( 'extension/expai/vector', 'Vector' ) ),
+                                 array( 'url' => false, 'text' => ezpI18n::tr( 'extension/expai/vector', 'Thread not found' ) ) );
+        return $Result;
+    }
+}
 $thread = expAiThread::isUuid( $thread ) ? $thread : '';
 $nodeID = (int) $param( 'node' );
 $node = $nodeID ? eZContentObjectTreeNode::fetch( $nodeID ) : null;
