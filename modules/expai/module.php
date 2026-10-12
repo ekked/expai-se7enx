@@ -169,7 +169,7 @@ $FunctionList['services'] = array(
 // Alt text for images (#370 M5 alt text, doc/alt-text.md): the "Missing alt text" report of a subtree, and queueing
 // suggestions as drafts; (node)/<node id>
 $ViewList['alttext'] = array(
-    'default_navigation_part' => 'ezmynavigationpart',
+    'default_navigation_part' => 'ezvisualnavigationpart',
     'script' => 'alttext.php',
     'functions' => array( 'write' ),
     'params' => array(),

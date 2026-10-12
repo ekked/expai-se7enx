@@ -11,18 +11,15 @@ Links[expai_vector]=expai/vector
 LinkNames[expai_vector]=Vector
 PolicyList_expai_vector[]=expai/write
 PolicyList_expai_vector[]=expai/vector
-Links[expai_log]=expai/log
-LinkNames[expai_log]=Exponential Intelligence log
-PolicyList_expai_log[]=expai/write
 # AI chains (doc/chains.md): the runs and their checkpoints, users with expai/write and expai/chain
 Links[expai_chain]=expai/chain
 LinkNames[expai_chain]=Chains
 PolicyList_expai_chain[]=expai/write
 PolicyList_expai_chain[]=expai/chain
-# The "Missing alt text" report (doc/alt-text.md): images without alt text under a subtree
-Links[expai_alttext]=expai/alttext
-LinkNames[expai_alttext]=Missing alt text
-PolicyList_expai_alttext[]=expai/write
+# The usage log (doc/usage-tracking.md), just above the help
+Links[expai_log]=expai/log
+LinkNames[expai_log]=Exponential Intelligence log
+PolicyList_expai_log[]=expai/write
 # The extension's documentation (expai/help, doc/index.md)
 Links[expai_help]=expai/help
 LinkNames[expai_help]=Exponential Intelligence help
@@ -46,5 +43,12 @@ PolicyList_expai_budgets[]=expai/log
 Links[expai_packages]=expai/packages
 LinkNames[expai_packages]=Content packages
 PolicyList_expai_packages[]=expai/package_import
+
+
+# Design > Missing alt text: images without alt text under a subtree (doc/alt-text.md), users with expai/write
+[Leftmenu_design]
+Links[expai_alttext]=expai/alttext
+LinkNames[expai_alttext]=Missing alt text
+PolicyList_expai_alttext[]=expai/write
 
 */ ?>
