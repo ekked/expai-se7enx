@@ -3,7 +3,8 @@
 `classes/diff/` compares two versions or two languages of an object, attribute by attribute, at block and sentence
 level. The translation sync ([translation-sync.md](translation-sync.md)) uses it to find what changed in the source
 language; Vector's review of staged changes (accept, reject or edit per hunk and per field, [vector.md](vector.md))
-uses the same hunks and `expAiDiff::apply()`.
+uses the same hunks and `expAiDiff::apply()`, and so does "What changed" of a draft written directly, whose parts
+are reverted with `apply()` and the parts the editor keeps ([review.md](review.md#direct-mode-what-changed-and-revert)).
 
 ## Segmenters
 

@@ -54,6 +54,11 @@ Ctrl elsewhere. Combinations taken by browsers (Ctrl+Shift+M, Ctrl+Shift+P, Ctrl
 
 Every command also has a visible control (buttons, menus, tabs), and every shortcut is shown next to its control.
 
+The **What changed** dialog of a draft written directly (the Intelligence tab and Vector,
+[review.md](review.md#direct-mode-what-changed-and-revert)) has its own fixed keys while it is open: `j` / `k` next /
+previous part, `x` revert the part, `Shift+X` revert the field, `Esc` close. They are not part of the shortcut sheet,
+and Vector's keys do not act while the dialog is open.
+
 ## The shortcut sheet and your own keys
 
 `?` (or *Keyboard shortcuts* in the palette, or the ? button in Vector) shows every command with its keys. With

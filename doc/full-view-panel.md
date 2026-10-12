@@ -118,3 +118,14 @@ log) say so the next time they are shown.
 | Published | published (sent without approval, approved, or published elsewhere) |
 
 The approval hint per draft comes from expAiApprovalCheck (approval-workflow.md).
+
+### What changed
+
+The drafts here are written directly, without a review before the write. Each draft that is still a draft has
+**What changed**: a dialog with the diff of the draft against the version it was based on (the published version it
+was copied from, or an empty object for a new one), field by field and part by part, what goes in red and what comes
+in green; rich text is shown as text. **Revert** (`x`) takes one part back into the same draft, **Revert field**
+(`Shift+X`) a whole field; `j` / `k` move between the parts and `Esc` closes. Nothing is published. When the draft
+changed since the dialog was opened (in the edit form, or by the assistant), nothing is written and the dialog shows
+the diff as it is now. Only the editor the draft was written for sees it, and reverting needs edit permission for
+the object in its language at that moment. The details: [review.md](review.md#direct-mode-what-changed-and-revert).

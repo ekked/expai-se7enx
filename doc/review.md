@@ -4,7 +4,8 @@ In a Vector thread with **Review: Staged** (the default, and always for bulk wor
 drafts. `create_draft` and `update_draft` **stage proposals**: one per object, language and field, new objects
 included (owner decision). The editor reviews them in the *Changes* tab, part by part and field by field, and only the
 accepted parts are written into drafts. Nothing is ever published. Small edits in the Intelligence tab keep writing
-drafts directly ([full-view-panel.md](full-view-panel.md)).
+drafts directly ([full-view-panel.md](full-view-panel.md)); what such a draft changed can be seen, and reverted part
+by part, afterwards ([Direct mode: what changed, and revert](#direct-mode-what-changed-and-revert)).
 
 ## What a proposal is
 
@@ -79,6 +80,51 @@ the thread and the change) and carries the Exponential Intelligence label; it ap
 *Edit* and *View version*, and is published or sent for approval as usual. Required fields that are still empty are
 named.
 
+## Direct mode: what changed, and revert
+
+When the assistant writes a draft **directly** (the Intelligence tab, a Vector thread with **Review: Direct**), there
+is no review before the write. The review comes afterwards: every draft in the tab's draft list and under *Drafts
+written* of a thread has **What changed**. It opens a dialog with the diff of the draft against the version it was
+based on, field by field and part by part, with the same diff engine as the Changes tab ([diff.md](diff.md)): what
+goes in red, what comes in green, word by word; rich text as readable text, never as markup (every text is escaped in
+the browser). **Revert** takes one part back, **Revert field** a whole field; both write into the **same draft**.
+Nothing is published, and the published version stays as it is.
+
+| Action | Mouse | Keys (while the dialog is open) |
+| --- | --- | --- |
+| next / previous part | a click on the part | `j` / `k` |
+| revert the part | Revert | `x` |
+| revert the field | Revert field | `Shift+X` |
+| close | Close | `Esc` |
+
+- **The base** is the newest published (or archived) version below the draft, which is the version a new draft is
+  copied from; for a new object it is an empty object (every part is an insert). When another version was published
+  after the draft was written, the dialog says so: reverting brings back the text of the base, not of the newer
+  version.
+- **Reverting a part** (`expAiDraftRevert`, classes/diff/expaidraftrevert.php): the diff is computed again from the
+  draft as it is now; the field becomes the base with every other part of the field accepted
+  (`expAiDiff::apply()` with the parts the editor keeps), so the part taken back has the base text and the others keep
+  the draft's text. **Reverting a field** writes the base value of the field as it is. The values are written with
+  `expAiDiff::writeDraft()` into the same version (`reuse_version`), logged in `expai_draft_log` with source
+  `revert` (the thread of the draft, "Reverted N part(s) of ..."). A part that inserts or removes a table cell alone
+  cannot be taken back alone: revert the field.
+- **Conflicts**: the dialog keeps a fingerprint of every field's value. When a field to revert changed in the draft
+  since the dialog was opened (edited in the edit form, written again by the assistant), or the part is no longer
+  there, nothing is written; the dialog shows the diff as it is now and says so. Revert again from there.
+- **Who**: the editor the draft was written for; a draft of a thread only the thread's **owner** (the approvers who
+  may open a thread do not get the dialog). Reverting also needs, at that moment, the version to be still a draft of
+  the editor and content/edit of the object in its language; otherwise the dialog shows the diff with the reason and
+  without Revert. A version that was published or sent for approval shows what it changed and cannot be reverted.
+- The browser calls `expairevert::changes` (read only: `object_id`, `version`) and `expairevert::revert` (`hunks`
+  and `fields` as JSON lists, `seen`: identifier => fingerprint), both POST with the form token and the policy
+  `expai/write` (ezjscore.ini `[ezjscServer_expairevert]`, `expAiDraftRevertServerFunctions`). The dialog is
+  expai_whatchanged.js with expai_whatchanged.css (design.ini `BackendJavaScriptList[]`, `BackendCSSFileList[]`);
+  any button with `data-exp-ai-what-changed="<object id>:<version>"` opens it, and the event `draft:reverted`
+  (`ExpAi.on()`) follows each revert.
+
+Drafts that came from the staged review have the same dialog; their parts were accepted already, so it is mostly
+useful for drafts written directly.
+
 ## Permissions
 
 - Staging, deciding and applying need `expai/write` and `expai/vector` (and its `Review` limitation allows `staged`
@@ -94,3 +140,10 @@ both tools, hunks, re-staging, the bulk guard, unchanged and skipped fields, edi
 rejected parts, the same draft reused, the draft log), conflicts and restage, a new object, permissions, plan mode and
 the master switch and veto for background turns. It creates a folder with two articles under Media (node 43) and
 removes it at the end. The browser flows (Apache and Velocity, 960 px at scale 2) run against a real model.
+
+`php bin/php/ezexec.php extension/expai/tests/expaidraftrevert_test.php -s <admin siteaccess>`: What changed and
+revert of a draft written directly, without a model call: the base version and the parts, revert of one part (the
+other parts stay, the same draft, the published version unchanged, the log entry with source `revert`), revert of
+whole fields, the conflicts (a part gone, a field changed since), who may see and revert (the editor, a thread's
+owner only, a version the assistant did not write) and a published version (diff shown, revert refused). It creates
+a folder with an article under Media (node 43) and moves it to the trash at the end.
