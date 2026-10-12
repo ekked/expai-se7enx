@@ -726,7 +726,36 @@ class expAiAssistant
         $exchange['snippet'] = expAiText::cut( expAiText::oneLine( $exchange['reply'] !== '' ? $exchange['reply'] : $exchange['user'] ), 140 );
         $exchange['user_snippet'] = expAiText::cut( expAiText::oneLine( $exchange['user'] ), 100 );
         $exchange['lookups'] = count( array_filter( $exchange['steps'], function ( $s ) { return empty( $s['writes'] ); } ) );
+        $exchange['outcomes'] = self::outcomes( isset( $exchange['drafts'] ) ? (array) $exchange['drafts'] : array() );
         return $exchange;
+    }
+
+    /**
+     * #389 what became of the drafts of an exchange, as short system notes after the answer (the answer itself stays
+     * as the model wrote it): "Published as version 3", "Sent for approval as version 3".
+     * @param array $drafts the exchange's drafts ({ key "object:version", name, view })
+     * @return string[]
+     */
+    public static function outcomes( array $drafts )
+    {
+        $out = array();
+        foreach ( $drafts as $draft )
+        {
+            if ( !isset( $draft['key'] ) || !preg_match( '/^(\d+):(\d+)$/', (string) $draft['key'], $m ) )
+                continue;
+            $version = eZContentObjectVersion::fetchVersion( (int) $m[2], (int) $m[1] );
+            if ( !$version )
+                continue;
+            $status = (int) $version->attribute( 'status' );
+            $params = array( '%version' => (int) $m[2], '%name' => isset( $draft['name'] ) ? (string) $draft['name'] : '' );
+            if ( $status === eZContentObjectVersion::STATUS_PUBLISHED || $status === eZContentObjectVersion::STATUS_ARCHIVED )
+                $out[] = count( $drafts ) > 1 ? ezpI18n::tr( 'extension/expai/panel', '%name: published as version %version', null, $params )
+                                              : ezpI18n::tr( 'extension/expai/panel', 'Published as version %version', null, $params );
+            elseif ( $status === eZContentObjectVersion::STATUS_PENDING )
+                $out[] = count( $drafts ) > 1 ? ezpI18n::tr( 'extension/expai/panel', '%name: sent for approval as version %version', null, $params )
+                                              : ezpI18n::tr( 'extension/expai/panel', 'Sent for approval as version %version', null, $params );
+        }
+        return $out;
     }
 
     /**

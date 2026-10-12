@@ -32,6 +32,55 @@ class expAiPublisher
         return array( $log, $object, $version );
     }
 
+    /**
+     * #389 after "Send for approval", "Save as drafts" or Discard: a thread that says "To review" because of the drafts
+     * it wrote goes back to its resting state once none of its drafts waits for a decision any more (each one was
+     * published, sent for approval, kept or removed). A thread with staged Vector changes or a proposed plan stays
+     * in review (expAiThread::restingState()).
+     * @param array $pairs list of array( object id, version ) that were decided
+     * @return int threads changed
+     */
+    public static function settleThreads( array $pairs )
+    {
+        if ( !class_exists( 'expAiThread' ) || !expAiThread::available() )
+            return 0;
+        $threadIDs = array();
+        foreach ( $pairs as $pair )
+        {
+            $log = expAiDraftLog::fetchByVersion( (int) $pair[0], (int) $pair[1] );
+            if ( $log && (int) $log->attribute( 'thread_id' ) > 0 )
+                $threadIDs[(int) $log->attribute( 'thread_id' )] = true;
+        }
+        $changed = 0;
+        foreach ( array_keys( $threadIDs ) as $threadID )
+        {
+            $thread = expAiThread::fetchByID( $threadID );
+            if ( !$thread || $thread->attribute( 'state' ) !== 'review' )
+                continue;
+            $waiting = false;
+            foreach ( (array) eZPersistentObject::fetchObjectList( expAiDraftLog::definition(), null,
+                          array( 'thread_id' => $threadID, 'status' => expAiDraftLog::STATUS_DRAFT ) ) as $open )
+            {
+                $object = eZContentObject::fetch( (int) $open->attribute( 'contentobject_id' ) );
+                $version = $object ? $object->version( (int) $open->attribute( 'version' ) ) : null;
+                if ( $version && (int) $version->attribute( 'status' ) === eZContentObjectVersion::STATUS_DRAFT )
+                {
+                    $waiting = true;
+                    break;
+                }
+            }
+            if ( $waiting )
+                continue;
+            if ( $thread->setState( $thread->restingState() ) )
+            {
+                $thread->touch();
+                $thread->store();
+                $changed++;
+            }
+        }
+        return $changed;
+    }
+
     /** @return bool the current user may edit (and so publish or discard) this version */
     public static function canAct( eZContentObject $object, eZContentObjectVersion $version )
     {

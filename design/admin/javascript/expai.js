@@ -489,6 +489,8 @@
                 + ( x.notice ? '<p class="exp-ai-fallback-notice" role="status">' + esc( x.notice ) + '</p>' : '' )
                 + ( steps ? '<ul class="exp-ai-steps">' + steps + '</ul>' : '' )
                 + ( x.reply ? '<div class="exp-ai-msg exp-ai-msg-assistant"><span class="exp-ai-who">' + esc( S.assistant ) + '</span><div class="exp-ai-body">' + renderText( x.reply ) + '</div></div>' : '' )
+                // #389 what became of the drafts since (published, sent for approval): a system note, the answer stays as written
+                + ( x.outcomes || [] ).map( function ( o ) { return '<p class="exp-ai-x-outcome" role="note">' + esc( o ) + '</p>'; } ).join( '' )
                 + '</div>';
         }
 
@@ -867,6 +869,19 @@
                 }
                 setDrafts( data.drafts );
                 note( messages.join( ' ' ) );
+                // #389 a decision changes the history (system notes), the thread state and, once published, the page header
+                var decided = ( data.results || [] ).filter( function ( r ) { return r.ok; } );
+                if ( decided.length ) {
+                    decided.forEach( function ( r ) {
+                        if ( fn === 'send' && r.status === 'published' ) {
+                            Array.prototype.forEach.call( document.querySelectorAll( '.exp-object-version[data-object-id="' + r.object_id + '"] .exp-object-version-number' ), function ( el ) {
+                                el.textContent = String( r.version );
+                            } );
+                        }
+                    } );
+                    api( 'history', { node_id: nodeID } ).then( function ( page ) { showHistory( page, false ); } ).catch( function () { /* the next load shows it */ } );
+                    emit( 'panel:decided', { panel: root, data: data } );
+                }
             } ).catch( showError ).then( function () { setBusy( false ); } );
         }
 
@@ -1340,6 +1355,7 @@
         }
         load();
         on( 'panel:done', load );
+        on( 'panel:decided', load );
     };
 
     // Ctrl/Cmd+K on any admin page (outside fields and rich text editors): the palette, loaded on first use

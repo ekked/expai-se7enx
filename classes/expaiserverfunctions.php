@@ -248,6 +248,13 @@ class expAiServerFunctions extends ezjscServerFunctions
                     $results[] = array( 'object_id' => $objectID, 'version' => $version, 'ok' => false, 'error' => $e->translatedMessage() );
                 }
             }
+            // #389 a thread whose drafts are all decided no longer says "To review"
+            $decided = array();
+            foreach ( $results as $r )
+                if ( $r['ok'] )
+                    $decided[] = array( $r['object_id'], $r['version'] );
+            if ( $decided )
+                expAiPublisher::settleThreads( $decided );
             return array( 'results' => $results, 'drafts' => $nodeID ? expAiAssistant::drafts( eZUser::currentUser(), $nodeID ) : array() );
         } );
     }
