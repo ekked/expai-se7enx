@@ -370,3 +370,14 @@
 .exp-ai-v-queue-steer > span:not(.exp-ai-v-badge) { font-style: italic; }
 .exp-ai-step-steer { color: var(--exp-ai-accent); font-style: italic; }
 .exp-ai-slow { margin: 0.4em 0; color: var(--exp-ai-muted); font-size: 0.9em; } .exp-ai-slow-time { font-variant-numeric: tabular-nums; } .exp-ai-slow .exp-ai-slow-switch { margin-left: 0.4em; }
+
+/* Checkpoints (doc/checkpoints.md): the strip under the conversation and the restore preview */
+.exp-ai-v-checkpoints { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.3em 0.6em; margin: 0.5em 0; padding-top: 0.4em; border-top: 1px dashed var(--exp-ai-line); font-size: 0.86em; }
+.exp-ai-v-checkpoints[hidden] { display: none; }
+.exp-ai-v-cp-list { display: flex; flex-wrap: wrap; gap: 0.25em 0.8em; margin: 0; padding: 0; list-style: none; min-width: 0; }
+.exp-ai-v-cp { display: inline-flex; align-items: baseline; gap: 0.3em; max-width: 100%; }
+.exp-ai-v-cp-mark { color: var(--exp-ai-accent); }
+.exp-ai-v-cp-label { color: var(--exp-ai-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 22em; }
+.exp-ai-v-restore-list h3 { margin: 0.6em 0 0.2em; font-size: 0.95em; }
+.exp-ai-v-restore-list ul { margin: 0; padding-left: 1.2em; }
+.exp-ai-v-restore-list .exp-ai-v-restore-counts { margin-top: 0.6em; }

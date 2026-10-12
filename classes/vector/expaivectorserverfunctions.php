@@ -508,6 +508,9 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
             $options = array( 'alias' => $alias, 'read_only' => $readOnly, 'staged' => $staged, 'mode' => $mode,
                 'scope_note' => $thread->attribute( 'origin' ) === expAiThread::ORIGIN_PANEL ? '' : expAiThreadPrompts::scopeNote( $scope ),
                 'action' => $thread->attribute( 'origin' ) === expAiThread::ORIGIN_PANEL ? 'panel' : 'vector' );
+            // a checkpoint at the start of every turn with a new message (doc/checkpoints.md)
+            if ( self::post( 'continue' ) !== '1' && trim( self::post( 'message' ) ) !== '' )
+                expAiCheckpoint::write( $thread, expAiCheckpoint::labelFor( trim( self::post( 'message' ) ) ), expAiCheckpoint::KIND_TURN, $config );
             // a slow model: the turn runs in the queue; the browser follows its events
             if ( expAiThreadRunner::inBackground( $alias, $config ) )
             {
@@ -791,6 +794,8 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
         return self::run( function ()
         {
             $thread = self::loadThread( true );
+            // a checkpoint before the accepted changes are written (doc/checkpoints.md)
+            expAiCheckpoint::write( $thread, ezpI18n::tr( 'extension/expai/vector', 'Before writing accepted changes to drafts' ), expAiCheckpoint::KIND_APPLY );
             $result = ( new expAiChangeApplier( $thread ) )->apply( array_map( 'intval', self::postJson( 'changes' ) ) );
             return self::changesAnswer( $thread, array( 'result' => $result ) );
         } );
@@ -883,6 +888,7 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
             $reason = expAiThreadAccess::check( $thread->scope(), 'staged' );
             if ( $reason !== '' )
                 throw new expAiException( $reason );
+            expAiCheckpoint::write( $thread, ezpI18n::tr( 'extension/expai/vector', 'Before the approved plan runs' ), expAiCheckpoint::KIND_PLAN, $config );
             $run = expAiPlanner::approve( $thread, $plan, isset( $_POST['selected'] ) ? self::postJson( 'selected' ) : null, self::postJson( 'summaries' ), $config );
             $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ) ?: $thread;
             $followups = array();
@@ -909,6 +915,44 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
             $switch = expAiSlowModel::switchTo( $thread, self::post( 'alias' ), $config );
             $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ) ?: $thread;
             return array( 'switch' => $switch, 'thread' => expAiVector::detail( $fresh, self::userID(), $config ) );
+        } );
+    }
+
+    /* --------------------------------------------------- checkpoints (doc/checkpoints.md) */
+
+    /** checkpoints: the checkpoints of a thread (thread, limit), newest first; readable by whoever may read the thread */
+    public static function checkpoints( $args )
+    {
+        self::guard();
+        self::releaseSession();
+        return self::run( function ()
+        {
+            $thread = self::loadThread();
+            return array( 'checkpoints' => expAiCheckpoint::listFor( $thread, max( 1, min( 50, (int) self::post( 'limit', '50' ) ) ) ),
+                          'can_restore' => expAiThreadAccess::canWrite( $thread ) && expAiVector::allowed() );
+        } );
+    }
+
+    /**
+     * checkpoint_restore: thread, checkpoint (id), preview=1 (what would change, nothing done) or the restore itself
+     * (the owner only, nothing may run). Answer: preview or result, thread, drafts, the checkpoints.
+     */
+    public static function checkpoint_restore( $args )
+    {
+        $config = self::guard( true );
+        self::releaseSession();
+        return self::run( function () use ( $config )
+        {
+            $thread = self::loadThread( true );
+            $checkpoint = expAiCheckpoint::fetchByID( (int) self::post( 'checkpoint' ) );
+            if ( !$checkpoint || (int) $checkpoint->attribute( 'thread_id' ) !== (int) $thread->attribute( 'id' ) )
+                throw new expAiException( 'This checkpoint does not exist any more.' );
+            if ( self::post( 'preview' ) === '1' )
+                return array( 'preview' => $checkpoint->preview( $thread, $config ) );
+            $result = $checkpoint->restore( $thread, $config );
+            $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ) ?: $thread;
+            return array( 'result' => $result, 'thread' => expAiVector::detail( $fresh, self::userID(), $config ), 'drafts' => expAiVector::drafts( $fresh ),
+                          'checkpoints' => expAiCheckpoint::listFor( $fresh, 50 ) );
         } );
     }
 

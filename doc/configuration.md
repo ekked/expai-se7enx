@@ -475,6 +475,9 @@ lane; `expqueue.ini [JobType_expai.thread.item]` is the job of one item of a pla
 | Setting | Default | Effect |
 | --- | --- | --- |
 | `GlobalPalette` | enabled | Ctrl/Cmd+K opens the palette on every admin page (never in a field or rich text editor); Vector always has it |
+| `Checkpoints` | enabled | a checkpoint at the start of every turn, before accepted changes are written and before an approved plan runs ([checkpoints.md](checkpoints.md)) |
+| `MaxCheckpointBytes` | 1048576 | the largest checkpoint; over it the checkpoint keeps the conversation and the decisions, not the values |
+| `MaxCheckpointsPerThread` | 50 | the newest checkpoints kept per thread |
 | `UserOverrides` | enabled | editors may change their shortcuts (preference `expai_keybindings`) |
 | `Binding[<command>]` | see [keyboard.md](keyboard.md) | the keys of a command: `Mod+KeyK`, `Alt+ArrowDown`, `Escape Escape`, `?` |
 | `When[<command>]` | | where the keys work: `global`, `vector`, `list`, `composer` |

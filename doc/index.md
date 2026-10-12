@@ -28,6 +28,7 @@
 | [review.md](review.md) | Staged review in Vector: proposals instead of drafts, the Changes tab, accept/reject/edit per part and field, conflicts and rebase, apply into drafts |
 | [plan-mode.md](plan-mode.md) | Plan mode for bulk work: propose_plan, the Plan tab, the estimate and its calibration, limits and reservation, the run of an approved plan |
 | [parallel-runs.md](parallel-runs.md) | Parallel runs of an approved plan: child runs, dependencies, one field per run (held), progress and cost per item, the batch lane, workers, steering a running turn, slow models and the switch |
+| [checkpoints.md](checkpoints.md) | Checkpoints of a Vector thread (each turn, before writing, before a plan): the strip, the restore preview, discard and set back drafts, cut the conversation, undo a restore |
 | [keyboard.md](keyboard.md) | The command palette (Ctrl/Cmd+K), the shortcuts, your own keys, commands of your own |
 | [edit-view-integration.md](edit-view-integration.md) | The edit form hook, field actions, how values reach Tiptap / the Online Editor |
 | [alt-text.md](alt-text.md) | Alt text for images: the "Write alt text" button, vision models only, the data policy for images, image preparation and limits, the accessibility rules, the "Missing alt text" report and its draft jobs, cost |

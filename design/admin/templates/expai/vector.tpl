@@ -109,6 +109,10 @@
                         <h3 class="exp-ai-v-runs-head"><span id="exp-ai-v-runs-title">{'Items of the plan'|i18n( $exp_ai_i18n )}</span> <span class="exp-ai-v-runs-progress"></span></h3>
                         <ol class="exp-ai-v-runs-list"></ol>
                     </section>
+                    <div class="exp-ai-v-checkpoints" hidden="hidden">
+                        <span class="exp-ai-v-label" id="exp-ai-v-cp-title">{'Checkpoints'|i18n( $exp_ai_i18n )}</span>
+                        <ol class="exp-ai-v-cp-list" aria-labelledby="exp-ai-v-cp-title"></ol>
+                    </div>
                     <p class="exp-ai-slow exp-ai-v-slow" hidden="hidden" aria-live="polite"><span class="exp-ai-slow-text"></span> <span class="exp-ai-slow-time"></span>
                         <button type="button" class="exp-ai-v-btn exp-ai-v-btn-small exp-ai-slow-switch" hidden="hidden"></button></p>
                     <p class="exp-ai-v-working" hidden="hidden"><span class="exp-ai-spinner" aria-hidden="true"></span> <span class="exp-ai-v-working-text"></span></p>
@@ -173,6 +177,20 @@
             <div class="exp-ai-v-dialog-bar">
                 <button type="button" class="exp-ai-v-btn" value="cancel" data-dialog="cancel">{'Cancel'|i18n( $exp_ai_i18n )}</button>
                 <button type="button" class="exp-ai-v-btn exp-ai-v-btn-primary" data-dialog="save">{'Save scope'|i18n( $exp_ai_i18n )}</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog class="exp-ai exp-ai-v-dialog exp-ai-v-restore-dialog" aria-labelledby="exp-ai-v-restore-title">
+        <form method="dialog" class="exp-ai-v-dialog-body">
+            <h2 id="exp-ai-v-restore-title">{'Restore to this checkpoint?'|i18n( $exp_ai_i18n )}</h2>
+            <p class="exp-ai-v-dialog-intro exp-ai-v-restore-label"></p>
+            <div class="exp-ai-v-restore-list"></div>
+            <p class="exp-ai-v-hint">{'A checkpoint "Before restore" is written first: you can go back to the state of now.'|i18n( $exp_ai_i18n )}</p>
+            <p class="exp-ai-v-error" role="alert" hidden="hidden"></p>
+            <div class="exp-ai-v-dialog-bar">
+                <button type="button" class="exp-ai-v-btn" data-restore="cancel">{'Cancel'|i18n( $exp_ai_i18n )}</button>
+                <button type="button" class="exp-ai-v-btn exp-ai-v-btn-primary" data-restore="confirm">{'Restore'|i18n( $exp_ai_i18n )}</button>
             </div>
         </form>
     </dialog>
@@ -352,7 +370,22 @@
         'steer_hint', 'reaches Vector at its next step'|i18n( $exp_ai_i18n ),
         'steered_one', 'Your note reaches Vector at its next step.'|i18n( $exp_ai_i18n ),
         'hint_running_steer', '%steer to steer, %queue to queue, %stop to stop'|i18n( $exp_ai_i18n ),
-        'lane_batch_plan', 'batch: approved plans go to the provider as a batch'|i18n( $exp_ai_i18n )
+        'lane_batch_plan', 'batch: approved plans go to the provider as a batch'|i18n( $exp_ai_i18n ),
+        'cp_restore', 'Restore'|i18n( $exp_ai_i18n ),
+        'cp_restore_to', 'Restore to "%label"'|i18n( $exp_ai_i18n ),
+        'cp_turn', 'turn %n'|i18n( $exp_ai_i18n ),
+        'cp_discard', 'Drafts discarded'|i18n( $exp_ai_i18n ),
+        'cp_revert', 'Drafts set back to their values then'|i18n( $exp_ai_i18n ),
+        'cp_left', 'Left alone'|i18n( $exp_ai_i18n ),
+        'cp_stale', 'Staged changes set aside: %count'|i18n( $exp_ai_i18n ),
+        'cp_restore_changes', 'Staged changes back to their decision then: %count'|i18n( $exp_ai_i18n ),
+        'cp_exchanges', 'Exchanges removed from the conversation: %count'|i18n( $exp_ai_i18n ),
+        'cp_followups', 'Queued messages dropped: %count'|i18n( $exp_ai_i18n ),
+        'cp_exchanges_back', 'Exchanges back in the conversation: %count'|i18n( $exp_ai_i18n ),
+        'cp_nothing', 'Nothing changed since this checkpoint.'|i18n( $exp_ai_i18n ),
+        'cp_conversation_only', 'This checkpoint was too large to keep the field values: the conversation and the decisions are restored.'|i18n( $exp_ai_i18n ),
+        'cp_restored', 'Restored. "Before restore" lets you go back.'|i18n( $exp_ai_i18n ),
+        'cp_owner', 'Only the owner can restore.'|i18n( $exp_ai_i18n )
     ) )}</script>
 </div>
 {undef $exp_ai_i18n}

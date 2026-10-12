@@ -271,6 +271,8 @@ class expAiVector
             'reserved' => (int) $thread->attribute( 'reserved_micros' ) > 0 && expAiCost::enabled() ? expAiBudget::money( (int) $thread->attribute( 'reserved_micros' ) ) : '',
             // parallel runs of the plan (doc/parallel-runs.md): one row per item with state, progress, last step, cost
             'runs' => expAiThreadFanout::present( $thread ),
+            // checkpoints (doc/checkpoints.md): the newest ones for the strip under the conversation
+            'checkpoints' => expAiCheckpoint::listFor( $thread, 12 ),
         );
         return $row;
     }

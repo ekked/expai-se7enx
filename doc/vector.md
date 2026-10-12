@@ -78,7 +78,9 @@ the chosen lane applies to background runs.
 An approved plan runs its items side by side as child runs of the thread, translations after their source item, with
 progress and cost per item ([parallel-runs.md](parallel-runs.md)); with `ParallelRuns=disabled` one after the other
 as turns of the thread ([plan-mode.md](plan-mode.md)). A turn on a slow model shows its time per step and can be
-switched to the default model ([parallel-runs.md](parallel-runs.md#slow-models)).
+switched to the default model ([parallel-runs.md](parallel-runs.md#slow-models)). Under the conversation the strip of
+**checkpoints** (one per turn, before writing to drafts, before a plan) restores the thread to any of them
+([checkpoints.md](checkpoints.md)).
 
 ## How events reach the browser
 
@@ -120,6 +122,8 @@ same permission as `expai::*`: `ezjscore/call` with the function list `expai`):
 | `plan_estimate` | expai/vector | the estimate of a proposed plan with the editor's selection (not stored) |
 | `plan_decide` | expai/vector | approve (with the editor's selection and instructions) or reject a proposed plan; an approved plan fans out into child runs (`run.mode` `parallel`, `batch`, `background` or `foreground`) |
 | `switch_model` | expai/write | the running turn of a slow model goes on with another model (the owner; [parallel-runs.md](parallel-runs.md#slow-models)) |
+| `checkpoints` | expai/write | the checkpoints of a thread ([checkpoints.md](checkpoints.md)) |
+| `checkpoint_restore` | expai/vector | the preview of a restore (`preview=1`) or the restore to a checkpoint (owner only, nothing running) |
 
 Every function checks POST, the form token and the policies itself, and what the thread allows
 ([threads.md](threads.md#who-sees-a-thread)).

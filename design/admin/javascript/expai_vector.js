@@ -178,7 +178,76 @@
             renderSettings( t );
             renderCost( t );
             renderRuns( t );
+            renderCheckpoints( t );
             syncSide( t );
+        }
+
+        /* ------------------------------------------------ checkpoints (doc/checkpoints.md) */
+
+        function renderCheckpoints( t ) {
+            var box = q( '.exp-ai-v-checkpoints' );
+            if ( !box ) { return; }
+            var list = t.checkpoints || [];
+            box.hidden = !list.length;
+            // oldest first, the newest at the end next to the composer
+            q( '.exp-ai-v-cp-list', box ).innerHTML = list.slice().reverse().map( function ( c ) {
+                return '<li class="exp-ai-v-cp" data-cp="' + c.id + '"><span class="exp-ai-v-cp-mark" aria-hidden="true">◇</span> '
+                     + '<span class="exp-ai-v-cp-label" title="' + esc( timeText( c.created ) ) + '">' + esc( c.label ) + '</span>'
+                     + ( t.can_write ? ' <button type="button" class="exp-ai-v-link" data-restore-cp="' + c.id + '" aria-label="' + esc( T( 'cp_restore_to', { '%label': c.label } ) ) + '">'
+                                       + esc( T( 'cp_restore' ) ) + '</button>' : '' ) + '</li>';
+            } ).join( '' );
+        }
+
+        var restoreDialog = q( '.exp-ai-v-restore-dialog' ), restoreTarget = null;
+        function closeRestore() { if ( restoreDialog ) { restoreDialog.close ? restoreDialog.close() : restoreDialog.removeAttribute( 'open' ); } }
+        function previewRestore( id ) {
+            if ( !app.current || !restoreDialog ) { return; }
+            restoreTarget = id;
+            showError( q( '.exp-ai-v-error', restoreDialog ), null );
+            api( 'checkpoint_restore', { thread: app.current.uuid, checkpoint: id, preview: '1' } ).then( function ( data ) {
+                var p = data.preview || {};
+                var draftLi = function ( d ) { return '<li>' + esc( d.name + ' (' + d.language + ', v' + d.version + ')' ) + ( d.fields ? ': ' + esc( d.fields.join( ', ' ) ) : '' ) + ( d.why ? ' · ' + esc( d.why ) : '' ) + '</li>'; };
+                var html = '';
+                if ( p.nothing ) { html += '<p>' + esc( T( 'cp_nothing' ) ) + '</p>'; }
+                if ( p.discard && p.discard.length ) { html += '<h3>' + esc( T( 'cp_discard' ) ) + '</h3><ul>' + p.discard.map( draftLi ).join( '' ) + '</ul>'; }
+                if ( p.revert && p.revert.length ) { html += '<h3>' + esc( T( 'cp_revert' ) ) + '</h3><ul>' + p.revert.map( draftLi ).join( '' ) + '</ul>'; }
+                if ( p.left && p.left.length ) { html += '<h3>' + esc( T( 'cp_left' ) ) + '</h3><ul>' + p.left.map( draftLi ).join( '' ) + '</ul>'; }
+                var lines = [];
+                if ( p.stale && p.stale.length ) { lines.push( T( 'cp_stale', { '%count': p.stale.length } ) ); }
+                if ( p.restore && p.restore.length ) { lines.push( T( 'cp_restore_changes', { '%count': p.restore.length } ) ); }
+                if ( p.exchanges ) { lines.push( T( 'cp_exchanges', { '%count': p.exchanges } ) ); }
+                if ( p.exchanges_back ) { lines.push( T( 'cp_exchanges_back', { '%count': p.exchanges_back } ) ); }
+                if ( p.followups && p.followups.length ) { lines.push( T( 'cp_followups', { '%count': p.followups.length } ) ); }
+                if ( lines.length ) { html += '<ul class="exp-ai-v-restore-counts">' + lines.map( function ( l ) { return '<li>' + esc( l ) + '</li>'; } ).join( '' ) + '</ul>'; }
+                if ( p.conversation_only ) { html += '<p class="exp-ai-v-hint">' + esc( T( 'cp_conversation_only' ) ) + '</p>'; }
+                q( '.exp-ai-v-restore-label', restoreDialog ).textContent = p.checkpoint ? p.checkpoint.label : '';
+                q( '.exp-ai-v-restore-list', restoreDialog ).innerHTML = html;
+                var confirm = q( '[data-restore="confirm"]', restoreDialog );
+                confirm.disabled = !!p.blocked || !!p.nothing;
+                if ( p.blocked ) { showError( q( '.exp-ai-v-error', restoreDialog ), { message: p.blocked } ); }
+                if ( restoreDialog.showModal ) { restoreDialog.showModal(); } else { restoreDialog.setAttribute( 'open', 'open' ); }
+                ( confirm.disabled ? q( '[data-restore="cancel"]', restoreDialog ) : confirm ).focus();
+            } ).catch( function ( err ) { toast( T( 'error' ) + ' ' + ( err.message || '' ) ); } );
+        }
+        function doRestore() {
+            if ( !app.current || !restoreTarget ) { return; }
+            var uuid = app.current.uuid;
+            var confirm = q( '[data-restore="confirm"]', restoreDialog );
+            confirm.disabled = true;
+            api( 'checkpoint_restore', { thread: uuid, checkpoint: restoreTarget } ).then( function ( data ) {
+                closeRestore();
+                var errors = ( data.result && data.result.errors ) || [];
+                toast( T( 'cp_restored' ) + ( errors.length ? ' ' + errors.join( '; ' ) : '' ) );
+                // the conversation, drafts, changes and plan as they are now
+                return open( uuid, false ).then( function () { review.seen = null; plan.seen = null; if ( app.current ) { syncSide( app.current ); } } );
+            } ).catch( function ( err ) { showError( q( '.exp-ai-v-error', restoreDialog ), err ); confirm.disabled = false; } );
+        }
+        if ( restoreDialog ) {
+            restoreDialog.addEventListener( 'click', function ( e ) {
+                var b = e.target.closest( '[data-restore]' );
+                if ( !b ) { return; }
+                if ( b.getAttribute( 'data-restore' ) === 'confirm' ) { doRestore(); } else { closeRestore(); }
+            } );
         }
 
         /** The items of a plan that runs side by side (doc/parallel-runs.md): one row per child run */
@@ -1405,7 +1474,7 @@
         };
 
         document.addEventListener( 'keydown', function ( e ) {
-            if ( e.defaultPrevented || ( window.ExpAiPalette && window.ExpAiPalette.isOpen() ) || ( el.dialog && el.dialog.open ) ) { return; }
+            if ( e.defaultPrevented || ( window.ExpAiPalette && window.ExpAiPalette.isOpen() ) || ( el.dialog && el.dialog.open ) || ( restoreDialog && restoreDialog.open ) ) { return; }
             var ids = Object.keys( app.bindings );
             for ( var i = 0; i < ids.length; i++ ) {
                 var id = ids[i], b = app.bindings[id];
@@ -1438,6 +1507,8 @@
             if ( mode && !mode.disabled && app.current && mode.getAttribute( 'data-mode' ) !== app.current.run_mode ) { save( { run_mode: mode.getAttribute( 'data-mode' ) } ); return; }
             var tab = e.target.closest( '.exp-ai-v-tabs [role="tab"]' );
             if ( tab ) { showTab( tab.getAttribute( 'data-tab' ) ); return; }
+            var cp = e.target.closest( '[data-restore-cp]' );
+            if ( cp && app.current ) { previewRestore( parseInt( cp.getAttribute( 'data-restore-cp' ), 10 ) ); return; }
             var drop = e.target.closest( '[data-drop]' );
             if ( drop && app.current ) {
                 api( 'followup', { thread: app.current.uuid, op: 'drop', id: drop.getAttribute( 'data-drop' ) } ).then( function ( data ) {
