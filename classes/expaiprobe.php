@@ -88,7 +88,8 @@ class expAiProbe
     /**
      * The tasks. node and object are the probe location ([ProbeSettings] NodeID, default the content root).
      * Each: id, message, check (function( array calls, string text ): string '' passed, else why), follow (optional:
-     * a scripted tool result fed back after the first call, then the check of the second answer), choice (none:
+     * a scripted tool result fed back after the first call, then the check of the second answer), follow_ok (the
+     * write tool of the task: lookups before it are answered with scripted results, then the next call is graded), choice (none:
      * the model must answer in words).
      * @return array
      */
@@ -120,12 +121,13 @@ class expAiProbe
                 if ( !isset( $c['input']['class_identifier'] ) || strtolower( (string) $c['input']['class_identifier'] ) !== $class ) return 'wrong class_identifier';
                 if ( !$intIs( isset( $c['input']['parent_node_id'] ) ? $c['input']['parent_node_id'] : $nodeID, $nodeID ) ) return 'wrong parent_node_id';
                 return isset( $c['input']['fields'] ) && is_array( $c['input']['fields'] ) && in_array( 'Probe page', array_map( 'strval', array_filter( $c['input']['fields'], 'is_scalar' ) ), true ) ? '' : 'fields do not carry the name'; },
-            'follow_ok' => true );
+            'follow_ok' => 'create_draft' );
         $tasks[] = array( 'id' => 'update_draft', 'message' => "Change the field \"name\" of object $objectID to \"Probe title\". Do it now without asking.",
             'check' => function ( $calls ) use ( $call, $intIs, $objectID ) { $c = $call( $calls, 'update_draft' );
-                if ( !$c ) return 'no update_draft call';
+                if ( !$c ) return $call( $calls, 'get_node' ) || $call( $calls, 'get_class_definition' ) ? 'looked up first (no update_draft call)' : 'no update_draft call';
                 if ( !$intIs( isset( $c['input']['object_id'] ) ? $c['input']['object_id'] : null, $objectID ) ) return 'wrong object_id';
-                return isset( $c['input']['fields']['name'] ) && (string) $c['input']['fields']['name'] === 'Probe title' ? '' : 'fields.name is not "Probe title"'; } );
+                return isset( $c['input']['fields']['name'] ) && (string) $c['input']['fields']['name'] === 'Probe title' ? '' : 'fields.name is not "Probe title"'; },
+            'follow_ok' => 'update_draft' );
         $tasks[] = array( 'id' => 'no_tool', 'message' => 'Reply with the single word: ready',
             'check' => function ( $calls, $text ) { return $calls ? 'called a tool' : ( stripos( $text, 'ready' ) !== false ? '' : 'did not say ready' ); } );
         $tasks[] = array( 'id' => 'general_knowledge', 'message' => 'Without looking anything up: what is 7 times 6? Answer with the number.',
@@ -190,6 +192,7 @@ class expAiProbe
             $reason = '';
             $calls = array();
             $text = '';
+            $followed = 0;
             try
             {
                 $answer = $provider->send( $request );
@@ -216,6 +219,28 @@ class expAiProbe
                         list( $calls, $text ) = self::callsOf( $answer );
                     }
                 }
+                // #392 follow_ok: a model that looks things up first (the class definition, the node) before it writes
+                // is answered with scripted lookup results, at most [ProbeSettings] FollowRounds times (default 2), and
+                // its next call is graded. A call of a write tool other than the task's ends the follow.
+                if ( $reason === '' && !empty( $task['follow_ok'] ) )
+                {
+                    $target = (string) $task['follow_ok'];
+                    $rounds = $this->config->int( 'ProbeSettings', 'FollowRounds', 2, 0, 5 );
+                    while ( $followed < $rounds && $calls && !self::hasCall( $calls, $target ) && self::onlyLookups( $calls ) )
+                    {
+                        $request['messages'][] = array( 'role' => 'assistant', 'content_json' => $answer['content_json'] )
+                                               + ( isset( $answer['native_json'] ) ? array( 'native_json' => $answer['native_json'], 'native_for' => $answer['native_for'],
+                                                                                            'native_ids' => isset( $answer['native_ids'] ) ? $answer['native_ids'] : array() ) : array() );
+                        $resultBlocks = array();
+                        foreach ( $calls as $c )
+                            $resultBlocks[] = array( 'type' => 'tool_result', 'tool_use_id' => $c['id'],
+                                                     'content' => json_encode( self::lookupResult( $c, $nodeID, $objectID, $class ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) );
+                        $request['messages'][] = array( 'role' => 'user', 'content' => $resultBlocks );
+                        $answer = $provider->send( $request );
+                        list( $calls, $text ) = self::callsOf( $answer );
+                        $followed++;
+                    }
+                }
                 if ( $reason === '' )
                     $reason = call_user_func( $task['check'], $calls, $text );
             }
@@ -227,14 +252,63 @@ class expAiProbe
             if ( $ok )
                 $passed++;
             $row = array( 'id' => $task['id'], 'ok' => $ok, 'reason' => $reason, 'ms' => (int) round( ( microtime( true ) - $start ) * 1000 ),
-                          'calls' => array_map( function ( $c ) { return $c['name']; }, $calls ) );
+                          'calls' => array_map( function ( $c ) { return $c['name']; }, $calls ), 'followed' => $followed );
             $results[] = $row;
             if ( $progress )
-                call_user_func( $progress, sprintf( '%s %-18s %6d ms %s%s', $ok ? 'ok  ' : 'FAIL', $task['id'], $row['ms'],
-                                                    $row['calls'] ? implode( ',', $row['calls'] ) : '(text)', $ok ? '' : ' - ' . $reason ) );
+                call_user_func( $progress, sprintf( '%s %-18s %6d ms %s%s%s', $ok ? 'ok  ' : 'FAIL', $task['id'], $row['ms'],
+                                                    $row['calls'] ? implode( ',', $row['calls'] ) : '(text)',
+                                                    $followed ? ' (after ' . $followed . ' answered lookup' . ( $followed > 1 ? 's' : '' ) . ')' : '', $ok ? '' : ' - ' . $reason ) );
         }
         $count = count( $results );
         return array( 'tasks' => $count, 'passed' => $passed, 'pass_rate' => $count ? (int) floor( 100 * $passed / $count ) : 0, 'results' => $results );
+    }
+
+    /** @return bool one of the calls is of the tool */
+    public static function hasCall( array $calls, $name )
+    {
+        foreach ( $calls as $c )
+            if ( $c['name'] === $name )
+                return true;
+        return false;
+    }
+
+    /** @return bool every call reads (no tool that writes, by the probe's list of the panel's write tools) */
+    public static function onlyLookups( array $calls )
+    {
+        foreach ( $calls as $c )
+            if ( in_array( $c['name'], array( 'create_draft', 'update_draft', 'propose_plan', 'web_fetch', 'web_search' ), true ) || strpos( $c['name'], '__' ) !== false )
+                return false;
+        return true;
+    }
+
+    /**
+     * #392 The scripted answer to a lookup of a follow_ok task: what the probe location looks like (never read from
+     * the database; the tools are not run).
+     * @param array $call { id, name, input }
+     * @return array
+     */
+    public static function lookupResult( array $call, $nodeID, $objectID, $class )
+    {
+        $node = array( 'node_id' => (int) $nodeID, 'object_id' => (int) $objectID, 'name' => 'Home', 'class_identifier' => $class,
+                       'fields' => array( array( 'identifier' => 'name', 'datatype' => 'ezstring', 'value' => 'Home' ) ) );
+        $definition = array( 'class_identifier' => $class, 'name' => ucfirst( $class ), 'fields' => array(
+            array( 'identifier' => 'name', 'name' => 'Name', 'datatype' => 'ezstring', 'required' => true, 'writable' => true ),
+            array( 'identifier' => 'short_description', 'name' => 'Summary', 'datatype' => 'ezxmltext', 'required' => false, 'writable' => true ) ) );
+        switch ( $call['name'] )
+        {
+            case 'get_class_definition':
+                return $definition;
+            case 'list_creatable_classes':
+                return array( 'parent_node_id' => (int) $nodeID, 'classes' => array( array( 'identifier' => $class, 'name' => ucfirst( $class ) ) ) );
+            case 'get_node':
+                return array( 'node' => $node );
+            case 'get_tree_context':
+                return array( 'node' => $node, 'path' => array( array( 'node_id' => 1, 'name' => 'Top' ) ), 'children' => array() );
+            case 'list_children':
+                return array( 'node_id' => (int) $nodeID, 'children' => array(), 'total' => 0 );
+            default:
+                return array( 'ok' => true, 'note' => 'nothing more to look up' );
+        }
     }
 
     /** @return array( list of { id, name, input }, string text ) */
