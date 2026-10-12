@@ -31,8 +31,10 @@ if ( is_file( $root . '/vendor/autoload.php' ) )
     require_once $root . '/vendor/autoload.php';
 require_once $root . '/autoload.php';
 
-// the suite's own helpers (tests/phpunit/support), before the kernel's autoload can map anything of the same name
-spl_autoload_register( static function ( $class )
+// the suite's own classes: everything under tests/ (support/, the base test cases, the mock servers) through the
+// kernel's tests autoload, as the extension array leaves tests/ out; on a kernel without it, support/ through a map of
+// its own, before the kernel's autoload can map anything of the same name
+$supportLoader = static function ( $class )
 {
     static $map = null;
     if ( $map === null )
@@ -47,7 +49,15 @@ spl_autoload_register( static function ( $class )
     }
     if ( isset( $map[strtolower( $class )] ) )
         require_once $map[strtolower( $class )];
-}, true, true );
+};
+if ( method_exists( 'ezpAutoloader', 'enableTests' ) )
+{
+    ezpAutoloader::enableTests( dirname( __DIR__ ) );
+}
+else
+{
+    spl_autoload_register( $supportLoader, true, true );
+}
 
 expAiTestInstallation::boot( getenv( 'EXPAI_TEST_SITEACCESS' ) ?: 'admin' );
 
