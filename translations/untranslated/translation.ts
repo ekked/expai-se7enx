@@ -5614,5 +5614,144 @@
         <source>The test of %model runs in the background.</source>
         <translation type="unfinished"></translation>
     </message>
+<!-- expai vector parallel/checkpoints: begin -->
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>Not staged: another run is changing these fields (%fields). Leave them alone: do the rest of your item, or end your turn and say which fields were held.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing runs in this thread.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The thread already runs on this model.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/keyboard</name>
+    <message>
+        <source>Steer the running turn with a note</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/vector</name>
+    <message>
+        <source>Items of the plan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A note that reaches Vector at its next step</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Steer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plan approved: %count item(s), up to %parallel side by side. Their changes appear in the Changes tab.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plan approved: %count item(s) go to the provider as a batch (%lane). Their changes appear in the Changes tab when the batch returns.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>queued</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>waits for item %items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>working</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Item %n</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>step %done of about %total</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%done of %total done</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Per item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Actual</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>reaches Vector at its next step</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your note reaches Vector at its next step.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%steer to steer, %queue to queue, %stop to stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>batch: approved plans go to the provider as a batch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Batch answer staged for review: %fields</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Running on %model - about %seconds s per step (step %step)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Running on %model, a slow model (step %step)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to %model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The turn goes on with %model.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not run: the item it waits for (%run) did not finish.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The job of this item ended without an answer: %error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your note reached Vector: %note</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<!-- expai vector parallel/checkpoints: end -->
 </context>
 </TS>

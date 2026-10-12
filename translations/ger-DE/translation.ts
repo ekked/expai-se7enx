@@ -5614,5 +5614,144 @@
         <source>The test of %model runs in the background.</source>
         <translation>Der Test von %model läuft im Hintergrund.</translation>
     </message>
+<!-- expai vector parallel/checkpoints: begin -->
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>Not staged: another run is changing these fields (%fields). Leave them alone: do the rest of your item, or end your turn and say which fields were held.</source>
+        <translation>Nicht vorgemerkt: Ein anderer Lauf ändert diese Felder (%fields). Lassen Sie sie unverändert: Erledigen Sie den Rest Ihres Punkts oder beenden Sie Ihren Zug und nennen Sie die gesperrten Felder.</translation>
+    </message>
+    <message>
+        <source>Nothing runs in this thread.</source>
+        <translation>In diesem Thread läuft nichts.</translation>
+    </message>
+    <message>
+        <source>The thread already runs on this model.</source>
+        <translation>Der Thread läuft bereits mit diesem Modell.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/keyboard</name>
+    <message>
+        <source>Steer the running turn with a note</source>
+        <translation>Den laufenden Zug mit einer Notiz lenken</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/vector</name>
+    <message>
+        <source>Items of the plan</source>
+        <translation>Punkte des Plans</translation>
+    </message>
+    <message>
+        <source>A note that reaches Vector at its next step</source>
+        <translation>Eine Notiz, die Vector bei seinem nächsten Schritt erreicht</translation>
+    </message>
+    <message>
+        <source>Steer</source>
+        <translation>Lenken</translation>
+    </message>
+    <message>
+        <source>Plan approved: %count item(s), up to %parallel side by side. Their changes appear in the Changes tab.</source>
+        <translation>Plan freigegeben: %count Punkt(e), bis zu %parallel gleichzeitig. Ihre Änderungen erscheinen im Reiter Änderungen.</translation>
+    </message>
+    <message>
+        <source>Plan approved: %count item(s) go to the provider as a batch (%lane). Their changes appear in the Changes tab when the batch returns.</source>
+        <translation>Plan freigegeben: %count Punkt(e) gehen als Stapel an den Anbieter (%lane). Ihre Änderungen erscheinen im Reiter Änderungen, sobald der Stapel zurückkommt.</translation>
+    </message>
+    <message>
+        <source>queued</source>
+        <translation>wartet</translation>
+    </message>
+    <message>
+        <source>waits for item %items</source>
+        <translation>wartet auf Punkt %items</translation>
+    </message>
+    <message>
+        <source>working</source>
+        <translation>arbeitet</translation>
+    </message>
+    <message>
+        <source>failed</source>
+        <translation>fehlgeschlagen</translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation>angehalten</translation>
+    </message>
+    <message>
+        <source>Item %n</source>
+        <translation>Punkt %n</translation>
+    </message>
+    <message>
+        <source>step %done of about %total</source>
+        <translation>Schritt %done von etwa %total</translation>
+    </message>
+    <message>
+        <source>%done of %total done</source>
+        <translation>%done von %total erledigt</translation>
+    </message>
+    <message>
+        <source>Per item</source>
+        <translation>Pro Punkt</translation>
+    </message>
+    <message>
+        <source>Item</source>
+        <translation>Punkt</translation>
+    </message>
+    <message>
+        <source>Actual</source>
+        <translation>Tatsächlich</translation>
+    </message>
+    <message>
+        <source>reaches Vector at its next step</source>
+        <translation>erreicht Vector bei seinem nächsten Schritt</translation>
+    </message>
+    <message>
+        <source>Your note reaches Vector at its next step.</source>
+        <translation>Ihre Notiz erreicht Vector bei seinem nächsten Schritt.</translation>
+    </message>
+    <message>
+        <source>%steer to steer, %queue to queue, %stop to stop</source>
+        <translation>%steer zum Lenken, %queue zum Einreihen, %stop zum Anhalten</translation>
+    </message>
+    <message>
+        <source>batch: approved plans go to the provider as a batch</source>
+        <translation>Stapel: Freigegebene Pläne gehen als Stapel an den Anbieter</translation>
+    </message>
+    <message>
+        <source>Batch answer staged for review: %fields</source>
+        <translation>Stapelantwort zur Prüfung vorgemerkt: %fields</translation>
+    </message>
+    <message>
+        <source>Running on %model - about %seconds s per step (step %step)</source>
+        <translation>Läuft mit %model - etwa %seconds s pro Schritt (Schritt %step)</translation>
+    </message>
+    <message>
+        <source>Running on %model, a slow model (step %step)</source>
+        <translation>Läuft mit %model, einem langsamen Modell (Schritt %step)</translation>
+    </message>
+    <message>
+        <source>Switch to %model</source>
+        <translation>Zu %model wechseln</translation>
+    </message>
+    <message>
+        <source>The turn goes on with %model.</source>
+        <translation>Der Zug geht mit %model weiter.</translation>
+    </message>
+    <message>
+        <source>Not run: the item it waits for (%run) did not finish.</source>
+        <translation>Nicht ausgeführt: Der Punkt, auf den er wartet (%run), wurde nicht fertig.</translation>
+    </message>
+    <message>
+        <source>The job of this item ended without an answer: %error</source>
+        <translation>Der Job dieses Punkts endete ohne Antwort: %error</translation>
+    </message>
+    <message>
+        <source>Your note reached Vector: %note</source>
+        <translation>Ihre Notiz hat Vector erreicht: %note</translation>
+    </message>
+</context>
+<!-- expai vector parallel/checkpoints: end -->
 </context>
 </TS>

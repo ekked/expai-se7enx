@@ -236,9 +236,17 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
                 // a background turn whose job ended without an answer: the thread says so
                 if ( expAiThreadRunner::reconcile( $thread ) )
                     $thread = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) );
+                // the items of an approved plan whose jobs ended without finishing (doc/parallel-runs.md); looked at only
+                // when no item reported for 20 seconds (a working item touches the thread with every step)
+                if ( $thread->attribute( 'state' ) === 'running' && (int) $thread->attribute( 'plan_id' ) && (int) $thread->attribute( 'modified' ) < time() - 20
+                     && expAiThreadFanout::reconcile( $thread ) )
+                    $thread = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) );
                 $cursor = isset( $after[$uuid] ) ? (int) $after[$uuid] : 0;
                 $out['threads'][] = array( 'uuid' => $uuid, 'state' => (string) $thread->attribute( 'state' ), 'last_event_id' => (int) $thread->attribute( 'last_event_id' ),
-                                           'cost' => $thread->costText(), 'modified' => (int) $thread->attribute( 'modified' ) );
+                                           'cost' => $thread->costText(), 'modified' => (int) $thread->attribute( 'modified' ),
+                                           'progress' => expAiVector::progressText( $thread ),
+                                           // a turn on a slow model: its model, time per step, step, since; the switch target
+                                           'slow' => $thread->isOwner( self::userID() ) ? expAiSlowModel::status( $thread, $config ) : null );
                 if ( in_array( $thread->attribute( 'state' ), array( 'queued', 'running' ), true ) )
                 {
                     if ( $uuid === $open )
@@ -530,6 +538,8 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
             $result['thread'] = expAiVector::detail( $fresh ?: $thread, self::userID(), $config );
             $result['drafts'] = expAiVector::drafts( $fresh ?: $thread );
             $result['read_only'] = $readOnly;
+            // the queue after the step: notes that steered it are gone, a note the turn could not take is queued
+            $result['followups'] = array_map( function ( $f ) { return $f->present(); }, expAiFollowup::waiting( (int) $thread->attribute( 'id' ) ) );
             return $result;
         } );
     }
@@ -547,8 +557,11 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
             $thread = self::loadThread( true );
             if ( in_array( $thread->attribute( 'state' ), array( 'queued', 'running', 'waiting_input' ), true ) )
             {
-                // a background turn: its job is cancelled (a running one stops after the current step)
+                // a background turn: its job is cancelled (a running one stops after the current step); the items of
+                // an approved plan: their job group (doc/parallel-runs.md)
                 expAiThreadRunner::cancel( $thread );
+                expAiThreadFanout::cancel( $thread );
+                $thread = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ) ?: $thread;
                 $thread->setState( 'stopped' );
                 $run = $thread->leadRun();
                 if ( $run )
@@ -877,6 +890,25 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
                 $followups[] = $followup->present();
             return self::planAnswer( $fresh, expAiPlan::fetchByID( (int) $plan->attribute( 'id' ) ), $config,
                                      array( 'run' => $run, 'thread' => expAiVector::detail( $fresh, self::userID(), $config ), 'followups' => $followups ) );
+        } );
+    }
+
+    /**
+     * switch_model: the running turn of a thread on a slow model goes on with another model (alias, '' the site
+     * default): the job is stopped, a new lead run carries the conversation (compacted). The owner only; also for
+     * threads of the Intelligence tab (expai/write). Answer: switch (alias, label, background, pending), thread.
+     * The browser continues the turn (continue=1) unless it was queued again (background).
+     */
+    public static function switch_model( $args )
+    {
+        $config = self::guard( false, true );
+        self::releaseSession();
+        return self::run( function () use ( $config )
+        {
+            $thread = self::loadThread( true );
+            $switch = expAiSlowModel::switchTo( $thread, self::post( 'alias' ), $config );
+            $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ) ?: $thread;
+            return array( 'switch' => $switch, 'thread' => expAiVector::detail( $fresh, self::userID(), $config ) );
         } );
     }
 

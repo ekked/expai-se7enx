@@ -395,6 +395,16 @@ class expAiAssistant
                 $results[] = $result;
                 $steps[] = $step;
             }
+            // steering (doc/parallel-runs.md): notes the editor sent while this turn worked reach the model at this call
+            // boundary, as text after the tool results (a valid message list for every adapter, thinking intact)
+            $notes = $this->bound && class_exists( 'expAiFollowup' ) ? expAiFollowup::takeSteers( $conversation ) : array();
+            if ( $notes )
+            {
+                $results[] = array( 'type' => 'text', 'text' => "Note from the editor while you worked (follow it from now on):\n" . implode( "\n", $notes ) );
+                foreach ( $notes as $note )
+                    $steps[] = array( 'text' => ezpI18n::tr( 'extension/expai/vector', 'Your note reached Vector: %note', null,
+                                                             array( '%note' => expAiText::cut( expAiText::oneLine( $note ), 120 ) ) ), 'ok' => true, 'steer' => true );
+            }
             $messages[] = array( 'role' => 'user', 'content' => $results );
         }
         if ( $this->provider instanceof expAiUsageRecorder )

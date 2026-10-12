@@ -49,7 +49,7 @@ class expAiThreadTurnHandler extends expQueueHandlerBase
             self::finish( $thread, 'failed', ezpI18n::tr( 'extension/expai/vector', 'The owner of this thread no longer has access to it.' ) );
             throw new expQueuePermanentException( 'the owner may not run the thread any more', 'access' );
         }
-        $conversation = $thread->conversation();
+        $conversation = self::conversationOf( $thread, $p );
         if ( !$conversation )
             throw new expQueuePermanentException( 'the thread has no conversation', 'thread' );
         $config = expAiConfig::instance();
@@ -106,6 +106,9 @@ class expAiThreadTurnHandler extends expQueueHandlerBase
                 if ( $context->isCancelled() )
                 {
                     $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) );
+                    // switched to another model meanwhile (expAiSlowModel): the new lead run is not this job's
+                    if ( $fresh && !empty( $p['run_id'] ) && (int) $fresh->attribute( 'lead_run_id' ) !== (int) $p['run_id'] )
+                        throw new expQueueCancelledException( 'the turn went on with another model' );
                     self::finish( $fresh, 'stopped' );
                     if ( $planID && $fresh )
                         expAiPlanner::complete( $fresh );
@@ -147,7 +150,7 @@ class expAiThreadTurnHandler extends expQueueHandlerBase
                 $context->progress( $steps, null, ( count( $messages ) > 1 ? ( $i + 1 ) . '/' . count( $messages ) . ' ' : '' )
                                                   . ( $last && isset( $last['text'] ) ? (string) $last['text'] : '' ) );
                 // the conversation was stored by the step: read it fresh for the next one
-                $conversation = $thread->conversation();
+                $conversation = self::conversationOf( $thread, $p ) ?: $conversation;
             }
             if ( $i + 1 < count( $messages ) )
                 $context->saveCheckpoint( array( 'index' => $i + 1, 'sent' => 0 ) );
@@ -155,6 +158,23 @@ class expAiThreadTurnHandler extends expQueueHandlerBase
         if ( $planID && ( $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ) ) )
             expAiPlanner::complete( $fresh );
         return array( 'steps' => $steps, 'status' => $status, 'turns' => count( $messages ) - $first );
+    }
+
+    /**
+     * The conversation of the job's run (payload run_id), else the thread's lead conversation (jobs queued before
+     * run_id was set). After a switch of model the lead is another run: the job stays in its own conversation.
+     * @return expAiConversation|null
+     */
+    protected static function conversationOf( expAiThread $thread, array $p )
+    {
+        $run = !empty( $p['run_id'] ) ? expAiThreadRun::fetchByID( (int) $p['run_id'] ) : null;
+        if ( $run && (int) $run->attribute( 'thread_id' ) === (int) $thread->attribute( 'id' ) && (int) $run->attribute( 'conversation_id' ) )
+        {
+            $conversation = eZPersistentObject::fetchObject( expAiConversation::definition(), null, array( 'id' => (int) $run->attribute( 'conversation_id' ) ) );
+            if ( $conversation instanceof expAiConversation )
+                return $conversation;
+        }
+        return $thread->conversation();
     }
 
     /**

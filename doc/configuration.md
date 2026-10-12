@@ -460,6 +460,13 @@ See [mcp.md](mcp.md).
 | `OutputPerField` | 250 | output tokens per field of a new object |
 | `CharsPerToken` | 3.5 | characters per token for text whose tokens are not counted |
 | `SecondsPerRound` | 8 | the duration shown with the estimate |
+| `ParallelRuns` | enabled | each item of an approved plan is a child run of its own, side by side, translations after their source ([parallel-runs.md](parallel-runs.md)); `disabled`: one job, the items one after the other |
+| `MaxParallelRunsPerThread` | 4 | items of one thread that run at once (the queue resource `expai.thread:<thread id>`) |
+| `MaxKickedWorkers` | 4 | live queue workers at most when expai starts one after queueing: another one starts when a job is ready and every live worker is busy ([parallel-runs.md](parallel-runs.md#workers)) |
+| `SlowStepSeconds` | 20 | a model whose median time per step reaches this is slow: its running turn shows the time per step and "Switch to <default model>" ([parallel-runs.md](parallel-runs.md#slow-models)) |
+
+`[QueueSettings] Appliers[vector_plan_item]=expAiPlanItemApplier` stages the answers of a plan that runs on a batch
+lane; `expqueue.ini [JobType_expai.thread.item]` is the job of one item of a plan.
 
 **[VectorPane_<name>]** `Template=`: the template of a right-pane tab (`expai/vector/pane_plan.tpl`, ...).
 

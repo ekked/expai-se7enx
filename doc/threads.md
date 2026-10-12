@@ -55,7 +55,8 @@ Owner decision: a thread is **private to its owner**, plus the **approvers of it
 
 Every thread has an append-only event stream (table `expai_thread_event`): `status` (a state change), `step_end`
 (a tool step, with its text and whether it wrote), `text` (the model's answer), `draft` (a draft written), `cost`
-(the thread's totals after a request), `followup` (a queued message), `error`. Payloads are JSON of at most
+(the thread's totals after a request), `followup` (a queued message; `steered` when a note reached the turn), `error`,
+`run` (a child run of a plan started or ended) and `held` (a field another run holds, [parallel-runs.md](parallel-runs.md)). Payloads are JSON of at most
 `[ThreadSettings] MaxEventPayloadBytes` (16 KiB); bigger ones keep their keys with long strings cut.
 
 The browser reads them with `expaivector::events` (polling) or `expai/stream` (Server-Sent Events where the

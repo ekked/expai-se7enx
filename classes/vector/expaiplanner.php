@@ -15,7 +15,9 @@
  * An approved plan runs as turns of the thread's lead run, one turn per item, in write mode with staged review (every
  * write becomes a staged change, new objects too): in the job queue (job expai.thread.turn with the item messages,
  * the estimate reserved on the job) when the queue is there, else in the browser (the item messages wait as queued
- * follow-ups and are sent one after the other). Parallel runs per item are a later step (V5).
+ * follow-ups and are sent one after the other). With [VectorSettings] ParallelRuns=enabled each item is a child run of
+ * its own, side by side, translations after their source item (expAiThreadFanout, doc/parallel-runs.md); on a batch
+ * lane each item is one provider batch request (expAiPlanBatch).
  */
 class expAiPlanner
 {
@@ -54,9 +56,65 @@ class expAiPlanner
             $item['refused'] = self::check( $thread, $item, $siteLanguages, $scope );
             if ( $item['refused'] === '' || $item['target_name'] === '' )
                 $item['target_name'] = self::targetName( $item );
+            // dependencies (doc/parallel-runs.md): the numbers of earlier items this one waits for (1-based in the tool
+            // input, kept as indexes); an index the item already has (a plan read back for approval) stays as it is
+            $item['depends_on'] = self::dependencies( $in, $n );
             $items[] = $item;
         }
+        return self::autoDependencies( $items );
+    }
+
+    /** @return int[] the earlier item indexes an input item names in depends_on (1-based numbers, or indexes as stored) */
+    protected static function dependencies( array $in, $n )
+    {
+        $out = array();
+        $list = isset( $in['depends_on'] ) ? (array) $in['depends_on'] : array();
+        $stored = !empty( $in['depends_stored'] );
+        foreach ( $list as $value )
+        {
+            if ( !is_numeric( $value ) )
+                continue;
+            $index = $stored ? (int) $value : (int) $value - 1;
+            if ( $index >= 0 && $index < $n && !in_array( $index, $out, true ) )
+                $out[] = $index;
+        }
+        sort( $out );
+        return $out;
+    }
+
+    /**
+     * A translation waits for the item that updates or creates its source: an earlier update item of the same object
+     * (the translation then works from the staged source text, not the published one).
+     * @return array the items with depends_on completed
+     */
+    public static function autoDependencies( array $items )
+    {
+        foreach ( $items as $i => $item )
+        {
+            if ( $item['action'] !== 'translate' || empty( $item['target']['object_id'] ) )
+                continue;
+            for ( $j = 0; $j < $i; $j++ )
+                if ( $items[$j]['action'] === 'update' && (int) $items[$j]['target']['object_id'] === (int) $item['target']['object_id']
+                     && !array_intersect( $items[$j]['languages'], $item['languages'] ) && !in_array( $j, $item['depends_on'], true ) )
+                    $items[$i]['depends_on'][] = $j;
+            sort( $items[$i]['depends_on'] );
+        }
         return $items;
+    }
+
+    /**
+     * The dependencies of the runnable items among each other: a dependency on an item that does not run (deselected
+     * or refused) is dropped, the item runs without waiting.
+     * @param array $run the runnable items
+     * @return array index => int[] runnable indexes it waits for
+     */
+    public static function runnableDependencies( array $run )
+    {
+        $indexes = array_map( function ( $i ) { return (int) $i['index']; }, $run );
+        $out = array();
+        foreach ( $run as $item )
+            $out[(int) $item['index']] = array_values( array_intersect( isset( $item['depends_on'] ) ? array_map( 'intval', (array) $item['depends_on'] ) : array(), $indexes ) );
+        return $out;
     }
 
     /** @return string '' or why the item cannot run (translated) */
@@ -231,7 +289,8 @@ class expAiPlanner
         {
             return array( 'action' => $i['action'], 'node_id' => $i['target']['node_id'], 'object_id' => $i['target']['object_id'],
                           'parent_node_id' => $i['target']['parent_node_id'], 'class' => $i['class'], 'languages' => $i['languages'],
-                          'fields' => $i['fields'], 'summary' => $i['summary'] );
+                          'fields' => $i['fields'], 'summary' => $i['summary'],
+                          'depends_on' => isset( $i['depends_on'] ) ? $i['depends_on'] : array(), 'depends_stored' => true );
         }, $plan->items() ), $config );
         $old = $plan->items();
         foreach ( $items as $i => $item )
@@ -267,6 +326,12 @@ class expAiPlanner
             $messages[] = self::itemMessage( $item, $n + 1, count( $run ) );
         $scope = $thread->scope();
         $nodeID = $scope['nodes'] ? $scope['nodes'][0] : ( $scope['subtrees'] ? $scope['subtrees'][0] : 0 );
+        // the thread's lane is a batch lane: one provider batch request per item, staged when the batch returns
+        if ( $nodeID && expAiPlanBatch::applies( $thread, $config ) )
+            return expAiPlanBatch::start( $thread, $plan, $run, $config );
+        // one child run per item, side by side in the queue (doc/parallel-runs.md)
+        if ( $nodeID && expAiThreadFanout::enabled( $config ) )
+            return expAiThreadFanout::start( $thread, $plan, $run, $reserve, $config );
         if ( expAiThreadRunner::queueAvailable() && $nodeID )
         {
             $job = expAiThreadRunner::enqueue( $thread, $nodeID, '', self::runOptions( $thread ) + array( 'messages' => $messages, 'plan_id' => (int) $plan->attribute( 'id' ) ) );
@@ -318,6 +383,10 @@ class expAiPlanner
         $thread->refreshCost();
         $estimate = $plan->estimate();
         $estimate['actual_micros'] = max( 0, (int) $thread->attribute( 'cost_micros' ) - ( isset( $estimate['start_micros'] ) ? (int) $estimate['start_micros'] : 0 ) );
+        // per item (child runs, doc/parallel-runs.md): the actual cost of each item, for the calibration per action and class
+        $items = expAiThreadFanout::itemActuals( $thread, $plan );
+        if ( $items )
+            $estimate['actual_items'] = $items;
         $plan->setEstimate( $estimate );
         $plan->setAttribute( 'state', 'done' );
         $plan->setAttribute( 'modified', time() );

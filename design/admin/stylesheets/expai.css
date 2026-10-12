@@ -726,3 +726,9 @@ a.exp-ai-help-link:focus-visible { outline: 2px solid var(--exp-ai-accent); outl
 }
 @media print { .exp-ai-help-link { display: none !important; } }
 .exp-ai-help-link.exp-ai-help-link-text { width: auto; padding: 0 0.6em; font-weight: 500; }
+
+/* a turn on a slow model: its time per step and the switch (doc/parallel-runs.md "Slow models") */
+.exp-ai-slow { margin: 0.4em 0; color: var(--exp-ai-muted); font-size: 0.9em; }
+.exp-ai-slow[hidden] { display: none; }
+.exp-ai-slow-time { font-variant-numeric: tabular-nums; }
+.exp-ai-slow .exp-ai-slow-switch { margin-left: 0.4em; }

@@ -70,8 +70,11 @@ now and only this item ... stage the change"):
 - without the queue: the item messages wait as **queued follow-ups** and the browser sends them one after the other.
 
 Every write of the run is a staged change ([review.md](review.md)), new objects too; the editor reviews and applies
-them as usual. Plan states: `proposed`, `approved`, `running`, `done`, `rejected`, `superseded`. Parallel runs per item
-(one child run per object and language) are a later step.
+them as usual. Plan states: `proposed`, `approved`, `running`, `done`, `rejected`, `superseded`.
+
+With `[VectorSettings] ParallelRuns=enabled` (the default) and the job queue, the items run **side by side** instead:
+one child run and one `expai.thread.item` job per item, translations after their source item, progress and cost per
+item, and on a batch lane as one provider batch ([parallel-runs.md](parallel-runs.md)).
 
 ## Functions and settings
 

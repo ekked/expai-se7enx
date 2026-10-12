@@ -34,7 +34,8 @@ it was when the palette closes.
 | --- | --- | --- |
 | Ctrl/Cmd+K | the palette | everywhere (`global`) |
 | Ctrl/Cmd+Enter | run, or queue while a turn runs | Vector (`vector`) |
-| Alt+Enter | queue the message (sends it when nothing runs) | the message field (`composer`) |
+| Alt+Enter | steer: a note that reaches the running turn at its next step ([parallel-runs.md](parallel-runs.md#steering)); sends the message when nothing runs | the message field (`composer`) |
+| Ctrl/Cmd+Shift+Enter | queue the message (sent when the turn ends; sends it when nothing runs) | the message field (`composer`) |
 | Esc Esc | stop the thread (twice within 600 ms) | Vector |
 | j / k | next / previous part of the Changes tab while it is shown, else next / previous exchange | Vector, not in a field (`list`) |
 | a / x | accept / reject the current part of a staged change, then on to the next one that waits ([review.md](review.md)) | list |
@@ -81,7 +82,7 @@ or one character; two chords separated by a space must follow within 600 ms. `Wh
 | `list` | in Vector, not in a field |
 | `composer` | in Vector's message field |
 
-The commands are palette, run, queue, stop, next, previous, accept, reject, accept_field, reject_field, edit_hunk, thread_next, thread_previous,
+The commands are palette, run, queue, steer, stop, next, previous, accept, reject, accept_field, reject_field, edit_hunk, thread_next, thread_previous,
 new_thread, mode, model, lane, scope, tab_plan, tab_diff, tab_cost, help.
 
 ## Commands of your own

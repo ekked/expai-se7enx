@@ -31,6 +31,8 @@ Rules when staging (`expAiChangeStager`):
   `BulkLanguageThreshold`); more is bulk work and the tool asks the model to call `propose_plan` first
   ([plan-mode.md](plan-mode.md));
 - at most `[VectorSettings] MaxStagedChanges` (500) open changes per thread;
+- a field another run still works on (an open proposal of a queued or running run, in any thread) is **held**: it is
+  not staged, the tool result says "held by run N" ([parallel-runs.md](parallel-runs.md#one-field-one-run));
 - datatypes the assistant does not write (images, relations, files) are skipped, as with drafts.
 
 The tool result tells the model the change ids and that nothing is written yet; the step reads "Proposed changes to

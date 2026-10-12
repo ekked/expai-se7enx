@@ -5614,5 +5614,144 @@
         <source>The test of %model runs in the background.</source>
         <translation>The test of %model runs in the background.</translation>
     </message>
+<!-- expai vector parallel/checkpoints: begin -->
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>Not staged: another run is changing these fields (%fields). Leave them alone: do the rest of your item, or end your turn and say which fields were held.</source>
+        <translation>Not staged: another run is changing these fields (%fields). Leave them alone: do the rest of your item, or end your turn and say which fields were held.</translation>
+    </message>
+    <message>
+        <source>Nothing runs in this thread.</source>
+        <translation>Nothing runs in this thread.</translation>
+    </message>
+    <message>
+        <source>The thread already runs on this model.</source>
+        <translation>The thread already runs on this model.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/keyboard</name>
+    <message>
+        <source>Steer the running turn with a note</source>
+        <translation>Steer the running turn with a note</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/vector</name>
+    <message>
+        <source>Items of the plan</source>
+        <translation>Items of the plan</translation>
+    </message>
+    <message>
+        <source>A note that reaches Vector at its next step</source>
+        <translation>A note that reaches Vector at its next step</translation>
+    </message>
+    <message>
+        <source>Steer</source>
+        <translation>Steer</translation>
+    </message>
+    <message>
+        <source>Plan approved: %count item(s), up to %parallel side by side. Their changes appear in the Changes tab.</source>
+        <translation>Plan approved: %count item(s), up to %parallel side by side. Their changes appear in the Changes tab.</translation>
+    </message>
+    <message>
+        <source>Plan approved: %count item(s) go to the provider as a batch (%lane). Their changes appear in the Changes tab when the batch returns.</source>
+        <translation>Plan approved: %count item(s) go to the provider as a batch (%lane). Their changes appear in the Changes tab when the batch returns.</translation>
+    </message>
+    <message>
+        <source>queued</source>
+        <translation>queued</translation>
+    </message>
+    <message>
+        <source>waits for item %items</source>
+        <translation>waits for item %items</translation>
+    </message>
+    <message>
+        <source>working</source>
+        <translation>working</translation>
+    </message>
+    <message>
+        <source>failed</source>
+        <translation>failed</translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation>stopped</translation>
+    </message>
+    <message>
+        <source>Item %n</source>
+        <translation>Item %n</translation>
+    </message>
+    <message>
+        <source>step %done of about %total</source>
+        <translation>step %done of about %total</translation>
+    </message>
+    <message>
+        <source>%done of %total done</source>
+        <translation>%done of %total done</translation>
+    </message>
+    <message>
+        <source>Per item</source>
+        <translation>Per item</translation>
+    </message>
+    <message>
+        <source>Item</source>
+        <translation>Item</translation>
+    </message>
+    <message>
+        <source>Actual</source>
+        <translation>Actual</translation>
+    </message>
+    <message>
+        <source>reaches Vector at its next step</source>
+        <translation>reaches Vector at its next step</translation>
+    </message>
+    <message>
+        <source>Your note reaches Vector at its next step.</source>
+        <translation>Your note reaches Vector at its next step.</translation>
+    </message>
+    <message>
+        <source>%steer to steer, %queue to queue, %stop to stop</source>
+        <translation>%steer to steer, %queue to queue, %stop to stop</translation>
+    </message>
+    <message>
+        <source>batch: approved plans go to the provider as a batch</source>
+        <translation>batch: approved plans go to the provider as a batch</translation>
+    </message>
+    <message>
+        <source>Batch answer staged for review: %fields</source>
+        <translation>Batch answer staged for review: %fields</translation>
+    </message>
+    <message>
+        <source>Running on %model - about %seconds s per step (step %step)</source>
+        <translation>Running on %model - about %seconds s per step (step %step)</translation>
+    </message>
+    <message>
+        <source>Running on %model, a slow model (step %step)</source>
+        <translation>Running on %model, a slow model (step %step)</translation>
+    </message>
+    <message>
+        <source>Switch to %model</source>
+        <translation>Switch to %model</translation>
+    </message>
+    <message>
+        <source>The turn goes on with %model.</source>
+        <translation>The turn goes on with %model.</translation>
+    </message>
+    <message>
+        <source>Not run: the item it waits for (%run) did not finish.</source>
+        <translation>Not run: the item it waits for (%run) did not finish.</translation>
+    </message>
+    <message>
+        <source>The job of this item ended without an answer: %error</source>
+        <translation>The job of this item ended without an answer: %error</translation>
+    </message>
+    <message>
+        <source>Your note reached Vector: %note</source>
+        <translation>Your note reached Vector: %note</translation>
+    </message>
+</context>
+<!-- expai vector parallel/checkpoints: end -->
 </context>
 </TS>

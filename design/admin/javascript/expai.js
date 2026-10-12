@@ -240,8 +240,40 @@
         commands: {
             pending: [],
             register: function ( id, def ) { this.pending.push( [ id, def ] ); }
-        }
+        },
+        slowStatus: slowStatus
     };
+
+    /**
+     * A running turn on a slow model (doc/parallel-runs.md "Slow models"), in the Intelligence tab and in Vector: the
+     * line "Running on <model> - about N s per step (step k)" with the time elapsed (a timer of its own) and the button
+     * "Switch to <model>". box: an element with .exp-ai-slow-text, .exp-ai-slow-time, .exp-ai-slow-switch; slow: the
+     * status of expaivector::events (null hides it); onSwitch( slow ) runs on the button.
+     */
+    function slowStatus( box, slow, onSwitch ) {
+        if ( !box ) {
+            return;
+        }
+        window.clearInterval( box.expAiTimer );
+        box.hidden = !slow;
+        if ( !slow ) {
+            return;
+        }
+        var text = box.querySelector( '.exp-ai-slow-text' ), time = box.querySelector( '.exp-ai-slow-time' ), button = box.querySelector( '.exp-ai-slow-switch' );
+        if ( text ) { text.textContent = slow.text || ''; }
+        if ( button ) {
+            button.hidden = !slow.switch_to;
+            button.textContent = slow.button || '';
+            button.disabled = false;
+            button.onclick = function () { button.disabled = true; onSwitch( slow ); };
+        }
+        var tick = function () {
+            var s = Math.max( 0, Math.round( Date.now() / 1000 - ( slow.since || 0 ) ) );
+            if ( time ) { time.textContent = '· ' + Math.floor( s / 60 ) + ':' + ( '0' + ( s % 60 ) ).slice( -2 ); }
+        };
+        tick();
+        box.expAiTimer = window.setInterval( tick, 1000 );
+    }
 
     /* ---------------------------------------------------------------- labels */
 
@@ -590,6 +622,8 @@
             var uuid = data.thread;
             var cursor = 0;
             var text = working ? working.querySelector( '.exp-ai-working-text' ) : null;
+            var slowBox = root.querySelector( '.exp-ai-slow' );
+            var switched = null;
             if ( text && data.notice ) {
                 text.textContent = data.notice;
             }
@@ -611,6 +645,13 @@
                         } );
                         var st = ( ev.threads || [] )[0];
                         var done = !st || ( st.state !== 'queued' && st.state !== 'running' );
+                        // a slow model: its time per step and the switch to the default model
+                        ExpAi.slowStatus( slowBox, done || !st ? null : st.slow, function () {
+                            api( 'expaivector::switch_model', { thread: uuid } ).then( function ( r ) {
+                                switched = r.switch || null;
+                                if ( text && r.switch ) { text.textContent = r.switch.label; }
+                            } ).catch( function ( err ) { showError( err ); } );
+                        } );
                         var refresh = news.length ? api( 'history', { node_id: nodeID } ).then( function ( page ) {
                             var list = page.exchanges || [];
                             if ( list.length ) {
@@ -634,7 +675,7 @@
                             if ( st && st.state === 'failed' ) {
                                 reject( { message: failed, kind: 'server' } );
                             } else {
-                                resolve( { status: 'done' } );
+                                resolve( { status: switched ? 'switched' : 'done', 'switch': switched } );
                             }
                         } );
                     } ).catch( function () { window.setTimeout( tick, 3000 ); } );
@@ -650,6 +691,10 @@
                         setDrafts( data.drafts );
                     }
                     return followQueued( data ).then( function ( r ) {
+                        // switched to another model: it goes on with the same message (in the queue, or here)
+                        if ( r.status === 'switched' && r['switch'] && r['switch'].pending ) {
+                            return r['switch'].background ? followQueued( { thread: data.thread } ) : step( { 'continue': '1' } );
+                        }
                         emit( 'panel:done', { panel: root, data: r } );
                         return r;
                     } );

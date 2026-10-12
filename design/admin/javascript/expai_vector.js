@@ -34,10 +34,10 @@
             title: q( '.exp-ai-v-title' ), state: q( '.exp-ai-v-state' ), chips: q( '.exp-ai-v-chips' ), note: q( '.exp-ai-v-note' ),
             model: q( '.exp-ai-v-model' ), lane: q( '.exp-ai-v-lane' ), review: q( '.exp-ai-v-review' ), log: q( '.exp-ai-v-log' ),
             older: q( '.exp-ai-v-older' ), working: q( '.exp-ai-v-working' ), workingText: q( '.exp-ai-v-working-text' ), error: q( '.exp-ai-v-thread .exp-ai-v-error' ),
-            input: q( '.exp-ai-v-input' ), run: q( '.exp-ai-v-run' ), stop: q( '.exp-ai-v-stop' ), queueBtn: q( '.exp-ai-v-queue-btn' ),
+            input: q( '.exp-ai-v-input' ), run: q( '.exp-ai-v-run' ), stop: q( '.exp-ai-v-stop' ), queueBtn: q( '.exp-ai-v-queue-btn' ), steerBtn: q( '.exp-ai-v-steer-btn' ),
             queue: q( '.exp-ai-v-queue' ), queueList: q( '.exp-ai-v-queue-list' ), hint: q( '.exp-ai-v-hint' ), live: q( '[data-live="steps"]' ),
             readonly: q( '.exp-ai-v-readonly' ), dialog: q( '.exp-ai-v-scope-dialog' ), toast: q( '.exp-ai-v-toast' ), side: q( '.exp-ai-v-side' ),
-            threadsPane: q( '.exp-ai-v-threads' )
+            threadsPane: q( '.exp-ai-v-threads' ), runs: q( '.exp-ai-v-runs' ), runsList: q( '.exp-ai-v-runs-list' ), runsProgress: q( '.exp-ai-v-runs-progress' )
         };
 
         var app = {
@@ -84,8 +84,10 @@
                 k.textContent = keys ? Keys.display( keys ) : '';
                 k.hidden = !keys;
             } );
-            el.hint.textContent = app.busy ? T( 'hint_running', { '%queue': Keys.display( keysOf( 'queue' ) ), '%stop': Keys.display( keysOf( 'stop' ) ) } )
-                                           : T( 'hint_idle', { '%run': Keys.display( keysOf( 'run' ) ) } );
+            el.hint.textContent = app.busy
+                ? ( keysOf( 'steer' ) ? T( 'hint_running_steer', { '%steer': Keys.display( keysOf( 'steer' ) ), '%queue': Keys.display( keysOf( 'queue' ) ), '%stop': Keys.display( keysOf( 'stop' ) ) } )
+                                      : T( 'hint_running', { '%queue': Keys.display( keysOf( 'queue' ) ), '%stop': Keys.display( keysOf( 'stop' ) ) } ) )
+                : T( 'hint_idle', { '%run': Keys.display( keysOf( 'run' ) ) } );
         }
         function canWrite() { return !!( app.current && app.current.can_write ); }
 
@@ -106,7 +108,7 @@
                  + '<span class="exp-ai-v-row-title' + ( row.untitled ? ' exp-ai-v-untitled' : '' ) + '">' + esc( row.title ) + '</span>'
                  + ( row.unread ? '<span class="exp-ai-v-unread" title="' + esc( T( 'unread' ) ) + '"><span class="exp-ai-sr">' + esc( T( 'unread' ) ) + '</span></span>' : '' )
                  + '<span class="exp-ai-v-row-meta">' + ( row.bulk ? '<span class="exp-ai-v-badge">' + esc( T( 'bulk' ) ) + '</span> ' : '' )
-                 + esc( row.origin === 'panel' ? T( 'origin_panel' ) : stateLabel( row.state ) ) + '</span></div>';
+                 + esc( row.origin === 'panel' ? T( 'origin_panel' ) : stateLabel( row.state ) + ( row.progress ? ' ' + row.progress : '' ) ) + '</span></div>';
         }
 
         function renderList() {
@@ -164,7 +166,7 @@
             el.title.value = t.untitled ? '' : t.title;
             el.title.placeholder = T( 'new_thread' );
             el.title.readOnly = !t.can_write;
-            el.state.textContent = stateLabel( t.state );
+            el.state.textContent = stateLabel( t.state ) + ( t.progress ? ' · ' + t.progress : '' );
             el.state.className = 'exp-ai-v-state exp-ai-v-st-' + t.state;
             el.readonly.hidden = t.can_write;
             var pin = q( '[data-command="pin"]' );
@@ -175,7 +177,28 @@
             renderChips( t );
             renderSettings( t );
             renderCost( t );
+            renderRuns( t );
             syncSide( t );
+        }
+
+        /** The items of a plan that runs side by side (doc/parallel-runs.md): one row per child run */
+        function renderRuns( t ) {
+            if ( !el.runs ) { return; }
+            var r = t.runs || { runs: [] };
+            el.runs.hidden = !r.runs.length;
+            if ( !r.runs.length ) { return; }
+            el.runsProgress.textContent = T( 'run_progress', { '%done': r.done, '%total': r.total } );
+            el.runsList.innerHTML = r.runs.map( function ( run ) {
+                var state = run.state === 'waiting' && run.depends_on.length ? T( 'run_state_waiting', { '%items': run.depends_on.join( ', ' ) } ) : T( 'run_state_' + run.state );
+                var steps = run.state === 'running' && run.progress_total ? T( 'run_steps', { '%done': run.progress_done, '%total': run.progress_total } ) : '';
+                return '<li class="exp-ai-v-run exp-ai-v-run-' + esc( run.state ) + '" data-run="' + run.id + '">'
+                     + '<span class="exp-ai-v-run-n">' + esc( T( 'run_item', { '%n': run.item + 1 } ) ) + '</span> '
+                     + '<span class="exp-ai-v-run-label">' + esc( run.label ) + '</span> '
+                     + '<span class="exp-ai-v-badge exp-ai-v-badge-run-' + esc( run.state ) + '">' + esc( state ) + '</span>'
+                     + ( steps ? ' <span class="exp-ai-v-muted">' + esc( steps ) + '</span>' : '' )
+                     + ( run.actual ? ' <span class="exp-ai-v-muted">' + esc( run.actual ) + '</span>' : '' )
+                     + ( run.last ? '<span class="exp-ai-v-run-last">' + esc( run.last ) + '</span>' : '' ) + '</li>';
+            } ).join( '' );
         }
 
         function chip( node, kind ) {
@@ -217,9 +240,10 @@
             }
             el.model.innerHTML = html;
             el.model.disabled = !t.can_write || !( app.boot && app.boot.model_choice );
+            // a batch lane is for bulk work only: approved plans go to the provider as a batch (doc/parallel-runs.md)
             el.lane.innerHTML = ( app.lanes || [] ).map( function ( l ) {
-                return '<option value="' + esc( l.name ) + '"' + ( l.name === t.lane ? ' selected' : '' ) + ( !l.usable || l.batch ? ' disabled' : '' ) + '>'
-                     + esc( l.label + ( l.batch ? ' · ' + T( 'lane_batch_note' ) : '' ) ) + '</option>';
+                return '<option value="' + esc( l.name ) + '"' + ( l.name === t.lane ? ' selected' : '' ) + ( !l.usable || ( l.batch && !t.bulk ) ? ' disabled' : '' ) + '>'
+                     + esc( l.label + ( l.batch ? ' · ' + T( t.bulk ? 'lane_batch_plan' : 'lane_batch_note' ) : '' ) ) + '</option>';
             } ).join( '' );
             var reviews = app.boot ? app.boot.choices.review : [ 'staged', 'direct' ];
             qa( 'option', el.review ).forEach( function ( o ) {
@@ -245,6 +269,19 @@
                 rows.push( [ T( 'cost_tokens' ), t.tokens ], [ T( 'cost_requests' ), String( t.requests ) ], [ T( 'cost_model' ), t.model_label || t.model_alias || '-' ],
                            [ T( 'cost_lane' ), ( app.lanes.filter( function ( l ) { return l.name === t.lane; } )[0] || { label: t.lane } ).label ] );
                 dl.innerHTML = rows.map( function ( r ) { return '<div><dt>' + esc( r[0] ) + '</dt><dd>' + esc( r[1] ) + '</dd></div>'; } ).join( '' );
+            }
+            // estimate vs actual per item of the plan (parallel runs and batch plans)
+            var box = q( '.exp-ai-v-cost-items' );
+            var runs = t.runs && t.runs.runs ? t.runs.runs : [];
+            if ( box ) {
+                // money is '' where costs are not shown: then there is nothing to compare
+                box.hidden = !runs.some( function ( r ) { return r.estimate || r.actual; } );
+                box.innerHTML = box.hidden ? '' : '<h4>' + esc( T( 'cost_items' ) ) + '</h4><table class="exp-ai-v-cost-table"><thead><tr><th scope="col">' + esc( T( 'cost_item' ) )
+                    + '</th><th scope="col">' + esc( T( 'cost_estimate' ) ) + '</th><th scope="col">' + esc( T( 'cost_actual' ) ) + '</th></tr></thead><tbody>'
+                    + runs.map( function ( r ) {
+                        return '<tr class="exp-ai-v-run-' + esc( r.state ) + '"><td>' + ( r.item + 1 ) + ' · ' + esc( r.label ) + '</td><td>' + esc( r.estimate ) + '</td><td>'
+                             + esc( r.actual ) + ( r.state === 'running' ? ' …' : '' ) + '</td></tr>';
+                    } ).join( '' ) + '</tbody></table>';
             }
             var count = q( '[data-tab-count="cost"]' );
             if ( count ) { count.textContent = t.cost || ''; }
@@ -635,9 +672,13 @@
                     takePlan( data );
                     if ( op === 'reject' ) { toast( T( 'pl_rejected' ) ); return; }
                     var r = data.run || {};
-                    toast( T( r.mode === 'background' ? 'pl_approved_bg' : 'pl_approved_fg', { '%count': r.items || 0 } ) );
+                    var key = { background: 'pl_approved_bg', parallel: 'pl_approved_parallel', batch: 'pl_approved_batch' }[r.mode] || 'pl_approved_fg';
+                    toast( T( key, { '%count': r.items || 0, '%parallel': r.parallel || 1, '%lane': r.lane || '' } ) );
                     loadList();
-                    if ( r.mode === 'background' ) {
+                    // a batch waits for the provider (minutes to hours): the thread is followed by the regular poll
+                    if ( r.mode === 'batch' ) {
+                        open( app.current.uuid, false );
+                    } else if ( r.mode === 'background' || r.mode === 'parallel' ) {
                         el.workingText.textContent = T( 'queued_background' );
                         setBusy( true );
                         follow( app.current.uuid ).then( function () { setBusy( false ); loadReview(); loadPlan(); loadList(); } );
@@ -668,9 +709,11 @@
                 reads = [];
             }
             ( steps || [] ).forEach( function ( s ) {
-                if ( s.ok && !s.writes ) { reads.push( s ); return; }
+                // a steering note that reached the model always shows, it is not a lookup
+                if ( s.ok && !s.writes && !s.steer ) { reads.push( s ); return; }
                 flush();
-                out.push( '<li class="exp-ai-step' + ( s.ok ? '' : ' exp-ai-step-failed' ) + ( s.writes ? ' exp-ai-step-write' : '' ) + '">' + esc( s.text ) + '</li>' );
+                out.push( '<li class="exp-ai-step' + ( s.ok ? '' : ' exp-ai-step-failed' ) + ( s.writes ? ' exp-ai-step-write' : '' ) + ( s.steer ? ' exp-ai-step-steer' : '' ) + '">'
+                        + esc( s.text ) + '</li>' );
             } );
             flush();
             return out.join( '' );
@@ -712,7 +755,9 @@
         function renderFollowups() {
             el.queue.hidden = !app.followups.length;
             el.queueList.innerHTML = app.followups.map( function ( f ) {
-                return '<li data-id="' + f.id + '"><span>' + esc( f.body ) + '</span> <button type="button" class="exp-ai-v-link" data-drop="' + f.id + '" aria-label="'
+                return '<li data-id="' + f.id + '" class="exp-ai-v-queue-' + esc( f.delivery ) + '">'
+                     + ( f.delivery === 'steer' ? '<span class="exp-ai-v-badge exp-ai-v-badge-steer" title="' + esc( T( 'steer_hint' ) ) + '">' + esc( T( 'steer' ) ) + '</span> ' : '' )
+                     + '<span>' + esc( f.body ) + '</span> <button type="button" class="exp-ai-v-link" data-drop="' + f.id + '" aria-label="'
                      + esc( T( 'queue_remove' ) ) + '">×</button></li>';
             } ).join( '' );
         }
@@ -800,6 +845,7 @@
             el.working.hidden = !on;
             el.stop.hidden = !on;
             el.queueBtn.hidden = !on;
+            if ( el.steerBtn ) { el.steerBtn.hidden = !on; }
             el.run.hidden = on;
             if ( !on ) { app.stopRequested = false; }
             paintKeys();
@@ -815,6 +861,8 @@
                 ( data.steps || [] ).forEach( function ( s ) { announce( s.text ); } );
                 if ( data.thread ) { setHeader( data.thread ); }
                 if ( data.drafts ) { renderDrafts( data.drafts ); }
+                // notes that steered this step leave the queue
+                if ( data.followups ) { app.followups = data.followups; renderFollowups(); }
                 if ( data.status === 'queued' ) {
                     // a slow model: the turn runs in the background; follow its events
                     el.workingText.textContent = T( 'queued_background' );
@@ -872,15 +920,19 @@
                         } );
                         var st = ( data.threads || [] ).filter( function ( t ) { return t.uuid === uuid; } )[0];
                         var done = !st || ( st.state !== 'queued' && st.state !== 'running' );
+                        showSlow( done ? null : st.slow, uuid );
                         var reload = news.length ? api( 'thread', { thread: uuid } ).then( function ( d ) {
                             ( d.history.exchanges || [] ).forEach( function ( x ) { showExchange( x, false ); } );
                             renderDrafts( d.drafts );
+                            // a steering note the background turn took leaves the queue
+                            app.followups = d.followups || [];
+                            renderFollowups();
                             setHeader( d.thread );
                             scrollDown();
                         } ) : Promise.resolve();
                         return reload.then( function () {
                             if ( done ) {
-                                if ( st && st.state === 'stopped' ) { toast( T( 'stopped' ) ); }
+                                if ( st && st.state === 'stopped' && !app.afterSwitch ) { toast( T( 'stopped' ) ); }
                                 if ( st && st.state === 'failed' ) { showError( el.error, { message: lastError || T( 'background_failed' ) } ); }
                                 ExpAi.emit( 'vector:done', { data: { status: st ? st.state : 'done' } } );
                                 resolve( null );
@@ -892,6 +944,32 @@
                 }
                 window.setTimeout( tick, 800 );
             } );
+        }
+
+        /** A turn on a slow model (doc/parallel-runs.md "Slow models"): the status line and "Switch to <model>" */
+        function showSlow( slow, uuid ) {
+            ExpAi.slowStatus( q( '.exp-ai-v-slow' ), slow, function () {
+                api( 'switch_model', { thread: uuid } ).then( function ( d ) {
+                    app.afterSwitch = d['switch'] || null;
+                    toast( slow.switched || '' );
+                    if ( d.thread && app.current && app.current.uuid === uuid ) { setHeader( d.thread ); }
+                    // a turn that ran in the background of this window: it is followed until the old job ends; one that
+                    // was only seen by the poll goes on right here
+                    if ( !app.busy ) { continueAfterSwitch(); }
+                } ).catch( function ( err ) { showError( el.error, err ); } );
+            } );
+        }
+        function continueAfterSwitch() {
+            var s = app.afterSwitch;
+            app.afterSwitch = null;
+            if ( !s || !s.pending || !app.current ) { return; }
+            if ( s.background ) {
+                setBusy( true );
+                el.workingText.textContent = T( 'queued_background' );
+                follow( app.current.uuid ).then( function () { setBusy( false ); loadList(); } );
+            } else {
+                run( null );
+            }
         }
 
         function run( text ) {
@@ -911,9 +989,12 @@
                 showError( el.error, err );
             } ).then( function () {
                 setBusy( false );
+                showSlow( null, uuid );
                 loadList();
                 if ( app.current && app.current.uuid === uuid ) {
                     el.input.focus();
+                    // switched to another model while it ran: the same message goes on there
+                    if ( app.afterSwitch ) { continueAfterSwitch(); return; }
                     nextFollowup();
                 }
             } );
@@ -930,15 +1011,20 @@
             run( text );
         }
 
-        function queue( text ) {
+        function queue( text, delivery ) {
             text = text || el.input.value.trim();
             if ( !text || !app.current ) { return; }
-            api( 'followup', { thread: app.current.uuid, op: 'add', body: text } ).then( function ( data ) {
+            api( 'followup', { thread: app.current.uuid, op: 'add', body: text, delivery: delivery || 'queue' } ).then( function ( data ) {
                 el.input.value = '';
                 app.followups = data.followups || [];
                 renderFollowups();
-                toast( T( 'queued_one' ) );
+                toast( T( delivery === 'steer' ? 'steered_one' : 'queued_one' ) );
             } ).catch( function ( err ) { toast( T( 'error' ) + ' ' + ( err.message || '' ) ); } );
+        }
+
+        /** Alt+Enter: while a turn runs, a note that reaches the model at its next step; otherwise the message runs */
+        function steer() {
+            if ( app.busy ) { queue( null, 'steer' ); } else { submit(); }
         }
 
         function nextFollowup() {
@@ -1179,7 +1265,10 @@
             states.forEach( function ( s ) {
                 app.rows.forEach( function ( r ) {
                     if ( r.uuid === s.uuid && r.state !== s.state ) { r.state = s.state; changed = true; }
+                    if ( r.uuid === s.uuid && s.progress !== undefined && r.progress !== s.progress ) { r.progress = s.progress; changed = true; }
                 } );
+                // the open thread works on a slow model elsewhere (opened again, another window): its status and the switch
+                if ( app.current && s.uuid === app.current.uuid && !app.busy ) { showSlow( s.state === 'queued' || s.state === 'running' ? s.slow : null, s.uuid ); }
             } );
             events.forEach( function ( ev ) {
                 app.cursor[ev.thread] = Math.max( app.cursor[ev.thread] || 0, ev.id );
@@ -1261,7 +1350,25 @@
             // an opened drawer is brought into the window (the page may be scrolled down)
             var drawer = on && q( cls === 'exp-ai-v-side-open' ? '.exp-ai-v-side' : '.exp-ai-v-threads' );
             if ( drawer && drawer.getBoundingClientRect().bottom > window.innerHeight ) { drawer.scrollIntoView( { block: 'nearest' } ); }
+            fitDrawers();
         }
+        /**
+         * A drawer ends inside the window: it lies over a page that may be shorter than the drawer (a long plan at
+         * 200 % zoom), so its height is what is left below its top; its pane scrolls within it.
+         */
+        function fitDrawers() {
+            [ '.exp-ai-v-side', '.exp-ai-v-threads' ].forEach( function ( sel ) {
+                var d = q( sel );
+                if ( !d ) { return; }
+                if ( window.getComputedStyle( d ).position !== 'absolute' || !d.offsetParent ) { d.style.maxHeight = ''; return; }
+                var top = Math.max( 8, d.getBoundingClientRect().top );
+                d.style.maxHeight = Math.max( 240, window.innerHeight - top - 8 ) + 'px';
+            } );
+        }
+        var fitTimer = null;
+        [ 'scroll', 'resize' ].forEach( function ( type ) {
+            window.addEventListener( type, function () { window.clearTimeout( fitTimer ); fitTimer = window.setTimeout( fitDrawers, 60 ); }, { passive: true } );
+        } );
         function placeholder() { toast( T( 'item_placeholder' ) ); }
 
         var actions = {
@@ -1269,6 +1376,7 @@
             help: function () { if ( window.ExpAiPalette ) { window.ExpAiPalette.help(); } },
             run: function () { if ( app.busy ) { queue(); } else { submit(); } },
             queue: function () { if ( app.busy ) { queue(); } else { submit(); } },
+            steer: steer,
             stop: stop,
             // j/k move through the parts of the Changes tab while it is shown, else through the exchanges
             next: function () { if ( !reviewVisible() || !moveHunk( 1 ) ) { moveItem( 1 ); } },

@@ -96,8 +96,87 @@ class expAiPlanEstimate
         return array( 'in' => (int) $in, 'out' => (int) $out );
     }
 
+    /** @var array|null the ratios of finished items: list of { action, class, ratio } (read once per estimate) */
+    protected $itemRatios = null;
+
+    /**
+     * The actual / expected ratios of the items of the last finished plans that ran as child runs (their actual cost
+     * per item is recorded, doc/parallel-runs.md).
+     * @return array list of { action, class, ratio }
+     */
+    protected function itemRatios()
+    {
+        if ( $this->itemRatios !== null )
+            return $this->itemRatios;
+        $this->itemRatios = array();
+        foreach ( expAiPlan::fetchDone( 40 ) as $plan )
+        {
+            $e = $plan->estimate();
+            if ( empty( $e['actual_items'] ) || empty( $e['items'] ) )
+                continue;
+            $expected = array();
+            foreach ( (array) $e['items'] as $row )
+                $expected[(int) $row['index']] = isset( $row['micros'] ) ? (int) $row['micros'] : 0;
+            foreach ( $plan->items() as $item )
+            {
+                $i = (int) $item['index'];
+                if ( empty( $expected[$i] ) || !isset( $e['actual_items'][$i] ) || (int) $e['actual_items'][$i] <= 0 )
+                    continue;
+                $this->itemRatios[] = array( 'action' => (string) $item['action'], 'class' => (string) $item['class'],
+                                             'ratio' => (int) $e['actual_items'][$i] / $expected[$i] );
+            }
+        }
+        return $this->itemRatios;
+    }
+
+    /** @return float|null the median of ratios between 0.5 and 3, null below 3 values */
+    protected static function median( array $ratios )
+    {
+        if ( count( $ratios ) < 3 )
+            return null;
+        sort( $ratios );
+        $mid = (int) floor( count( $ratios ) / 2 );
+        $median = count( $ratios ) % 2 ? $ratios[$mid] : ( $ratios[$mid - 1] + $ratios[$mid] ) / 2;
+        return round( max( 0.5, min( 3.0, $median ) ), 3 );
+    }
+
+    /**
+     * The calibration of one item: the median actual / expected of finished items with the same action and class (at
+     * least 3), else the same action, else the plan-level calibration.
+     * @return array factor, from (items or plans used), by (action_class, action, plan)
+     */
+    public function itemCalibration( $action, $class )
+    {
+        $same = array();
+        $sameAction = array();
+        foreach ( $this->itemRatios() as $row )
+        {
+            if ( $row['action'] !== (string) $action )
+                continue;
+            $sameAction[] = $row['ratio'];
+            if ( $row['class'] === (string) $class )
+                $same[] = $row['ratio'];
+        }
+        if ( ( $f = self::median( $same ) ) !== null )
+            return array( 'factor' => $f, 'from' => count( $same ), 'by' => 'action_class' );
+        if ( ( $f = self::median( $sameAction ) ) !== null )
+            return array( 'factor' => $f, 'from' => count( $sameAction ), 'by' => 'action' );
+        return $this->calibration() + array( 'by' => 'plan' );
+    }
+
+    /** @var array|null the plan-level calibration (read once per estimate) */
+    protected $planCalibration = null;
+
     /** @return array factor (1.0 without data), from (finished plans used) */
     public function calibration()
+    {
+        if ( $this->planCalibration !== null )
+            return $this->planCalibration;
+        return $this->planCalibration = $this->planLevelCalibration();
+    }
+
+    /** @return array factor, from: the median of actual / expected of the last finished plans */
+    protected function planLevelCalibration()
     {
         $ratios = array();
         foreach ( expAiPlan::fetchDone( 20 ) as $plan )
@@ -128,13 +207,15 @@ class expAiPlanEstimate
         $frame = $this->frameTokens( $thread );
         $extra = $this->config->int( 'VectorSettings', 'HighExtraRounds', 2, 0, 20 );
         $calibration = $this->calibration();
-        $factor = (float) $calibration['factor'];
         $lanes = array();
         if ( class_exists( 'expAiLane' ) )
             foreach ( expAiLane::forModel( (string) $alias, $this->config ) as $name => $lane )
                 if ( $lane->usable() )
                     $lanes[(string) $name] = $lane;
         $totals = array( 'low' => array( 0, 0 ), 'expected' => array( 0, 0 ), 'high' => array( 0, 0 ) );
+        // the tokens weighted by the calibration of each item (per action and class, else per plan): what is priced
+        $weighted = $totals;
+        $byItem = false;
         $rows = array();
         $roundsTotal = 0;
         foreach ( array_values( $items ) as $n => $item )
@@ -145,27 +226,38 @@ class expAiPlanEstimate
             $r = $this->rounds( $action );
             $sizes = array( 'low' => max( 1, $r - 1 ), 'expected' => $r, 'high' => $r + $extra );
             $row = array( 'index' => isset( $item['index'] ) ? (int) $item['index'] : $n, 'languages' => $languages );
+            $own = $this->itemCalibration( $action, isset( $item['class'] ) ? (string) $item['class'] : '' );
+            $f = (float) $own['factor'];
+            if ( $own['by'] !== 'plan' )
+            {
+                $byItem = true;
+                $row['calibration'] = $own;
+            }
             foreach ( $sizes as $key => $rounds )
             {
                 $t = $this->itemTokens( $item, $rounds, $frame, $context );
                 $totals[$key][0] += $t['in'] * $languages;
                 $totals[$key][1] += $t['out'] * $languages;
+                $weighted[$key][0] += $t['in'] * $languages * $f;
+                $weighted[$key][1] += $t['out'] * $languages * $f;
                 if ( $key === 'expected' )
                 {
                     $row['in'] = $t['in'] * $languages;
                     $row['out'] = $t['out'] * $languages;
                     $cost = $budget->estimate( $alias, $row['in'], $row['out'] );
-                    $row['micros'] = (int) round( $cost['micros'] * $factor );
+                    $row['micros'] = (int) round( $cost['micros'] * $f );
                 }
             }
             $roundsTotal += $r * $languages;
             $rows[] = $row;
         }
-        $price = function ( $key, $lane ) use ( $budget, $alias, $totals, $factor )
+        $price = function ( $key, $lane ) use ( $budget, $alias, $weighted )
         {
-            $cost = $budget->estimate( $alias, $totals[$key][0], $totals[$key][1], $lane );
-            return array( (int) round( $cost['micros'] * $factor ), $cost['known'] );
+            $cost = $budget->estimate( $alias, (int) round( $weighted[$key][0] ), (int) round( $weighted[$key][1] ), $lane );
+            return array( (int) $cost['micros'], $cost['known'] );
         };
+        if ( $byItem )
+            $calibration['per_item'] = true;
         $chosen = $laneName !== '' && $laneName !== 'auto' && isset( $lanes[$laneName] ) ? $laneName : ( isset( $lanes['standard'] ) ? 'standard' : '' );
         $laneRows = array();
         foreach ( $lanes as $name => $lane )

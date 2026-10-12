@@ -105,6 +105,12 @@
                 <div class="exp-ai-v-scroll">
                     <button type="button" class="exp-ai-v-link exp-ai-v-older" hidden="hidden">{'Show older'|i18n( $exp_ai_i18n )}</button>
                     <ol class="exp-ai-v-log" aria-label="{'Conversation'|i18n( $exp_ai_i18n )}"></ol>
+                    <section class="exp-ai-v-runs" hidden="hidden" aria-labelledby="exp-ai-v-runs-title">
+                        <h3 class="exp-ai-v-runs-head"><span id="exp-ai-v-runs-title">{'Items of the plan'|i18n( $exp_ai_i18n )}</span> <span class="exp-ai-v-runs-progress"></span></h3>
+                        <ol class="exp-ai-v-runs-list"></ol>
+                    </section>
+                    <p class="exp-ai-slow exp-ai-v-slow" hidden="hidden" aria-live="polite"><span class="exp-ai-slow-text"></span> <span class="exp-ai-slow-time"></span>
+                        <button type="button" class="exp-ai-v-btn exp-ai-v-btn-small exp-ai-slow-switch" hidden="hidden"></button></p>
                     <p class="exp-ai-v-working" hidden="hidden"><span class="exp-ai-spinner" aria-hidden="true"></span> <span class="exp-ai-v-working-text"></span></p>
                     <p class="exp-ai-v-error" role="alert" hidden="hidden"></p>
                 </div>
@@ -120,6 +126,7 @@
                               placeholder="{'What should happen in this scope?'|i18n( $exp_ai_i18n )|wash}"></textarea>
                     <div class="exp-ai-v-composer-bar">
                         <span class="exp-ai-v-hint"></span>
+                        <button type="button" class="exp-ai-v-btn exp-ai-v-steer-btn" data-command="steer" hidden="hidden" title="{'A note that reaches Vector at its next step'|i18n( $exp_ai_i18n )|wash}">{'Steer'|i18n( $exp_ai_i18n )} <kbd class="exp-ai-v-kbd" data-keys="steer"></kbd></button>
                         <button type="button" class="exp-ai-v-btn exp-ai-v-queue-btn" data-command="queue" hidden="hidden">{'Queue'|i18n( $exp_ai_i18n )} <kbd class="exp-ai-v-kbd" data-keys="queue"></kbd></button>
                         <button type="button" class="exp-ai-v-btn exp-ai-v-stop" data-command="stop" hidden="hidden">{'Stop'|i18n( $exp_ai_i18n )} <kbd class="exp-ai-v-kbd" data-keys="stop"></kbd></button>
                         <button type="submit" class="exp-ai-v-btn exp-ai-v-btn-primary exp-ai-v-run" data-command="run">{'Run'|i18n( $exp_ai_i18n )} <kbd class="exp-ai-v-kbd" data-keys="run"></kbd></button>
@@ -325,7 +332,27 @@
         'pl_rejected', 'Plan rejected.'|i18n( $exp_ai_i18n ),
         'pl_ask', 'Say what to change in the plan:'|i18n( $exp_ai_i18n ),
         'pl_none_selected', 'Choose at least one item.'|i18n( $exp_ai_i18n ),
-        'pl_reserved', 'Reserved'|i18n( $exp_ai_i18n )
+        'pl_reserved', 'Reserved'|i18n( $exp_ai_i18n ),
+        'pl_approved_parallel', 'Plan approved: %count item(s), up to %parallel side by side. Their changes appear in the Changes tab.'|i18n( $exp_ai_i18n ),
+        'pl_approved_batch', 'Plan approved: %count item(s) go to the provider as a batch (%lane). Their changes appear in the Changes tab when the batch returns.'|i18n( $exp_ai_i18n ),
+        'run_state_queued', 'queued'|i18n( $exp_ai_i18n ),
+        'run_state_waiting', 'waits for item %items'|i18n( $exp_ai_i18n ),
+        'run_state_running', 'working'|i18n( $exp_ai_i18n ),
+        'run_state_done', 'done'|i18n( $exp_ai_i18n ),
+        'run_state_failed', 'failed'|i18n( $exp_ai_i18n ),
+        'run_state_stopped', 'stopped'|i18n( $exp_ai_i18n ),
+        'run_item', 'Item %n'|i18n( $exp_ai_i18n ),
+        'run_steps', 'step %done of about %total'|i18n( $exp_ai_i18n ),
+        'run_progress', '%done of %total done'|i18n( $exp_ai_i18n ),
+        'cost_items', 'Per item'|i18n( $exp_ai_i18n ),
+        'cost_item', 'Item'|i18n( $exp_ai_i18n ),
+        'cost_estimate', 'Estimate'|i18n( $exp_ai_i18n ),
+        'cost_actual', 'Actual'|i18n( $exp_ai_i18n ),
+        'steer', 'Steer'|i18n( $exp_ai_i18n ),
+        'steer_hint', 'reaches Vector at its next step'|i18n( $exp_ai_i18n ),
+        'steered_one', 'Your note reaches Vector at its next step.'|i18n( $exp_ai_i18n ),
+        'hint_running_steer', '%steer to steer, %queue to queue, %stop to stop'|i18n( $exp_ai_i18n ),
+        'lane_batch_plan', 'batch: approved plans go to the provider as a batch'|i18n( $exp_ai_i18n )
     ) )}</script>
 </div>
 {undef $exp_ai_i18n}

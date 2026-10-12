@@ -18,7 +18,9 @@ class expAiThreadEvent extends eZPersistentObject
 {
     /** @var string[] */
     public static $kinds = array( 'status', 'text', 'text_delta', 'step_start', 'step_end', 'question', 'plan', 'change', 'draft', 'cost',
-                                  'checkpoint', 'followup', 'error' );
+                                  'checkpoint', 'followup', 'error',
+                                  // parallel runs (doc/parallel-runs.md): a child run started or ended; a field held by another run
+                                  'run', 'held' );
 
     public static function definition()
     {

@@ -152,55 +152,15 @@ class expAiThreadRunner
     }
 
     /**
-     * Starts one detached worker for interactive jobs when none runs (at most one start per 15 seconds).
+     * Starts detached workers for interactive jobs (expAiQueueKick, shared with every producer): when the queued job
+     * waits and no live worker is free (none runs, or each is busy with a long job), bounded by
+     * [VectorSettings] MaxKickedWorkers. The items of an approved plan ask for several (doc/parallel-runs.md).
+     * @param int $wanted jobs that may run at once now (1 for a turn, up to MaxParallelRunsPerThread for a plan)
+     * @param int $maxSeconds how long a started worker takes new jobs (it leaves earlier when nothing is ready)
      * @return bool a worker was started
      */
-    public static function kick()
+    public static function kick( $wanted = 1, $maxSeconds = 60 )
     {
-        $config = expAiConfig::instance();
-        if ( !$config->flag( 'VectorSettings', 'KickWorker', true ) || !class_exists( 'expQueueWorker' ) )
-            return false;
-        if ( expQueueWorker::live() )
-            return false;
-        $dir = eZSys::cacheDirectory() . '/expai';
-        if ( !is_dir( $dir ) )
-            eZDir::mkdir( $dir, false, true );
-        $stamp = "$dir/worker-kick.lock";
-        $handle = @fopen( $stamp, 'c+' );
-        if ( !$handle || !flock( $handle, LOCK_EX | LOCK_NB ) )
-            return false;
-        $last = (int) stream_get_contents( $handle );
-        if ( $last > time() - 15 )
-        {
-            flock( $handle, LOCK_UN );
-            fclose( $handle );
-            return false;
-        }
-        ftruncate( $handle, 0 );
-        rewind( $handle );
-        fwrite( $handle, (string) time() );
-        flock( $handle, LOCK_UN );
-        fclose( $handle );
-        $php = (string) $config->get( 'VectorSettings', 'PhpCli', '' );
-        if ( $php === '' )
-            $php = PHP_SAPI === 'cli' ? PHP_BINARY : PHP_BINDIR . '/php';
-        $root = realpath( eZSys::rootDir() ?: getcwd() );
-        $script = $root . '/extension/expqueue/bin/php/work.php';
-        $current = class_exists( 'eZSiteAccess' ) ? eZSiteAccess::current() : null;
-        $access = is_array( $current ) && isset( $current['name'] ) ? preg_replace( '/[^A-Za-z0-9_-]/', '', (string) $current['name'] ) : '';
-        if ( !is_file( $script ) || !is_executable( $php ) )
-        {
-            eZDebug::writeWarning( "expai: no worker started ($php, $script)", __METHOD__ );
-            return false;
-        }
-        $command = 'cd ' . escapeshellarg( $root ) . ' && nohup setsid ' . escapeshellarg( $php ) . ' ' . escapeshellarg( $script )
-                 . ' --until-empty --max-seconds=60 --class=interactive --origin=cli --allow-root-user'
-                 // the siteaccess of this request: expai may be active for the admin siteaccesses only
-                 . ( $access !== '' ? ' -s ' . escapeshellarg( $access ) : '' ) . ' > /dev/null 2>&1 &';
-        $proc = @proc_open( array( '/bin/sh', '-c', $command ), array( 0 => array( 'file', '/dev/null', 'r' ), 1 => array( 'file', '/dev/null', 'w' ), 2 => array( 'file', '/dev/null', 'w' ) ), $pipes );
-        if ( !is_resource( $proc ) )
-            return false;
-        proc_close( $proc );
-        return true;
+        return expAiQueueKick::kick( $wanted, $maxSeconds, 'interactive' ) > 0;
     }
 }

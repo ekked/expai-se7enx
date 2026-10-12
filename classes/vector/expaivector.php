@@ -202,7 +202,23 @@ class expAiVector
             'unread' => $thread->isOwner( $userID ) && (int) $thread->attribute( 'last_event_id' ) > (int) $thread->attribute( 'seen_event_id' ),
             'last_event_id' => (int) $thread->attribute( 'last_event_id' ),
             'is_owner' => $thread->isOwner( $userID ),
+            'progress' => self::progressText( $thread ),
         );
+    }
+
+    /**
+     * "3/8": the items of the thread's running plan that ended, of its items (doc/parallel-runs.md); '' when no plan
+     * runs as child runs. Cheap: only for working threads with a plan.
+     */
+    public static function progressText( expAiThread $thread )
+    {
+        if ( !(int) $thread->attribute( 'plan_id' ) || !in_array( $thread->attribute( 'state' ), array( 'queued', 'running' ), true ) )
+            return '';
+        $runs = expAiThreadFanout::planRuns( expAiThreadFanout::planOf( $thread ) );
+        if ( !$runs )
+            return '';
+        $done = count( array_filter( $runs, function ( $r ) { return !$r->isActive(); } ) );
+        return $done . '/' . count( $runs );
     }
 
     /** @return array a thread with its scope names and settings (the header of the open thread) */
@@ -253,6 +269,8 @@ class expAiVector
             'changes' => expAiChange::counts( (int) $thread->attribute( 'id' ) ),
             'plan' => self::planSummary( $thread ),
             'reserved' => (int) $thread->attribute( 'reserved_micros' ) > 0 && expAiCost::enabled() ? expAiBudget::money( (int) $thread->attribute( 'reserved_micros' ) ) : '',
+            // parallel runs of the plan (doc/parallel-runs.md): one row per item with state, progress, last step, cost
+            'runs' => expAiThreadFanout::present( $thread ),
         );
         return $row;
     }

@@ -299,7 +299,7 @@ class expAiChangeStager
             throw new expAiException( 'This thread has %max staged changes waiting. Ask the editor to review them first.', '', 0, array( '%max' => $max ) );
         $writable = $this->context->config->writableDatatypes();
         $runID = $this->context->conversation ? (int) $this->context->conversation->attribute( 'run_id' ) : 0;
-        $result = array( 'change_ids' => array(), 'staged' => array(), 'unchanged' => array(), 'skipped' => array(), 'errors' => array() );
+        $result = array( 'change_ids' => array(), 'staged' => array(), 'unchanged' => array(), 'skipped' => array(), 'errors' => array(), 'held' => array() );
         $now = time();
         $db = eZDB::instance();
         $db->begin();
@@ -326,6 +326,13 @@ class expAiChangeStager
             }
             $baseValue = isset( $values[$identifier] ) ? (string) $values[$identifier]['value'] : '';
             $existing = expAiChange::fetchTarget( $threadID, $objectID, $newKey, $language, $identifier );
+            // one field is staged by one run at a time (doc/parallel-runs.md): another run that still works holds it
+            $holder = $objectID ? self::holder( $existing, $runID, $objectID, $language, $identifier ) : null;
+            if ( $holder )
+            {
+                $result['held'][$identifier] = 'held by ' . $holder->shortName();
+                continue;
+            }
             if ( $proposed === $baseValue )
             {
                 // the proposal is the published value: nothing to review (an earlier proposal of the field goes)
@@ -356,20 +363,51 @@ class expAiChangeStager
             $result['staged'][] = $identifier;
         }
         if ( $result['change_ids'] )
-        {
             $this->thread->addEvent( 'change', array( 'object_id' => (int) $objectID, 'new_key' => (string) $newKey, 'language' => (string) $language,
                                                       'fields' => $result['staged'], 'changes' => $result['change_ids'] ), $runID );
-            $this->thread->touch();
-            $this->thread->store();
-        }
+        if ( $result['held'] )
+            $this->thread->addEvent( 'held', array( 'object_id' => (int) $objectID, 'language' => (string) $language, 'fields' => $result['held'] ), $runID );
+        // only the events and the time: other runs of the thread may change its state meanwhile
+        if ( $result['change_ids'] || $result['held'] )
+            $this->thread->storeActivity();
         $db->commit();
+        if ( !$result['change_ids'] && !$result['unchanged'] && $result['held'] )
+            throw new expAiException( 'Not staged: another run is changing these fields (%fields). Leave them alone: do the rest of your item, or end your turn and say which fields were held.',
+                                      '', 0, array( '%fields' => implode( '; ', array_map( function ( $k, $v ) { return "$k $v"; }, array_keys( $result['held'] ), $result['held'] ) ) ) );
         if ( !$result['change_ids'] && !$result['unchanged'] && $result['errors'] )
             throw new expAiException( 'Nothing was staged: %errors', '', 0, array( '%errors' => implode( '; ', array_map( function ( $k, $v ) { return "$k: $v"; },
                                                                                                                        array_keys( $result['errors'] ), $result['errors'] ) ) ) );
         $result['status'] = $result['change_ids']
             ? 'staged for the editor\'s review (nothing is written until the editor accepts and applies it)'
+              . ( $result['held'] ? '; the fields under "held" are being changed by another run and were not staged' : '' )
             : 'nothing to stage: the values equal the published version';
         return $result;
+    }
+
+    /**
+     * The run that holds a field: a run other than this one that still works (queued, running, waiting) and has an
+     * open proposal for the same object, language and field, in this thread or another (doc/parallel-runs.md).
+     * @param expAiChange|null $existing the open change of this thread for the field
+     * @return expAiThreadRun|null
+     */
+    public static function holder( $existing, $runID, $objectID, $language, $identifier )
+    {
+        $candidates = $existing ? array( $existing ) : array();
+        $others = eZPersistentObject::fetchObjectList( expAiChange::definition(), null,
+            array( 'contentobject_id' => (int) $objectID, 'language_code' => (string) $language, 'attribute_identifier' => (string) $identifier,
+                   'decision' => array( array( 'pending', 'accepted', 'partial' ) ) ), array( 'id' => 'desc' ), array( 'offset' => 0, 'length' => 20 ) );
+        foreach ( array_merge( $candidates, (array) $others ) as $change )
+        {
+            $other = (int) $change->attribute( 'run_id' );
+            if ( !$other || $other === (int) $runID )
+                continue;
+            $run = expAiThreadRun::fetchByID( $other );
+            // a run that stopped reporting (a closed browser window) holds nothing after [ThreadSettings] StaleRunSeconds
+            if ( $run && $run->isActive()
+                 && (int) $run->attribute( 'modified' ) >= time() - expAiConfig::instance()->int( 'ThreadSettings', 'StaleRunSeconds', 900, 60 ) )
+                return $run;
+        }
+        return null;
     }
 
     /* -------------------------------------------------- after the editor */

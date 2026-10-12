@@ -48,6 +48,8 @@ eZUser::setCurrentlyLoggedInUser( $user, (int) $user->attribute( 'contentobject_
 $userID = (int) $user->attribute( 'contentobject_id' );
 $ini = eZINI::instance( 'expai.ini' );
 $ini->setVariable( 'VectorSettings', 'KickWorker', 'disabled' );
+// the plan runs as one job here (the turns one after the other); parallel runs: expaivectorparallel_test.php
+$ini->setVariable( 'VectorSettings', 'ParallelRuns', 'disabled' );
 $config = expAiConfig::instance();
 $xml = function ( array $paragraphs )
 {

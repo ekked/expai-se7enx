@@ -9,6 +9,9 @@
     </div>
     <ol class="exp-ai-log" aria-live="polite" aria-label="{'Conversation'|i18n( 'extension/expai/panel' )}"></ol>
     <p class="exp-ai-working" hidden="hidden"><span class="exp-ai-spinner" aria-hidden="true"></span> <span class="exp-ai-working-text">{'Exponential Intelligence is working...'|i18n( 'extension/expai/panel' )}</span></p>
+    {* a turn on a slow model: its model, time per step and the switch to the default model (expAiSlowModel) *}
+    <p class="exp-ai-slow" hidden="hidden" aria-live="polite"><span class="exp-ai-slow-text"></span> <span class="exp-ai-slow-time"></span>
+        <button type="button" class="button exp-ai-btn exp-ai-slow-switch" hidden="hidden"></button></p>
     <p class="exp-ai-error" role="alert" hidden="hidden"></p>
     <form class="exp-ai-form" method="post" action={'expai/log'|ezurl} onsubmit="return false;">
         <label class="exp-ai-label" for="exp-ai-message">{'Your request'|i18n( 'extension/expai/panel' )}</label>

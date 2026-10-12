@@ -1079,6 +1079,35 @@ When[reject_field]=list
 Binding[edit_hunk]=KeyE
 When[edit_hunk]=list
 
+# ---- Parallel runs, steering (doc/parallel-runs.md) -------------------------------------------------------------
+[VectorSettings]
+# enabled: each item of an approved plan is a child run of its own in the job queue (job expai.thread.item), side by
+# side with the others; translations wait for the item of their source. disabled: the items run one after the other
+# as turns of the thread (one job)
+ParallelRuns=enabled
+# Items of one thread that run at once (the queue resource expai.thread:<thread id>; the queue's [ResourceSettings]
+# MaxConcurrent and the class interactive's MaxRunning are the ceilings)
+MaxParallelRunsPerThread=4
+# Workers started right after a job is queued (KickWorker): another one when a job is ready and every live worker is
+# busy (a long turn of a slow model never holds up a short job), at most this many live workers in all (cron and
+# systemd workers included)
+MaxKickedWorkers=4
+# A model is slow (its running turn shows its time per step and "Switch to <default model>") when its provider is a
+# managed local server (Managed=ollama), it is marked slow, or the median latency of its last requests is at least this
+SlowStepSeconds=20
+
+[QueueSettings]
+# The answers of a plan that runs on a batch lane are staged as changes of the item's run
+Appliers[vector_plan_item]=expAiPlanItemApplier
+
+[KeyBindings]
+# Steering: Alt+Enter while a turn runs sends a note that reaches the model at its next step; queued follow-ups
+# (sent when the turn ends) move to Mod+Shift+Enter (Mod+Enter queues as well while a turn runs)
+Binding[steer]=Alt+Enter
+When[steer]=composer
+Binding[queue]=Mod+Shift+Enter
+When[queue]=composer
+
 # ------------------------------------------------------------------ web and history tools (#369)
 # doc/tools.md (web_fetch, web_search, project_history), doc/security.md. Each tool is offered only to users with
 # the policy expai/web (limitation Tool) and only once it is configured below.

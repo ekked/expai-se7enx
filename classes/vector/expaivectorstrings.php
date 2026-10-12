@@ -56,6 +56,7 @@ class expAiVectorStrings
             'palette' => $t( 'Open the command palette' ),
             'run' => $t( 'Run / send the message' ),
             'queue' => $t( 'Queue the message while a turn runs' ),
+            'steer' => $t( 'Steer the running turn with a note' ),
             'stop' => $t( 'Stop the thread (press twice)' ),
             'next' => $t( 'Next item' ),
             'previous' => $t( 'Previous item' ),

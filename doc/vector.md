@@ -69,12 +69,16 @@ the chosen lane applies to background runs.
   It runs as the editor, with the thread's model; the tools refuse what the editor may not do.
 - **Stop** (Esc twice, or the button) stops calling the next step: the state becomes `stopped`, the steps so far are
   kept. A call already sent to the model finishes first.
-- **Queue** (Alt+Enter, or Enter on the Queue button while a turn runs) keeps the message in the thread's queue
-  (`expai_followup`); when the turn ends the first one is sent automatically. A queued message can be removed (x).
+- **Queue** (Ctrl/Cmd+Shift+Enter or Ctrl/Cmd+Enter while a turn runs, or the Queue button) keeps the message in the
+  thread's queue (`expai_followup`); when the turn ends the first one is sent automatically. A queued message can be
+  removed (x).
+- **Steer** (Alt+Enter while a turn runs, or the Steer button) sends a note that reaches the model at its next step,
+  after the tool results ([parallel-runs.md](parallel-runs.md#steering)).
 
-An approved plan runs its items one after the other as turns of the thread ([plan-mode.md](plan-mode.md)).
-Parallel runs per item and steering a running turn come with the next steps; the thread data, events and the
-stream are ready for them.
+An approved plan runs its items side by side as child runs of the thread, translations after their source item, with
+progress and cost per item ([parallel-runs.md](parallel-runs.md)); with `ParallelRuns=disabled` one after the other
+as turns of the thread ([plan-mode.md](plan-mode.md)). A turn on a slow model shows its time per step and can be
+switched to the default model ([parallel-runs.md](parallel-runs.md#slow-models)).
 
 ## How events reach the browser
 
@@ -114,7 +118,8 @@ same permission as `expai::*`: `ezjscore/call` with the function list `expai`):
 | `apply` | expai/vector | write the accepted parts into drafts (never published); conflicts are reported, not written |
 | `plan` | expai/write | the current plan with its estimate and the limits it touches ([plan-mode.md](plan-mode.md)) |
 | `plan_estimate` | expai/vector | the estimate of a proposed plan with the editor's selection (not stored) |
-| `plan_decide` | expai/vector | approve (with the editor's selection and instructions) or reject a proposed plan |
+| `plan_decide` | expai/vector | approve (with the editor's selection and instructions) or reject a proposed plan; an approved plan fans out into child runs (`run.mode` `parallel`, `batch`, `background` or `foreground`) |
+| `switch_model` | expai/write | the running turn of a slow model goes on with another model (the owner; [parallel-runs.md](parallel-runs.md#slow-models)) |
 
 Every function checks POST, the form token and the policies itself, and what the thread allows
 ([threads.md](threads.md#who-sees-a-thread)).
@@ -154,10 +159,11 @@ expqueue, class `interactive`) instead:
 - an approved plan is one job with one turn per item ([plan-mode.md](plan-mode.md)); the thread stays running
   until the last item is done.
 
-Without a running worker, the request that queues the turn starts one detached worker for interactive jobs
-(`ext:expqueue:work --until-empty --max-seconds=60 --class=interactive -s <siteaccess>`, at most one start per 15
-seconds; `KickWorker=enabled`, `PhpCli=` the PHP command line binary, empty for the one of this PHP); the cron part
-of expqueue and its systemd service stay the safety net. The worker must run in a siteaccess where expai is active:
+When no live worker is free (none runs, or each is busy with a long job), the request that queues the turn starts a
+detached worker for interactive jobs (`ext:expqueue:work --until-empty --max-seconds=60 --class=interactive -s
+<siteaccess>`; at most `MaxKickedWorkers` live workers in all, [parallel-runs.md](parallel-runs.md#workers);
+`KickWorker=enabled`, `PhpCli=` the PHP command line binary, empty for the one of this PHP); the cron part of
+expqueue and its systemd service stay the safety net. The worker must run in a siteaccess where expai is active:
 if expai is an access extension of the admin siteaccess only, the cron line of expqueue needs `-s <admin siteaccess>`.
 
 The Intelligence tab does the same for a slow model (`expai::chat` answers "queued" with the thread, and the panel

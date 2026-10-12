@@ -18,7 +18,8 @@ class expAiToolProposePlan extends expAiTool
         return 'Proposes a plan for bulk work (more than one object or language) for the editor to approve before anything is staged. '
              . 'One item per object and action: create (a new object under parent_node_id, with class), update (object_id or node_id), '
              . 'translate (object_id or node_id into languages). languages: language codes such as eng-GB; fields: the field identifiers '
-             . 'the item writes; summary: the instruction for that item in one sentence. Read what you need first (list_children, get_node). '
+             . 'the item writes; summary: the instruction for that item in one sentence; depends_on: earlier items it waits for. '
+             . 'Read what you need first (list_children, get_node). '
              . 'After this call stop and summarize the plan in two sentences: the editor approves, edits or rejects it in the Plan tab.';
     }
 
@@ -35,6 +36,8 @@ class expAiToolProposePlan extends expAiTool
                     'languages' => array( 'type' => 'array', 'items' => array( 'type' => 'string' ) ),
                     'fields' => array( 'type' => 'array', 'items' => array( 'type' => 'string' ) ),
                     'summary' => array( 'type' => 'string', 'description' => 'What to do for this item, one sentence' ),
+                    'depends_on' => array( 'type' => 'array', 'items' => array( 'type' => 'integer' ),
+                                           'description' => 'Numbers (1 = the first item) of earlier items this item must wait for. A translation waits for the update of its source object automatically; items without dependencies run side by side.' ),
                 ), 'required' => array( 'action', 'languages', 'summary' ) ) ),
             'assumptions' => array( 'type' => 'array', 'items' => array( 'type' => 'string' ), 'description' => 'What you assumed' ),
             'questions' => array( 'type' => 'array', 'items' => array( 'type' => 'string' ), 'description' => 'Open questions for the editor' ),

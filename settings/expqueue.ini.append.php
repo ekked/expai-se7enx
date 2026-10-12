@@ -78,6 +78,17 @@ RetryBase=10
 MaxBackoff=60
 Description=One turn of a thread of Exponential Intelligence (Vector, the Intelligence tab) in the background
 
+# Parallel runs (doc/parallel-runs.md): one item of an approved plan as a child run of its thread, side by side with
+# the other items (resource expai.thread:<thread id>, at most [VectorSettings] MaxParallelRunsPerThread at once).
+[JobType_expai.thread.item]
+Handler=expAiThreadItemHandler
+Class=interactive
+MaxAttempts=2
+Timeout=900
+RetryBase=10
+MaxBackoff=60
+Description=One item of an approved plan of a Vector thread, run side by side with the other items
+
 # The translation sync: after a publish in the source language, decides for each translation and queues the small
 # patches (no model call; the patches themselves are expai.request jobs of the class translation_patch).
 [JobType_expai.translation.check]
