@@ -1006,6 +1006,9 @@ WritePassRate=90
 # The node and class the probe tasks name (nothing is read or written: the tools are not run). Empty: the content root.
 NodeID=
 ClassIdentifier=folder
+# A task marked follow_ok (create_draft, update_draft) whose model looks things up first is answered with scripted
+# lookup results this many times (0..5), then the next call is graded; the result records how often (doc/probe.md).
+FollowRounds=2
 
 [LocalModelSettings]
 # A local Ollama managed through expai/models (doc/local-models.md). The web process never runs commands: it writes a
@@ -1013,9 +1016,6 @@ ClassIdentifier=folder
 SpoolDirectory=/var/lib/expai-llm/spool
 StatusFile=/var/lib/expai-llm/status.json
 # The models the view offers to pull and remove (the helper has its own allowlist, /etc/expai-llm/models.allow).
-# A task marked follow_ok (create_draft, update_draft) whose model looks things up first is answered with scripted
-# lookup results this many times (0..5), then the next call is graded; the result records how often (doc/probe.md).
-FollowRounds=2
 Models[]=qwen3.5:4b
 # #377 the smaller, faster option for simple prompts (Apache-2.0, tool calling; model local.qwen3.5-2b)
 Models[]=qwen3.5:2b
