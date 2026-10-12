@@ -99,13 +99,32 @@ a new lead run whose conversation carries the earlier exchanges as a short summa
 old run keeps its conversation, so a step of the slow model that was still under way ends there and changes nothing.
 The browser continues the turn on the new model; a thread of the Intelligence tab also makes it the user's model.
 
+## The record of a turn
+
+Under every exchange, in Vector and in the Intelligence tab, one collapsed line is the **record** of the turn
+(`expAiTurnRecord`, from the usage log rows of the thread): the model that actually answered, the steps, the
+duration, the tokens, the cost and the result: *done*, *failed*, *timed out*, *stopped*, *replaced* (the fallback
+answered instead of the model asked for, or the editor switched the model), *working*. Opened, it shows the fallback
+in words ("Asked for <model>; <model> answered: <reason>"), each step with its model, duration, tools, tokens and cost
+and a link to its request in the log (`expai/log/(request)/<id>`), and the links of the turn: the thread's requests
+(`expai/log/(thread)/<id>`), the job of a turn that ran in the background (`expqueue/job/<uuid>`, for users with
+`expqueue/view`), the thread in Vector. History answers (`history`, `thread`) carry `records`, each step's answer
+the record of its exchange.
+
+## Watch this run
+
+As soon as a turn is accepted, the Intelligence tab and Vector show **Watch this run →** with a live chip (queued,
+running step k, done, failed, stopped), kept up to date by the step answers and the poll (`events` sends `watch` for
+the open thread), and the links to its live record: the thread's requests in the log, its job when it runs in the
+background, and (in the Intelligence tab) the thread in Vector.
+
 ## Functions and settings
 
 | Function | Policy | Does |
 | --- | --- | --- |
 | `followup` (`delivery=steer`) | expai/vector | a note that steers the running turn |
-| `events` | expai/write | per thread also `progress` ("3/8") and `slow` (the status of a turn on a slow model) |
-| `thread` | expai/write | the thread's `runs` (one row per child run) and `progress` |
+| `events` | expai/write | per thread also `progress` ("3/8"), `slow` (the status of a turn on a slow model) and, for the open thread, `watch` |
+| `thread` | expai/write | the thread's `runs` (one row per child run), `progress`, and in its history the `records` of the exchanges |
 | `switch_model` | expai/write | the running turn goes on with another model (owner only) |
 
 `[VectorSettings] ParallelRuns`, `MaxParallelRunsPerThread`, `MaxKickedWorkers`, `SlowStepSeconds`;

@@ -113,6 +113,7 @@
                         <span class="exp-ai-v-label" id="exp-ai-v-cp-title">{'Checkpoints'|i18n( $exp_ai_i18n )}</span>
                         <ol class="exp-ai-v-cp-list" aria-labelledby="exp-ai-v-cp-title"></ol>
                     </div>
+                    <p class="exp-ai-watch exp-ai-v-watch" hidden="hidden" aria-live="polite"></p>
                     <p class="exp-ai-slow exp-ai-v-slow" hidden="hidden" aria-live="polite"><span class="exp-ai-slow-text"></span> <span class="exp-ai-slow-time"></span>
                         <button type="button" class="exp-ai-v-btn exp-ai-v-btn-small exp-ai-slow-switch" hidden="hidden"></button></p>
                     <p class="exp-ai-v-working" hidden="hidden"><span class="exp-ai-spinner" aria-hidden="true"></span> <span class="exp-ai-v-working-text"></span></p>

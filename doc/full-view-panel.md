@@ -81,6 +81,13 @@ the same on Apache and Velocity. One row per exchange:
 A conversation stored before the history existed is shown from its messages (words only, all with the
 conversation's start time).
 
+Under each exchange one collapsed line is the **record** of the turn: the model that answered (and the one asked for
+when the fallback replaced it, with the reason), the steps with their duration, tools, tokens and cost, and the result,
+each step linked to its request in the log. As soon as a message is sent, **Watch this run →** shows its live state
+(queued, running step k, done, failed) with links to its requests in the log, its job when it runs in the
+background, and the thread in Vector. A turn on a slow model shows its time per step and **Switch to <default
+model>** ([parallel-runs.md](parallel-runs.md#slow-models)).
+
 ## The context window
 
 What goes to the model is bounded: `[AssistantSettings] ContextWindowTurns` exchanges (8 by default). When the

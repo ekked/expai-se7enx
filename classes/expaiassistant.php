@@ -86,6 +86,15 @@ class expAiAssistant
         if ( $this->current )
             expAiThread::afterStep( $this->current, $result, $this->lastWritten );
         return $result;
+            // the state after the step: "Watch this run" and the record of the exchange with this step's request
+            $thread = class_exists( 'expAiTurnRecord' ) ? expAiThread::fetchForConversation( $this->current ) : null;
+            if ( $thread )
+            {
+                $result['watch'] = expAiTurnRecord::watch( $thread );
+                $history = $this->historyOf( $this->current );
+                $result['records'] = $history ? self::records( $this->current, array( end( $history ) ) ) : array();
+            }
+        }
     }
 
     /** @var expAiDraftLog[] the drafts written in the last step */
@@ -580,6 +589,8 @@ class expAiAssistant
         $this->fallback = expAiModelFallback::describe( $this->config, $alias, $used, $reason );
         $this->fallbackTo = $used;
         // the next model gets its own time
+                      // "Watch this run" and the record of the exchange: set by step() after the thread is updated
+                      'watch' => null, 'records' => array(),
         $settings = $this->config->registry()->settingsFor( $used );
         if ( function_exists( 'set_time_limit' ) )
             @set_time_limit( max( 1, min( 600, (int) ( !empty( $settings['Timeout'] ) ? $settings['Timeout'] : $this->config->int( 'AISettings', 'Timeout', 115, 1, 600 ) ) ) ) + 30 );
@@ -674,7 +685,25 @@ class expAiAssistant
             $history = array_values( array_filter( $history, function ( $e ) use ( $before ) { return (int) $e['id'] < (int) $before; } ) );
         $page = array_slice( $history, -$limit );
         return array( 'exchanges' => array_map( array( 'expAiAssistant', 'presentExchange' ), $page ),
-                      'has_older' => count( $history ) > count( $page ) );
+                      'has_older' => count( $history ) > count( $page ), 'records' => self::records( $conversation, $page ) );
+    }
+
+    /**
+     * The record of each exchange of a page (expAiTurnRecord, doc/parallel-runs.md "The record of a turn"): the model
+     * that answered, the steps with their duration, tools, tokens, cost, the result and the links; by exchange id.
+     * @return array
+     */
+    public static function records( $conversation, array $page )
+    {
+        $thread = $conversation && class_exists( 'expAiTurnRecord' ) ? expAiThread::fetchForConversation( $conversation ) : null;
+        if ( !$thread )
+            return array();
+        $all = expAiTurnRecord::forThread( $thread );
+        $out = array();
+        foreach ( $page as $exchange )
+            if ( isset( $all[(int) $exchange['id']] ) )
+                $out[(string) (int) $exchange['id']] = $all[(int) $exchange['id']];
+        return $out;
     }
 
     /**

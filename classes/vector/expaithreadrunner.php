@@ -114,6 +114,7 @@ class expAiThreadRunner
         $job = self::enqueue( $thread, $nodeID, $message, array( 'alias' => $alias, 'read_only' => false, 'mode' => 'write', 'scope_note' => '', 'action' => 'panel',
                                                                   'panel' => true ) );
         return array( 'status' => 'queued', 'job' => (string) $job->attribute( 'uuid' ), 'thread' => (string) $thread->attribute( 'uuid' ),
+                      'watch' => expAiTurnRecord::watch( expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ) ?: $thread ),
                       'steps' => array(), 'text' => '', 'exchange' => null, 'drafts' => expAiAssistant::drafts( $user, $nodeID ),
                       'notice' => ezpI18n::tr( 'extension/expai/vector', 'This model is slow: the turn runs in the background. You may leave this page; the thread keeps working.' ) );
     }

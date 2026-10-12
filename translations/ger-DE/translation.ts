@@ -5682,12 +5682,20 @@
         <translation>Nicht vorgemerkt: Ein anderer Lauf ändert diese Felder (%fields). Lassen Sie sie unverändert: Erledigen Sie den Rest Ihres Punkts oder beenden Sie Ihren Zug und nennen Sie die gesperrten Felder.</translation>
     </message>
     <message>
+        <source>Only the owner of this thread can restore it.</source>
+        <translation>Nur der Eigentümer dieses Threads kann ihn wiederherstellen.</translation>
+    </message>
+    <message>
         <source>Nothing runs in this thread.</source>
         <translation>In diesem Thread läuft nichts.</translation>
     </message>
     <message>
         <source>The thread already runs on this model.</source>
         <translation>Der Thread läuft bereits mit diesem Modell.</translation>
+    </message>
+    <message>
+        <source>This checkpoint does not exist any more.</source>
+        <translation>Diesen Prüfpunkt gibt es nicht mehr.</translation>
     </message>
     <message>
         <source>Request in the log</source>
@@ -5712,12 +5720,28 @@
         <translation>Punkte des Plans</translation>
     </message>
     <message>
+        <source>Checkpoints</source>
+        <translation>Prüfpunkte</translation>
+    </message>
+    <message>
         <source>A note that reaches Vector at its next step</source>
         <translation>Eine Notiz, die Vector bei seinem nächsten Schritt erreicht</translation>
     </message>
     <message>
         <source>Steer</source>
         <translation>Lenken</translation>
+    </message>
+    <message>
+        <source>Restore to this checkpoint?</source>
+        <translation>Zu diesem Prüfpunkt zurückkehren?</translation>
+    </message>
+    <message>
+        <source>A checkpoint "Before restore" is written first: you can go back to the state of now.</source>
+        <translation>Zuerst wird ein Prüfpunkt „Vor dem Zurücksetzen“ geschrieben: Sie können zum jetzigen Stand zurückkehren.</translation>
+    </message>
+    <message>
+        <source>Restore</source>
+        <translation>Zurücksetzen</translation>
     </message>
     <message>
         <source>Plan approved: %count item(s), up to %parallel side by side. Their changes appear in the Changes tab.</source>
@@ -5788,6 +5812,86 @@
         <translation>Stapel: Freigegebene Pläne gehen als Stapel an den Anbieter</translation>
     </message>
     <message>
+        <source>Restore to "%label"</source>
+        <translation>Zurücksetzen auf „%label“</translation>
+    </message>
+    <message>
+        <source>turn %n</source>
+        <translation>Zug %n</translation>
+    </message>
+    <message>
+        <source>Drafts discarded</source>
+        <translation>Verworfene Entwürfe</translation>
+    </message>
+    <message>
+        <source>Drafts set back to their values then</source>
+        <translation>Entwürfe, die ihre damaligen Werte zurückbekommen</translation>
+    </message>
+    <message>
+        <source>Left alone</source>
+        <translation>Unverändert gelassen</translation>
+    </message>
+    <message>
+        <source>Staged changes set aside: %count</source>
+        <translation>Beiseitegelegte vorgemerkte Änderungen: %count</translation>
+    </message>
+    <message>
+        <source>Staged changes back to their decision then: %count</source>
+        <translation>Vorgemerkte Änderungen mit ihrer damaligen Entscheidung: %count</translation>
+    </message>
+    <message>
+        <source>Exchanges removed from the conversation: %count</source>
+        <translation>Aus der Unterhaltung entfernte Wechsel: %count</translation>
+    </message>
+    <message>
+        <source>Queued messages dropped: %count</source>
+        <translation>Verworfene eingereihte Nachrichten: %count</translation>
+    </message>
+    <message>
+        <source>Exchanges back in the conversation: %count</source>
+        <translation>Wieder in die Unterhaltung aufgenommene Wechsel: %count</translation>
+    </message>
+    <message>
+        <source>Nothing changed since this checkpoint.</source>
+        <translation>Seit diesem Prüfpunkt hat sich nichts geändert.</translation>
+    </message>
+    <message>
+        <source>This checkpoint was too large to keep the field values: the conversation and the decisions are restored.</source>
+        <translation>Dieser Prüfpunkt war zu groß, um die Feldwerte zu behalten: Die Unterhaltung und die Entscheidungen werden zurückgesetzt.</translation>
+    </message>
+    <message>
+        <source>Restored. "Before restore" lets you go back.</source>
+        <translation>Zurückgesetzt. Mit „Vor dem Zurücksetzen“ kommen Sie zurück.</translation>
+    </message>
+    <message>
+        <source>Only the owner can restore.</source>
+        <translation>Nur der Eigentümer kann zurücksetzen.</translation>
+    </message>
+    <message>
+        <source>Before: %text</source>
+        <translation>Vor: %text</translation>
+    </message>
+    <message>
+        <source>This checkpoint belongs to another thread.</source>
+        <translation>Dieser Prüfpunkt gehört zu einem anderen Thread.</translation>
+    </message>
+    <message>
+        <source>Stop the thread first: nothing may run while it is restored.</source>
+        <translation>Halten Sie den Thread zuerst an: Während des Zurücksetzens darf nichts laufen.</translation>
+    </message>
+    <message>
+        <source>no longer a draft (published or sent for approval)</source>
+        <translation>kein Entwurf mehr (veröffentlicht oder zur Freigabe gesendet)</translation>
+    </message>
+    <message>
+        <source>a draft of another user</source>
+        <translation>ein Entwurf eines anderen Benutzers</translation>
+    </message>
+    <message>
+        <source>Before restore to: %label</source>
+        <translation>Vor dem Zurücksetzen auf: %label</translation>
+    </message>
+    <message>
         <source>Batch answer staged for review: %fields</source>
         <translation>Stapelantwort zur Prüfung vorgemerkt: %fields</translation>
     </message>
@@ -5814,6 +5918,62 @@
     <message>
         <source>The job of this item ended without an answer: %error</source>
         <translation>Der Job dieses Punkts endete ohne Antwort: %error</translation>
+    </message>
+    <message>
+        <source>Watch this run</source>
+        <translation>Diesen Lauf verfolgen</translation>
+    </message>
+    <message>
+        <source>Requests in the log</source>
+        <translation>Anfragen im Protokoll</translation>
+    </message>
+    <message>
+        <source>Job</source>
+        <translation>Job</translation>
+    </message>
+    <message>
+        <source>Open in Vector</source>
+        <translation>In Vector öffnen</translation>
+    </message>
+    <message>
+        <source>Request</source>
+        <translation>Anfrage</translation>
+    </message>
+    <message>
+        <source>Record of this turn</source>
+        <translation>Nachweis dieses Zugs</translation>
+    </message>
+    <message>
+        <source>timed out</source>
+        <translation>Zeit überschritten</translation>
+    </message>
+    <message>
+        <source>replaced</source>
+        <translation>ersetzt</translation>
+    </message>
+    <message>
+        <source>%count step(s)</source>
+        <translation>%count Schritt(e)</translation>
+    </message>
+    <message>
+        <source>%tokens tokens</source>
+        <translation>%tokens Token</translation>
+    </message>
+    <message>
+        <source>Asked for %requested; %model answered: %reason</source>
+        <translation>Angefragt war %requested; %model hat geantwortet: %reason</translation>
+    </message>
+    <message>
+        <source>running step %step</source>
+        <translation>läuft, Schritt %step</translation>
+    </message>
+    <message>
+        <source>Before writing accepted changes to drafts</source>
+        <translation>Vor dem Schreiben angenommener Änderungen in Entwürfe</translation>
+    </message>
+    <message>
+        <source>Before the approved plan runs</source>
+        <translation>Vor dem Lauf des freigegebenen Plans</translation>
     </message>
     <message>
         <source>Your note reached Vector: %note</source>

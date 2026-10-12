@@ -5682,12 +5682,20 @@
         <translation>Not staged: another run is changing these fields (%fields). Leave them alone: do the rest of your item, or end your turn and say which fields were held.</translation>
     </message>
     <message>
+        <source>Only the owner of this thread can restore it.</source>
+        <translation>Only the owner of this thread can restore it.</translation>
+    </message>
+    <message>
         <source>Nothing runs in this thread.</source>
         <translation>Nothing runs in this thread.</translation>
     </message>
     <message>
         <source>The thread already runs on this model.</source>
         <translation>The thread already runs on this model.</translation>
+    </message>
+    <message>
+        <source>This checkpoint does not exist any more.</source>
+        <translation>This checkpoint does not exist any more.</translation>
     </message>
     <message>
         <source>Request in the log</source>
@@ -5712,12 +5720,28 @@
         <translation>Items of the plan</translation>
     </message>
     <message>
+        <source>Checkpoints</source>
+        <translation>Checkpoints</translation>
+    </message>
+    <message>
         <source>A note that reaches Vector at its next step</source>
         <translation>A note that reaches Vector at its next step</translation>
     </message>
     <message>
         <source>Steer</source>
         <translation>Steer</translation>
+    </message>
+    <message>
+        <source>Restore to this checkpoint?</source>
+        <translation>Restore to this checkpoint?</translation>
+    </message>
+    <message>
+        <source>A checkpoint "Before restore" is written first: you can go back to the state of now.</source>
+        <translation>A checkpoint "Before restore" is written first: you can go back to the state of now.</translation>
+    </message>
+    <message>
+        <source>Restore</source>
+        <translation>Restore</translation>
     </message>
     <message>
         <source>Plan approved: %count item(s), up to %parallel side by side. Their changes appear in the Changes tab.</source>
@@ -5788,6 +5812,86 @@
         <translation>batch: approved plans go to the provider as a batch</translation>
     </message>
     <message>
+        <source>Restore to "%label"</source>
+        <translation>Restore to "%label"</translation>
+    </message>
+    <message>
+        <source>turn %n</source>
+        <translation>turn %n</translation>
+    </message>
+    <message>
+        <source>Drafts discarded</source>
+        <translation>Drafts discarded</translation>
+    </message>
+    <message>
+        <source>Drafts set back to their values then</source>
+        <translation>Drafts set back to their values then</translation>
+    </message>
+    <message>
+        <source>Left alone</source>
+        <translation>Left alone</translation>
+    </message>
+    <message>
+        <source>Staged changes set aside: %count</source>
+        <translation>Staged changes set aside: %count</translation>
+    </message>
+    <message>
+        <source>Staged changes back to their decision then: %count</source>
+        <translation>Staged changes back to their decision then: %count</translation>
+    </message>
+    <message>
+        <source>Exchanges removed from the conversation: %count</source>
+        <translation>Exchanges removed from the conversation: %count</translation>
+    </message>
+    <message>
+        <source>Queued messages dropped: %count</source>
+        <translation>Queued messages dropped: %count</translation>
+    </message>
+    <message>
+        <source>Exchanges back in the conversation: %count</source>
+        <translation>Exchanges back in the conversation: %count</translation>
+    </message>
+    <message>
+        <source>Nothing changed since this checkpoint.</source>
+        <translation>Nothing changed since this checkpoint.</translation>
+    </message>
+    <message>
+        <source>This checkpoint was too large to keep the field values: the conversation and the decisions are restored.</source>
+        <translation>This checkpoint was too large to keep the field values: the conversation and the decisions are restored.</translation>
+    </message>
+    <message>
+        <source>Restored. "Before restore" lets you go back.</source>
+        <translation>Restored. "Before restore" lets you go back.</translation>
+    </message>
+    <message>
+        <source>Only the owner can restore.</source>
+        <translation>Only the owner can restore.</translation>
+    </message>
+    <message>
+        <source>Before: %text</source>
+        <translation>Before: %text</translation>
+    </message>
+    <message>
+        <source>This checkpoint belongs to another thread.</source>
+        <translation>This checkpoint belongs to another thread.</translation>
+    </message>
+    <message>
+        <source>Stop the thread first: nothing may run while it is restored.</source>
+        <translation>Stop the thread first: nothing may run while it is restored.</translation>
+    </message>
+    <message>
+        <source>no longer a draft (published or sent for approval)</source>
+        <translation>no longer a draft (published or sent for approval)</translation>
+    </message>
+    <message>
+        <source>a draft of another user</source>
+        <translation>a draft of another user</translation>
+    </message>
+    <message>
+        <source>Before restore to: %label</source>
+        <translation>Before restore to: %label</translation>
+    </message>
+    <message>
         <source>Batch answer staged for review: %fields</source>
         <translation>Batch answer staged for review: %fields</translation>
     </message>
@@ -5814,6 +5918,62 @@
     <message>
         <source>The job of this item ended without an answer: %error</source>
         <translation>The job of this item ended without an answer: %error</translation>
+    </message>
+    <message>
+        <source>Watch this run</source>
+        <translation>Watch this run</translation>
+    </message>
+    <message>
+        <source>Requests in the log</source>
+        <translation>Requests in the log</translation>
+    </message>
+    <message>
+        <source>Job</source>
+        <translation>Job</translation>
+    </message>
+    <message>
+        <source>Open in Vector</source>
+        <translation>Open in Vector</translation>
+    </message>
+    <message>
+        <source>Request</source>
+        <translation>Request</translation>
+    </message>
+    <message>
+        <source>Record of this turn</source>
+        <translation>Record of this turn</translation>
+    </message>
+    <message>
+        <source>timed out</source>
+        <translation>timed out</translation>
+    </message>
+    <message>
+        <source>replaced</source>
+        <translation>replaced</translation>
+    </message>
+    <message>
+        <source>%count step(s)</source>
+        <translation>%count step(s)</translation>
+    </message>
+    <message>
+        <source>%tokens tokens</source>
+        <translation>%tokens tokens</translation>
+    </message>
+    <message>
+        <source>Asked for %requested; %model answered: %reason</source>
+        <translation>Asked for %requested; %model answered: %reason</translation>
+    </message>
+    <message>
+        <source>running step %step</source>
+        <translation>running step %step</translation>
+    </message>
+    <message>
+        <source>Before writing accepted changes to drafts</source>
+        <translation>Before writing accepted changes to drafts</translation>
+    </message>
+    <message>
+        <source>Before the approved plan runs</source>
+        <translation>Before the approved plan runs</translation>
     </message>
     <message>
         <source>Your note reached Vector: %note</source>

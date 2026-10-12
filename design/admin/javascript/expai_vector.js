@@ -42,12 +42,15 @@
 
         var app = {
             boot: null, bindings: {}, shelf: root.getAttribute( 'data-shelf' ) || '', rows: [], shared: [], current: null, busy: false,
-            stopRequested: false, followups: [], activeItem: -1, cursor: {}, oldest: null, pollTimer: null, stream: null, lanes: [], scopeDraft: null
+            stopRequested: false, followups: [], activeItem: -1, cursor: {}, oldest: null, pollTimer: null, stream: null, lanes: [], scopeDraft: null,
+            records: {}
         };
 
         /* ------------------------------------------------------------ utilities */
 
         function stateLabel( s ) { return T( 'state_' + s ); }
+        /** the records of the exchanges (expAiTurnRecord) from a history page or a step's answer */
+        function takeRecords( data ) { Object.keys( ( data && data.records ) || {} ).forEach( function ( id ) { app.records[id] = data.records[id]; } ); }
         function money( t ) { return t || ''; }
         function timeText( seconds ) {
             var d = new Date( seconds * 1000 ), now = new Date();
@@ -799,7 +802,9 @@
                  + ( steps ? '<ul class="exp-ai-steps exp-ai-v-steps">' + steps + '</ul>' : '' )
                  + '<div class="exp-ai-v-msg exp-ai-v-msg-ai"><span class="exp-ai-v-who"><span class="exp-ai-mark" aria-hidden="true"></span> ' + esc( T( 'assistant' ) ) + '</span>'
                  + '<div class="exp-ai-v-body">' + ( x.reply ? ExpAi.renderText( x.reply ) : '<p class="exp-ai-v-muted">' + esc( T( 'no_reply' ) ) + '</p>' ) + '</div>'
-                 + ( drafts ? '<div class="exp-ai-v-drafts-inline"><span>' + esc( T( 'drafts_written' ) ) + ':</span> ' + drafts + '</div>' : '' ) + '</div>';
+                 + ( drafts ? '<div class="exp-ai-v-drafts-inline"><span>' + esc( T( 'drafts_written' ) ) + ':</span> ' + drafts + '</div>' : '' ) + '</div>'
+                 // the record of the turn: model, steps, duration, tokens, cost, result (expAiTurnRecord)
+                 + ( app.records[x.id] ? ExpAi.turnRecord( app.records[x.id] ) : '' );
         }
 
         function showExchange( x, prepend ) {
@@ -846,6 +851,8 @@
                 }
                 setHeader( data.thread );
                 el.log.innerHTML = '';
+                app.records = {};
+                takeRecords( data.history );
                 app.oldest = null;
                 app.activeItem = -1;
                 ( data.history.exchanges || [] ).forEach( function ( x ) { showExchange( x, false ); } );
@@ -923,6 +930,8 @@
         var stepCount = 0;
         function step( params ) {
             return api( 'turn', $.extend( { thread: app.current.uuid }, params ) ).then( function ( data ) {
+                takeRecords( data );
+                ExpAi.watchChip( q( '.exp-ai-v-watch' ), data.watch || null, [ 'vector' ] );
                 if ( data.exchange ) {
                     showExchange( data.exchange, false );
                     scrollDown();
@@ -990,7 +999,9 @@
                         var st = ( data.threads || [] ).filter( function ( t ) { return t.uuid === uuid; } )[0];
                         var done = !st || ( st.state !== 'queued' && st.state !== 'running' );
                         showSlow( done ? null : st.slow, uuid );
+                        if ( st && st.watch ) { ExpAi.watchChip( q( '.exp-ai-v-watch' ), st.watch, [ 'vector' ] ); }
                         var reload = news.length ? api( 'thread', { thread: uuid } ).then( function ( d ) {
+                            takeRecords( d.history );
                             ( d.history.exchanges || [] ).forEach( function ( x ) { showExchange( x, false ); } );
                             renderDrafts( d.drafts );
                             // a steering note the background turn took leaves the queue
@@ -1548,6 +1559,7 @@
         el.older.addEventListener( 'click', function () {
             if ( !app.current ) { return; }
             api( 'history', { thread: app.current.uuid, before: app.oldest } ).then( function ( page ) {
+                takeRecords( page );
                 ( page.exchanges || [] ).slice().reverse().forEach( function ( x ) { showExchange( x, true ); } );
                 el.older.hidden = !page.has_older;
             } );

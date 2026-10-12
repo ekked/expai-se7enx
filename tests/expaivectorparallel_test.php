@@ -404,6 +404,16 @@ try
     $waiting = expAiFollowup::waiting( (int) $t5->attribute( 'id' ) );
     $check( $lateRow->attribute( 'state' ) === 'waiting' && $lateRow->attribute( 'delivery' ) === 'queue' && (int) $waiting[0]->attribute( 'id' ) === (int) $late->attribute( 'id' ),
             'a steer the turn could not take becomes the next queued follow-up' );
+    // the record of the turn and "Watch this run" (expAiTurnRecord)
+    $records = expAiTurnRecord::forThread( expAiThread::fetchByID( $t5->attribute( 'id' ) ), $config );
+    $rec = end( $records );
+    $check( $rec && $rec['step_count'] === 2 && $rec['result'] === 'done' && $rec['line'] !== '' && $rec['links']['log'] === 'expai/log/(thread)/' . (int) $t5->attribute( 'id' )
+            && strpos( $rec['steps'][0]['log'], 'expai/log/(request)/' ) === 0, 'the record of the turn: 2 steps, done, links to the log: ' . ( $rec ? $rec['line'] : '-' ) );
+    $check( !empty( $s2['records'] ) && !empty( $s2['watch'] ) && $s2['watch']['state'] === 'done' && $s2['watch']['links']['log'] !== '', 'the step answers with its record and the watch state' );
+    $w = expAiTurnRecord::watch( expAiThread::fetchByID( $t5->attribute( 'id' ) ) );
+    $check( $w['texts']['watch'] !== '' && isset( $w['links']['vector'] ), 'watch: texts and links' );
+    $hist = ( new expAiAssistant( $config ) )->useConversation( $t5->conversation() )->history( $user, (int) $a1->mainNodeID() );
+    $check( !empty( $hist['records'] ), 'the history carries the records of its exchanges' );
     $childConv = eZPersistentObject::fetchObject( expAiConversation::definition(), null, array( 'id' => (int) $runs[2]->attribute( 'conversation_id' ) ) );
     $check( expAiFollowup::takeSteers( $childConv ) === array(), 'child runs are never steered' );
 }

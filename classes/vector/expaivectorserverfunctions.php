@@ -246,7 +246,9 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
                                            'cost' => $thread->costText(), 'modified' => (int) $thread->attribute( 'modified' ),
                                            'progress' => expAiVector::progressText( $thread ),
                                            // a turn on a slow model: its model, time per step, step, since; the switch target
-                                           'slow' => $thread->isOwner( self::userID() ) ? expAiSlowModel::status( $thread, $config ) : null );
+                                           'slow' => $thread->isOwner( self::userID() ) ? expAiSlowModel::status( $thread, $config ) : null,
+                                           // "Watch this run" of the open thread: its state and step, with the links to its live record
+                                           'watch' => $uuid === $open ? expAiTurnRecord::watch( $thread ) : null );
                 if ( in_array( $thread->attribute( 'state' ), array( 'queued', 'running' ), true ) )
                 {
                     if ( $uuid === $open )
@@ -520,7 +522,7 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
                 $job = expAiThreadRunner::enqueue( $thread, $nodeID, $message, $options );
                 $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ) ?: $thread;
                 return array( 'status' => 'queued', 'job' => (string) $job->attribute( 'uuid' ), 'steps' => array(), 'text' => '',
-                              'thread' => expAiVector::detail( $fresh, self::userID(), $config ), 'read_only' => $readOnly );
+                              'thread' => expAiVector::detail( $fresh, self::userID(), $config ), 'read_only' => $readOnly, 'watch' => expAiTurnRecord::watch( $fresh ) );
             }
             if ( self::post( 'continue' ) !== '1' )
             {

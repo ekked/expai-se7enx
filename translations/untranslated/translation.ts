@@ -5682,11 +5682,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Only the owner of this thread can restore it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Nothing runs in this thread.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>The thread already runs on this model.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This checkpoint does not exist any more.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5712,11 +5720,27 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Checkpoints</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>A note that reaches Vector at its next step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Steer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restore to this checkpoint?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A checkpoint "Before restore" is written first: you can go back to the state of now.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5788,6 +5812,86 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Restore to "%label"</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>turn %n</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drafts discarded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drafts set back to their values then</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left alone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Staged changes set aside: %count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Staged changes back to their decision then: %count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exchanges removed from the conversation: %count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Queued messages dropped: %count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exchanges back in the conversation: %count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing changed since this checkpoint.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This checkpoint was too large to keep the field values: the conversation and the decisions are restored.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restored. "Before restore" lets you go back.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only the owner can restore.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Before: %text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This checkpoint belongs to another thread.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop the thread first: nothing may run while it is restored.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>no longer a draft (published or sent for approval)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>a draft of another user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Before restore to: %label</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Batch answer staged for review: %fields</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5813,6 +5917,62 @@
     </message>
     <message>
         <source>The job of this item ended without an answer: %error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch this run</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Requests in the log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in Vector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record of this turn</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>timed out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>replaced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count step(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%tokens tokens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Asked for %requested; %model answered: %reason</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>running step %step</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Before writing accepted changes to drafts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Before the approved plan runs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -9,6 +9,8 @@
     </div>
     <ol class="exp-ai-log" aria-live="polite" aria-label="{'Conversation'|i18n( 'extension/expai/panel' )}"></ol>
     <p class="exp-ai-working" hidden="hidden"><span class="exp-ai-spinner" aria-hidden="true"></span> <span class="exp-ai-working-text">{'Exponential Intelligence is working...'|i18n( 'extension/expai/panel' )}</span></p>
+    {* "Watch this run": the live state of the turn just sent, with links to its requests, its job, the thread (expAiTurnRecord) *}
+    <p class="exp-ai-watch" hidden="hidden" aria-live="polite"></p>
     {* a turn on a slow model: its model, time per step and the switch to the default model (expAiSlowModel) *}
     <p class="exp-ai-slow" hidden="hidden" aria-live="polite"><span class="exp-ai-slow-text"></span> <span class="exp-ai-slow-time"></span>
         <button type="button" class="button exp-ai-btn exp-ai-slow-switch" hidden="hidden"></button></p>

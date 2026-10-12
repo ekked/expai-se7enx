@@ -732,3 +732,19 @@ a.exp-ai-help-link:focus-visible { outline: 2px solid var(--exp-ai-accent); outl
 .exp-ai-slow[hidden] { display: none; }
 .exp-ai-slow-time { font-variant-numeric: tabular-nums; }
 .exp-ai-slow .exp-ai-slow-switch { margin-left: 0.4em; }
+
+/* the record of a turn (one line, open for the steps) and "Watch this run" (doc/parallel-runs.md) */
+.exp-ai-record { margin: 0.35em 0 0; font-size: 0.82em; color: var(--exp-ai-muted); }
+.exp-ai-record > summary { cursor: pointer; overflow-wrap: anywhere; }
+.exp-ai-record-failed > summary, .exp-ai-record-timeout > summary { color: var(--exp-ai-error); }
+.exp-ai-record-replaced > summary { color: var(--exp-ai-warn, #b45309); }
+.exp-ai-record-steps { margin: 0.3em 0; padding-left: 1.2em; }
+.exp-ai-record-step { overflow-wrap: anywhere; }
+.exp-ai-record-error { color: var(--exp-ai-error); }
+.exp-ai-record-fallback, .exp-ai-record-links { margin: 0.25em 0; }
+.exp-ai-watch { margin: 0.35em 0; font-size: 0.86em; color: var(--exp-ai-muted); overflow-wrap: anywhere; }
+.exp-ai-watch[hidden] { display: none; }
+.exp-ai-watch-chip { display: inline-block; padding: 0 0.5em; border: 1px solid currentColor; border-radius: 999px; font-weight: 600; }
+.exp-ai-watch-running, .exp-ai-watch-queued { color: var(--exp-ai-accent); }
+.exp-ai-watch-done { color: var(--exp-ai-ok, #15803d); }
+.exp-ai-watch-failed { color: var(--exp-ai-error); }

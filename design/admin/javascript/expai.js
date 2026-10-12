@@ -241,8 +241,54 @@
             pending: [],
             register: function ( id, def ) { this.pending.push( [ id, def ] ); }
         },
-        slowStatus: slowStatus
+        slowStatus: slowStatus,
+        turnRecord: turnRecord,
+        watchChip: watchChip
     };
+
+    /**
+     * The record of a turn (expAiTurnRecord, doc/parallel-runs.md "The record of a turn"), collapsed to one line: the
+     * model that answered, steps, duration, tokens, cost, result; open: the fallback, each step with its duration,
+     * tools, tokens and cost and a link to its request in the log, and the links of the turn.
+     * @return string HTML ('' without a record)
+     */
+    function turnRecord( r ) {
+        if ( !r ) {
+            return '';
+        }
+        var t = r.texts || {};
+        var steps = ( r.steps || [] ).map( function ( s, i ) {
+            return '<li class="exp-ai-record-step' + ( s.error ? ' exp-ai-record-error' : '' ) + '">' + ( i + 1 ) + '. ' + esc( [ s.model, s.duration, s.tools, s.tokens + '', s.cost, s.error ].filter( Boolean ).join( ' · ' ) )
+                 + ' <a href="' + esc( url( s.log ) ) + '">' + esc( t.request || 'Request' ) + '</a></li>';
+        } ).join( '' );
+        var links = [ [ r.links && r.links.log, t.log ], [ r.links && r.links.job, t.job ], [ r.links && r.links.vector, t.vector ] ].filter( function ( l ) { return l[0]; } )
+            .map( function ( l ) { return '<a href="' + esc( url( l[0] ) ) + '">' + esc( l[1] ) + '</a>'; } ).join( ' · ' );
+        return '<details class="exp-ai-record exp-ai-record-' + esc( r.result ) + '"><summary title="' + esc( t.record || '' ) + '">' + esc( r.line ) + '</summary>'
+             + ( r.fallback_text ? '<p class="exp-ai-record-fallback">' + esc( r.fallback_text ) + '</p>' : '' )
+             + ( steps ? '<ol class="exp-ai-record-steps">' + steps + '</ol>' : '' )
+             + ( links ? '<p class="exp-ai-record-links">' + links + '</p>' : '' ) + '</details>';
+    }
+
+    /**
+     * "Watch this run" right after a turn was accepted: a chip with its live state (queued, running step k, done,
+     * failed, stopped) and the links to its live record (its requests in the log, its job, the thread in Vector).
+     * box: an element (.exp-ai-watch); watch: expAiTurnRecord::watch() or null (hides it); skip: link kinds to leave out.
+     */
+    function watchChip( box, watch, skip ) {
+        if ( !box ) {
+            return;
+        }
+        box.hidden = !watch;
+        if ( !watch ) {
+            return;
+        }
+        var t = watch.texts || {};
+        skip = skip || [];
+        var links = [ [ 'log', t.log ], [ 'job', t.job ], [ 'vector', t.vector ] ].filter( function ( l ) { return watch.links[l[0]] && skip.indexOf( l[0] ) === -1; } )
+            .map( function ( l ) { return '<a href="' + esc( url( watch.links[l[0]] ) ) + '">' + esc( l[1] ) + '</a>'; } ).join( ' · ' );
+        box.innerHTML = '<span class="exp-ai-watch-title">' + esc( t.watch || '' ) + ' →</span> <span class="exp-ai-watch-chip exp-ai-watch-' + esc( watch.state ) + '">'
+                      + esc( watch.label ) + '</span>' + ( links ? ' <span class="exp-ai-watch-links">' + links + '</span>' : '' );
+    }
 
     /**
      * A running turn on a slow model (doc/parallel-runs.md "Slow models"), in the Intelligence tab and in Vector: the
@@ -445,6 +491,12 @@
         }
 
         /** Puts an exchange into the list (replacing the row of the same id), open or closed */
+        // the record of each exchange (expAiTurnRecord): from the history and from each step's answer
+        var records = {};
+        function takeRecords( data ) {
+            Object.keys( ( data && data.records ) || {} ).forEach( function ( id ) { records[id] = data.records[id]; } );
+        }
+
         function showExchange( x, open, prepend ) {
             if ( !log || !x ) {
                 return null;
@@ -460,7 +512,7 @@
                     log.appendChild( li );
                 }
             }
-            li.innerHTML = exchangeHtml( x );
+            li.innerHTML = exchangeHtml( x ) + ( records[x.id] ? ExpAi.turnRecord( records[x.id] ) : '' );
             setOpen( li, open, false );
             if ( oldestId === null || x.id < oldestId ) {
                 oldestId = x.id;
@@ -481,6 +533,7 @@
 
         function showHistory( page, prepend ) {
             var list = page && page.exchanges ? page.exchanges : [];
+            takeRecords( page );
             var latest = list.length ? list[list.length - 1].id : null;
             ( prepend ? list.slice().reverse() : list ).forEach( function ( x ) {
                 var saved = remembered[x.id];
@@ -645,6 +698,7 @@
                         } );
                         var st = ( ev.threads || [] )[0];
                         var done = !st || ( st.state !== 'queued' && st.state !== 'running' );
+                        if ( st && st.watch ) { ExpAi.watchChip( root.querySelector( '.exp-ai-watch' ), st.watch ); }
                         // a slow model: its time per step and the switch to the default model
                         ExpAi.slowStatus( slowBox, done || !st ? null : st.slow, function () {
                             api( 'expaivector::switch_model', { thread: uuid } ).then( function ( r ) {
@@ -654,6 +708,7 @@
                         } );
                         var refresh = news.length ? api( 'history', { node_id: nodeID } ).then( function ( page ) {
                             var list = page.exchanges || [];
+                            takeRecords( page );
                             if ( list.length ) {
                                 var x = list[list.length - 1];
                                 var li = showExchange( x, true, false );
@@ -686,6 +741,9 @@
 
         function step( params ) {
             return api( 'chat', $.extend( { node_id: nodeID }, params ) ).then( function ( data ) {
+                // "Watch this run": the state of the accepted turn with the links to its live record
+                takeRecords( data );
+                ExpAi.watchChip( root.querySelector( '.exp-ai-watch' ), data.watch || null );
                 if ( data.status === 'queued' && data.thread ) {
                     if ( data.drafts ) {
                         setDrafts( data.drafts );
