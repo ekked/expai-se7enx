@@ -41,6 +41,7 @@ class expAiScriptTestsTest extends expAiTestCase
             'expaifallback' => array( 'expaifallback', array(), array(), false, 47 ),
             'expaigate' => array( 'expaigate', array( '-s', 'admin' ), $admin, false, 47 ),
             'expaihelp' => array( 'expaihelp', array( '-s', 'admin' ), array(), false, 73 ),
+            'expaimelious' => array( 'expaimelious', array(), array(), false, 98 ),
             'expaimodelstats' => array( 'expaimodelstats', array( '-s', 'admin' ), $admin, false, 45 ),
             'expaimodeltest' => array( 'expaimodeltest', array( '-s', 'admin' ), $admin, false, 51 ),
             'expaipresets' => array( 'expaipresets', array( '-s', 'admin' ), array(), false, 82 ),

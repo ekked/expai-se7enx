@@ -196,6 +196,28 @@ class expAiChainRunsTest extends expAiContentTestCase
         $this->assertStringContainsString( 'the model xtnosuch.model of the step write is not in the provider registry', $run->attribute( 'last_error' ) );
     }
 
+    public function testAnAnswerThatIsNotTheJsonOfTheStepEndsTheRun(): void
+    {
+        $config = $this->siteSettings( self::chainSettings() );
+        $folder = $this->folder();
+        $this->forgetRuns( $folder );
+        $this->asUser( 'admin' );
+        $engine = new expAiChainEngine( $config );
+        $run = $engine->start( 'xt', (int) $folder->attribute( 'node_id' ), 'A brief' )[0];
+        $this->assertSame( 'running', $run->attribute( 'state' ) );
+        $job = new expQueueJob( array( 'uuid' => expAiChainEngine::uuid() ) );
+        $answer = $engine->onAnswer( $job, array( 'text' => 'Here is your article, without any JSON.', 'stop_reason' => 'max_tokens' ),
+                                     array( 'run' => (int) $run->attribute( 'id' ), 'step' => 'write', 'iteration' => 0 ) );
+        $this->assertSame( array( 'failed', 'write' ), array( $answer['chain'], $answer['step'] ) );
+        $run = expAiChainRun::fetch( (int) $run->attribute( 'id' ) );
+        $this->assertSame( 'failed', $run->attribute( 'state' ) );
+        $this->assertStringContainsString( 'the step write did not answer in the expected format', $run->attribute( 'last_error' ) );
+        $step = $run->steps()[0];
+        $this->assertSame( 'failed', $step->attribute( 'state' ) );
+        $this->assertSame( 'the answer was not the JSON the step asks for (stop reason max_tokens)', $step->attribute( 'note' ) );
+        $this->assertSame( array( 'text' => 'Here is your article, without any JSON.' ), $step->outputArray(), 'the text is kept for the editor' );
+    }
+
     public function testAChainWithAMissingClassIsRefused(): void
     {
         $config = $this->siteSettings( self::chainSettings( '1.00', 'xt_no_such_class' ) );
