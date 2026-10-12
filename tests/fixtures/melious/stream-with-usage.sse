@@ -1,0 +1,44 @@
+data: {"id":"chatcmpl-t385fixture","object":"chat.completion.chunk","created":1791800000,"model":"deepseek-v4.1-flash","choices":[{"index":0,"delta":{"role":"assistant","content":"","tool_calls":null,"reasoning_content":null},"finish_reason":null}],"usage":null}
+
+data: {"id":"chatcmpl-t385fixture","object":"chat.completion.chunk","created":1791800000,"model":"deepseek-v4.1-flash","choices":[{"index":0,"delta":{"role":null,"content":null,"tool_calls":null,"reasoning_content":"We"},"finish_reason":null}],"usage":null}
+
+data: {"id":"chatcmpl-t385fixture","object":"chat.completion.chunk","created":1791800000,"model":"deepseek-v4.1-flash","choices":[{"index":0,"delta":{"role":null,"content":null,"tool_calls":null,"reasoning_content":" need answer user"},"finish_reason":null}],"usage":null}
+
+data: {"id":"chatcmpl-t385fixture","object":"chat.completion.chunk","created":1791800000,"model":"deepseek-v4.1-flash","choices":[{"index":0,"delta":{"role":null,"content":null,"tool_calls":null,"reasoning_content":" asks"},"finish_reason":null}],"usage":null}
+
+data: {"id":"chatcmpl-t385fixture","object":"chat.completion.chunk","created":1791800000,"model":"deepseek-v4.1-flash","choices":[{"index":0,"delta":{"role":null,"content":null,"tool_calls":null,"reasoning_content":" \"Count from 1 to"},"finish_reason":null}],"usage":null}
+
+data: {"id":"chatcmpl-t385fixture","object":"chat.completion.chunk","created":1791800000,"model":"deepseek-v4.1-flash","choices":[{"index":0,"delta":{"role":null,"content":null,"tool_calls":null,"reasoning_content":" 5, digits only.\""},"finish_reason":null}],"usage":null}
+
+data: {"id":"chatcmpl-t385fixture","object":"chat.completion.chunk","created":1791800000,"model":"deepseek-v4.1-flash","choices":[{"index":0,"delta":{"role":null,"content":null,"tool_calls":null,"reasoning_content":" Need comply"},"finish_reason":null}],"usage":null}
+
+data: {"id":"chatcmpl-t385fixture","object":"chat.completion.chunk","created":1791800000,"model":"deepseek-v4.1-flash","choices":[{"index":0,"delta":{"role":null,"content":null,"tool_calls":null,"reasoning_content":". Digits"},"finish_reason":null}],"usage":null}
+
+data: {"id":"chatcmpl-t385fixture","object":"chat.completion.chunk","created":1791800000,"model":"deepseek-v4.1-flash","choices":[{"index":0,"delta":{"role":null,"content":null,"tool_calls":null,"reasoning_content":" only likely output"},"finish_reason":null}],"usage":null}
+
+data: {"id":"chatcmpl-t385fixture","object":"chat.completion.chunk","created":1791800000,"model":"deepseek-v4.1-flash","choices":[{"index":0,"delta":{"role":null,"content":null,"tool_calls":null,"reasoning_content":" \"123"},"finish_reason":null}],"usage":null}
+
+data: {"id":"chatcmpl-t385fixture","object":"chat.completion.chunk","created":1791800000,"model":"deepseek-v4.1-flash","choices":[{"index":0,"delta":{"role":null,"content":null,"tool_calls":null,"reasoning_content":"45\" or \"1 "},"finish_reason":null}],"usage":null}
+
+data: {"id":"chatcmpl-t385fixture","object":"chat.completion.chunk","created":1791800000,"model":"deepseek-v4.1-flash","choices":[{"index":0,"delta":{"role":null,"content":null,"tool_calls":null,"reasoning_content":"2 3 4 "},"finish_reason":null}],"usage":null}
+
+data: {"id":"chatcmpl-t385fixture","object":"chat.completion.chunk","created":1791800000,"model":"deepseek-v4.1-flash","choices":[{"index":0,"delta":{"role":null,"content":null,"tool_calls":null,"reasoning_content":"5\"? \""},"finish_reason":null}],"usage":null}
+
+data: {"id":"chatcmpl-t385fixture","object":"chat.completion.chunk","created":1791800000,"model":"deepseek-v4.1-flash","choices":[{"index":0,"delta":{"role":null,"content":null,"tool_calls":null,"reasoning_content":"digits only\" means no"},"finish_reason":null}],"usage":null}
+
+data: {"id":"chatcmpl-t385fixture","object":"chat.completion.chunk","created":1791800000,"model":"deepseek-v4.1-flash","choices":[{"index":0,"delta":{"role":null,"content":null,"tool_calls":null,"reasoning_content":" spaces?"},"finish_reason":null}],"usage":null}
+
+data: {"id":"chatcmpl-t385fixture","object":"chat.completion.chunk","created":1791800000,"model":"deepseek-v4.1-flash","choices":[{"index":0,"delta":{"role":null,"content":null,"tool_calls":null,"reasoning_content":" Count"},"finish_reason":null}],"usage":null}
+
+data: {"id":"chatcmpl-t385fixture","object":"chat.completion.chunk","created":1791800000,"model":"deepseek-v4.1-flash","choices":[{"index":0,"delta":{"role":null,"content":null,"tool_calls":null,"reasoning_content":" from 1 to 5"},"finish_reason":null}],"usage":null}
+
+data: {"id":"chatcmpl-t385fixture","object":"chat.completion.chunk","created":1791800000,"model":"deepseek-v4.1-flash","choices":[{"index":0,"delta":{"role":null,"content":null,"tool_calls":null,"reasoning_content":","},"finish_reason":null}],"usage":null}
+
+data: {"id":"chatcmpl-t385fixture","object":"chat.completion.chunk","created":1791800000,"model":"deepseek-v4.1-flash","choices":[{"index":0,"delta":{"role":null,"content":null,"tool_calls":null,"reasoning_content":" digits only."},"finish_reason":null}],"usage":null}
+
+data: {"id":"chatcmpl-t385fixture","object":"chat.completion.chunk","created":1791800000,"model":"deepseek-v4.1-flash","choices":[{"index":0,"delta":{"role":null,"content":null,"tool_calls":null,"reasoning_content":null},"finish_reason":"length"}],"usage":null}
+
+data: {"id":"chatcmpl-t385fixture","object":"chat.completion.chunk","created":1791800000,"model":"deepseek-v4.1-flash","choices":[{"index":0,"delta":{"role":null,"content":null,"tool_calls":null,"reasoning_content":null},"finish_reason":null}],"usage":{"prompt_tokens":41,"completion_tokens":60,"total_tokens":101,"cached_tokens":0,"reasoning_tokens":63,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens_details":{"reasoning_tokens":63}}}
+
+data: [DONE]
+

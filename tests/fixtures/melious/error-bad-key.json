@@ -1,0 +1,11 @@
+{
+  "_recorded": "Melious bad-key, 2026-10-12, HTTP 401; ids scrubbed",
+  "response": {
+    "error": {
+      "message": "Invalid API key format",
+      "type": "authentication_error",
+      "param": null,
+      "code": "invalid_api_key"
+    }
+  }
+}

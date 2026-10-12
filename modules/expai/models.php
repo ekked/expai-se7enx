@@ -98,6 +98,8 @@ foreach ( array_keys( $registry->providers() ) as $id )
         $p['models'][$i]['writes'] = expAiProbe::writeAllowed( $m['alias'], $config );
         $p['models'][$i]['write_refusal'] = expAiProbe::writeRefusal( $m['alias'], $config );
         $p['models'][$i]['cost'] = expAiCost::costClass( $m['alias'], $config );
+        // #385 the context window of the model ([Model_<alias>] ContextTokens), abbreviated (1M)
+        $p['models'][$i]['context'] = !empty( $m['context_tokens'] ) ? expAiCost::tokens( $m['context_tokens'] ) : '';
         // the newest test and load of the model (expai.model.test jobs), and whether a local model is loaded
         $p['models'][$i]['run'] = expAiModelTest::forModel( $m['alias'], $config, null, $recentTests );
         if ( $test && $test['alias'] === $m['alias'] )

@@ -8,6 +8,7 @@
 | [architecture.md](architecture.md) | How the parts fit: browser, ezjscore, the step loop, tools, provider, storage, long turns |
 | [configuration.md](configuration.md) | Every setting of expai.ini and the other settings files, with default and effect |
 | [providers.md](providers.md) | The provider registry, the anthropic and openai_chat adapters, models, the picker, tool modes, errors and retries |
+| [demo-melious.md](demo-melious.md) | A demo of expai on Melious (EU, open-weight models): what to click, what it shows, the measured timings and cost |
 | [provider-support.md](provider-support.md) | What is proven with which provider: live, against docs-derived mocks, or not yet |
 | [data-policy.md](data-policy.md) | Regions and retention of providers, rules per section and class, where they are enforced |
 | [switch-and-veto.md](switch-and-veto.md) | The master switch (on, off, off per siteaccess) at every entry point, and the veto hook: rules and the ezpEvent filter expai/request/veto |

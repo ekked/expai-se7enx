@@ -116,6 +116,13 @@ class expAiUsageRecorder implements expAiProvider
         $row['reasoning_tokens'] = (int) ( isset( $tokens['reasoning'] ) ? $tokens['reasoning'] : 0 );
         $row['reported_cost_micros'] = isset( $tokens['reported_cost'] ) && is_numeric( $tokens['reported_cost'] ) && $tokens['reported_cost'] > 0
                                      ? (int) round( (float) $tokens['reported_cost'] * 1000000 ) : 0;
+        // #385 a cost reported in another currency (Melious: EUR) is stored in [Pricing] Currency; without a rate it is
+        // not stored, and the row is priced from the model's prices (or "cost unknown")
+        if ( $row['reported_cost_micros'] > 0 && !empty( $tokens['reported_currency'] ) )
+        {
+            $rate = expAiCost::rate( $tokens['reported_currency'] );
+            $row['reported_cost_micros'] = $rate === null ? 0 : (int) round( (float) $tokens['reported_cost'] * $rate * 1000000 );
+        }
         $row['latency_ms'] = (int) round( ( microtime( true ) - $start ) * 1000 );
         $row['model'] = isset( $answer['model'] ) && $answer['model'] !== '' ? (string) $answer['model'] : $row['model'];
         $row['stop_reason'] = isset( $answer['stop_reason'] ) ? (string) $answer['stop_reason'] : '';

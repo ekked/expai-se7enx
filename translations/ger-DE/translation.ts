@@ -2014,6 +2014,10 @@
 <context>
     <name>extension/expai/models</name>
     <message>
+        <source>context %tokens tokens</source>
+        <translation>Kontext %tokens Tokens</translation>
+    </message>
+    <message>
         <source>The request %id was handed to the local model helper.</source>
         <translation>Der Auftrag %id wurde an den Helfer für lokale Modelle übergeben.</translation>
     </message>

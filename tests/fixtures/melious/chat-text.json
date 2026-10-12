@@ -1,0 +1,53 @@
+{
+  "_recorded": "Melious plain-glm-5.3-flash, 2026-10-12, HTTP 200; ids scrubbed",
+  "response": {
+    "id": "chatcmpl-t385fixture",
+    "object": "chat.completion",
+    "created": 1791800000,
+    "model": "glm-5.3-flash",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "Paris",
+          "role": "assistant",
+          "tool_calls": null,
+          "function_call": null,
+          "provider_specific_fields": {
+            "refusal": null
+          }
+        },
+        "finish_reason": "stop",
+        "logprobs": null
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 22,
+      "completion_tokens": 3,
+      "total_tokens": 25,
+      "cached_tokens": 0,
+      "reasoning_tokens": 1,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 1
+      }
+    },
+    "system_fingerprint": null,
+    "environment_impact": {
+      "energy_kwh": 0.0006152206398546696,
+      "carbon_g_co2": 0.11873758349195122,
+      "water_liters": 0.0,
+      "renewable_percent": 100,
+      "pue": 1.2,
+      "provider_id": "melious",
+      "location": "FI"
+    },
+    "billing_cost": {
+      "energy": "0.034",
+      "credits": "0.0000034",
+      "paid_with": "energy"
+    }
+  }
+}

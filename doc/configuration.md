@@ -59,7 +59,7 @@ settings keep working unchanged). More providers: the next three sections and [p
 | Setting | Effect |
 | --- | --- |
 | `Type` | `anthropic` (Messages API), `openai_chat` (OpenAI Chat Completions and every compatible server), or `custom` with `Class=` (a class implementing `expAiProvider`; its constructor receives these settings with the model's). |
-| `Flavor` | `openai_chat` only: `openai`, `huggingface`, `openrouter`, `mistral`, `xai`, `ollama`, `llamacpp`, `generic`: the small differences (tool_choice support, Mistral's tool names, `max_completion_tokens`, OpenRouter's `reasoning` object). |
+| `Flavor` | `openai_chat` only: `openai`, `huggingface`, `openrouter`, `mistral`, `xai`, `ollama`, `llamacpp`, `melious`, `generic`: the small differences (tool_choice support, Mistral's tool names, `max_completion_tokens`, OpenRouter's `reasoning` object, the cost Melious reports in `billing_cost.credits`). |
 | `Label` | The name in the picker, in error texts and on expai/models. |
 | `BaseURL` | The API: for `openai_chat` the base (`https://router.huggingface.co/v1`; `/chat/completions` is added, a query such as Azure's `api-version` is kept); for `anthropic` the messages URL. |
 | `ApiKey` | The key, ONLY in settings/override. expai/models warns about a key in any other file. |
@@ -76,6 +76,7 @@ settings keep working unchanged). More providers: the next three sections and [p
 | `RetryOnServerError` | `enabled` (default): one retry after a second on 500/502/504 or a failed connection (never after a timeout). |
 | `AnthropicExtras` | `anthropic` only: `disabled` leaves out prompt caching, the refusal fallback, the workspace header and the beta headers (for an Anthropic-compatible server such as Ollama's `/v1/messages`). |
 | `Managed` | `ollama`: a local Ollama that expai/models can start, stop and pull models for ([local-models.md](local-models.md)). |
+| `PriceCurrency` | The currency of the prices of its models and of the cost it reports (Melious: `EUR`); empty: `[Pricing] Currency`. Converted with `[Pricing] ExchangeRates[]`; without a rate the cost is unknown. A `[Model_<alias>] PriceCurrency` wins. |
 
 ## [Model_<alias>]: one model
 
@@ -93,6 +94,8 @@ The alias is what users choose and what the usage log records (letters, digits, 
 | `MaxOutput` | The longest answer of one call (tokens); default `[AISettings] MaxTokens`. |
 | `Effort` | `none`, `minimal`, `low`, `medium`, `high`, `xhigh` (with `Capabilities[]=reasoning_effort`; `none` switches thinking off, e.g. for Qwen on a CPU). |
 | `InputPerMTok`, `OutputPerMTok`, `CacheWritePerMTok`, `CacheReadPerMTok` | Prices per million tokens (0: free). Without them the model is priced by `[Pricing]` by its id; a model of another provider without prices has an unknown cost (never a Claude price). A cost the provider reports (OpenRouter) always wins. |
+| `ContextTokens` | The context window in tokens, shown on expai/models (`context 1M tokens`); information only. |
+| `PriceCurrency` | As in `[Provider_<id>]`, for this model. |
 | `Slow` | `true` marks the model "slow" in the picker (default for providers with `Region=local`). |
 | `PromptProfile` | `compact` (default for providers with `Region=local`) or `full`: a compact prompt is a short system prompt, only the tools the editor's message needs and a short snapshot of the open page for a question about it ([local-models.md](local-models.md), "Making a local model usable"). |
 | `Tools[]` | With `PromptProfile=compact`: the tools a compact prompt may offer this model (empty: `get_node`, `list_children`, `get_class_definition`, `create_draft`, `update_draft`, `propose_plan`). |
@@ -198,6 +201,7 @@ reported) and the spend limit of the organization, set in the Claude Console.
 | `Currency` | `USD` | The currency of the prices; shown with its symbol. |
 | `PricesAsOf`, `Source` | the release date, Anthropic's pricing page | Shown under the cost so readers know how old the table is. |
 | `Multiplier` | `1.0` | Applied to every price (regional inference, fast mode, a reseller's margin). |
+| `ExchangeRates[<code>]`, `ExchangeRatesAsOf` | `EUR`: 1.16, 2026-10-12 | What one unit of another currency is in `Currency`, for providers with `PriceCurrency` (Melious prices in EUR): their prices and reported costs are converted with it. An approximate rate for an estimate; without a rate their cost is unknown. |
 | `Default*PerMTok` | Claude Sonnet 5.5 | Prices for a model without an entry; such costs are shown as approximate (`≈`). |
 | `InputPerMTok[<model>]`, `CacheWritePerMTok[...]`, `CacheReadPerMTok[...]`, `OutputPerMTok[...]` | the shipped table | Prices per million tokens. Cache write is the 5-minute cache price. |
 | `LongContextThreshold[<model>]` and `*PerMTokLong[<model>]` | Claude Haiku 5.5 | A request whose prompt (input + cache write + cache read) is above the threshold uses the `Long` prices. |

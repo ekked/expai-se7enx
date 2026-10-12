@@ -179,15 +179,20 @@ class expAiProviderRegistry
             $value = isset( $values[$name] ) && $values[$name] !== '' ? $values[$name] : $default;
             return in_array( strtolower( trim( (string) $value ) ), array( 'enabled', 'true', '1', 'yes', 'on' ), true );
         };
-        $price = function ( $name ) use ( $values )
+        $providers = $this->providers();
+        // prices in another currency ([Model_<alias>] or [Provider_<id>] PriceCurrency, e.g. EUR) are converted into
+        // [Pricing] Currency; without a rate they are unknown
+        $currency = isset( $values['PriceCurrency'] ) && trim( (string) $values['PriceCurrency'] ) !== '' ? (string) $values['PriceCurrency']
+                  : ( isset( $providers[$provider]['PriceCurrency'] ) ? (string) $providers[$provider]['PriceCurrency'] : '' );
+        $rate = expAiCost::rate( $currency, $this->config );
+        $price = function ( $name ) use ( $values, $rate )
         {
-            return isset( $values[$name] ) && is_numeric( $values[$name] ) ? (float) $values[$name] : null;
+            return $rate !== null && isset( $values[$name] ) && is_numeric( $values[$name] ) ? (float) $values[$name] * $rate : null;
         };
         $toolUse = isset( $values['ToolUse'] ) ? strtolower( trim( (string) $values['ToolUse'] ) ) : 'native';
         $toolUse = in_array( $toolUse, array( 'native', 'prompted', 'none' ), true ) ? $toolUse : 'native';
         $capabilities = isset( $values['Capabilities'] ) ? (array) $values['Capabilities'] : array();
         $capabilities = array_values( array_filter( array_map( 'strtolower', array_map( 'trim', array_map( 'strval', $capabilities ) ) ), 'strlen' ) );
-        $providers = $this->providers();
         return array(
             'alias' => $alias,
             'provider' => $provider,
@@ -199,6 +204,9 @@ class expAiProviderRegistry
             'capabilities' => $capabilities,
             'max_output' => isset( $values['MaxOutput'] ) && (int) $values['MaxOutput'] > 0 ? (int) $values['MaxOutput'] : 0,
             'effort' => isset( $values['Effort'] ) ? (string) $values['Effort'] : '',
+            // the context window in tokens ([Model_<alias>] ContextTokens; 0: not stated), shown on expai/models
+            'context_tokens' => isset( $values['ContextTokens'] ) && (int) $values['ContextTokens'] > 0 ? (int) $values['ContextTokens'] : 0,
+            'price_currency' => strtoupper( trim( $currency ) ),
             'prices' => array( 'input' => $price( 'InputPerMTok' ), 'output' => $price( 'OutputPerMTok' ),
                                'cache_write' => $price( 'CacheWritePerMTok' ), 'cache_read' => $price( 'CacheReadPerMTok' ) ),
             'slow' => $flag( 'Slow', isset( $providers[$provider]['Region'] ) && $providers[$provider]['Region'] === 'local' ? 'true' : 'false' ),

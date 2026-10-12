@@ -174,6 +174,25 @@ class expAiCost
         return $out < 1 ? '$' : ( $out < 8 ? '$$' : '$$$' );
     }
 
+    /**
+     * The factor that converts an amount in another currency into [Pricing] Currency ([Pricing] ExchangeRates[<code>]:
+     * what one unit of it is in Currency). A provider that prices in EUR (Melious) is priced and its reported cost
+     * stored in the site's currency with it.
+     * @param string $currency an ISO code ('' or the site's own: 1.0)
+     * @return float|null null when no rate is configured (the cost is then unknown)
+     */
+    public static function rate( $currency, ?expAiConfig $config = null )
+    {
+        $currency = strtoupper( trim( (string) $currency ) );
+        $config = $config ?: expAiConfig::instance();
+        $site = strtoupper( trim( (string) $config->get( 'Pricing', 'Currency', 'USD' ) ) );
+        if ( $currency === '' || $currency === $site )
+            return 1.0;
+        $rates = $config->get( 'Pricing', 'ExchangeRates', array() );
+        $rates = is_array( $rates ) ? array_change_key_case( $rates, CASE_UPPER ) : array();
+        return isset( $rates[$currency] ) && is_numeric( $rates[$currency] ) && (float) $rates[$currency] > 0 ? (float) $rates[$currency] : null;
+    }
+
     /** @return string the currency symbol of [Pricing] Currency */
     public static function symbol()
     {

@@ -1,0 +1,64 @@
+{
+  "_recorded": "Melious tool-deepseek-v4-flash-0731, 2026-10-12, HTTP 200; ids scrubbed",
+  "response": {
+    "id": "chatcmpl-t385fixture",
+    "object": "chat.completion",
+    "created": 1791800000,
+    "model": "deepseek-v4-flash-0731",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "",
+          "role": "assistant",
+          "tool_calls": [
+            {
+              "index": 0,
+              "function": {
+                "arguments": "{\"node_id\": 2}",
+                "name": "get_node"
+              },
+              "id": "call_t385fixture0",
+              "type": "function"
+            }
+          ],
+          "function_call": null,
+          "reasoning_content": "The user asks me to read node 2 with the tool. Let me do that.",
+          "provider_specific_fields": {
+            "refusal": null
+          }
+        },
+        "finish_reason": "tool_calls",
+        "logprobs": null
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 367,
+      "completion_tokens": 64,
+      "total_tokens": 431,
+      "cached_tokens": 0,
+      "reasoning_tokens": 19,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 19
+      }
+    },
+    "system_fingerprint": null,
+    "environment_impact": {
+      "energy_kwh": 0.0003460751801729202,
+      "carbon_g_co2": 0.0667925097733736,
+      "water_liters": 0.0,
+      "renewable_percent": 100,
+      "pue": 1.2,
+      "provider_id": "melious",
+      "location": "FI"
+    },
+    "billing_cost": {
+      "energy": "0.527",
+      "credits": "0.0000527",
+      "paid_with": "energy"
+    }
+  }
+}

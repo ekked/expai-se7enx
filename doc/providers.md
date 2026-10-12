@@ -7,7 +7,7 @@ that translates both ways. Two adapters are built in:
 | Type | For | Class |
 | --- | --- | --- |
 | `anthropic` | the Anthropic Messages API (and Anthropic-compatible servers with `AnthropicExtras=disabled`) | `expAiAnthropicProvider` |
-| `openai_chat` | OpenAI Chat Completions and every compatible server: Hugging Face Inference Providers (router), OpenRouter, Mistral, xAI, Ollama, llama.cpp `llama-server` (with `--jinja`), vLLM, LM Studio, Azure OpenAI | `expAiOpenAiChatProvider` |
+| `openai_chat` | OpenAI Chat Completions and every compatible server: Hugging Face Inference Providers (router), OpenRouter, Mistral, Melious, xAI, Ollama, llama.cpp `llama-server` (with `--jinja`), vLLM, LM Studio, Azure OpenAI | `expAiOpenAiChatProvider` |
 | `custom` | your own class implementing `expAiProvider` ([extending.md](extending.md)) | `Class=` |
 
 What is proven against which provider is in [provider-support.md](provider-support.md).
@@ -148,5 +148,57 @@ train on prompts. Every answer reports its cost, which the log shows as "reporte
 
 Mistral (EU): `Flavor=mistral`, `BaseURL=https://api.mistral.ai/v1`, `Region=eu`.
 
+Melious (EU, open-weight models): `Flavor=melious`, `BaseURL=https://api.melious.ai/v1`, `Region=eu`, `Retention=zdr`,
+`PriceCurrency=EUR`; see [Melious](#melious) below.
+
 A local Ollama: `Flavor=ollama`, `BaseURL=http://127.0.0.1:11434/v1`, `ApiKeyHeader=none`, `Region=local`,
 `Retention=none`, a longer `Timeout`; see [local-models.md](local-models.md).
+
+## Melious
+
+[Melious](https://melious.ai/docs/reference) offers open-weight models (GLM, DeepSeek, Qwen, Kimi, Mistral ...) through
+an OpenAI-compatible API, run by providers inside the EU. expai speaks to it with the `openai_chat` adapter and
+`Flavor=melious`. The shipped `[Provider_melious]` and the four models below are inactive until `melious` is listed in
+`[ProviderSettings] Providers[]` and the key is in settings/override:
+
+```ini
+# settings/override/expai.ini.append.php (mode 0640, never committed)
+[ProviderSettings]
+Providers[]=melious
+
+[Provider_melious]
+ApiKey=sk-mel-...
+```
+
+What Melious states and what expai makes of it (read 2026-10-12):
+
+| Topic | Melious | In expai |
+| --- | --- | --- |
+| API | `POST https://api.melious.ai/v1/chat/completions`, `Authorization: Bearer <key>` (or `x-api-key`); `GET /v1/models?include_meta=true` lists every model with its capabilities, context length and prices | `BaseURL=https://api.melious.ai/v1`, the default Bearer header |
+| Region | "Every inference request runs on a provider inside the EU"; a request may be retried on the next-best EU provider (the answer names it in `environment_impact.provider_id`, `location`) | `Region=eu` |
+| Retention and training | No prompt or answer content is kept, only operational metadata (request id, tokens, model, provider, energy, cost); no provider on the network trains on the traffic. Providers may keep short-term operational logs. This is the documentation, not a data processing agreement | `Retention=zdr`, `TermsCheckedAt=2026-10-12`; ask Melious for a DPA before personal data goes there |
+| Prices | per model, in EUR per million tokens (input, output, cache read) | `[Model_melious.*]` prices in EUR with `PriceCurrency=EUR`, converted with `[Pricing] ExchangeRates[EUR]` |
+| Cost per request | every answer carries `billing_cost` (`credits`: the EUR amount, also when the plan pays with "energy" units) | stored as the reported cost (in the site's currency), shown as "reported" |
+| Tool calling | OpenAI `tools` / `tool_choice` (`auto`, `none`, `required`, a function); answers with `tool_calls` and DeepSeek's `reasoning_content` | native tool use; the answer is sent back as it came (null fields and LiteLLM's `provider_specific_fields` left out) |
+| Structured output | `response_format` `json_object` or `json_schema` (only some models list `json_schema`) | `Capabilities[]=json_schema` for DeepSeek V4 Flash 0731, `json_object` for the others |
+| Reasoning | `reasoning_effort` low / medium / high; usage reports `reasoning_tokens` | `Effort=low`, `Capabilities[]=reasoning_effort`; reasoning tokens stored per request |
+| Prompt caching | automatic; usage reports `prompt_tokens_details.cached_tokens` | counted as cache reads, priced at the cache read price |
+| Streaming | SSE (`stream: true`, `stream_options.include_usage` for the usage in the last chunk) | expai asks every provider for whole answers; Vector streams its steps to the browser itself |
+| Rate limits | per plan; headers `x-ratelimit-limit`, `x-ratelimit-remaining`, `x-ratelimit-reset`; 429 with `Retry-After` (code `AUTH_1028`) | headers kept with the usage row; one retry after a short `Retry-After` |
+| Errors | `{"error": {"message", "type", "code"}}` (e.g. `model_not_found` 404, `invalid_api_key` 401, `BILLING_2001` out of credit, `INFERENCE_3207` context too long) | mapped to the editor's texts by status; the code is in the log row |
+
+The models of the partner demo (all with native tool calling and a context of one million tokens):
+
+| Alias | Prices EUR in / out / cache read per M | Notes |
+| --- | --- | --- |
+| `melious.glm-5.3-flash` | 0.10 / 0.40 / 0.02 | always reasons (short reasoning at `Effort=low`) |
+| `melious.glm-5.3` | 1.00 / 3.00 / 0.20 | hybrid |
+| `melious.deepseek-v4-flash-0731` | 0.10 / 0.25 / 0.02 | hybrid, `json_schema`; the fastest in the demo |
+| `melious.deepseek-v4.1-flash` | 0.20 / 1.00 / 0.01 | hybrid; text and images in |
+
+Each may write drafts only after a live probe of at least 90 % ([probe.md](probe.md)); until then they read, answer,
+fill the edit form (field actions, presets), plan in Vector and run chain steps and the translation sync, which write
+through their own code. The probe results, the demo and what was measured are in [demo-melious.md](demo-melious.md).
+
+The Melious command line tool (`melious run "..." --model glm-5.3`, `melious launch`) is meant for your own machine;
+it is not needed on the server and is not installed there.

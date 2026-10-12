@@ -30,7 +30,7 @@
  * (OpenRouter usage.cost). The message as received is kept as native_json and sent back unchanged to the same
  * provider and model (reasoning fields of some providers must be returned).
  *
- * [Provider_<id>] Flavor=openai | huggingface | openrouter | mistral | xai | ollama | llamacpp | generic sets the
+ * [Provider_<id>] Flavor=openai | huggingface | openrouter | mistral | xai | ollama | llamacpp | melious | generic sets the
  * small differences; everything else comes from the settings (see doc/providers.md).
  */
 class expAiOpenAiChatProvider extends expAiProviderBase
@@ -47,7 +47,7 @@ class expAiOpenAiChatProvider extends expAiProviderBase
     public function flavor()
     {
         $flavor = strtolower( trim( (string) $this->setting( 'Flavor', 'generic' ) ) );
-        return in_array( $flavor, array( 'openai', 'huggingface', 'openrouter', 'mistral', 'xai', 'ollama', 'llamacpp', 'generic' ), true ) ? $flavor : 'generic';
+        return in_array( $flavor, array( 'openai', 'huggingface', 'openrouter', 'mistral', 'xai', 'ollama', 'llamacpp', 'melious', 'generic' ), true ) ? $flavor : 'generic';
     }
 
     /** @return string the chat completions URL from [Provider_<id>] BaseURL */
@@ -395,6 +395,15 @@ class expAiOpenAiChatProvider extends expAiProviderBase
         $cacheWrite = isset( $usage['prompt_tokens_details']['cache_write_tokens'] ) ? (int) $usage['prompt_tokens_details']['cache_write_tokens'] : 0;
         $reasoning = isset( $usage['completion_tokens_details']['reasoning_tokens'] ) ? (int) $usage['completion_tokens_details']['reasoning_tokens'] : 0;
         $cost = isset( $usage['cost'] ) && is_numeric( $usage['cost'] ) ? (float) $usage['cost'] : null;
+        // #385 Melious reports the cost of every answer outside usage, in EUR credits (billing_cost.credits, a numeric
+        // string; the same amount whether the account paid with credits or with its plan's energy units). It is in the
+        // provider's PriceCurrency, converted into the site's currency when the usage row is written.
+        $currency = '';
+        if ( $cost === null && isset( $data['billing_cost']['credits'] ) && is_numeric( $data['billing_cost']['credits'] ) )
+        {
+            $cost = (float) $data['billing_cost']['credits'];
+            $currency = strtoupper( trim( (string) $this->setting( 'PriceCurrency', 'EUR' ) ) );
+        }
 
         $json = array();
         foreach ( $content as $block )
@@ -410,7 +419,8 @@ class expAiOpenAiChatProvider extends expAiProviderBase
             'model' => isset( $data['model'] ) && is_string( $data['model'] ) && $data['model'] !== '' ? $data['model'] : $this->modelName(),
             'usage' => $usage,
             'tokens' => array( 'input' => max( 0, $prompt - $cacheRead - $cacheWrite ), 'output' => isset( $usage['completion_tokens'] ) ? (int) $usage['completion_tokens'] : 0,
-                               'cache_write' => $cacheWrite, 'cache_read' => $cacheRead, 'reasoning' => $reasoning, 'reported_cost' => $cost ),
+                               'cache_write' => $cacheWrite, 'cache_read' => $cacheRead, 'reasoning' => $reasoning, 'reported_cost' => $cost,
+                               'reported_currency' => $currency ),
             'invalid_tool_input' => $invalid,
             // the tier that served the request (default, flex, priority ...): a lane is billed at the real tier
             'service_tier' => isset( $data['service_tier'] ) && is_string( $data['service_tier'] ) ? substr( $data['service_tier'], 0, 20 ) : '',

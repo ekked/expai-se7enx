@@ -38,7 +38,7 @@
 {foreach $p.models as $m}
                 <tr>
                     <td>{$m.label|wash}{if eq( $m.alias, $default_alias )} <em>{'(default)'|i18n( 'extension/expai/model' )}</em>{/if}{if $m.slow} <span class="exp-ai-badge">{'slow'|i18n( 'extension/expai/models' )}</span>{/if}{if eq( $m.prompt_profile, 'compact' )} <span class="exp-ai-badge">{'compact prompt'|i18n( 'extension/expai/models' )}</span>{/if}<br /><code>{$m.alias|wash}</code></td>
-                    <td><code>{$m.id|wash}</code></td>
+                    <td><code>{$m.id|wash}</code>{if $m.context}<br /><small>{'context %tokens tokens'|i18n( 'extension/expai/models',, hash( '%tokens', $m.context ) )|wash}</small>{/if}</td>
                     <td>{switch match=$m.tool_use}{case match='prompted'}{'prompted JSON'|i18n( 'extension/expai/models' )}{/case}{case match='none'}{'none'|i18n( 'extension/expai/models' )}{/case}{case}{'native'|i18n( 'extension/expai/models' )}{/case}{/switch}</td>
                     <td>{if $m.writes}{'may write'|i18n( 'extension/expai/models' )}{if eq( $m.write_gate, 'trusted' )} ({'trusted'|i18n( 'extension/expai/models' )}){/if}{else}{'read only'|i18n( 'extension/expai/models' )}<br /><small>{$m.write_refusal|wash}</small>{/if}</td>
                     <td>{if $m.probe_live}{'live %rate% (%passed/%tasks)'|i18n( 'extension/expai/models',, hash( '%rate', $m.probe_live.pass_rate, '%passed', $m.probe_live.passed, '%tasks', $m.probe_live.tasks ) )}<br /><small>{$m.probe_live.created|l10n( 'shortdatetime' )}</small>{else}{'no live probe'|i18n( 'extension/expai/models' )}{/if}{if $m.probe_mock}<br /><small>{'mock %rate%'|i18n( 'extension/expai/models',, hash( '%rate', $m.probe_mock.pass_rate ) )}</small>{/if}</td>

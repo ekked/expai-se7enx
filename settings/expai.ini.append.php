@@ -152,6 +152,22 @@ Retention=30d
 TermsCheckedAt=
 Timeout=115
 
+# Example: Melious (EU inference, open-weight models; doc/providers.md "Melious"). Every request runs on a provider
+# inside the EU, prompts and answers are not kept and no provider trains on them (melious.ai/docs/concepts/privacy,
+# read 2026-10-12; it is not a data processing agreement). Prices are in EUR (PriceCurrency, converted with [Pricing]
+# ExchangeRates[EUR]); every answer reports its cost (billing_cost.credits), which the log shows as "reported".
+[Provider_melious]
+Type=openai_chat
+Flavor=melious
+Label=Melious
+BaseURL=https://api.melious.ai/v1
+ApiKey=
+Region=eu
+Retention=zdr
+TermsCheckedAt=2026-10-12
+PriceCurrency=EUR
+Timeout=115
+
 # Example: a local Ollama on this server (see doc/local-models.md). No key; nothing leaves the server.
 [Provider_local]
 Type=openai_chat
@@ -243,6 +259,69 @@ InputPerMTok=0
 OutputPerMTok=0
 Slow=true
 PromptProfile=compact
+
+# The models of Melious the partner demo uses (GET https://api.melious.ai/v1/models?include_meta=true, 2026-10-12):
+# prices in EUR per million tokens, ContextTokens the context window. All four call tools natively; glm-5.3-flash
+# always reasons, the others are hybrid. Each may write drafts only after it passed the probe on expai/models.
+[Model_melious.glm-5.3-flash]
+Provider=melious
+Id=glm-5.3-flash
+Label=GLM 5.3 Flash (Melious)
+ToolUse=native
+WriteTools=enabled
+Capabilities[]=json_object
+Capabilities[]=reasoning_effort
+Effort=low
+MaxOutput=8000
+ContextTokens=1000000
+InputPerMTok=0.10
+OutputPerMTok=0.40
+CacheReadPerMTok=0.02
+
+[Model_melious.glm-5.3]
+Provider=melious
+Id=glm-5.3
+Label=GLM 5.3 (Melious)
+ToolUse=native
+WriteTools=enabled
+Capabilities[]=json_object
+Capabilities[]=reasoning_effort
+Effort=low
+MaxOutput=8000
+ContextTokens=1000000
+InputPerMTok=1.00
+OutputPerMTok=3.00
+CacheReadPerMTok=0.20
+
+[Model_melious.deepseek-v4-flash-0731]
+Provider=melious
+Id=deepseek-v4-flash-0731
+Label=DeepSeek V4 Flash 0731 (Melious)
+ToolUse=native
+WriteTools=enabled
+Capabilities[]=json_schema
+Capabilities[]=reasoning_effort
+Effort=low
+MaxOutput=8000
+ContextTokens=1000000
+InputPerMTok=0.10
+OutputPerMTok=0.25
+CacheReadPerMTok=0.02
+
+[Model_melious.deepseek-v4.1-flash]
+Provider=melious
+Id=deepseek-v4.1-flash
+Label=DeepSeek V4.1 Flash (Melious)
+ToolUse=native
+WriteTools=enabled
+Capabilities[]=json_object
+Capabilities[]=reasoning_effort
+Effort=low
+MaxOutput=8000
+ContextTokens=1000000
+InputPerMTok=0.20
+OutputPerMTok=1.00
+CacheReadPerMTok=0.01
 
 # Examples of providers with lanes (not active until listed in [ProviderSettings] Providers[] and given a key).
 [Provider_openai]
@@ -808,6 +887,12 @@ Currency=USD
 PricesAsOf=2026-10-11
 Source=https://platform.claude.com/docs/en/about-claude/pricing
 Multiplier=1.0
+# Providers that price in another currency ([Provider_<id>] or [Model_<alias>] PriceCurrency, e.g. Melious in EUR):
+# what one unit of that currency is in Currency. Their prices and reported costs are converted with it; without a
+# rate their cost is "unknown". An approximate rate for an estimate: set your own and the day you checked it.
+ExchangeRates[]
+ExchangeRates[EUR]=1.16
+ExchangeRatesAsOf=2026-10-12
 
 # Fallback for models without an entry (the prices of the default model, Claude Sonnet 5.5)
 DefaultInputPerMTok=2

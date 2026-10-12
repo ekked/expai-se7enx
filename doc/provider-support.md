@@ -100,3 +100,28 @@ EXPAI_BATCH_MOCK_URL=http://127.0.0.1:18359 EXPAI_MOCK_STATE=<dir> EXPAI_TEST_LO
 
 Results of 2026-10-11: lanes, batches and budgets end to end 167/167; packages 48/48 and the 200-object queued import
 5/5.
+
+## Melious (proof of 2026-10-12)
+
+Live against `https://api.melious.ai/v1` with the partner's key, on the test installation (Apache :443 and Velocity :8080, 960 px at
+scale 2), every request in the usage log with its tokens and the cost Melious reported. Details, timings and the
+order to show it in: [demo-melious.md](demo-melious.md).
+
+| Feature | Result |
+| --- | --- |
+| Models list (`/v1/models?include_meta=true`) | the four partner models exist with these ids; function calling on all four; context 1M |
+| Chat, panel step loop | proven live on both servers (DeepSeek V4 Flash 0731, GLM 5.3 Flash): 1.8 to 3.3 s per question |
+| Tools, native (single and two calls, round trip with `reasoning_content`) | proven live (in process and in the panel, Vector, the probe) |
+| Probe (15 tasks) | 13/15 (86 %) for each of the four models: they look up the class or object before `create_draft` / `update_draft`, or use another read tool (`exp_svc_node_children_names`) for a listing. Below 90 %: read only |
+| Drafts through the assistant | not opened (read only below the gate); the panel and Vector answer with the text to copy instead |
+| Field actions, presets, Improve | proven live on both servers, 1.8 to 11.6 s |
+| Vector plan mode | proven live: propose_plan, Plan tab, approve, the item ran in the queue (no change: read only) |
+| Chain steps (write, review) | proven live: DeepSeek V4 Flash 0731 wrote, GLM 5.3 Flash reviewed (score 85, pass), the draft waited at the checkpoint |
+| Translation sync (patch eng-US to ger-DE) | proven live: check, approve, patch job, ger-DE draft |
+| Usage (input, output, cached, reasoning tokens) | proven live; cached tokens appear from the second turn on |
+| Cost | proven live: `billing_cost.credits` (EUR) equals the list price of the tokens; stored converted as "reported" |
+| Rate limit headers | `x-ratelimit-limit`, `-remaining`, `-reset`, `x-request-id` kept |
+| Errors | 404 `model_not_found` and 401 `invalid_api_key` recorded live (unit test); a host that does not resolve: "could not be reached" and the fallback |
+| Fallback | proven live on both servers: Claude Sonnet 5.5 answered instead, with the line saying so; after the restore Melious answered again |
+| Data policy, EI: Summary, audit channel ai | Melious shown with EU and zdr; every request an event of the channel ai |
+| Streaming | Melious streams (recorded, unit test); expai asks for whole answers |

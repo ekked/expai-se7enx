@@ -1,0 +1,11 @@
+{
+  "_recorded": "Melious unknown-model, 2026-10-12, HTTP 404; ids scrubbed",
+  "response": {
+    "error": {
+      "message": "Model not found: no-such-model-t385",
+      "type": "invalid_request_error",
+      "param": null,
+      "code": "model_not_found"
+    }
+  }
+}
