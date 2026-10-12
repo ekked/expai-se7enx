@@ -46,7 +46,13 @@ With expai active, the audit console has an **Exponential Intelligence** source
   log), the top users and models; links to the console filtered on the channel and, with `expai/log`, to EI: Log
   (all, errors only), EI: Drafts and EI: Budgets.
 - **The sidebar** of the Audit tab: "AI events" (the console on the channel `ai`, with `audit/read`) and "EI: Log"
-  (with `expai/write` and `expai/log`).
+  (with `expai/write` and `expai/log`). A user whose `audit/read` is limited to other channels does not see "AI
+  events": the kernel's audit menu leaves out every link into a channel the user may not read.
+- **Export**: the CSV of the channel `ai` (`audit/export/(channel)/ai/(format)/csv`, or `exp:audit export
+  --channel=ai --format=csv` with expai active) has, after the generic columns, `provider`, `model`, `model_alias`,
+  `region`, `purpose`, `lane`, `tokens_in`, `tokens_out`, `latency_ms`, `http_status`, `status` (of a draft),
+  `fallback_from`, `fallback_reason`, `cost_micros` and `currency` (`expAiAuditSource::exportColumns()`). Never a
+  prompt, an answer, a draft's text or a key; the JSON exports carry the records as written.
 - **Console, Recent events, Charts, Alerts, Export**: the channel `ai` in the channel filter ("ai (Exponential
   Intelligence)"), and a line of links: the AI events, failed requests, drafts, and EI: Log with the console's user,
   node and day range carried over as view parameters (`expai/log/(user)/14/(node)/275/(from)/2026-10-01`).
@@ -93,7 +99,8 @@ The volume: one line (about 1 KB) per model request and per draft. A busy site w
 ```
 
 `tests/expaiaudit_test.php` records every event through the real code paths with a stub provider, checks the channel,
-the fields and that no prompt, answer or summary reaches the file, and removes what it wrote:
+the fields and that no prompt, answer or summary reaches the file, the CSV columns of the channel and the sidebar rule,
+and removes what it wrote:
 
 ```bash
 php bin/php/ezexec.php extension/expai/tests/expaiaudit_test.php -s admin

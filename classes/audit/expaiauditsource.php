@@ -11,7 +11,8 @@
  * The source of Exponential Intelligence in the audit console (audit.ini [AuditSourceSettings] Sources[expai],
  * doc/audit-trail.md): the dashboard panel (requests, failures, refusals, drafts written and published, budget holds
  * and the estimated cost, today and in 7 days; the top users and models), the links of the console's views, the
- * fields and links of an event of the channel "ai", the chart of requests and drafts per day. Every link into
+ * fields and links of an event of the channel "ai", the chart of requests and drafts per day, the columns of its CSV
+ * export (provider, model, region, purpose, lane, tokens, latency, status, fallback, cost). Every link into
  * expai's own pages is offered only to a user with the policy that page needs.
  */
 class expAiAuditSource extends expAuditSourceBase
@@ -212,6 +213,31 @@ class expAiAuditSource extends expAuditSourceBase
             array( 'label' => $t( 'drafts written' ), 'name' => 'content.expai_draft.write' ),
             array( 'label' => $t( 'drafts published' ), 'name' => 'content.expai_draft.publish' ),
         ) ) );
+    }
+
+    /**
+     * The CSV export of the channel "ai" (audit/export/(channel)/ai/(format)/csv): the request's routing and usage
+     * after the generic columns. Only these fields: never a prompt, an answer, a draft's text or a key.
+     */
+    public function exportColumns()
+    {
+        return array(
+            'provider'        => 'after.provider',
+            'model'           => 'after.model',
+            'model_alias'     => 'after.model_alias',
+            'region'          => 'after.region',
+            'purpose'         => 'after.action',
+            'lane'            => 'after.lane',
+            'tokens_in'       => 'after.usage.in',
+            'tokens_out'      => 'after.usage.out',
+            'latency_ms'      => 'after.latency_ms',
+            'http_status'     => 'after.http_status',
+            'status'          => 'after.status',
+            'fallback_from'   => 'after.fallback_from',
+            'fallback_reason' => 'after.fallback_reason',
+            'cost_micros'     => 'after.cost_micros',
+            'currency'        => 'after.currency',
+        );
     }
 
     /** @return bool the user may see every user's requests in expai/log (expai/write and expai/log) */

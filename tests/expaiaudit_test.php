@@ -4,7 +4,9 @@
  * with a stub provider, the veto, the master switch, the draft log) and the recorder's own calls, every event lands in
  * the channel "ai" with its object, target and fields, and no prompt, answer, request summary or provider error text
  * reaches the file; the chain of the channel is intact; the audit console's source of expai (expAiAuditSource) answers
- * the panel's links, an event's fields and links, the object links and the chart.
+ * the panel's links, an event's fields and links, the object links, the chart and the CSV columns of the channel "ai"
+ * (exported into the throwaway directory), and the audit menu leaves "AI events" out for a user limited to other
+ * channels.
  *
  * The audit is pointed at a throwaway directory (the kernel's test fixtures, var/tmp/audit-tests/), so the live audit
  * log is not touched; settings change only in memory; no request leaves the server. The usage and draft log rows the
@@ -223,6 +225,32 @@ $check( 'the console links carry user, node and day into EI: Log', in_array( 'ex
 $check( 'every link is a view path', count( array_filter( $links, function ( $l ) { return !expAuditSourceRegistry::isPath( $l ); } ) ), 0 );
 $check( 'the chart has five series', count( expAuditSourceRegistry::charts( null )[0]['series'] ), 5 );
 $check( 'a user limited to the content channel sees nothing of expai', expAuditSourceRegistry::readable( array( 'content' ) ), array() );
+$check( 'nor its entry in the audit menu', in_array( 'expai_events', expAuditSourceRegistry::hiddenMenuLinks( 'Leftmenu_audit', array( 'content' ) ), true ), true );
+$check( 'a user who may read the channel ai keeps it', expAuditSourceRegistry::hiddenMenuLinks( 'Leftmenu_audit', array( 'content', 'ai' ) ), array() );
+
+// ---------------------------------------------------------------- the CSV export of the channel ai
+$columns = array( 'provider', 'model', 'model_alias', 'region', 'purpose', 'lane', 'tokens_in', 'tokens_out', 'latency_ms', 'http_status',
+                  'status', 'fallback_from', 'fallback_reason', 'cost_micros', 'currency' );
+$check( 'the source declares its CSV columns', array_keys( expAuditSourceRegistry::exportColumns( 'ai' ) ), $columns );
+$check( 'no columns for another channel', expAuditSourceRegistry::exportColumns( 'content' ), array() );
+$csvFile = $dir . 'export-ai.csv';
+( new expAuditExporter() )->export( $records( 'system.expai.' ), 'csv', $csvFile, array( 'channel' => 'ai' ) );
+$csv = file_get_contents( $csvFile );
+$lines = array_map( function ( $l ) { return str_getcsv( $l, ',', '"', '\\' ); }, array_values( array_filter( explode( "\n", $csv ), 'strlen' ) ) );
+$header = $lines[0];
+$check( 'the CSV of the channel ai has the generic columns, then the source\'s', array_slice( $header, -count( $columns ) ), $columns );
+$check( 'and starts with the generic ones', array_slice( $header, 0, 4 ), array( 'time', 'id', 'channel', 'name' ) );
+$row = null;
+foreach ( array_slice( $lines, 1 ) as $l )
+    if ( count( $l ) === count( $header ) && $l[array_search( 'id', $header, true )] === $request['id'] )
+        $row = array_combine( $header, $l );
+$check( 'the request\'s row carries model, purpose and tokens', $row ? array( $row['model'], $row['purpose'], $row['tokens_in'], $row['tokens_out'], $row['provider'] ) : null,
+        array( 'stub-model', 'panel', '120', '30', 'anthropic' ) );
+$check( 'no prompt or answer in the CSV', strpos( $csv, $secret ), false );
+$check( 'no column for a text or a key', count( array_filter( $header, function ( $h ) { return preg_match( '/prompt|answer|text|key|token$|secret/', $h ); } ) ), 0 );
+$plain = $dir . 'export-all.csv';
+( new expAuditExporter() )->export( $records( 'system.expai.' ), 'csv', $plain, array() );
+$check( 'without a channel filter the CSV has the generic columns only', count( str_getcsv( strtok( file_get_contents( $plain ), "\n" ), ',', '"', '\\' ) ), 18 );
 
 // ---------------------------------------------------------------- cleanup
 $restoreIni();
