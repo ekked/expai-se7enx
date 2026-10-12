@@ -218,12 +218,12 @@ class expAiBudget
         {
             $job->setAttribute( 'state', 'held' );
             expQueueEvent::add( $job->attribute( 'id' ), $job->attribute( 'group_id' ), 'hold', 'held: ' . $message, array( 'reason' => 'budget' ) );
+            if ( class_exists( 'expAiAudit' ) )
+                expAiAudit::budgetHold( $job );
         }
         return $ok;
     }
 
-            if ( class_exists( 'expAiAudit' ) )
-                expAiAudit::budgetHold( $job );
     /**
      * Resumes held jobs whose reservation fits now, oldest first by priority.
      * @param int $limit
