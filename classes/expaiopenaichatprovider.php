@@ -143,6 +143,12 @@ class expAiOpenAiChatProvider extends expAiProviderBase
                                     $native['tool_calls'][$i]['function']['arguments'] = '{}';
                             }
                         unset( $native['refusal'], $native['annotations'] );
+                        // #385 fields a proxy adds to the answer that are not part of a request message (LiteLLM based
+                        // servers such as Melious: provider_specific_fields, tool_calls: null, function_call: null)
+                        unset( $native['provider_specific_fields'] );
+                        foreach ( array( 'tool_calls', 'function_call', 'reasoning_content', 'audio' ) as $field )
+                            if ( array_key_exists( $field, $native ) && $native[$field] === null )
+                                unset( $native[$field] );
                         if ( !isset( $native['content'] ) )
                             $native['content'] = isset( $native['tool_calls'] ) ? null : '';
                         $messages[] = $native;
