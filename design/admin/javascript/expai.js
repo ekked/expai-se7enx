@@ -365,25 +365,8 @@
             if ( !data || !data.labels ) {
                 return;
             }
-            var badge = function ( info ) {
-                var title = data.texts.full + ( info && info.model ? ' - ' + data.texts.model + ': ' + info.model : '' );
-                return '<span class="exp-ai-badge" title="' + esc( title ) + '"><span class="exp-ai-mark" aria-hidden="true"></span>' + esc( data.texts.short ) + '</span>';
-            };
-            var done = {};
-            anchors.forEach( function ( item ) {
-                var key = item.key || ( data.collab && data.collab[item.collab] );
-                // the page's own version gets the banner instead
-                if ( !key || !data.labels[key] || ( pageVersion && key === pageVersion[1] + ':' + pageVersion[2] ) ) {
-                    return;
-                }
-                var row = item.a.closest( 'tr, li, .exp-card, article' ) || item.a.parentNode;
-                var rowKey = key + '|' + ( row ? ( row.__expAiId = row.__expAiId || Math.random() ) : '' );
-                if ( done[rowKey] || ( row && row.querySelector( '.exp-ai-badge' ) ) ) {
-                    return;
-                }
-                done[rowKey] = true;
-                item.a.insertAdjacentHTML( 'afterend', ' ' + badge( data.labels[key] ) );
-            } );
+            // No badge next to every link to a version written by Exponential Intelligence (it did nothing and cluttered
+            // the lists); only the page's own version shows the banner below.
             var pageKey = pageVersion ? pageVersion[1] + ':' + pageVersion[2] : ( pageCollab && data.collab ? data.collab[pageCollab[1]] : '' );
             if ( pageKey && data.labels[pageKey] ) {
                 var info = data.labels[pageKey];
