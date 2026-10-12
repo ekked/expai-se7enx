@@ -24,8 +24,9 @@ live and mock result per model. A mock result never opens the gate.
 
 ## The tasks
 
-15 scripted tasks, sent with the panel's real tool definitions. The tools are never run and nothing is read or
-written: the probe grades the call the model makes.
+15 scripted tasks, sent with the panel's real tool definitions (a model with `PromptProfile=compact`: the short
+definitions of the seven panel tools the tasks use, as the compact prompt sends them). The tools are never run and
+nothing is read or written: the probe grades the call the model makes.
 
 | Task | Passes when |
 | --- | --- |

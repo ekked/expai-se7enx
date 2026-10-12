@@ -30,7 +30,7 @@ All menu entries of expai (settings/menu.ini.append.php), each shown only with i
 | Dashboard | EI: Log | `expai/log` | `expai/write` |
 | Dashboard | EI: Help | `expai/help` | `expai/write` |
 | Design | Missing alt text | `expai/alttext` | `expai/write` |
-| Setup | EI: Summary | `expai/summary` | `expai/facts` |
+| Setup | EI: Summary | `expai/summary` | `expai/summary` |
 | Setup | EI: Models | `expai/models` | `expai/model_manage` |
 | Setup | EI: Budgets | `expai/budgets` | `expai/log` |
 | Setup | Job queue | `expqueue/dashboard` | `expqueue/view` |
@@ -41,7 +41,7 @@ left menu of the Design tab: `expai/alttext` uses the navigation part `ezvisualn
 stays active. The Setup entries are translated in `design/admin/parts/setup/menu`, the Design entry in
 `design/admin/parts/design/menu`. Every expai page also has a "?" link to its help page (`expai/help/(page)/<name>`),
 and the dashboard's **Details** link to the models page (with `expai/model_manage`), the "EI: Summary" page
-(`expai/summary`, with `expai/facts`), the "Missing alt text" report and the help.
+(`expai/summary`, with `expai/summary`), the "Missing alt text" report and the help.
 
 ### Start writing
 
@@ -113,7 +113,9 @@ One row per model that had requests in the period and scope (Mine / Site), most 
   budget, or the web budget), other. **Replaced by the fallback N times** counts the requests that asked for this
   model and were answered by the site default instead (`requested_model_alias`, by `fallback_reason`); the model that
   answered says "answered N for another model".
-- **Latency**: the median of the successful requests, and the 95th percentile.
+- **Latency**: the median of the successful requests, and the 95th percentile; under it the median prompt of a
+  request (tokens read: input, cache write and cache read) and the share of all prompt tokens the server read from its
+  cache ([local-models.md](local-models.md), "Making a local model usable").
 - **Speed**: the median output speed (output tokens per second of a request) and the median time per turn (all
   requests of one panel message, field action or thread run added up: what the editor waited).
 - **Cost**: the estimated cost (hidden with `[Pricing] Enabled=false`; "unknown" when a price is missing).
