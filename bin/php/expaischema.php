@@ -5,7 +5,9 @@
  *
  *   php extension/expai/bin/php/expaischema.php --install [-s <siteaccess>]   creates the missing tables, columns and
  *                                                                             indexes in the siteaccess's database
- *                                                                             (idempotent; also the upgrade)
+ *                                                                             (idempotent; also the upgrade, which
+ *                                                                             renames role policies of pre-release
+ *                                                                             builds to the current function names)
  *   php extension/expai/bin/php/expaischema.php --check  [-s <siteaccess>]    says which tables, columns and indexes
  *                                                                             are missing
  *   php extension/expai/bin/php/expaischema.php --print=<engine>              prints the SQL of mysql, postgresql,
@@ -114,9 +116,16 @@ else
             }
             while ( $report['created'] + $report['linked'] > 0 && $report['candidates'] >= 500 );
         }
+        // role policies of pre-release builds get the function names of module.php (idempotent; expAiPolicyMigration)
+        if ( !$errors && class_exists( 'expAiPolicyMigration' ) )
+            foreach ( expAiPolicyMigration::run( false ) as $row )
+                $cli->output( "policy {$row['id']} of role " . ( $row['role'] !== '' ? $row['role'] : $row['role_id'] )
+                            . ": {$row['from']} renamed to {$row['to']}" );
     }
     elseif ( expAiThread::available() && ( $pendingThreads = expAiThreadMigration::pending() ) )
         $cli->output( "threads: $pendingThreads panel conversation(s) are not threads yet (--install migrates them)" );
+    if ( !$options['install'] && class_exists( 'expAiPolicyMigration' ) && ( $pendingPolicies = count( expAiPolicyMigration::pending() ) ) )
+        $cli->output( "policies: $pendingPolicies role policy(ies) of a pre-release build to rename (--install renames them)" );
     $missing = array_merge( expAiSchema::missingTables( $db ), expAiSchema::missingColumns( $db ) );
     if ( $missing )
     {
