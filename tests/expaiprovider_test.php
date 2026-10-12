@@ -50,7 +50,7 @@ $all->setVariable( 'ProviderSettings', 'Providers', array( 'anthropic', 'hugging
 $allConfig = new expAiConfig( $all );
 $allRegistry = $allConfig->registry();
 $check( 'all: model aliases', array_keys( $allRegistry->models() ), array( 'anthropic.claude-sonnet-5-5', 'anthropic.claude-opus-5-5', 'anthropic.claude-haiku-5-5',
-                                                                           'huggingface.gpt-oss-120b', 'openrouter.gpt-oss-120b', 'local.qwen3.5-4b' ) );
+                                                                           'huggingface.gpt-oss-120b', 'openrouter.gpt-oss-120b', 'local.qwen3.5-4b', 'local.qwen3.5-2b' ) );
 $check( 'all: local is slow', $allRegistry->getModel( 'local.qwen3.5-4b' )['slow'], true );
 $check( 'all: local provider class', get_class( $allRegistry->providerFor( 'local.qwen3.5-4b' ) ), 'expAiOpenAiChatProvider' );
 $check( 'all: huggingface model has write tools but needs the probe', $allRegistry->getModel( 'huggingface.gpt-oss-120b' )['write_gate'], 'probe' );
