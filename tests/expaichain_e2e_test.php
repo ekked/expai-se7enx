@@ -243,7 +243,9 @@ $engine->stop( $run, 'test stop' );
 $set( 'Chain_article', array( 'MaxCostPerRun' => '1.00' ) );
 
 // ------------------------------------------------------------------ 5. policy
-$check( 'policy: the chain limitation offers the chains', array_map( function ( $c ) { return $c['id']; }, ( new expAiChainPolicy() )->chains() ), array( 'article' ) );
+$offered = array_map( function ( $c ) { return $c['id']; }, ( new expAiChainPolicy() )->chains() );
+$check( 'policy: the chain limitation offers the configured chains', $offered, array_values( expAiChain::ids( expAiConfig::instance() ) ) );
+$check( 'policy: the shipped chain is among them', in_array( 'article', $offered, true ), true );
 $anonymous = eZUser::fetch( eZUser::anonymousId() );
 $check( 'policy: anonymous may not use chains', expAiChainPolicy::mayUse( 'article', $anonymous ), false );
 $check( 'policy: anonymous may not see a run', expAiChainPolicy::maySee( $run, $anonymous ), false );

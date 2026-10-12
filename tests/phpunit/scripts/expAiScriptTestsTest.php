@@ -67,7 +67,7 @@ class expAiScriptTestsTest extends expAiTestCase
             'expaifallback_e2e' => array( 'expaifallback_e2e', array( '-s', 'admin' ), $admin + array( 'url' => 'EXPAI_MOCK_URL' ), 'server.php',
                                           array( 'hfmock', 'ormock', 'deadlocal', 'deadremote' ), array(), true, 19 ),
             'expaichain_e2e' => array( 'expaichain_e2e', array( '-s', 'admin' ), $admin + array( 'url' => 'EXPAI_CHAIN_MOCK_URL' ), 'chain_server.php',
-                                       array( 'tch' ), array(), true, 42 ),
+                                       array( 'tch' ), array(), true, 43 ),
             'expaiqueue_e2e' => array( 'expaiqueue_e2e', array( '-s', 'admin' ), $admin + array( 'url' => 'EXPAI_BATCH_MOCK_URL' ), 'batch_server.php',
                                        array( 'tbanth', 'tboai', 'tbgem', 'tbmis', 'tbor' ), array( 'tb test group' ), false, 167 ),
         );

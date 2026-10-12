@@ -27,7 +27,8 @@
         {
             $data = xdebug_get_code_coverage();
             xdebug_stop_code_coverage( false );
-            file_put_contents( $file, serialize( $data ) );
+            // per process: a job a worker forks runs this too, and must not overwrite its parent's lines
+            file_put_contents( $file . '.' . getmypid(), serialize( $data ) );
         } );
     } );
 } )();

@@ -69,9 +69,10 @@ class expAiScriptRunner
 
         if ( $coverageFile !== null )
         {
-            if ( is_file( $coverageFile ) )
+            // one file per process of the script (a worker may fork for a job)
+            foreach ( (array) glob( $coverageFile . '.*' ) as $processFile )
             {
-                $raw = unserialize( (string) file_get_contents( $coverageFile ) );
+                $raw = unserialize( (string) file_get_contents( $processFile ) );
                 if ( is_array( $raw ) && $raw )
                     $coverage->append( self::paths( $coverage )
                                        ? SebastianBergmann\CodeCoverage\Data\RawCodeCoverageData::fromXdebugWithPathCoverage( $raw )
