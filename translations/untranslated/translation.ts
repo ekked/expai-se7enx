@@ -2289,6 +2289,22 @@
 <context>
     <name>extension/expai/panel</name>
     <message>
+        <source>%name: sent for approval as version %version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%name: published as version %version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sent for approval as version %version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Published as version %version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>(The answer was cut off at the length limit.)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2573,6 +2589,30 @@
 </context>
 <context>
     <name>extension/expai/usage</name>
+    <message>
+        <source>no price</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showing the requests without a price only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show them</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count without a price</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count requests without a price</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 request without a price</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>Estimated at prices as of %date; Anthropic's invoice is authoritative.</source>
         <translation type="unfinished"></translation>
@@ -3073,6 +3113,22 @@
 </context>
 <context>
     <name>extension/expai/vector</name>
+    <message>
+        <source>Back to Vector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It was deleted, or you may not open it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This thread no longer exists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Thread not found</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>Vector</source>
         <translation type="unfinished"></translation>

@@ -2289,6 +2289,22 @@
 <context>
     <name>extension/expai/panel</name>
     <message>
+        <source>%name: sent for approval as version %version</source>
+        <translation>%name: als Version %version zur Freigabe gesendet</translation>
+    </message>
+    <message>
+        <source>%name: published as version %version</source>
+        <translation>%name: als Version %version veröffentlicht</translation>
+    </message>
+    <message>
+        <source>Sent for approval as version %version</source>
+        <translation>Als Version %version zur Freigabe gesendet</translation>
+    </message>
+    <message>
+        <source>Published as version %version</source>
+        <translation>Als Version %version veröffentlicht</translation>
+    </message>
+    <message>
         <source>(The answer was cut off at the length limit.)</source>
         <translation>(Die Antwort wurde an der Längengrenze abgeschnitten.)</translation>
     </message>
@@ -2573,6 +2589,30 @@
 </context>
 <context>
     <name>extension/expai/usage</name>
+    <message>
+        <source>no price</source>
+        <translation>kein Preis</translation>
+    </message>
+    <message>
+        <source>Showing the requests without a price only.</source>
+        <translation>Es werden nur die Anfragen ohne Preis angezeigt.</translation>
+    </message>
+    <message>
+        <source>Show them</source>
+        <translation>Anzeigen</translation>
+    </message>
+    <message>
+        <source>%count without a price</source>
+        <translation>%count ohne Preis</translation>
+    </message>
+    <message>
+        <source>%count requests without a price</source>
+        <translation>%count Anfragen ohne Preis</translation>
+    </message>
+    <message>
+        <source>1 request without a price</source>
+        <translation>1 Anfrage ohne Preis</translation>
+    </message>
     <message>
         <source>Estimated at prices as of %date; Anthropic's invoice is authoritative.</source>
         <translation>Geschätzt mit den Preisen vom %date; maßgeblich ist die Rechnung von Anthropic.</translation>
@@ -3073,6 +3113,22 @@
 </context>
 <context>
     <name>extension/expai/vector</name>
+    <message>
+        <source>Back to Vector</source>
+        <translation>Zurück zu Vector</translation>
+    </message>
+    <message>
+        <source>It was deleted, or you may not open it.</source>
+        <translation>Er wurde gelöscht, oder Sie dürfen ihn nicht öffnen.</translation>
+    </message>
+    <message>
+        <source>This thread no longer exists</source>
+        <translation>Diesen Thread gibt es nicht mehr</translation>
+    </message>
+    <message>
+        <source>Thread not found</source>
+        <translation>Thread nicht gefunden</translation>
+    </message>
     <message>
         <source>Vector</source>
         <translation>Vector</translation>

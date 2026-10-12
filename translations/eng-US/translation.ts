@@ -2289,6 +2289,22 @@
 <context>
     <name>extension/expai/panel</name>
     <message>
+        <source>%name: sent for approval as version %version</source>
+        <translation>%name: sent for approval as version %version</translation>
+    </message>
+    <message>
+        <source>%name: published as version %version</source>
+        <translation>%name: published as version %version</translation>
+    </message>
+    <message>
+        <source>Sent for approval as version %version</source>
+        <translation>Sent for approval as version %version</translation>
+    </message>
+    <message>
+        <source>Published as version %version</source>
+        <translation>Published as version %version</translation>
+    </message>
+    <message>
         <source>(The answer was cut off at the length limit.)</source>
         <translation>(The answer was cut off at the length limit.)</translation>
     </message>
@@ -2573,6 +2589,30 @@
 </context>
 <context>
     <name>extension/expai/usage</name>
+    <message>
+        <source>no price</source>
+        <translation>no price</translation>
+    </message>
+    <message>
+        <source>Showing the requests without a price only.</source>
+        <translation>Showing the requests without a price only.</translation>
+    </message>
+    <message>
+        <source>Show them</source>
+        <translation>Show them</translation>
+    </message>
+    <message>
+        <source>%count without a price</source>
+        <translation>%count without a price</translation>
+    </message>
+    <message>
+        <source>%count requests without a price</source>
+        <translation>%count requests without a price</translation>
+    </message>
+    <message>
+        <source>1 request without a price</source>
+        <translation>1 request without a price</translation>
+    </message>
     <message>
         <source>Estimated at prices as of %date; Anthropic's invoice is authoritative.</source>
         <translation>Estimated at prices as of %date; Anthropic's invoice is authoritative.</translation>
@@ -3073,6 +3113,22 @@
 </context>
 <context>
     <name>extension/expai/vector</name>
+    <message>
+        <source>Back to Vector</source>
+        <translation>Back to Vector</translation>
+    </message>
+    <message>
+        <source>It was deleted, or you may not open it.</source>
+        <translation>It was deleted, or you may not open it.</translation>
+    </message>
+    <message>
+        <source>This thread no longer exists</source>
+        <translation>This thread no longer exists</translation>
+    </message>
+    <message>
+        <source>Thread not found</source>
+        <translation>Thread not found</translation>
+    </message>
     <message>
         <source>Vector</source>
         <translation>Vector</translation>
