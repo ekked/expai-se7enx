@@ -29,6 +29,10 @@ abstract class expAiTestCase extends PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // the server functions set a time limit for a web request (the model's timeout plus 30 s); in the suite it
+        // would count on through every later test, so every test starts without one
+        if ( function_exists( 'set_time_limit' ) )
+            set_time_limit( 0 );
         chdir( EXPAI_TEST_ROOT );
         expAiTestInstallation::forceFileMail();
         expAiTestInstallation::blockProviders();

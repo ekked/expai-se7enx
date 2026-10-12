@@ -72,10 +72,17 @@ class expAiTestMockServer
         if ( !self::$shutdownRegistered )
         {
             self::$shutdownRegistered = true;
-            register_shutdown_function( array( __CLASS__, 'stopAll' ) );
+            register_shutdown_function( array( __CLASS__, 'shutdown' ) );
         }
         self::$servers[$name] = array( 'process' => $process, 'url' => 'http://127.0.0.1:' . $port, 'state' => $state );
         return self::$servers[$name];
+    }
+
+    /** At the end of the process: PHPUnit's error handler is not wanted any more (a warning would end the run). */
+    public static function shutdown()
+    {
+        restore_error_handler();
+        self::stopAll();
     }
 
     /** Stops every server of this process and removes their state directories. */
@@ -105,7 +112,9 @@ class expAiTestMockServer
     }
 
     /**
-     * Removes a directory the suite made (only below its temporary directory).
+     * Removes a directory the suite made (only below its temporary directory), and the temporary directory itself
+     * once it is empty. It never raises a warning: it runs from shutdown functions too, where PHPUnit's error handler
+     * may still be installed and would turn a warning into a crash of the run.
      *
      * @param string $dir
      */
@@ -115,10 +124,45 @@ class expAiTestMockServer
         $real = realpath( $dir );
         if ( $base === false || $real === false || strpos( $real, $base . '/' ) !== 0 )
             return;
-        $items = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $real, FilesystemIterator::SKIP_DOTS ), RecursiveIteratorIterator::CHILD_FIRST );
-        foreach ( $items as $item )
-            $item->isDir() && !$item->isLink() ? @rmdir( $item->getPathname() ) : @unlink( $item->getPathname() );
-        @rmdir( $real );
-        @rmdir( $base );
+        set_error_handler( static function () { return true; } );
+        try
+        {
+            self::removeDirectory( $real );
+            if ( self::isEmptyDirectory( $base ) )
+                rmdir( $base );
+        }
+        finally
+        {
+            restore_error_handler();
+        }
+    }
+
+    /**
+     * @param string $dir
+     */
+    private static function removeDirectory( $dir )
+    {
+        if ( is_link( $dir ) || !is_dir( $dir ) )
+        {
+            if ( is_link( $dir ) || is_file( $dir ) )
+                unlink( $dir );
+            return;
+        }
+        $entries = scandir( $dir );
+        foreach ( is_array( $entries ) ? $entries : array() as $entry )
+            if ( $entry !== '.' && $entry !== '..' )
+                self::removeDirectory( $dir . '/' . $entry );
+        if ( self::isEmptyDirectory( $dir ) )
+            rmdir( $dir );
+    }
+
+    /**
+     * @param string $dir
+     * @return bool
+     */
+    private static function isEmptyDirectory( $dir )
+    {
+        $entries = is_dir( $dir ) ? scandir( $dir ) : false;
+        return is_array( $entries ) && count( $entries ) <= 2;
     }
 }
