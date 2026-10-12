@@ -148,6 +148,8 @@ if ( $view === 'drafts' )
             'name' => $object ? ( (string) $object->versionLanguageName( (int) $log->attribute( 'version' ), $log->attribute( 'language_code' ) ) ?: (string) $object->attribute( 'name' ) ) : '',
             'exists' => (bool) $object,
             'can_read' => $object ? (bool) $object->canRead() : false,
+            // the version view only while the logged version is still there (a discarded draft leaves the row)
+            'version_exists' => $object ? (bool) $object->version( (int) $log->attribute( 'version' ) ) : false,
             'links' => expAiLinks::build( (int) $log->attribute( 'contentobject_id' ), (int) $log->attribute( 'version' ), (string) $log->attribute( 'language_code' ),
                                           (int) $log->attribute( 'node_id' ), (string) $log->attribute( 'prompt_summary' ) !== '' ? (int) $log->attribute( 'id' ) : 0 ),
         );

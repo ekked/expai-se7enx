@@ -52,4 +52,4 @@ $tpl->setVariable( 'reserve_factor', $budget->reserveFactor() );
 $Result = array();
 $Result['content'] = $tpl->fetch( 'design:expai/budgets.tpl' );
 $Result['path'] = array( array( 'url' => 'expai/dashboard', 'text' => ezpI18n::tr( 'extension/expai/budget', 'Exponential Intelligence' ) ),
-                         array( 'url' => false, 'text' => ezpI18n::tr( 'extension/expai/budget', 'Budgets and lanes' ) ) );
+                         array( 'url' => false, 'text' => ezpI18n::tr( 'extension/expai/budget', 'EI: Budgets' ) ) );

@@ -24,5 +24,5 @@ $tpl->setVariable( 'pages', $help->pages() );
 
 $Result = array();
 $Result['content'] = $tpl->fetch( 'design:expai/help.tpl' );
-$Result['path'] = array( array( 'url' => 'expai/help', 'text' => ezpI18n::tr( 'extension/expai/help', 'Exponential Intelligence help' ) ),
+$Result['path'] = array( array( 'url' => 'expai/help', 'text' => ezpI18n::tr( 'extension/expai/help', 'EI: Help' ) ),
                          array( 'url' => false, 'text' => $page['title'] ) );

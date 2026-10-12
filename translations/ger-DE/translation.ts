@@ -397,6 +397,10 @@
 <context>
     <name>extension/expai/budget</name>
     <message>
+        <source>EI: Budgets</source>
+        <translation>EI: Budgets</translation>
+    </message>
+    <message>
         <source>Budgets and lanes</source>
         <translation>Budgets und Wege</translation>
     </message>
@@ -5070,6 +5074,10 @@
 <context>
     <name>extension/expai/help</name>
     <message>
+        <source>EI: Help</source>
+        <translation>EI: Hilfe</translation>
+    </message>
+    <message>
         <source>Exponential Intelligence help</source>
         <translation>Hilfe zu Exponential Intelligence</translation>
     </message>
@@ -5124,6 +5132,10 @@
 </context>
 <context>
     <name>design/admin/parts/setup/menu</name>
+    <message>
+        <source>Job queue</source>
+        <translation>Auftragswarteschlange</translation>
+    </message>
     <message>
         <source>AI models</source>
         <translation>KI-Modelle</translation>
@@ -5859,6 +5871,13 @@
     <message>
         <source>You may not edit this content in %language.</source>
         <translation>Sie dürfen diesen Inhalt in %language nicht bearbeiten.</translation>
+    </message>
+</context>
+<context>
+    <name>design/admin/parts/design/menu</name>
+    <message>
+        <source>Missing alt text</source>
+        <translation>Fehlender Alternativtext</translation>
     </message>
 </context>
 </TS>

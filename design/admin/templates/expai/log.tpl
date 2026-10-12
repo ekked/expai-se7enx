@@ -153,7 +153,7 @@
         <tbody>
 {foreach $rows as $row}
             <tr>
-                <td>{if and( $row.exists, $row.can_read )}<a href={concat( 'content/versionview/', $row.log.contentobject_id, '/', $row.log.version, '/', $row.log.language_code )|ezurl}>{$row.name|wash}</a>{elseif $row.exists}{'(no access)'|i18n( 'extension/expai/log' )}{else}{'(removed)'|i18n( 'extension/expai/log' )}{/if}</td>
+                <td>{if and( $row.exists, $row.can_read, $row.version_exists )}<a href={concat( 'content/versionview/', $row.log.contentobject_id, '/', $row.log.version, '/', $row.log.language_code )|ezurl}>{$row.name|wash}</a>{elseif and( $row.exists, $row.can_read )}{$row.name|wash}{elseif $row.exists}{'(no access)'|i18n( 'extension/expai/log' )}{else}{'(removed)'|i18n( 'extension/expai/log' )}{/if}</td>
                 <td>{$row.log.version}</td>
                 <td>{$row.log.created|l10n( 'shortdatetime' )}</td>
                 <td>{switch match=$row.log.source}{case match='edit'}{'Edit form'|i18n( 'extension/expai/log' )}{/case}{case}{'Panel'|i18n( 'extension/expai/log' )}{/case}{/switch}</td>

@@ -4,7 +4,7 @@
     <header class="exp-ai-head">
         <span class="exp-ai-mark" aria-hidden="true"></span>
         <div>
-            <h1 class="context-title">{'Budgets and lanes'|i18n( 'extension/expai/budget' )}</h1>
+            <h1 class="context-title">{'EI: Budgets'|i18n( 'extension/expai/budget' )}</h1>
             <p class="exp-ai-sub">{'Exponential Intelligence'|i18n( 'extension/expai/budget' )}</p>
         </div>
     </header>

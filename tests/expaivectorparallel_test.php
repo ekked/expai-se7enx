@@ -9,7 +9,8 @@
  * answer), Stop, and steering a running turn at the next call boundary.
  *
  * It creates a folder with two articles under the node EXPAI_TEST_PARENT (default 43, Media), as the user
- * EXPAI_TEST_LOGIN (default admin), and moves that folder to the trash at the end, with the threads and jobs it made.
+ * EXPAI_TEST_LOGIN (default admin), and moves that folder to the trash at the end, with the threads and jobs it made
+ * and the usage rows of its stub provider (model "stub"), so the dashboard's Models card shows real requests only.
  *
  *   php bin/php/ezexec.php extension/expai/tests/expaivectorparallel_test.php -s <admin siteaccess>
  *
@@ -49,6 +50,7 @@ if ( !$user || !expAiThread::available() || !expAiThreadRunner::queueAvailable()
 }
 eZUser::setCurrentlyLoggedInUser( $user, (int) $user->attribute( 'contentobject_id' ), eZUser::NO_SESSION_REGENERATE );
 $userID = (int) $user->attribute( 'contentobject_id' );
+$firstUsageID = (int) eZDB::instance()->arrayQuery( 'SELECT MAX(id) AS m FROM expai_usage_log' )[0]['m'];
 $ini = eZINI::instance( 'expai.ini' );
 $ini->setVariable( 'VectorSettings', 'KickWorker', 'disabled' );
 $ini->setVariable( 'VectorSettings', 'ParallelRuns', 'enabled' );
@@ -438,6 +440,16 @@ foreach ( $threads as $t )
     $db->query( 'DELETE FROM expqueue_resource WHERE resource_key = \'expai.thread:' . (int) $t->attribute( 'id' ) . '\'' );
     $t->removeAll( true );
 }
+$removedUsage = 0;
+foreach ( eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), null, array( 'id' => array( '>', $firstUsageID ), 'user_id' => $userID ), null, null, true ) as $row )
+{
+    if ( in_array( (string) $row->attribute( 'model' ), array( 'stub', 'stub-model' ), true ) )
+    {
+        $row->remove();
+        ++$removedUsage;
+    }
+}
+echo "removed $removedUsage usage row(s) of the stub provider\n";
 eZContentObjectTreeNode::removeSubtrees( array( (int) $folderNode->attribute( 'node_id' ) ), true );
 $check( !eZContentObjectTreeNode::fetch( (int) $folderNode->attribute( 'node_id' ) ) || true, 'test folder moved to the trash' );
 echo ( $failures ? 'FAIL' : 'PASS' ) . " expai vector parallel runs and steering: $failures failure(s)\n";

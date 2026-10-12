@@ -4,7 +4,7 @@
     <header class="exp-ai-head">
         <span class="exp-ai-mark" aria-hidden="true"></span>
         <div>
-            <h1 class="context-title">{'Exponential Intelligence help'|i18n( 'extension/expai/help' )}</h1>
+            <h1 class="context-title">{'EI: Help'|i18n( 'extension/expai/help' )}</h1>
             <p class="exp-ai-sub">{'The documentation of this installation\'s version, file %file'|i18n( 'extension/expai/help',, hash( '%file', $page.file ) )|wash}</p>
         </div>
     </header>
