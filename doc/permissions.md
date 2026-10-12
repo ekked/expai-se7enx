@@ -4,7 +4,7 @@
 
 | Policy | Allows |
 | --- | --- |
-| `expai/write` | The Intelligence tab, the edit form controls, every ezjscore function except `labels`, the dashboard page (own usage), the dashboard block, the left menu entries, `expai/log` (own requests and versions) |
+| `expai/write` | The Intelligence tab, the edit form controls, every ezjscore function except `labels`, the dashboard page (own usage), the dashboard block, the left menu entries, `expai/log` (own requests and versions), the "Missing alt text" report (`expai/alttext`), the help pages (`expai/help`) |
 | `expai/log` | everyone's requests and versions on `expai/log` (filter by user with `/(user)/<id>`), the "Site" view of the dashboard with the top users, the site limits |
 | `expai/settings` | for administrators: the dashboard's Details show where the site default model is set (settings file and placement) |
 | `expai/model_use` | choosing models of providers outside `[ProviderSettings] ProvidersWithoutPolicy[]` (default: every provider but anthropic). Limitation **Provider**: only the models of those providers. Without it a user has the site default and the open providers' models; a model posted that is not allowed is refused ("This model is not available.") |
@@ -16,7 +16,7 @@
 | `expai/chain` | AI chains ([chains.md](chains.md#permissions)): with `expai/write`, starting runs (Intelligence tab, dashboard), the view `expai/chain`, approving, asking for changes, stopping and continuing runs at their checkpoint. Limitation **Chain**: only those chains |
 | `expai/web` | the web and history tools in the panel ([tools.md](tools.md#web-and-history-tools)). Limitation **Tool**: `web_fetch`, `web_search`, `project_history`; without it all three (each is still offered only once configured) |
 | `expai/translation_sync` | in the Translations section of the Intelligence tab: Check translations, Approve, Translate in full, Skip (`expaitranslation::check`, `approve`, `skip`), with `expai/write`; Approve and Skip also need `content/edit` in that language ([translation-sync.md](translation-sync.md)) |
-| `expai/facts` | the view `expai/facts`, the printable "AI facts" page (Setup > AI facts, and a link in the dashboard's Details): providers, regions, retention, where keys come from (never the keys), roles, lanes, data policy, limits, tools ([ai-facts.md](ai-facts.md)). Needs no other expai policy and no content access |
+| `expai/facts` | the view `expai/facts`, the printable "AI facts" page (Setup > AI facts, and a link in the dashboard's Details): providers, regions, retention, where keys come from (never the keys), roles, lanes, data policy, limits, tools ([ai-facts.md](ai-facts.md)), and the help pages (`expai/help`). Needs no other expai policy and no content access |
 | `expai/services` | service tools: the read services of expservices that opted in, called by the assistant as the editor ([service-tools.md](service-tools.md)); each call also needs `ezjscore/call` and the access the service declares. Limitation **Domain**: only the services of those domains (`node`, `tags`, ...); without it every opted-in service |
 
 `expai/log` also opens `expai/budgets` (the site budget, job groups, lanes, batches); with `expai/settings` its

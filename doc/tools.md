@@ -1,4 +1,4 @@
-# The tools Claude can call
+# The tools the model can call
 
 The tools of `[ToolSettings] Tools[]` are offered to the model in every panel call (a conversation keeps the
 definitions it started with). Each runs in-process with the kernel API as the current user. A result is JSON, cut to

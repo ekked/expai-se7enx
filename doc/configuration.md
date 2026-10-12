@@ -282,7 +282,7 @@ a group. Shipped: `anthropic.standard`, `anthropic.batch`, `anthropic.fast` (dis
 | `BatchCollectSeconds` | `300` | How long waiting requests are collected before a batch is submitted. |
 | `PollSeconds` | `300` | Seconds between two polls of a batch. |
 | `DeleteAfterFetch` | `enabled` | Delete the batch (and its files) at the provider after its results were fetched. |
-| `ExpiredLane` | `standard` | Where an expired or cancelled batch request goes. |
+| `ExpiredLane` | `standard` | Where an expired or canceled batch request goes. |
 | `Verified`, `Source`, `Label` | | When and where the offer was read; a label. |
 
 `[Provider_<id>] Lanes[]` and `[Model_<alias>] Lanes[]`, when set, restrict the lanes of a provider and a model. The
@@ -385,13 +385,13 @@ See [mcp.md](mcp.md).
 
 | File | What it sets |
 | --- | --- |
-| `module.ini` | `ModuleList[]=expai` (policies `expai/write`, `expai/log`, `expai/settings`, `expai/model_use`, `expai/model_manage`, `expai/mcp`; views expai/dashboard, expai/log, expai/models) |
+| `module.ini` | `ModuleList[]=expai`: the module with every policy of [permissions.md](permissions.md) and the views expai/dashboard, log, vector, stream, chain, alttext, models, budgets, packages, facts and help |
 | `ezjscore.ini` | `[ezjscServer] FunctionList[]=expai`, `[ezjscServer_expai] Class=expAiServerFunctions`, `Functions[]=expai` |
 | `design.ini` | `DesignExtensions[]=expai`, `BackendJavaScriptList[]=expai.js`, `BackendCSSFileList[]=expai.css` |
 | `admininterface.ini` | the tabs `expai` (content navigation part) and `expai_media` (media), header template `expai_header.tpl`, body `expai.tpl` |
 | `content.ini` | `[EditSettings] AdditionalTemplates[]=content/edit/expai.tpl` |
-| `menu.ini` | `[Leftmenu_my] Links[expai]=expai/dashboard` and `Links[expai_log]=expai/log`, shown with `expai/write` |
-| `cronjob.ini` | the cronjob part `expai` (`expai_prune.php`: removes usage rows older than `RetentionDays`) |
+| `menu.ini` | the entries of the Dashboard menu (`[Leftmenu_my]`: the dashboard, Vector, the log, Chains, Missing alt text, the help) and of Setup (`[Leftmenu_setup]`: AI facts, AI models, Budgets and lanes, Content packages), each with its policies ([dashboard.md](dashboard.md)) |
+| `cronjob.ini` | the cronjob part `expai`: `expai_queue.php` (resumes held jobs, releases lost batch submits), `expai_prune.php` (usage rows older than `RetentionDays`), `expai_thread_prune.php` (thread events, proposals, checkpoints); run it with `-s <admin siteaccess>` |
 | `dashboard.ini` | the dashboard block `expai_drafts` (Priority 35, 5 items, `expai/write`) |
 | `browse.ini` | `[ExpAiStartWriting]`: the content browser of "Change location" (single node) |
 | `site.ini` | `TranslationExtensions[]=expai`, `[TemplateSettings] ExtensionAutoloadPath[]=expai` (the template operators `expai_money`, `expai_tokens`, `expai_number`) |

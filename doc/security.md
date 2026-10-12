@@ -28,14 +28,18 @@ for this editor and still the editor's own drafts.
 
 - Panel: the instructions (with the open node's name, class, path and the site's default language), the tool
   definitions, the editor's messages, and the results of the tools the model calls: names and field values of
-  content the editor may read, class definitions. Images and files are not sent (only alt texts), user account fields
+  content the editor may read, class definitions. Images are not sent here (only their alt texts), files and user account fields
   never.
 - Edit form: the object's name and class, the field, its current value and the other fields' current values in the
   form (about 30 KB at most), the editor's instruction.
+- Alt text: the stored image of the field (scaled down to `MaxEdge` when larger, as base64 inside the request), the page title, the text of the
+  other fields and the language, to a vision model whose provider meets the data policy for images; the request log
+  never keeps the pixels ([alt-text.md](alt-text.md)).
 - Not sent: the editor's name, login or e-mail, passwords, session data, the content of other users' drafts.
 
-Choose a provider account and data retention that fit your content. With Anthropic, see their commercial terms and
-data retention options.
+Choose a provider account and data retention that fit your content: the provider's commercial terms and retention
+options, written into `Region`, `Retention` and `TermsCheckedAt` ([data-policy.md](data-policy.md)). The "AI facts"
+page sums it up for a data protection officer ([ai-facts.md](ai-facts.md)).
 
 ## Several providers
 

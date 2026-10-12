@@ -88,7 +88,7 @@ While the run waits, an editor who may act on it (below) has three buttons:
 - **Ask for changes** (a note is required): the note goes to the revise step as a high-severity issue, then the review
   runs again (with a fresh count of three), then SEO and QA, and the run is back at the checkpoint. The same draft is
   updated; no second object is created.
-- **Stop the run**: the run's queued jobs are cancelled. The draft stays a draft; discard it like any other.
+- **Stop the run**: the run's queued jobs are canceled. The draft stays a draft; discard it like any other.
 
 A run that is held by its budget offers "Continue with a higher run budget"; any run that has not ended can be stopped.
 

@@ -2,8 +2,8 @@
 
 | Document | What it covers |
 | --- | --- |
-| [../README.md](../README.md) | What expai is, features, quick start |
-| [../INSTALL.md](../INSTALL.md) | Requirements, activation, API key, tables, policies, caches, Velocity, first check |
+| [../README.md](../README.md) | What expai is, why, features, provider support, requirements, quick start |
+| [../INSTALL.md](../INSTALL.md) | Requirements, activation, keys, tables, roles and policies, caches, Velocity, cron parts, streaming, checks, the install and upgrade checklist |
 | [../USAGE.md](../USAGE.md) | For editors: the Intelligence tab, the edit form, the label, approval, the dashboard |
 | [architecture.md](architecture.md) | How the parts fit: browser, ezjscore, the step loop, tools, provider, storage, long turns |
 | [configuration.md](configuration.md) | Every setting of expai.ini and the other settings files, with default and effect |
@@ -34,11 +34,11 @@
 | [ai-facts.md](ai-facts.md) | The printable "AI facts" page (expai/facts) for a data protection officer: providers, regions, key sources, roles, lanes, limits, tools |
 | [dashboard.md](dashboard.md) | expai/dashboard (figures, chart, limits, Start writing, view parameters), the menu entries, the dashboard block, the log page |
 | [usage-tracking.md](usage-tracking.md) | What is recorded per request, turns, the estimated cost and how to check it, limits, retention, privacy |
-| [tools.md](tools.md) | Every tool Claude can call: input, result, permission checks, limits |
+| [tools.md](tools.md) | Every tool the model can call: input, result, permission checks, limits |
 | [service-tools.md](service-tools.md) | Service tools: one expservices declaration as HTTP endpoint, MCP tool and assistant tool; opting in, checks, the tested example |
 | [approval-workflow.md](approval-workflow.md) | Drafts, ezapprove, the collaboration item and the label, the tested path |
 | [security.md](security.md) | The key, permissions as the user, no auto-publish, prompt injection, logging and privacy |
-| [database.md](database.md) | The four tables, per engine, the install and upgrade script |
+| [database.md](database.md) | The 15 tables, per engine, the install and upgrade script |
 | [extending.md](extending.md) | Adding field actions, panel sections, tools, providers, JavaScript hooks (worked examples) |
 | [customization.md](customization.md) | Template overrides, CSS tokens, labels, translations, instructions |
 | [translations.md](translations.md) | Contexts, the shipped languages, adding one |
@@ -46,3 +46,15 @@
 | [faq.md](faq.md) | Short answers |
 | [changelog/0.1.0.md](changelog/0.1.0.md) | The first release |
 | [examples/expaiexample](examples/expaiexample) | The example extension of extending.md |
+
+## Help in the administration interface
+
+Every page above is also part of the administration interface: `expai/help` (Dashboard > Exponential Intelligence
+help) shows this index, `expai/help/(page)/<name>` one page (`readme`, `install`, `usage`, the name of a `doc/*.md`
+without `.md`, or `changelog-<version>`), and each expai page (the dashboard, the Intelligence tab, Vector, AI facts,
+the "Missing alt text" report, chains, content packages) has a "?" link to its page. The pages are rendered from the
+installed files, so they always match the installed version. Policy: `expai/write` or `expai/facts`.
+
+The rendering is a Markdown subset (headings, paragraphs, lists, tables, code, emphasis, links) by `expAiHelp`
+(classes/expaihelp.php): every character of a document is escaped, only the renderer's own tags are written, and
+links are kept only to other help pages, anchors, http(s) and mailto addresses. Test: `tests/expaihelp_test.php`.

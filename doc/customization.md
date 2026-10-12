@@ -16,13 +16,21 @@ expai:
 | `expai/dashboard.tpl`, `expai/browse_start_writing.tpl` | the dashboard page, the browser's description |
 | `dashboard/expai_drafts.tpl` | the dashboard block |
 | `expai/log.tpl` | the log page |
+| `expai/panel/threads.tpl`, `expai/panel/chains.tpl`, `expai/panel/translations.tpl` | the panel's threads, chains and translations sections |
+| `expai/edit/presets.tpl`, `expai/edit/alttext.tpl` | the presets, the Improve menu, the defaults line; the "Write alt text" button |
+| `expai/vector.tpl`, `expai/vector/pane_*.tpl` | Vector and its right panes (plan, changes, cost) |
+| `expai/chain.tpl`, `expai/chain_run.tpl`, `expai/chains/*.tpl` | AI chains: the runs, one run, the prompt of each step |
+| `expai/alttext.tpl` | the "Missing alt text" report |
+| `expai/models.tpl`, `expai/budgets.tpl`, `expai/packages.tpl`, `expai/facts.tpl` | models and providers, budgets and lanes, content packages, the "AI facts" page |
+| `expai/help.tpl`, `expai/parts/help_link.tpl` | the help pages, the "?" link of each page |
+| `expai/parts/*.tpl` | shared parts: the model picker, bars, trends, links, budget summary, thread cards |
 
 Keep the classes and ids expai.js uses (`#exp-ai-panel`, `.exp-ai-log`, `.exp-ai-input`, `.exp-ai-send`, ... in the
 shipped templates). To add, not replace, use sections (extending.md).
 
-## Colours and look
+## Colors and look
 
-expai.css scopes everything to `.exp-ai` and `.exp-ai-badge` and takes its colours from tokens, which follow the admin4
+expai.css scopes everything to `.exp-ai` and `.exp-ai-badge` and takes its colors from tokens, which follow the admin4
 tokens where they exist (light and dark) and fall back otherwise:
 
 | Token | Default | Used for |
@@ -60,7 +68,7 @@ reword a text, add your own translation of the message (also for eng-US) in the 
   the HTML subset, no images, no invented facts, language), `panelSystem()` and `fieldSystem()`. To change them
   beyond ExtraInstructions, extend expAiAssistant / a field action handler in your extension.
 
-## Behaviour per class or section
+## Behavior per class or section
 
 - Which classes it may create, and where, follows the editor's `content/create` policies (class, section, subtree,
   parent class, language): restrict an editor role, and expai follows.

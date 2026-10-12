@@ -6,7 +6,7 @@ caller's own permissions.
 The extension expservices (part of the Exponential distribution) declares its remote services in the static
 `$services` of each domain class. That one declaration already makes a service an HTTP endpoint
 (`ezjscore/call/exp<domain>::<method>`) and, through the extension expmcp, an MCP tool (`exp_svc_<domain>_<method>`).
-expai reads the same catalogue and offers a service to the model as a tool of the same name, but only when the
+expai reads the same catalog and offers a service to the model as a tool of the same name, but only when the
 service opts in. Services are private to the assistant by default.
 
 ## The example: one declaration, three channels
@@ -36,7 +36,7 @@ class expAiExampleServices extends expServiceBase
 | Channel | How it is reached | Who it runs as |
 | --- | --- | --- |
 | HTTP | `GET /ezjscore/call/expexample::childNames::2` (session or API token) | the signed-in user |
-| MCP | the tool `exp_svc_example_child_names` that expmcp generates from the catalogue | expmcp's service account (`[Services] ServiceUserLogin` of expmcp.ini) |
+| MCP | the tool `exp_svc_example_child_names` that expmcp generates from the catalog | expmcp's service account (`[Services] ServiceUserLogin` of expmcp.ini) |
 | The assistant | the tool `exp_svc_example_child_names`, because of `'ai' => true` | the editor in the panel, Vector or a chain step |
 
 The test `tests/expaiservicetools_test.php` loads this example and checks all three channels: the router finds it and
@@ -56,7 +56,7 @@ the same rows as HTTP.
 | `expai.ini [ServiceTools] Enabled` | `disabled` | no service is offered |
 
 A service whose declaration says `'write' => true` is never offered, whatever the declaration or the settings say:
-this release offers reads only (writes are planned as staged proposals the editor reviews). The catalogue
+this release offers reads only (writes are planned as staged proposals the editor reviews). The catalog
 (`expservices::catalog`) reports the flag as `ai`; `expAiServiceTools::report()` lists every opted-in read service
 with its state on the site.
 
@@ -95,7 +95,7 @@ error: Node 9 does not exist"), so the model can correct its call. A long answer
 The call runs in process, as `eZUser::currentUser()`, through `expServiceBase::invoke()`, the same entry the HTTP
 router uses. Before it:
 
-1. the policy `expai/services` (limitation Domain: the domains of the catalogue) - without it no service is offered;
+1. the policy `expai/services` (limitation Domain: the domains of the catalog) - without it no service is offered;
 2. the policy `ezjscore/call`, and the router's own check of the domain (`Functions` / `PermissionPrFunction` of its
    `[ezjscServer_exp<domain>]` block), exactly as for HTTP;
 3. the service's own `access` declaration (`public`, `user` or `array( module, function )`); the service then checks

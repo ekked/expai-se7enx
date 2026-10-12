@@ -289,7 +289,7 @@ answer text must follow) and `max_tokens`. The answer: `content` (blocks: `text`
 Throw `expAiException` on failure (its code is the HTTP status; set `$e->rateLimits` to the rate limit headers if the
 API sent any). A provider for a chat completions API maps tools and tool calls to that API's form.
 
-For the usage log and the limits, a provider returns optionally `tokens` — the usage normalised to
+For the usage log and the limits, a provider returns optionally `tokens` — the usage normalized to
 `array( 'input' => ..., 'output' => ..., 'cache_write' => ..., 'cache_read' => ... )` (without it the Anthropic
 `usage` fields are read) — and `http_status`, `retries` and `rate_limits` (header name => value). `providerId()`
 is stored with every row, so the log and the dashboard can tell providers apart. Costs come from the `[Pricing]`

@@ -30,7 +30,7 @@ turns with their totals; opening a turn shows its requests.
 
 ### Providers
 
-The provider normalises the usage it reports into the four token counts (an OpenAI-style provider's cached tokens are
+The provider normalizes the usage it reports into the four token counts (an OpenAI-style provider's cached tokens are
 taken out of the input and counted as cache reads, as Anthropic reports them), plus reasoning tokens and a cost it
 reported. The row stores the provider id, the model alias, the provider's region and retention, and the tool mode, so
 every provider's rows are counted the same way ([providers.md](providers.md), extending.md).
@@ -91,7 +91,7 @@ checked before a request is sent; when one is reached the editor sees which limi
 is not sent. The dashboard shows a bar for every limit that is set.
 
 Anthropic's own limits apply in addition: the rate limits of the key (the dashboard shows what the last response
-reported; a rate-limited request fails with "busy or over its limit, try again later" and is recorded with its `retry-after`; there is no automatic retry) and the organisation's
+reported; a rate-limited request is retried once when its `retry-after` is short (at most `RetryAfterMax` seconds, [providers.md](providers.md)), otherwise it fails with "busy or over its limit, try again later" and is recorded with its `retry-after`) and the organization's
 monthly spend limit, which an API key cannot read: see it in the Claude Console.
 
 ## Retention

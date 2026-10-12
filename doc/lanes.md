@@ -117,9 +117,9 @@ fast or flex request the provider served at its standard tier is billed at 100 %
    - succeeded: a usage row (lane `batch`, the lane's price factor, the batch id, the job), the reservation settled,
      the answer stored in the request job's checkpoint, the job woken to apply it;
    - errored: a request the provider calls invalid ends dead; any other error waits for the next batch;
-   - expired or cancelled: the job moves to `ExpiredLane` (standard) and runs there.
+   - expired or canceled: the job moves to `ExpiredLane` (standard) and runs there.
    Then the batch is deleted at the provider (`DeleteAfterFetch`), before its retention ends.
-4. A batch whose requests were all cancelled is cancelled at the provider.
+4. A batch whose requests were all canceled is canceled at the provider.
 
 The batch API shapes (classes `expAiBatchAnthropic`, `expAiBatchOpenAi`, `expAiBatchGemini`, `expAiBatchMistral`,
 `expAiBatchOpenRouter`):
@@ -136,7 +136,7 @@ Gemini's batch API is its native API; its key is sent as `x-goog-api-key` (the p
 
 ## Admin and command line
 
-- Setup > Exponential Intelligence > Budgets and lanes (`expai/budgets`): the lanes of every model, the provider
+- Setup > Budgets and lanes (`expai/budgets`): the lanes of every model, the provider
   batches with their state and whether they were deleted at the provider.
 - The expqueue pages show the jobs (`expai.request`, `expai.batch.submit`, `expai.batch.poll`) with their lane, events
   and results.

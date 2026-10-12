@@ -85,7 +85,7 @@ edit the object in that language:
 | Check translations | decides again for every translation (and queues small patches) |
 | Approve | queues what was decided (patch or full) |
 | Translate in full | queues a full translation instead of a patch |
-| Skip | marks the translation as up to date with the current source version (a queued job is cancelled) |
+| Skip | marks the translation as up to date with the current source version (a queued job is canceled) |
 
 The section loads through ezjscore (`expaitranslation::status`, `check`, `approve`, `skip`, POST with the form
 token), so nothing personal is in the cached view; while a job is queued it asks again every 5 seconds.

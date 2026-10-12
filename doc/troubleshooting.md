@@ -1,6 +1,7 @@
 # Troubleshooting
 
-Each entry was met while building and testing 0.1.0.
+Each entry was met while building and testing 0.1.0. The help pages of the administration interface
+(`expai/help`) show this page too.
 
 ## The Intelligence tab is missing
 
@@ -68,6 +69,23 @@ A conversation that was bound to it goes on with the default and returns to the 
 One model call took longer than `[AISettings] Timeout`, or the web server cut the request. Keep Timeout below the
 web server's and proxy's timeouts (architecture.md, "Long turns"); ask for less per message (two articles rather than
 ten). **Continue** resumes from what was stored.
+
+## 504 Gateway Timeout, or "The model ... is too slow for field actions here"
+
+A web server ends a request after its own limit (Velocity after its request timeout, Apache after its proxy timeout)
+and the browser then gets a 504 instead of an answer. A local model can need a minute to load and writes a few tokens
+per second, so a call to it from a page request does not fit. expai therefore never makes such a call from a web
+request (`[WebBudget]`, [configuration.md](configuration.md)):
+
+- **Test prompt** and **Load model** on expai/models run as jobs; the page shows "Testing…" and then the result
+  ([local-models.md](local-models.md), "Test prompt and Load model"). If "Testing…" stays at "waiting for a worker",
+  no worker runs: see "Queued work never starts" below.
+- **Turns** in the Intelligence tab and in Vector run in the background for slow models ([vector.md](vector.md)).
+- **Field actions**, presets and the fill of the edit form refuse a slow model with "The model ... is too slow for
+  field actions here (more than ... seconds per request)": choose another model in the model menu of the edit form,
+  or use the Intelligence tab. A model counts as slow when it is marked `Slow=true`, belongs to a provider with
+  `Managed=ollama`, or took longer than `[WebBudget] Seconds` on average over its last requests. Behind a web server
+  with a long timeout, `[WebBudget] SlowModels=allow` (or `[Model_<alias>] RunInBackground=never`) lets it through.
 
 ## "You do not have access to Exponential Intelligence." / an ezjscore access error
 
@@ -140,3 +158,39 @@ bar. Raise or empty the setting, or wait for the reset.
 
 expai's pages read view parameters only: `expai/dashboard/(period)/30d`, `expai/log/(from)/2026-10-01`. Query strings
 are ignored. See dashboard.md.
+
+## Queued work never starts (chains, batches, alt text suggestions, background runs stay "queued")
+
+- The cron part of expqueue (or its systemd worker) does not run, or runs without `-s <admin siteaccess>` while expai
+  is an access extension of the admin siteaccess only: the worker then does not know expai's job types. Run
+  `php runcronjobs.php -q -s <admin siteaccess> expqueue` every minute ([../INSTALL.md](../INSTALL.md), "Cron parts
+  and the job queue").
+- A budget holds the jobs: expai/budgets shows them as held, with the reason; the cron part `expai` (also with
+  `-s <admin siteaccess>`) resumes them once they fit ([budgets.md](budgets.md)).
+- The master switch is off for the siteaccess the jobs were queued from: they are held with "switched off: ..."
+  ([switch-and-veto.md](switch-and-veto.md)).
+
+## Vector and the Intelligence tab update only every few seconds
+
+The live stream (`expai/stream`) does not reach the browser, so it polls instead. Usually a buffer in between:
+
+- Apache's FastCGI worker without `flushpackets=on`, or a handler of the hosting panel that wins over the vhost's
+  (set the handler inside the `<Directory>` of the document root, [../INSTALL.md](../INSTALL.md), "Streaming and
+  long requests");
+- a proxy or CDN that buffers or compresses `text/event-stream` (expai sends `X-Accel-Buffering: no` for nginx);
+- `[VectorSettings] Transport=poll`, or more open streams than `MaxStreams` (the answer is then 204 and the browser
+  polls).
+
+The browser's developer tools show the stream request: it should answer `200` with `text/event-stream` and a first
+line `: ok` at once.
+
+## The site stops answering after the proxy to PHP-FPM was changed
+
+`enablereuse=on` on the FastCGI worker keeps one PHP-FPM child per idle Apache thread; with a small pool all
+children are held and new requests wait. Remove `enablereuse` (keep `flushpackets=on`) and reload Apache.
+
+## A help page says "not found"
+
+`expai/help/(page)/<name>` knows the extension's own documents only: `readme`, `install`, `usage`, `index`, the name
+of a `doc/*.md` without `.md` (`providers`, `vector`, `ai-facts` ...) and `changelog-<version>`. The pages are read
+from the installed extension, so they always match its version.

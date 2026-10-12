@@ -20,6 +20,25 @@ PolicyList_expai[]=expai/write
 CheckViewAccess`, one the user cannot open), so users without `expai/write` never see it. The name is translated in
 the menu's context `design/admin/parts/my/menu` (expai ships it).
 
+All menu entries of expai (settings/menu.ini.append.php), each shown only with its policies:
+
+| Menu | Entry | View | Policies |
+| --- | --- | --- | --- |
+| Dashboard | Exponential Intelligence | `expai/dashboard` | `expai/write` |
+| Dashboard | Vector | `expai/vector` | `expai/write`, `expai/vector` |
+| Dashboard | Exponential Intelligence log | `expai/log` | `expai/write` |
+| Dashboard | Chains | `expai/chain` | `expai/write`, `expai/chain` |
+| Dashboard | Missing alt text | `expai/alttext` | `expai/write` |
+| Dashboard | Exponential Intelligence help | `expai/help` | `expai/write` |
+| Setup | AI facts | `expai/facts` | `expai/facts` |
+| Setup | AI models | `expai/models` | `expai/model_manage` |
+| Setup | Budgets and lanes | `expai/budgets` | `expai/log` |
+| Setup | Content packages | `expai/packages` | `expai/package_import` |
+
+The Setup entries are translated in `design/admin/parts/setup/menu`. Every expai page also has a "?" link to its help
+page (`expai/help/(page)/<name>`), and the dashboard's **Details** link to the models page (with
+`expai/model_manage`), the "AI facts" page (with `expai/facts`), the "Missing alt text" report and the help.
+
 ### Start writing
 
 The card preselects a location: `expai.ini [DashboardSettings] DefaultNodeID`, or, when empty, `content.ini
@@ -41,11 +60,11 @@ anywhere below it, within the editor's own permissions.
 - **Status line**: Ready / Switched off / Not configured, the model in use, whether an approval workflow runs before
   publishing. **Details** opens: the model choice (when `AllowUserModelChoice` is on), whether the user may create
   and edit content (everywhere, in some places, nowhere: the access words of `content/create` and `content/edit`),
-  with `expai/settings` where the site default model is set, the price table's date, and a note on Anthropic's
-  organisation spend limit (visible in the Claude Console only). The key is never shown.
+  with `expai/settings` where the site default model is set, the price table's date, and a note on the organization's
+  spend limit at Anthropic (visible in the Claude Console only). The key is never shown.
 - **Four figures** for the period: estimated cost (hidden with `[Pricing] Enabled=false`), tokens (abbreviated, with
   input · output · cached below and the exact numbers as a tooltip), requests (average time, errors), drafts (how
-  many were sent or published). Each shows ▲ / ▼ and the change in per cent when the period before had data, and
+  many were sent or published). Each shows ▲ / ▼ and the change in percent when the period before had data, and
   nothing otherwise.
 - **Start writing** (below).
 - **Limits**: a bar for each limit of `[Limits]` that is set (site limits only with `expai/log`), with when it resets;
@@ -122,4 +141,4 @@ expai/models).
 
 `sort` is one of `created` (default), `latency_ms`, `input_tokens`, `output_tokens`; `dir` `desc` (default) or
 `asc`; `action` one of `panel`, `fill`, `field:<name>`, `probe`, `test`; `provider` a provider id; `region` `us`, `eu` or
-`local`. `user` is honoured only with `expai/log`.
+`local`. `user` is honored only with `expai/log`.

@@ -27,9 +27,9 @@ A block is an array:
 | `type` | `paragraph`, `heading`, `list_item`, `table_cell`, `custom`, `value`, `keyword` |
 | `text` | readable text; atoms as `[[embed object 12]]` |
 | `coded` | the text with inline markup as placeholders (rich text), else the text |
-| `hash` | identity of type, normalised text and markup shape: equal hashes are equal blocks |
-| `text_hash` | identity of the normalised text only: a different `hash` with the same `text_hash` is a change of markup only |
-| `chars` | characters of the normalised text |
+| `hash` | identity of type, normalized text and markup shape: equal hashes are equal blocks |
+| `text_hash` | identity of the normalized text only: a different `hash` with the same `text_hash` is a change of markup only |
+| `chars` | characters of the normalized text |
 | `sentences` | list of `{text, hash, chars}` |
 | `atoms` | embeds, images, anchors the block contains |
 | `mergeable` | false for table cells: they cannot be inserted or removed alone |
@@ -55,7 +55,7 @@ server). A boundary is `.`, `!`, `?` or `…`, optional closing quotes or bracke
 digit or an opening quote. A full stop does not end a sentence after an abbreviation of the language (built in for
 English and German, more in `[DiffSettings] Abbreviations[<family>]`, also written with inner spaces: `z. B.`,
 `d. h.`, `e.g.`), after a single letter (initials), after a number in German (ordinals: `am 3. Oktober`), or after a
-number followed by a lower-case word. Text is normalised before hashing: Unicode NFC, white space collapsed,
+number followed by a lower-case word. Text is normalized before hashing: Unicode NFC, white space collapsed,
 typographic quotes, dashes and non-breaking spaces replaced.
 
 ## Alignment and hunks
