@@ -51,6 +51,18 @@ class expAiSummary
         );
     }
 
+    /**
+     * #389 the summed cost of usage totals (expAiUsage::aggregate()): the priced requests, "≈" when fallback prices
+     * were used, and "(15 requests without a price)" when some had none; the same figure as the dashboard and the log.
+     * @return string
+     */
+    public static function costText( array $totals )
+    {
+        $text = expAiCost::money( $totals['cost'], !empty( $totals['cost_approx'] ) );
+        $note = expAiUsage::unpricedNote( isset( $totals['unpriced'] ) ? $totals['unpriced'] : 0 );
+        return $note !== '' ? $text . ' (' . $note . ')' : $text;
+    }
+
     /** @return string a region in words: US, EU, this server, unknown (translated) */
     public static function regionLabel( $region )
     {
@@ -172,7 +184,7 @@ class expAiSummary
                 'models' => $models, 'lanes' => $lanes, 'threshold' => $threshold,
                 'usage' => array( 'requests' => (int) $usage['totals']['requests'], 'tokens' => (int) ( $usage['totals']['input'] + $usage['totals']['output']
                                   + $usage['totals']['cache_write'] + $usage['totals']['cache_read'] ),
-                                  'cost' => expAiCost::money( $usage['totals']['cost'], !$usage['totals']['cost_known'] ) ),
+                                  'cost' => self::costText( $usage['totals'] ) ),
                 'limits' => $providerLimits,
             );
         }
@@ -289,7 +301,7 @@ class expAiSummary
             'rows' => $rows,
             'month' => array( 'requests' => (int) $usage['totals']['requests'],
                               'tokens' => expAiCost::tokens( $usage['totals']['input'] + $usage['totals']['output'] + $usage['totals']['cache_write'] + $usage['totals']['cache_read'] ),
-                              'cost' => expAiCost::money( $usage['totals']['cost'], !$usage['totals']['cost_known'] ) ),
+                              'cost' => self::costText( $usage['totals'] ) ),
             'budget' => $budget && $budget->siteCap() > 0 ? expAiBudget::money( $budget->siteCap() ) : '',
             'budget_spent' => $budget ? expAiBudget::money( $budget->spentThisMonth() ) : '',
         );

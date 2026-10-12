@@ -77,6 +77,7 @@
         <div class="exp-ai-kpi" title="{$prices_note|wash}">
             <span class="exp-ai-kpi-label">{'Estimated cost'|i18n( 'extension/expai/usage' )}</span>
             <span class="exp-ai-kpi-value">{$c.cost|expai_money( $c.cost_approx )}</span>
+            {include uri='design:expai/parts/unpriced_note.tpl' count=$c.unpriced filter_path=$details_path}
             {include uri='design:expai/parts/trend.tpl' change=$ch.cost before=$p.cost}
         </div>
 {/if}
@@ -107,7 +108,7 @@
             <thead><tr><th>{'Provider'|i18n( 'extension/expai/usage' )}</th><th>{'Region'|i18n( 'extension/expai/usage' )}</th><th>{'Requests'|i18n( 'extension/expai/usage' )}</th><th>{'Tokens'|i18n( 'extension/expai/usage' )}</th>{if $cost_enabled}<th>{'Cost'|i18n( 'extension/expai/usage' )}</th>{/if}<th>{'Errors'|i18n( 'extension/expai/usage' )}</th></tr></thead>
             <tbody>
 {foreach $per_provider as $pp}
-                <tr><td>{$pp.provider|wash}</td><td>{if $pp.regions}{$pp.regions|upcase|wash}{else}-{/if}</td><td>{$pp.requests|expai_number}</td><td>{sum( $pp.input, $pp.output, $pp.cache_write, $pp.cache_read )|expai_tokens}</td>{if $cost_enabled}<td>{if $pp.cost_known}{$pp.cost|expai_money}{else}{'unknown'|i18n( 'extension/expai/usage' )}{/if}</td>{/if}<td>{$pp.errors}</td></tr>
+                <tr><td>{$pp.provider|wash}</td><td>{if $pp.regions}{$pp.regions|upcase|wash}{else}-{/if}</td><td>{$pp.requests|expai_number}</td><td>{sum( $pp.input, $pp.output, $pp.cache_write, $pp.cache_read )|expai_tokens}</td>{if $cost_enabled}<td>{$pp.cost|expai_money} {include uri='design:expai/parts/unpriced_note.tpl' count=$pp.unpriced filter_path=concat( $details_path, '/(provider)/', $pp.provider ) short=true()}</td>{/if}<td>{$pp.errors}</td></tr>
 {/foreach}
             </tbody>
         </table>
@@ -169,6 +170,7 @@
                         {/switch}{/if}</span>
                         {include uri='design:expai/parts/bar.tpl' value=$l.used max=$l.max level=$l.level label=$l.key
                                  text='%used of %max (%percent %)'|i18n( 'extension/expai/limits',, hash( '%used', $used_text, '%max', $max_text, '%percent', $l.percent ) )}
+                        {if and( is_set( $l.unpriced ), gt( $l.unpriced, 0 ) )}{include uri='design:expai/parts/unpriced_note.tpl' count=$l.unpriced link=false()}{/if}
                         <span class="exp-ai-hint">{switch match=$l.period}
                             {case match='conversation'}{'Resets with a new conversation.'|i18n( 'extension/expai/limits' )}{/case}
                             {case match='session'}{'Resets when you log in again.'|i18n( 'extension/expai/limits' )}{/case}

@@ -128,7 +128,8 @@ class expAiLimits
             $level = $max <= 0 ? 'ok' : ( $used >= $max ? 'over' : ( $percent >= 90 ? 'high' : ( $percent >= 75 ? 'warn' : 'ok' ) ) );
             $out[$key] = array( 'key' => $key, 'setting' => $setting, 'unit' => $unit, 'scope' => $scope, 'period' => $period,
                                 'used' => $unit === 'cost' ? round( $used, 4 ) : (int) $used, 'max' => $max, 'percent' => $percent,
-                                'level' => $level, 'reset' => self::periodEnd( $period ), 'cost_known' => $t['cost_known'] );
+                                'level' => $level, 'reset' => self::periodEnd( $period ), 'cost_known' => $t['cost_known'],
+                                'unpriced' => $unit === 'cost' && isset( $t['unpriced'] ) ? (int) $t['unpriced'] : 0 );
         }
         foreach ( self::providerDefinitions( $config ) as $key => $def )
         {
@@ -148,7 +149,8 @@ class expAiLimits
             $level = $used >= $max ? 'over' : ( $percent >= 90 ? 'high' : ( $percent >= 75 ? 'warn' : 'ok' ) );
             $out[$key] = array( 'key' => $key, 'setting' => $setting, 'unit' => $unit, 'scope' => $scope, 'period' => $period, 'provider' => $provider,
                                 'used' => $unit === 'cost' ? round( $used, 4 ) : (int) $used, 'max' => $max, 'percent' => $percent,
-                                'level' => $level, 'reset' => self::periodEnd( $period ), 'cost_known' => $t['cost_known'] );
+                                'level' => $level, 'reset' => self::periodEnd( $period ), 'cost_known' => $t['cost_known'],
+                                'unpriced' => $unit === 'cost' && isset( $t['unpriced'] ) ? (int) $t['unpriced'] : 0 );
         }
         return $out;
     }

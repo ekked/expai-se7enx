@@ -178,7 +178,12 @@ expai/log/(provider)/openrouter/(region)/eu      the requests of one provider, o
 expai/log/(model)/local.qwen3.5-4b/(errors)/1    a model alias of the registry filters by alias, anything else by model id
 expai/log/(request)/802                          one request (the test prompt's result links here)
 expai/log/(thread)/151                           the requests of one thread ("Watch this run" links here)
+expai/log/(unpriced)/1                           the requests whose model has no price (the note beside a summed cost)
 ```
+
+A summed cost is the sum of the requests that have a price; when some have none (a model without `[Pricing]`
+whose provider reports no cost), "15 requests without a price" stands beside it and links to them. The
+dashboard, the limits, the monthly budget and EI: Summary sum the same way.
 
 With more than one provider every turn shows its provider and region, every request its model alias, region,
 retention and tool mode (when not native), and the cost says "reported" when the provider reported it (OpenRouter).

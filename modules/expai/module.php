@@ -45,7 +45,8 @@ $ViewList['log'] = array(
     'params' => array(),
     'unordered_params' => array( 'offset' => 'Offset', 'view' => 'View', 'export' => 'Export', 'from' => 'From', 'to' => 'To',
                                  'user' => 'User', 'node' => 'Node', 'action' => 'Action', 'model' => 'Model', 'errors' => 'Errors',
-                                 'sort' => 'Sort', 'dir' => 'Dir', 'provider' => 'Provider', 'region' => 'Region', 'request' => 'Request', 'thread' => 'Thread' ) );
+                                 'sort' => 'Sort', 'dir' => 'Dir', 'provider' => 'Provider', 'region' => 'Region', 'request' => 'Request', 'thread' => 'Thread',
+                                 'unpriced' => 'Unpriced' ) );
 
 // lanes and budgets (classes/lanes/, classes/budget/)
 $ViewList['budgets'] = array(

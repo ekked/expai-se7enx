@@ -11,6 +11,7 @@
  * from, to (YYYY-MM-DD), user (user object id, with expai/log only), node, action, model (a model alias of the
  * registry, or a model id), provider, region (us, eu, local), errors (1),
  * request (one request, by its id), thread (the requests of one thread; both from links, the filter form drops them),
+ * unpriced (1: the requests of models without a price, from the note beside a summed cost),
  * sort (created, latency_ms, input_tokens, output_tokens), dir (asc, desc), offset. The filter form posts and is
  * redirected to that address.
  * Users with expai/write see their own rows; with expai/log everyone's.
@@ -42,7 +43,8 @@ $clean = function ( array $in ) use ( $canSeeAll )
                   'region' => in_array( $value( 'region' ), array( 'us', 'eu', 'local' ), true ) ? $value( 'region' ) : '',
                   'errors' => $value( 'errors' ) === '1' ? '1' : '',
                   // drill-downs from links (the dashboard's Models card, the test prompt, Watch this run): one request, one thread
-                  'request' => $id( $value( 'request' ) ), 'thread' => $id( $value( 'thread' ) ) );
+                  'request' => $id( $value( 'request' ) ), 'thread' => $id( $value( 'thread' ) ),
+                  'unpriced' => $value( 'unpriced' ) === '1' ? '1' : '' );
 };
 // the view parameters of a set of filters: /(from)/2026-10-01/(errors)/1 ...
 $path = function ( array $query )
@@ -76,6 +78,7 @@ $filters = array(
     'errors' => $query['errors'] === '1',
     'id' => (int) $query['request'],
     'thread_id' => (int) $query['thread'],
+    'unpriced' => $query['unpriced'] === '1',
 );
 // (model)/<x>: an alias of the registry is the model alias of the requests, anything else the model id
 if ( $filters['model'] !== '' && expAiConfig::instance()->registry()->getModel( $filters['model'] ) )
@@ -135,6 +138,7 @@ $tpl->setVariable( 'sort_path', $sortPath );
 $tpl->setVariable( 'sort', $sort );
 $tpl->setVariable( 'dir', $dir );
 $tpl->setVariable( 'currency', expAiUsage::currency() );
+$tpl->setVariable( 'cost_enabled', expAiCost::enabled() );
 
 if ( $view === 'drafts' )
 {

@@ -34,6 +34,9 @@
             <a class="button exp-ai-btn" href={concat( 'expai/log/(export)/csv', $filter_path, $sort_path )|ezurl}>{'Export CSV'|i18n( 'extension/expai/log' )}</a>
         </span>
     </form>
+{if $query.unpriced}
+    <p class="exp-ai-notice" role="status">{'Showing the requests without a price only.'|i18n( 'extension/expai/usage' )} <a href={'expai/log'|ezurl}>{'Show all'|i18n( 'extension/expai/log' )}</a></p>
+{/if}
 {if or( $query.request, $query.thread )}
     <p class="exp-ai-notice" role="status">{if $query.request}{'Showing request %id only.'|i18n( 'extension/expai/log',, hash( '%id', $query.request ) )|wash}{else}{'Showing the requests of thread %id only.'|i18n( 'extension/expai/log',, hash( '%id', $query.thread ) )|wash}{/if} <a href={'expai/log'|ezurl}>{'Show all'|i18n( 'extension/expai/log' )}</a></p>
 {/if}
@@ -46,7 +49,7 @@
             <div><dt>{'Input tokens'|i18n( 'extension/expai/log' )}</dt><dd>{$t.input}</dd></div>
             <div><dt>{'Output tokens'|i18n( 'extension/expai/log' )}</dt><dd>{$t.output}</dd></div>
             <div><dt>{'Cache write / read'|i18n( 'extension/expai/log' )}</dt><dd>{$t.cache_write} / {$t.cache_read}</dd></div>
-            <div><dt>{'Estimated cost'|i18n( 'extension/expai/log' )}</dt><dd>{if $t.cost_known}{$t.cost|mul( 10000 )|round|div( 10000 )} {$currency|wash}{else}{'not configured'|i18n( 'extension/expai/log' )}{/if}</dd></div>
+            <div><dt>{'Estimated cost'|i18n( 'extension/expai/log' )}</dt><dd>{if $cost_enabled}{$t.cost|expai_money( $t.cost_approx )} {include uri='design:expai/parts/unpriced_note.tpl' count=$t.unpriced filter_path=$filter_path}{else}{'not configured'|i18n( 'extension/expai/log' )}{/if}</dd></div>
             <div><dt>{'Average latency'|i18n( 'extension/expai/log' )}</dt><dd>{$t.avg_latency} ms</dd></div>
             <div><dt>{'Error rate'|i18n( 'extension/expai/log' )}</dt><dd>{$t.error_rate} % ({$t.errors})</dd></div>
             <div><dt>{'Tool calls'|i18n( 'extension/expai/log' )}</dt><dd>{$t.tools}</dd></div>
@@ -62,7 +65,7 @@
             <thead><tr><th>{'Day'|i18n( 'extension/expai/log' )}</th><th>{'Requests'|i18n( 'extension/expai/log' )}</th><th>{'Input tokens'|i18n( 'extension/expai/log' )}</th><th>{'Output tokens'|i18n( 'extension/expai/log' )}</th><th>{'Cache write / read'|i18n( 'extension/expai/log' )}</th><th>{'Estimated cost'|i18n( 'extension/expai/log' )}</th><th>{'Errors'|i18n( 'extension/expai/log' )}</th></tr></thead>
             <tbody>
 {foreach $stats.per_day as $d}
-                <tr><td>{$d.day|wash}</td><td>{$d.requests}</td><td>{$d.input}</td><td>{$d.output}</td><td>{$d.cache_write} / {$d.cache_read}</td><td>{if $d.cost_known}{$d.cost|mul( 10000 )|round|div( 10000 )} {$currency|wash}{else}-{/if}</td><td>{$d.errors}</td></tr>
+                <tr><td>{$d.day|wash}</td><td>{$d.requests}</td><td>{$d.input}</td><td>{$d.output}</td><td>{$d.cache_write} / {$d.cache_read}</td><td>{if $cost_enabled}{$d.cost|expai_money} {include uri='design:expai/parts/unpriced_note.tpl' count=$d.unpriced filter_path=concat( $filter_path, '/(from)/', $d.day, '/(to)/', $d.day ) short=true()}{else}-{/if}</td><td>{$d.errors}</td></tr>
 {/foreach}
             </tbody>
         </table>
@@ -75,7 +78,7 @@
             <thead><tr><th>{'User ID'|i18n( 'extension/expai/log' )}</th><th>{'Requests'|i18n( 'extension/expai/log' )}</th><th>{'Input tokens'|i18n( 'extension/expai/log' )}</th><th>{'Output tokens'|i18n( 'extension/expai/log' )}</th><th>{'Cache write / read'|i18n( 'extension/expai/log' )}</th><th>{'Estimated cost'|i18n( 'extension/expai/log' )}</th><th>{'Errors'|i18n( 'extension/expai/log' )}</th></tr></thead>
             <tbody>
 {foreach $stats.per_user as $u}
-                <tr><td><a href={concat( 'expai/log/(user)/', $u.user_id )|ezurl}>{$u.user_id}</a></td><td>{$u.requests}</td><td>{$u.input}</td><td>{$u.output}</td><td>{$u.cache_write} / {$u.cache_read}</td><td>{if $u.cost_known}{$u.cost|mul( 10000 )|round|div( 10000 )} {$currency|wash}{else}-{/if}</td><td>{$u.errors}</td></tr>
+                <tr><td><a href={concat( 'expai/log/(user)/', $u.user_id )|ezurl}>{$u.user_id}</a></td><td>{$u.requests}</td><td>{$u.input}</td><td>{$u.output}</td><td>{$u.cache_write} / {$u.cache_read}</td><td>{if $cost_enabled}{$u.cost|expai_money} {include uri='design:expai/parts/unpriced_note.tpl' count=$u.unpriced filter_path=concat( '/(user)/', $u.user_id ) short=true()}{else}-{/if}</td><td>{$u.errors}</td></tr>
 {/foreach}
             </tbody>
         </table>
@@ -100,7 +103,7 @@
                         <span>{'%count request(s)'|i18n( 'extension/expai/log',, hash( '%count', $turn.requests ) )}</span>
                         <span>{'%in in / %out out'|i18n( 'extension/expai/log',, hash( '%in', $turn.input, '%out', $turn.output ) )}{if or( $turn.cache_write, $turn.cache_read )} &middot; {'cache %w / %r'|i18n( 'extension/expai/log',, hash( '%w', $turn.cache_write, '%r', $turn.cache_read ) )}{/if}</span>
                         <span>{$turn.latency} ms</span>
-                        <span>{if $turn.cost_known}{$turn.cost|mul( 10000 )|round|div( 10000 )} {$currency|wash}{if $turn.cost_reported} ({'reported'|i18n( 'extension/expai/log' )}){/if}{else}{'cost not configured'|i18n( 'extension/expai/log' )}{/if}</span>
+                        <span>{if $turn.cost_known}{$turn.cost|mul( 10000 )|round|div( 10000 )} {$currency|wash}{if $turn.cost_reported} ({'reported'|i18n( 'extension/expai/log' )}){/if}{elseif $cost_enabled}{'no price'|i18n( 'extension/expai/usage' )}{else}{'cost not configured'|i18n( 'extension/expai/log' )}{/if}</span>
                         {if $turn.reasoning}<span>{'%count reasoning tokens'|i18n( 'extension/expai/log',, hash( '%count', $turn.reasoning ) )}</span>{/if}
                         {if $turn.drafts}<span class="exp-ai-status-published">{'%count draft(s)'|i18n( 'extension/expai/log',, hash( '%count', $turn.drafts ) )}</span>{/if}
                         {include uri='design:expai/parts/links.tpl' links=$turn.links}

@@ -70,6 +70,20 @@ class expAiUsage
     /** @var bool a cost computed since the last approxSeen() call used the fallback prices */
     protected static $approx = false;
 
+    /**
+     * #389 the note beside a summed cost when some requests had no price: "15 requests without a price", or ''.
+     * @param int $count
+     * @return string
+     */
+    public static function unpricedNote( $count )
+    {
+        $count = (int) $count;
+        if ( $count <= 0 )
+            return '';
+        return $count === 1 ? ezpI18n::tr( 'extension/expai/usage', '1 request without a price' )
+                            : ezpI18n::tr( 'extension/expai/usage', '%count requests without a price', null, array( '%count' => expAiCost::number( $count ) ) );
+    }
+
     /** @return bool whether a cost since the last call used the fallback prices (and forget it) */
     public static function approxSeen()
     {
@@ -126,7 +140,40 @@ class expAiUsage
                 $conds[$field] = (string) $filters[$field];
         if ( !empty( $filters['errors'] ) )
             $conds['error_class'] = array( '!=', '' );
+        // #389 (unpriced)/1: the requests of the models without a price that the provider did not report a cost for
+        if ( !empty( $filters['unpriced'] ) )
+        {
+            $models = self::unpricedModels();
+            if ( $models )
+            {
+                $conds['model'] = array( $models );
+                $conds['reported_cost_micros'] = 0;
+            }
+            else
+                $conds['id'] = 0;
+        }
         return $conds;
+    }
+
+    /**
+     * #389 the models (ids as logged) whose requests have no price: every pair of model and model alias of the log
+     * that expAiUsage::cost() cannot price. None while cost is off (nothing is priced then, and nothing claims to be).
+     * @return string[]
+     */
+    public static function unpricedModels()
+    {
+        if ( !expAiCost::enabled() )
+            return array();
+        $db = eZDB::instance();
+        $models = array();
+        foreach ( (array) $db->arrayQuery( 'SELECT DISTINCT model, model_alias FROM ' . $db->escapeString( expAiUsageLog::definition()['name'] ) ) as $row )
+        {
+            $model = (string) $row['model'];
+            if ( $model !== '' && self::cost( $model, 1000, 1000, 0, 0, (string) $row['model_alias'], 0, 100 ) === null )
+                $models[$model] = $model;
+        }
+        self::approxSeen();
+        return array_values( $models );
     }
 
     /** @return expAiUsageLog[] one page */
@@ -155,12 +202,15 @@ class expAiUsage
         $rows = self::rows( eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), null, self::conditions( $filters ) ?: null,
             array( 'id' => 'desc' ), array( 'offset' => 0, 'length' => self::AGGREGATE_LIMIT ), false ) );
         $empty = array( 'requests' => 0, 'input' => 0, 'output' => 0, 'cache_write' => 0, 'cache_read' => 0, 'latency' => 0,
-                        'errors' => 0, 'cost' => 0.0, 'cost_known' => true, 'tools' => 0, 'drafts' => 0, 'reasoning' => 0 );
+                        'errors' => 0, 'cost' => 0.0, 'cost_known' => true, 'tools' => 0, 'drafts' => 0, 'reasoning' => 0,
+                        // #389 requests whose model has no price: the cost is the sum of the priced ones, with this count
+                        'unpriced' => 0, 'unpriced_models' => array() );
+        $costEnabled = expAiCost::enabled();
         $perProvider = array();
         $totals = $empty;
         $perUser = array();
         $perDay = array();
-        $add = function ( array &$t, array $row )
+        $add = function ( array &$t, array $row ) use ( $costEnabled )
         {
             $t['requests']++;
             $t['input'] += (int) $row['input_tokens'];
@@ -177,7 +227,15 @@ class expAiUsage
                                       isset( $row['price_factor'] ) ? (int) $row['price_factor'] : 100 );
             $t['reasoning'] += isset( $row['reasoning_tokens'] ) ? (int) $row['reasoning_tokens'] : 0;
             if ( $cost === null )
+            {
                 $t['cost_known'] = false;
+                if ( $costEnabled )
+                {
+                    $t['unpriced']++;
+                    $model = (string) $row['model'];
+                    $t['unpriced_models'][$model] = ( isset( $t['unpriced_models'][$model] ) ? $t['unpriced_models'][$model] : 0 ) + 1;
+                }
+            }
             else
                 $t['cost'] += $cost;
         };
@@ -204,6 +262,9 @@ class expAiUsage
         {
             $t['avg_latency'] = $t['requests'] ? (int) round( $t['latency'] / $t['requests'] ) : 0;
             $t['error_rate'] = $t['requests'] ? round( 100 * $t['errors'] / $t['requests'], 1 ) : 0;
+            arsort( $t['unpriced_models'] );
+            // a sum can be shown when cost is on and at least one request had a price
+            $t['cost_partial'] = $t['unpriced'] > 0 && $t['unpriced'] < $t['requests'];
             return $t;
         };
         krsort( $perDay );
@@ -291,7 +352,8 @@ class expAiUsage
             $t = $t['totals'];
             $out[$name] = array( 'requests' => $t['requests'], 'tokens' => $t['input'] + $t['output'] + $t['cache_write'] + $t['cache_read'],
                                  'input' => $t['input'], 'output' => $t['output'], 'cache' => $t['cache_write'] + $t['cache_read'],
-                                 'cost' => $t['cost'], 'cost_known' => $t['cost_known'] );
+                                 'cost' => $t['cost'], 'cost_known' => $t['cost_known'], 'unpriced' => $t['unpriced'],
+                                 'unpriced_models' => $t['unpriced_models'] );
         }
         return $out;
     }
@@ -346,6 +408,7 @@ class expAiUsage
             return array( 'requests' => $t['requests'], 'input' => $t['input'], 'output' => $t['output'],
                           'cached' => $t['cache_write'] + $t['cache_read'], 'tokens' => $t['input'] + $t['output'] + $t['cache_write'] + $t['cache_read'],
                           'cost' => round( $t['cost'], 6 ), 'cost_known' => $t['cost_known'], 'cost_approx' => !empty( $t['cost_approx'] ),
+                          'unpriced' => $t['unpriced'], 'unpriced_models' => $t['unpriced_models'],
                           'written' => $written, 'sent' => $sent, 'avg_latency' => $t['avg_latency'], 'errors' => $t['errors'] );
         };
         $current = $figures( $range['from'], $range['to'] );
@@ -353,7 +416,7 @@ class expAiUsage
         $change = array();
         foreach ( $current as $metric => $value )
         {
-            if ( $metric === 'cost_known' || $metric === 'cost_approx' )
+            if ( $metric === 'cost_known' || $metric === 'cost_approx' || $metric === 'unpriced' || $metric === 'unpriced_models' )
                 continue;
             $before = $previous[$metric];
             $change[$metric] = $before > 0 ? round( 100 * ( $value - $before ) / $before ) : null;

@@ -10,6 +10,9 @@
 {else}
     <p class="exp-ai-muted">{'No monthly site budget is set ([Budgets] SiteMonthly or [Limits] MaxCostPerSitePerMonth). Spent this month: %spent; reserved by queued requests: %reserved.'|i18n( 'extension/expai/budget',, hash( '%spent', $s.spent_money, '%reserved', $s.reserved_money ) )}</p>
 {/if}
+{if and( is_set( $s.unpriced ), gt( $s.unpriced, 0 ) )}
+    <p>{include uri='design:expai/parts/unpriced_note.tpl' count=$s.unpriced filter_path=$s.unpriced_path}</p>
+{/if}
 {if gt( $status.held, 0 )}
     <p class="exp-ai-error">{'%n queued jobs are held by a budget.'|i18n( 'extension/expai/budget',, hash( '%n', $status.held ) )}</p>
 {/if}

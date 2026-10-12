@@ -36,6 +36,9 @@ class expAiBudget
     /** @var int|null the cost of this month, read once per instance */
     protected $spent;
 
+    /** @var int this month's requests without a price (#389), counted with $spent */
+    protected $unpriced = 0;
+
     public function __construct( ?expAiConfig $config = null )
     {
         $this->config = $config ?: expAiConfig::instance();
@@ -83,6 +86,7 @@ class expAiBudget
         {
             $agg = expAiUsage::aggregate( array( 'from' => expAiLimits::periodStart( 'month' ) ) );
             $this->spent = self::micros( $agg['totals']['cost'] );
+            $this->unpriced = isset( $agg['totals']['unpriced'] ) ? (int) $agg['totals']['unpriced'] : 0;
         }
         return $this->spent;
     }
@@ -273,7 +277,9 @@ class expAiBudget
         $site = array( 'cap' => $cap, 'spent' => $spent, 'reserved' => $reserved, 'remaining' => $cap > 0 ? max( 0, $cap - $used ) : 0,
                        'percent' => $percent, 'level' => $cap <= 0 ? 'none' : ( $used >= $cap ? 'over' : ( $percent >= 90 ? 'high' : ( $percent >= 75 ? 'warn' : 'ok' ) ) ),
                        'cap_money' => self::money( $cap ), 'spent_money' => self::money( $spent ), 'reserved_money' => self::money( $reserved ),
-                       'remaining_money' => self::money( max( 0, $cap - $used ) ), 'resets' => expAiLimits::periodEnd( 'month' ) );
+                       'remaining_money' => self::money( max( 0, $cap - $used ) ), 'resets' => expAiLimits::periodEnd( 'month' ),
+                       // the spent figure sums the priced requests; these had no price (expai/log/(unpriced)/1)
+                       'unpriced' => $this->unpriced, 'unpriced_path' => '/(from)/' . date( 'Y-m-d', expAiLimits::periodStart( 'month' ) ) );
         $list = array();
         if ( $queue )
             foreach ( expQueueGroup::fetchRecent( max( 1, (int) $groups ) ) as $group )
