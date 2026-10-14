@@ -93,6 +93,11 @@ anywhere below it, within the editor's own permissions.
   (View, Edit, Prompt again, Intelligence tab; "deleted" or "in trash" when the object is gone), and the link to all
   of them in the log.
 
+A version whose content object was removed since (or purged from the trash) stays listed, here, in the dashboard
+block and in expai/log: as "(removed)" with the state "deleted" and no link. The page checks all its rows in one
+query and writes no "Object not found" error to the debug output. The Intelligence panel leaves such rows out. The
+cronjob `expai_prune` marks their log rows `deleted`; it keeps them as the record of what was written.
+
 Amounts and numbers use the user's locale (`expai_money`, `expai_tokens`, `expai_number` template operators); an
 amount under one cent shows as "< $0.01", one priced with the fallback prices as "≈".
 

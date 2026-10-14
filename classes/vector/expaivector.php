@@ -310,7 +310,7 @@ class expAiVector
                     $languages[$code] = $language ? (string) $language->attribute( 'name' ) : $code;
                 }
                 $class = eZContentClass::fetchByIdentifier( (string) $change->attribute( 'class_identifier' ) );
-                $object = $change->isNew() ? null : eZContentObject::fetch( (int) $change->attribute( 'contentobject_id' ) );
+                $object = $change->isNew() ? null : expAiObjects::fetch( (int) $change->attribute( 'contentobject_id' ) );
                 if ( $object && !$class )
                     $class = $object->contentClass();
                 $parent = $change->isNew() ? eZContentObjectTreeNode::fetch( (int) $change->attribute( 'parent_node_id' ) ) : ( $object ? $object->mainNode() : null );
@@ -360,10 +360,10 @@ class expAiVector
         $seen = array();
         $logs = eZPersistentObject::fetchObjectList( expAiDraftLog::definition(), null, array( 'thread_id' => (int) $thread->attribute( 'id' ) ),
                                                      array( 'id' => 'desc' ), array( 'offset' => 0, 'length' => 50 ) );
-        foreach ( (array) $logs as $log )
+        foreach ( expAiDraftLog::markObjectsThatExist( (array) $logs ) as $log )
         {
             $key = $log->attribute( 'contentobject_id' ) . ':' . $log->attribute( 'version' );
-            if ( isset( $seen[$key] ) || $log->attribute( 'status' ) === expAiDraftLog::STATUS_DISCARDED )
+            if ( isset( $seen[$key] ) || $log->attribute( 'status' ) === expAiDraftLog::STATUS_DISCARDED || $log->objectExists() === false )
                 continue;
             $seen[$key] = true;
             $row = expAiAssistant::draftRow( $log );

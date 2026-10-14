@@ -802,10 +802,11 @@ class expAiAssistant
     {
         $out = array();
         $seen = array();
-        foreach ( expAiDraftLog::fetchForUserNode( $user->attribute( 'contentobject_id' ), $nodeID, 30 ) as $log )
+        // a removed object leaves its rows; they are skipped here (the panel lists what can still be opened)
+        foreach ( expAiDraftLog::markObjectsThatExist( expAiDraftLog::fetchForUserNode( $user->attribute( 'contentobject_id' ), $nodeID, 30 ) ) as $log )
         {
             $key = $log->attribute( 'contentobject_id' ) . ':' . $log->attribute( 'version' );
-            if ( isset( $seen[$key] ) || $log->attribute( 'status' ) === expAiDraftLog::STATUS_DISCARDED )
+            if ( isset( $seen[$key] ) || $log->attribute( 'status' ) === expAiDraftLog::STATUS_DISCARDED || $log->objectExists() === false )
                 continue;
             $seen[$key] = true;
             $out[] = self::draftRow( $log );

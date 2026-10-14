@@ -20,9 +20,11 @@ class expAiLinks
      * @param int $nodeID the node the row belongs to (panel node), used when the object has no node
      * @param int $againID the expai_draft_log row whose request "Prompt again" prefills (only with [UsageSettings]
      *                     LogRequests=enabled; the dashboard checks that the row is the user's own)
+     * @param bool|null $exists whether the object still exists when the caller checked it already for a whole list
+     *                          (expAiDraftLog::markObjectsThatExist()); null: checked here
      * @return array state (ok | trash | deleted), view, edit, prompt, tab (URLs below the siteaccess root, '' when not offered)
      */
-    public static function build( $objectID, $version = 0, $language = '', $nodeID = 0, $againID = 0 )
+    public static function build( $objectID, $version = 0, $language = '', $nodeID = 0, $againID = 0, $exists = null )
     {
         $links = array( 'state' => 'ok', 'view' => '', 'edit' => '', 'prompt' => '', 'tab' => '' );
         $user = eZUser::currentUser();
@@ -30,7 +32,10 @@ class expAiLinks
         $object = null;
         if ( $objectID )
         {
-            $object = eZContentObject::fetch( (int) $objectID );
+            // a removed object: no link, and no "Object not found" error in the debug output
+            if ( $exists === false )
+                return array( 'state' => 'deleted' ) + $links;
+            $object = $exists === true ? eZContentObject::fetch( (int) $objectID ) : expAiObjects::fetch( (int) $objectID );
             if ( !$object )
                 return array( 'state' => 'deleted' ) + $links;
             if ( (int) $object->attribute( 'status' ) === eZContentObject::STATUS_ARCHIVED )

@@ -160,7 +160,8 @@
                 <td>{$row.log.version}</td>
                 <td>{$row.log.created|l10n( 'shortdatetime' )}</td>
                 <td>{switch match=$row.log.source}{case match='edit'}{'Edit form'|i18n( 'extension/expai/log' )}{/case}{case}{'Panel'|i18n( 'extension/expai/log' )}{/case}{/switch}</td>
-                <td>{switch match=$row.log.status}
+                <td>{switch match=$row.status}
+                    {case match='deleted'}{'deleted'|i18n( 'extension/expai/links' )}{/case}
                     {case match='kept'}{'Saved as draft'|i18n( 'extension/expai/log' )}{/case}
                     {case match='pending'}{'Waiting for approval'|i18n( 'extension/expai/log' )}{/case}
                     {case match='published'}{'Published'|i18n( 'extension/expai/log' )}{/case}

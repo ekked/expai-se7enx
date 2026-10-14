@@ -95,7 +95,7 @@ class expAiGate
             }
         }
         if ( !$object && (int) $c['object_id'] > 0 )
-            $object = eZContentObject::fetch( (int) $c['object_id'] );
+            $object = expAiObjects::fetch( (int) $c['object_id'] );
         if ( $object instanceof eZContentObject )
         {
             $c['object_id'] = (int) $object->attribute( 'id' );

@@ -13,7 +13,7 @@
  * This is what the "Exponential Intelligence" label is drawn from.
  *
  * status: draft (written, still a draft), kept ("Save as drafts" pressed), pending (sent, waiting for approval),
- *         published, discarded
+ *         published, discarded, deleted (the content object was removed since; set by the cronjob expai_prune)
  * action: create (new object), update (new version of an existing object), field (a field action in the edit form)
  * source: panel, edit
  */
@@ -24,6 +24,14 @@ class expAiDraftLog extends eZPersistentObject
     const STATUS_PENDING = 'pending';
     const STATUS_PUBLISHED = 'published';
     const STATUS_DISCARDED = 'discarded';
+    const STATUS_DELETED = 'deleted';
+
+    /**
+     * Whether the logged content object still exists: true or false once checked (markObjectsThatExist() for a
+     * whole list in one query), null while not checked yet.
+     * @var bool|null
+     */
+    public $ObjectExists = null;
 
     public static function definition()
     {
@@ -151,16 +159,103 @@ class expAiDraftLog extends eZPersistentObject
         return (int) eZPersistentObject::count( self::definition(), $conds );
     }
 
-    /** @return eZContentObject|null */
+    /**
+     * Checks for all entries at once (one query) whether their content object still exists, so that a list does
+     * not look up a removed object row by row.
+     * @param expAiDraftLog[] $logs
+     * @return expAiDraftLog[] the same entries
+     */
+    public static function markObjectsThatExist( array $logs )
+    {
+        $ids = array();
+        foreach ( $logs as $log )
+            $ids[] = (int) $log->attribute( 'contentobject_id' );
+        $existing = expAiObjects::existing( $ids );
+        foreach ( $logs as $log )
+            if ( (int) $log->attribute( 'contentobject_id' ) > 0 )
+                $log->ObjectExists = isset( $existing[(int) $log->attribute( 'contentobject_id' )] );
+        return $logs;
+    }
+
+    /** @return bool|null whether the content object still exists (null: not checked, see markObjectsThatExist()) */
+    public function objectExists()
+    {
+        return $this->ObjectExists;
+    }
+
+    /** @return eZContentObject|null null, without a debug error, when the object was removed */
     public function contentObject()
     {
-        return eZContentObject::fetch( (int) $this->attribute( 'contentobject_id' ) );
+        if ( $this->ObjectExists === false )
+            return null;
+        $id = (int) $this->attribute( 'contentobject_id' );
+        $object = $this->ObjectExists === true ? eZContentObject::fetch( $id ) : expAiObjects::fetch( $id );
+        if ( $this->ObjectExists === null )
+            $this->ObjectExists = (bool) $object;
+        return $object;
     }
 
     /** @return eZContentObjectVersion|null */
     public function contentVersion()
     {
+        if ( $this->ObjectExists === false )
+            return null;
         return eZContentObjectVersion::fetchVersion( (int) $this->attribute( 'version' ), (int) $this->attribute( 'contentobject_id' ) );
+    }
+
+    /**
+     * The entries whose content object no longer exists (removed, or purged from the trash), checked in batches.
+     * @param bool $unmarkedOnly only those not marked "deleted" yet
+     * @param int[]|null $rowIDs only among these entries (null: all)
+     * @return array list of array( id, contentobject_id, status )
+     */
+    public static function orphanRows( $unmarkedOnly = false, $rowIDs = null )
+    {
+        $out = array();
+        $offset = 0;
+        $batch = 500;
+        $conditions = array( 'contentobject_id' => array( '>', 0 ) );
+        if ( $rowIDs !== null )
+        {
+            $rowIDs = array_values( array_filter( array_map( 'intval', (array) $rowIDs ) ) );
+            if ( !$rowIDs )
+                return $out;
+            $conditions['id'] = array( $rowIDs );
+        }
+        do
+        {
+            $rows = eZPersistentObject::fetchObjectList( self::definition(), array( 'id', 'contentobject_id', 'status' ),
+                $conditions, array( 'id' => 'asc' ), array( 'offset' => $offset, 'length' => $batch ), false );
+            $rows = (array) $rows;
+            $existing = expAiObjects::existing( array_column( $rows, 'contentobject_id' ) );
+            foreach ( $rows as $row )
+            {
+                if ( isset( $existing[(int) $row['contentobject_id']] ) )
+                    continue;
+                if ( $unmarkedOnly && (string) $row['status'] === self::STATUS_DELETED )
+                    continue;
+                $out[] = array( 'id' => (int) $row['id'], 'contentobject_id' => (int) $row['contentobject_id'], 'status' => (string) $row['status'] );
+            }
+            $offset += $batch;
+        }
+        while ( count( $rows ) === $batch );
+        return $out;
+    }
+
+    /**
+     * Marks the entries whose content object was removed as "deleted" (the cronjob expai_prune). The rows stay:
+     * they are the record of what was written with Exponential Intelligence.
+     * @param int[]|null $rowIDs only among these entries (null: all)
+     * @return int the entries marked now
+     */
+    public static function markDeletedObjects( $rowIDs = null )
+    {
+        $ids = array_column( self::orphanRows( true, $rowIDs ), 'id' );
+        foreach ( array_chunk( $ids, 500 ) as $chunk )
+            eZPersistentObject::updateObjectList( array( 'definition' => self::definition(),
+                'update_fields' => array( 'status' => self::STATUS_DELETED, 'modified' => time() ),
+                'conditions' => array( 'id' => $chunk ) ) );
+        return count( $ids );
     }
 
     public function setStatus( $status )

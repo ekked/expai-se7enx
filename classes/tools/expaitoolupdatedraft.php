@@ -38,7 +38,7 @@ class expAiToolUpdateDraft extends expAiTool
     {
         if ( !isset( $input['fields'] ) || !is_array( $input['fields'] ) || !$input['fields'] )
             throw new expAiException( 'Give the fields to write.' );
-        $object = eZContentObject::fetch( isset( $input['object_id'] ) ? (int) $input['object_id'] : 0 );
+        $object = expAiObjects::fetch( isset( $input['object_id'] ) ? (int) $input['object_id'] : 0 );
         if ( !$object instanceof eZContentObject || !$object->canRead() )
             throw new expAiException( 'Object %id does not exist or you may not read it.', '', 0, array( '%id' => isset( $input['object_id'] ) ? (int) $input['object_id'] : 0 ) );
         $context->reader->assertAllowed( $object );

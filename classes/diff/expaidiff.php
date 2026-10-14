@@ -92,7 +92,7 @@ class expAiDiff
             $language = isset( $x['language'] ) ? (string) $x['language'] : $language;
         }
         if ( is_numeric( $object ) )
-            $object = eZContentObject::fetch( (int) $object );
+            $object = expAiObjects::fetch( (int) $object );
         if ( !$object instanceof eZContentObject )
             throw new expAiException( 'The content to compare was not found.', 'side ' . $which . ' is neither an object nor values' );
         $version = $version ?: (int) $object->attribute( 'current_version' );
@@ -526,7 +526,7 @@ class expAiDiff
         if ( empty( $options['write'] ) )
             return $result;
 
-        $object = $target instanceof eZContentObject ? $target : ( isset( $options['object'] ) ? $options['object'] : eZContentObject::fetch( (int) $diff->get( 'object_id' ) ) );
+        $object = $target instanceof eZContentObject ? $target : ( isset( $options['object'] ) ? $options['object'] : expAiObjects::fetch( (int) $diff->get( 'object_id' ) ) );
         if ( !$object instanceof eZContentObject )
             throw new expAiException( 'The content to compare was not found.', 'no object to write the draft of' );
         $language = isset( $options['language'] ) && $options['language'] !== '' ? (string) $options['language'] : (string) $diff->get( 'language_a' );

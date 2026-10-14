@@ -362,7 +362,7 @@ class expAiServerFunctions extends ezjscServerFunctions
                 $objectID = (int) $log->attribute( 'contentobject_id' );
                 if ( !isset( $readable[$objectID] ) )
                 {
-                    $object = eZContentObject::fetch( $objectID );
+                    $object = expAiObjects::fetch( $objectID );
                     $readable[$objectID] = $object && ( $object->canRead() || (int) $log->attribute( 'user_id' ) === (int) $user->attribute( 'contentobject_id' )
                                                         || in_array( $key, $result['collab'], true ) );
                 }

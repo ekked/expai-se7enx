@@ -67,7 +67,7 @@ class expAiPlanEstimate
             $node = eZContentObjectTreeNode::fetch( (int) $item['target']['node_id'] );
             $objectID = $node ? (int) $node->attribute( 'contentobject_id' ) : 0;
         }
-        $object = $objectID ? eZContentObject::fetch( $objectID ) : null;
+        $object = $objectID ? expAiObjects::fetch( $objectID ) : null;
         if ( !$object instanceof eZContentObject || ( isset( $item['action'] ) && $item['action'] === 'create' ) )
             return $this->config->int( 'VectorSettings', 'PlanNewObjectTokens', 300, 0 );
         $fields = isset( $item['fields'] ) ? array_map( 'strval', (array) $item['fields'] ) : array();

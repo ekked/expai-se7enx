@@ -62,7 +62,7 @@ class expAiChainPolicy
             return false;
         if ( (int) $run->attribute( 'user_id' ) === (int) $user->attribute( 'contentobject_id' ) )
             return true;
-        $object = (int) $run->attribute( 'object_id' ) ? eZContentObject::fetch( (int) $run->attribute( 'object_id' ) ) : null;
+        $object = (int) $run->attribute( 'object_id' ) ? expAiObjects::fetch( (int) $run->attribute( 'object_id' ) ) : null;
         return $object instanceof eZContentObject && $object->canEdit();
     }
 }

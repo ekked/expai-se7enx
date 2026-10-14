@@ -144,18 +144,21 @@ if ( $view === 'drafts' )
 {
     $userID = $canSeeAll && $query['user'] !== '' ? (int) $query['user'] : ( $canSeeAll ? false : eZUser::currentUserID() );
     $rows = array();
-    foreach ( expAiDraftLog::fetchList( $userID, $offset, $limit ) as $log )
+    // one query for whether the objects of all rows still exist; a removed one is listed as removed, without links
+    foreach ( expAiDraftLog::markObjectsThatExist( expAiDraftLog::fetchList( $userID, $offset, $limit ) ) as $log )
     {
         $object = $log->contentObject();
         $rows[] = array(
             'log' => $log,
+            'status' => $object || (int) $log->attribute( 'contentobject_id' ) <= 0 ? (string) $log->attribute( 'status' ) : expAiDraftLog::STATUS_DELETED,
             'name' => $object ? ( (string) $object->versionLanguageName( (int) $log->attribute( 'version' ), $log->attribute( 'language_code' ) ) ?: (string) $object->attribute( 'name' ) ) : '',
             'exists' => (bool) $object,
             'can_read' => $object ? (bool) $object->canRead() : false,
             // the version view only while the logged version is still there (a discarded draft leaves the row)
             'version_exists' => $object ? (bool) $object->version( (int) $log->attribute( 'version' ) ) : false,
             'links' => expAiLinks::build( (int) $log->attribute( 'contentobject_id' ), (int) $log->attribute( 'version' ), (string) $log->attribute( 'language_code' ),
-                                          (int) $log->attribute( 'node_id' ), (string) $log->attribute( 'prompt_summary' ) !== '' ? (int) $log->attribute( 'id' ) : 0 ),
+                                          (int) $log->attribute( 'node_id' ), (string) $log->attribute( 'prompt_summary' ) !== '' ? (int) $log->attribute( 'id' ) : 0,
+                                          $log->objectExists() ),
         );
     }
     $tpl->setVariable( 'rows', $rows );

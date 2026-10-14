@@ -60,7 +60,7 @@ class expAiDraftRevert
     public static function forDraft( $objectID, $versionNo, ?eZUser $user = null, ?expAiConfig $config = null )
     {
         $user = $user ?: eZUser::currentUser();
-        $object = eZContentObject::fetch( (int) $objectID );
+        $object = expAiObjects::fetch( (int) $objectID );
         if ( !$object instanceof eZContentObject || !$object->canRead() )
             throw new expAiException( 'Object %id does not exist or you may not read it.', '', 0, array( '%id' => (int) $objectID ) );
         $version = $object->version( (int) $versionNo );

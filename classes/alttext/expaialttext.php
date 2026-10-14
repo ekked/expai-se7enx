@@ -431,7 +431,7 @@ class expAiAltText
                       'estimate' => 0, 'messages' => array() );
         foreach ( $rows as $row )
         {
-            $object = eZContentObject::fetch( (int) $row['object_id'] );
+            $object = expAiObjects::fetch( (int) $row['object_id'] );
             if ( !$object || !$object->canEdit( false, false, false, (string) $row['language'] ) )
             {
                 $out['skipped'][(int) $row['object_id']] = 'you may not edit it';

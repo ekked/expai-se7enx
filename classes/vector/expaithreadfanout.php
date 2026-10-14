@@ -81,7 +81,7 @@ class expAiThreadFanout
             return (int) $item['target']['node_id'];
         if ( !empty( $item['target']['object_id'] ) )
         {
-            $object = eZContentObject::fetch( (int) $item['target']['object_id'] );
+            $object = expAiObjects::fetch( (int) $item['target']['object_id'] );
             if ( $object && $object->mainNodeID() )
                 return (int) $object->mainNodeID();
         }

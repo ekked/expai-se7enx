@@ -23,7 +23,7 @@ class expAiPublisher
     {
         $user = eZUser::currentUser();
         $log = expAiDraftLog::fetchByVersion( (int) $objectID, (int) $versionNumber );
-        $object = eZContentObject::fetch( (int) $objectID );
+        $object = expAiObjects::fetch( (int) $objectID );
         $version = $object ? $object->version( (int) $versionNumber ) : null;
         if ( !$log || !$object || !$version || (int) $log->attribute( 'user_id' ) !== (int) $user->attribute( 'contentobject_id' ) )
             throw new expAiException( 'This draft was not written for you by Exponential Intelligence.' );
@@ -61,7 +61,7 @@ class expAiPublisher
             foreach ( (array) eZPersistentObject::fetchObjectList( expAiDraftLog::definition(), null,
                           array( 'thread_id' => $threadID, 'status' => expAiDraftLog::STATUS_DRAFT ) ) as $open )
             {
-                $object = eZContentObject::fetch( (int) $open->attribute( 'contentobject_id' ) );
+                $object = expAiObjects::fetch( (int) $open->attribute( 'contentobject_id' ) );
                 $version = $object ? $object->version( (int) $open->attribute( 'version' ) ) : null;
                 if ( $version && (int) $version->attribute( 'status' ) === eZContentObjectVersion::STATUS_DRAFT )
                 {
@@ -127,7 +127,7 @@ class expAiPublisher
         if ( $status === eZContentObjectVersion::STATUS_PUBLISHED )
         {
             $log->setStatus( expAiDraftLog::STATUS_PUBLISHED );
-            $object = eZContentObject::fetch( (int) $objectID );
+            $object = expAiObjects::fetch( (int) $objectID );
             $main = $object ? $object->mainNode() : null;
             $url = $main ? 'content/view/full/' . (int) $main->attribute( 'node_id' ) : '';
             $result = 'published';

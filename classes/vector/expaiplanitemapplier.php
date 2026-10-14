@@ -73,7 +73,7 @@ class expAiPlanItemApplier implements expAiRequestApplier
             }
             else
             {
-                $object = eZContentObject::fetch( (int) $params['object_id'] );
+                $object = expAiObjects::fetch( (int) $params['object_id'] );
                 if ( !$object instanceof eZContentObject || !$object->canRead() )
                     throw new expAiException( 'Object %id does not exist or you may not read it.', '', 0, array( '%id' => (int) $params['object_id'] ) );
                 $result = $stager->stageUpdate( $object, $language, $fields );

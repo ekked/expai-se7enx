@@ -114,7 +114,7 @@ class expAiRequestHandler extends expQueueHandlerBase
         $policy = $lane->dataPolicy();
         foreach ( (array) $p['objects'] as $objectID )
         {
-            $object = eZContentObject::fetch( (int) $objectID );
+            $object = expAiObjects::fetch( (int) $objectID );
             if ( !$object instanceof eZContentObject )
                 continue;
             if ( !$policy->allowsObject( $object ) )

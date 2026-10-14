@@ -125,7 +125,7 @@ class expAiChangeApplier
     /** @return array|null the draft of an existing object */
     protected function applyExisting( array $changes, array &$out )
     {
-        $object = eZContentObject::fetch( (int) $changes[0]->attribute( 'contentobject_id' ) );
+        $object = expAiObjects::fetch( (int) $changes[0]->attribute( 'contentobject_id' ) );
         $language = (string) $changes[0]->attribute( 'language_code' );
         if ( !$object instanceof eZContentObject || !$object->canRead() )
             throw new expAiException( 'Object %id does not exist or you may not read it.', '', 0, array( '%id' => (int) $changes[0]->attribute( 'contentobject_id' ) ) );
@@ -200,7 +200,7 @@ class expAiChangeApplier
         {
             if ( !in_array( $log->attribute( 'status' ), array( expAiDraftLog::STATUS_DRAFT, expAiDraftLog::STATUS_KEPT ), true ) )
                 continue;
-            $object = eZContentObject::fetch( (int) $objectID );
+            $object = expAiObjects::fetch( (int) $objectID );
             $version = $object ? $object->version( (int) $log->attribute( 'version' ) ) : null;
             if ( $version && (int) $version->attribute( 'status' ) === eZContentObjectVersion::STATUS_DRAFT )
                 return (int) $log->attribute( 'version' );
@@ -211,7 +211,7 @@ class expAiChangeApplier
     /** @return array a written draft for the browser */
     protected function draftRow( $objectID, $version, $language, $created, array $changes, array $result )
     {
-        $object = eZContentObject::fetch( (int) $objectID );
+        $object = expAiObjects::fetch( (int) $objectID );
         $writer = new expAiContentWriter();
         $versionObject = $object ? $object->version( (int) $version ) : null;
         return array( 'object_id' => (int) $objectID, 'version' => (int) $version, 'language' => (string) $language, 'created' => (bool) $created,

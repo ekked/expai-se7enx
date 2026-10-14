@@ -159,7 +159,7 @@ class expAiMcpBridgeTool extends expAiTool
     {
         if ( !empty( $row['object_id'] ) && is_numeric( $row['object_id'] ) )
         {
-            $object = eZContentObject::fetch( (int) $row['object_id'] );
+            $object = expAiObjects::fetch( (int) $row['object_id'] );
             if ( $object instanceof eZContentObject )
                 return $object;
         }

@@ -21,20 +21,25 @@ class expAiDashboard
     public static function myDrafts( $offset = 0, $limit = 20 )
     {
         $out = array();
-        foreach ( expAiDraftLog::fetchList( eZUser::currentUserID(), $offset, $limit ) as $log )
+        // one query for whether the objects of all rows still exist; a removed one is listed as removed, without links
+        $logs = expAiDraftLog::markObjectsThatExist( expAiDraftLog::fetchList( eZUser::currentUserID(), $offset, $limit ) );
+        foreach ( $logs as $log )
         {
-            $row = expAiAssistant::draftRow( $log );
+            $deleted = $log->objectExists() === false;
+            $row = $deleted ? null : expAiAssistant::draftRow( $log );
             if ( !$row )
                 $row = array( 'object_id' => (int) $log->attribute( 'contentobject_id' ), 'version' => (int) $log->attribute( 'version' ),
                               'name' => '', 'class_name' => '', 'language' => (string) $log->attribute( 'language_code' ),
-                              'status' => expAiDraftLog::STATUS_DISCARDED, 'is_draft' => false, 'approval' => '', 'action' => (string) $log->attribute( 'action' ),
+                              'status' => $deleted ? expAiDraftLog::STATUS_DELETED : expAiDraftLog::STATUS_DISCARDED, 'is_draft' => false,
+                              'approval' => '', 'action' => (string) $log->attribute( 'action' ),
                               'model' => (string) $log->attribute( 'model' ), 'created' => (int) $log->attribute( 'created' ),
                               'urls' => array( 'edit' => '', 'view' => '', 'node' => '' ) );
+            $row['deleted'] = $deleted;
             $row['source'] = (string) $log->attribute( 'source' );
             $row['prompt_summary'] = (string) $log->attribute( 'prompt_summary' );
             $row['key'] = $row['object_id'] . ':' . $row['version'];
             $row['links'] = expAiLinks::build( $row['object_id'], $row['version'], $row['language'], (int) $log->attribute( 'node_id' ),
-                                              $row['prompt_summary'] !== '' ? (int) $log->attribute( 'id' ) : 0 );
+                                              $row['prompt_summary'] !== '' ? (int) $log->attribute( 'id' ) : 0, $log->objectExists() );
             $out[] = $row;
         }
         return $out;

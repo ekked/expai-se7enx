@@ -31,7 +31,7 @@ class expAiChainTranslateSync
         $sync = new expAiTranslationSync();
         if ( !$sync->enabled() )
             return array( 'skipped' => 'the translation sync is disabled ([TranslationSync] Enabled)' );
-        $object = eZContentObject::fetch( (int) $run->attribute( 'object_id' ) );
+        $object = expAiObjects::fetch( (int) $run->attribute( 'object_id' ) );
         if ( !$object instanceof eZContentObject || (int) $object->attribute( 'status' ) !== eZContentObject::STATUS_PUBLISHED )
             return array( 'skipped' => 'the draft is not published yet; the translation sync keeps translations in step once it is' );
         $targets = array_values( array_intersect( $sync->targetLanguages( $object ), $languages ) );

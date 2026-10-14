@@ -205,7 +205,7 @@ class expAiChange extends eZPersistentObject
     {
         if ( $this->isNew() )
             return array( 'value' => '', 'version' => 0, 'exists' => true );
-        $object = eZContentObject::fetch( (int) $this->attribute( 'contentobject_id' ) );
+        $object = expAiObjects::fetch( (int) $this->attribute( 'contentobject_id' ) );
         if ( !$object instanceof eZContentObject )
             return array( 'value' => '', 'version' => 0, 'exists' => false );
         return self::baseOf( $object, (string) $this->attribute( 'language_code' ), (string) $this->attribute( 'attribute_identifier' ) );

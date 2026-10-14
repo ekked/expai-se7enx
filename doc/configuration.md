@@ -419,7 +419,7 @@ See [mcp.md](mcp.md).
 | `admininterface.ini` | the tabs `expai` (content navigation part) and `expai_media` (media), header template `expai_header.tpl`, body `expai.tpl` |
 | `content.ini` | `[EditSettings] AdditionalTemplates[]=content/edit/expai.tpl` |
 | `menu.ini` | the entries of the Dashboard menu (`[Leftmenu_my]`: Exponential Intelligence, EI: Vector, EI: Chains, EI: Log, EI: Help), of Setup (`[Leftmenu_setup]`: EI: Summary, EI: Models, EI: Budgets, Job queue) and of Design (`[Leftmenu_design]`: Missing alt text), each with its policies ([dashboard.md](dashboard.md)) |
-| `cronjob.ini` | the cronjob part `expai`: `expai_queue.php` (resumes held jobs, releases lost batch submits), `expai_prune.php` (usage rows older than `RetentionDays`), `expai_thread_prune.php` (thread events, proposals, checkpoints); run it with `-s <admin siteaccess>` |
+| `cronjob.ini` | the cronjob part `expai`: `expai_queue.php` (resumes held jobs, releases lost batch submits), `expai_prune.php` (usage rows older than `RetentionDays`; draft log rows of removed objects marked `deleted`), `expai_thread_prune.php` (thread events, proposals, checkpoints); run it with `-s <admin siteaccess>` |
 | `dashboard.ini` | the dashboard block `expai_drafts` (Priority 35, 5 items, `expai/write`) |
 | `browse.ini` | `[ExpAiStartWriting]`: the content browser of "Change location" (single node) |
 | `site.ini` | `TranslationExtensions[]=expai`, `[TemplateSettings] ExtensionAutoloadPath[]=expai` (the template operators `expai_money`, `expai_tokens`, `expai_number`) |

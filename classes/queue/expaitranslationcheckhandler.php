@@ -28,7 +28,7 @@ class expAiTranslationCheckHandler extends expQueueHandlerBase
     public function run( expQueueJob $job, expQueueContext $context )
     {
         $p = $job->payloadArray();
-        $object = eZContentObject::fetch( (int) $p['object_id'] );
+        $object = expAiObjects::fetch( (int) $p['object_id'] );
         if ( !$object instanceof eZContentObject )
             throw new expQueuePermanentException( 'the object is gone', 'not_found' );
         $sync = new expAiTranslationSync();

@@ -610,7 +610,7 @@ class expAiTranslationSync
     public function applyAnswer( expQueueJob $job, array $answer, array $params )
     {
         $uuid = (string) $job->attribute( 'uuid' );
-        $object = eZContentObject::fetch( (int) $params['object_id'] );
+        $object = expAiObjects::fetch( (int) $params['object_id'] );
         if ( !$object instanceof eZContentObject )
             throw new expQueuePermanentException( 'the object is gone', 'not_found' );
         $target = (string) $params['target'];
@@ -695,7 +695,7 @@ class expAiTranslationSync
     {
         if ( !$this->enabled() )
             return 'disabled';
-        $object = eZContentObject::fetch( (int) $objectID );
+        $object = expAiObjects::fetch( (int) $objectID );
         if ( !$object instanceof eZContentObject )
             return 'not_found';
         $version = $object->version( (int) $versionNumber );

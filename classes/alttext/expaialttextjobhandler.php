@@ -35,7 +35,7 @@ class expAiAltTextJobHandler extends expQueueHandlerBase
     {
         $p = $job->payloadArray();
         $config = expAiConfig::instance();
-        $object = eZContentObject::fetch( (int) $p['object_id'] );
+        $object = expAiObjects::fetch( (int) $p['object_id'] );
         if ( !$object instanceof eZContentObject )
             throw new expQueuePermanentException( 'the object ' . (int) $p['object_id'] . ' is gone', 'not_found' );
         $checkpoint = $context->checkpoint();

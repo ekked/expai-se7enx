@@ -22,7 +22,7 @@ class expAiEditForm
     public static function draft( $objectID, $versionNumber, $language )
     {
         $user = eZUser::currentUser();
-        $object = eZContentObject::fetch( (int) $objectID );
+        $object = expAiObjects::fetch( (int) $objectID );
         $version = $object ? $object->version( (int) $versionNumber ) : null;
         if ( !$object || !$version )
             throw new expAiException( 'The draft was not found.' );

@@ -302,10 +302,11 @@
 {foreach $drafts as $d}
             <li>
                 <div class="exp-ai-recent-main">
-                    {if $d.urls.view}<a href={$d.urls.view|ezurl}>{$d.name|wash}</a>{else}<span>{$d.name|wash}</span>{/if}
+                    {if $d.urls.view}<a href={$d.urls.view|ezurl}>{$d.name|wash}</a>{elseif $d.deleted}<span>{'(removed)'|i18n( 'extension/expai/dashboard' )}</span>{else}<span>{$d.name|wash}</span>{/if}
                     <span class="exp-ai-recent-meta">{$d.class_name|wash} &middot; {$d.created|l10n( 'shortdatetime' )}</span>
                 </div>
                 <span class="exp-ai-state exp-ai-state-{$d.status|wash}">{switch match=$d.status}
+                    {case match='deleted'}{'deleted'|i18n( 'extension/expai/links' )}{/case}
                     {case match='kept'}{'Saved as draft'|i18n( 'extension/expai/panel' )}{/case}
                     {case match='pending'}{'Waiting for approval'|i18n( 'extension/expai/panel' )}{/case}
                     {case match='published'}{'Published'|i18n( 'extension/expai/panel' )}{/case}

@@ -63,7 +63,7 @@ $estimate = null;
 $model = null;
 if ( $node instanceof eZContentObjectTreeNode && $report['rows'] )
 {
-    $collection = expAiAltTextFunctionCollection::fetchModel( eZContentObject::fetch( (int) $report['rows'][0]['object_id'] ) );
+    $collection = expAiAltTextFunctionCollection::fetchModel( expAiObjects::fetch( (int) $report['rows'][0]['object_id'] ) );
     $model = $collection['result'];
     if ( $model['available'] )
     {

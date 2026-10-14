@@ -152,7 +152,7 @@ class expAiPlanner
         }
         $object = null;
         if ( $item['target']['object_id'] )
-            $object = eZContentObject::fetch( $item['target']['object_id'] );
+            $object = expAiObjects::fetch( $item['target']['object_id'] );
         elseif ( $item['target']['node_id'] )
         {
             $node = eZContentObjectTreeNode::fetch( $item['target']['node_id'] );
@@ -181,7 +181,7 @@ class expAiPlanner
             $node = eZContentObjectTreeNode::fetch( (int) $item['target']['parent_node_id'] );
             return $node && $node->canRead() ? (string) $node->attribute( 'name' ) : '#' . (int) $item['target']['parent_node_id'];
         }
-        $object = $item['target']['object_id'] ? eZContentObject::fetch( (int) $item['target']['object_id'] ) : null;
+        $object = $item['target']['object_id'] ? expAiObjects::fetch( (int) $item['target']['object_id'] ) : null;
         return $object && $object->canRead() ? (string) $object->attribute( 'name' ) : '#' . (int) ( $item['target']['object_id'] ?: $item['target']['node_id'] );
     }
 

@@ -678,7 +678,7 @@ class expAiChainEngine
         $language = (string) $run->attribute( 'language' );
         $chain = $run->chain();
         $fields = array_intersect_key( $document, array_flip( $chain->fields() ) + array_flip( self::allOutputFields( $chain ) ) );
-        $object = (int) $run->attribute( 'object_id' ) ? eZContentObject::fetch( (int) $run->attribute( 'object_id' ) ) : null;
+        $object = (int) $run->attribute( 'object_id' ) ? expAiObjects::fetch( (int) $run->attribute( 'object_id' ) ) : null;
         $first = !$object instanceof eZContentObject;
         if ( $first )
         {
@@ -767,7 +767,7 @@ class expAiChainEngine
      */
     protected function readDraft( expAiChainRun $run )
     {
-        $object = (int) $run->attribute( 'object_id' ) ? eZContentObject::fetch( (int) $run->attribute( 'object_id' ) ) : null;
+        $object = (int) $run->attribute( 'object_id' ) ? expAiObjects::fetch( (int) $run->attribute( 'object_id' ) ) : null;
         if ( !$object instanceof eZContentObject || !(int) $run->attribute( 'version' ) )
             return;
         $chain = $run->chain();
@@ -1091,7 +1091,7 @@ class expAiChainEngine
                 }
                 elseif ( preg_match( '~^ezobject://(\d+)~', $url, $u ) )
                 {
-                    $ok = (bool) eZContentObject::fetch( (int) $u[1] );
+                    $ok = (bool) expAiObjects::fetch( (int) $u[1] );
                     $why = $ok ? '' : 'no object ' . (int) $u[1];
                 }
                 elseif ( preg_match( '~^mailto:~i', $url ) )

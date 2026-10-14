@@ -116,7 +116,7 @@ class expAiCheckpoint extends eZPersistentObject
     /** @return eZContentObjectVersion|null the version when it is still a draft */
     protected static function draftVersion( $objectID, $version )
     {
-        $object = eZContentObject::fetch( (int) $objectID );
+        $object = expAiObjects::fetch( (int) $objectID );
         $v = $object ? $object->version( (int) $version ) : null;
         return $v && (int) $v->attribute( 'status' ) === eZContentObjectVersion::STATUS_DRAFT ? $v : null;
     }
@@ -127,7 +127,7 @@ class expAiCheckpoint extends eZPersistentObject
      */
     protected static function draftValues( $objectID, $version, $language, expAiConfig $config )
     {
-        $object = eZContentObject::fetch( (int) $objectID );
+        $object = expAiObjects::fetch( (int) $objectID );
         if ( !$object )
             return array();
         $writable = $config->writableDatatypes();
@@ -285,7 +285,7 @@ class expAiCheckpoint extends eZPersistentObject
                 continue;
             $seen[$key] = true;
             $objectID = (int) $log->attribute( 'contentobject_id' );
-            $object = eZContentObject::fetch( $objectID );
+            $object = expAiObjects::fetch( $objectID );
             $name = $object ? (string) $object->attribute( 'name' ) : '#' . $objectID;
             $row = array( 'object_id' => $objectID, 'version' => (int) $log->attribute( 'version' ), 'language' => (string) $log->attribute( 'language_code' ),
                           'name' => $name, 'log_id' => (int) $log->attribute( 'id' ) );
@@ -371,7 +371,7 @@ class expAiCheckpoint extends eZPersistentObject
         // drafts written after the checkpoint: discarded
         foreach ( $plan['discard'] as $row )
         {
-            $object = eZContentObject::fetch( (int) $row['object_id'] );
+            $object = expAiObjects::fetch( (int) $row['object_id'] );
             $version = self::draftVersion( (int) $row['object_id'], (int) $row['version'] );
             if ( !$object || !$version )
                 continue;
@@ -387,7 +387,7 @@ class expAiCheckpoint extends eZPersistentObject
         foreach ( $plan['revert'] as $row )
         {
             $key = $row['object_id'] . ':' . $row['version'] . ':' . $row['language'];
-            $object = eZContentObject::fetch( (int) $row['object_id'] );
+            $object = expAiObjects::fetch( (int) $row['object_id'] );
             if ( !$object || !isset( $known[$key] ) || !is_array( $known[$key]['values'] ) )
                 continue;
             $values = array();

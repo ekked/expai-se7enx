@@ -45,7 +45,8 @@ class expAiDashboardTest extends expAiCoreTestCase
         $this->assertSame( 'expai/dashboard/(node)/' . $nodeID . '/(again)/' . $mine->attribute( 'id' ), $row['links']['prompt'] );
         $this->assertSame( 'content/view/full/' . $nodeID . '#exp-ai', $row['links']['tab'] );
         $deleted = $rows['999999999:1'];
-        $this->assertSame( 'discarded', $deleted['status'] );
+        $this->assertSame( 'deleted', $deleted['status'] );
+        $this->assertTrue( $deleted['deleted'] );
         $this->assertSame( 'deleted', $deleted['links']['state'] );
         $this->assertGreaterThanOrEqual( 2, expAiDashboard::myDraftCount() );
 

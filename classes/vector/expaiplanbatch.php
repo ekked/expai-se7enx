@@ -78,7 +78,7 @@ class expAiPlanBatch
         }
         else
         {
-            $object = eZContentObject::fetch( (int) $item['target']['object_id'] );
+            $object = expAiObjects::fetch( (int) $item['target']['object_id'] );
             if ( !$object instanceof eZContentObject )
                 throw new expAiException( 'Object %id does not exist or you may not read it.', '', 0, array( '%id' => (int) $item['target']['object_id'] ) );
             $objects[] = (int) $object->attribute( 'id' );

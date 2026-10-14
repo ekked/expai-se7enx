@@ -11,7 +11,7 @@
 {foreach $exp_ai_drafts as $d sequence array( 'bglight', 'bgdark' ) as $style}
     <tr class="{$style}">
         <td>{if $d.urls.view}<a href={$d.urls.view|ezurl}>{$d.name|wash}</a>{else}{'(removed)'|i18n( 'extension/expai/dashboard' )}{/if}</td>
-        <td>{switch match=$d.status}{case match='kept'}{'Saved as draft'|i18n( 'extension/expai/panel' )}{/case}{case match='pending'}{'Waiting for approval'|i18n( 'extension/expai/panel' )}{/case}{case match='published'}{'Published'|i18n( 'extension/expai/panel' )}{/case}{case match='discarded'}{'Discarded'|i18n( 'extension/expai/dashboard' )}{/case}{case}{'Draft'|i18n( 'extension/expai/panel' )}{/case}{/switch}</td>
+        <td>{switch match=$d.status}{case match='deleted'}{'deleted'|i18n( 'extension/expai/links' )}{/case}{case match='kept'}{'Saved as draft'|i18n( 'extension/expai/panel' )}{/case}{case match='pending'}{'Waiting for approval'|i18n( 'extension/expai/panel' )}{/case}{case match='published'}{'Published'|i18n( 'extension/expai/panel' )}{/case}{case match='discarded'}{'Discarded'|i18n( 'extension/expai/dashboard' )}{/case}{case}{'Draft'|i18n( 'extension/expai/panel' )}{/case}{/switch}</td>
         <td>{$d.created|l10n( 'shortdatetime' )}</td>
     </tr>
 {/foreach}

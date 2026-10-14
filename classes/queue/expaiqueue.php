@@ -103,7 +103,7 @@ class expAiQueue
         $policy = expAiDataPolicy::forProvider( $config, $model['provider'] );
         foreach ( $objects as $objectID )
         {
-            $object = eZContentObject::fetch( $objectID );
+            $object = expAiObjects::fetch( $objectID );
             if ( $object instanceof eZContentObject )
                 $requirements[] = $policy->requirement( $object );
         }
