@@ -5395,6 +5395,7 @@
         <source>The test of %model runs in the background.</source>
         <translation>Der Test von %model läuft im Hintergrund.</translation>
     </message>
+</context>
 <!-- expai vector parallel/checkpoints: begin -->
 <context>
     <name>extension/expai/error</name>
@@ -5702,7 +5703,6 @@
     </message>
 </context>
 <!-- expai vector parallel/checkpoints: end -->
-</context>
 <context>
     <name>extension/expai/modelstats</name>
     <message>
