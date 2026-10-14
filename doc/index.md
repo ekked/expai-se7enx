@@ -50,6 +50,7 @@
 | [troubleshooting.md](troubleshooting.md) | Failures and their fixes |
 | [faq.md](faq.md) | Short answers |
 | [changelog/0.0.1.2.md](changelog/0.0.1.2.md) | Every translation file validates again, so expai is translated |
+| [changelog/0.0.1.3.md](changelog/0.0.1.3.md) | Draft log entries of removed objects show as removed, without an "Object not found" error |
 | [changelog/0.0.1.1.md](changelog/0.0.1.1.md) | No "Decorative" choice for a field that requires an alt text |
 | [changelog/0.0.1.0.md](changelog/0.0.1.0.md) | The first release |
 | [examples/expaiexample](examples/expaiexample) | The example extension of extending.md |
