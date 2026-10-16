@@ -1065,6 +1065,106 @@
         <source>Exponential Intelligence suggested no values.</source>
         <translation>Exponential Intelligence suggested no values.</translation>
     </message>
+    <message>
+        <source>Review the answer</source>
+        <translation>Review the answer</translation>
+    </message>
+    <message>
+        <source>Nothing was written into the field yet: review the answer below.</source>
+        <translation>Nothing was written into the field yet: review the answer below.</translation>
+    </message>
+    <message>
+        <source>The field changed while the answer was written.</source>
+        <translation>The field changed while the answer was written.</translation>
+    </message>
+    <message>
+        <source>%list would be lost.</source>
+        <translation>%list would be lost.</translation>
+    </message>
+    <message>
+        <source>%count answer(s) not written: review them at their fields.</source>
+        <translation>%count answer(s) not written: review them at their fields.</translation>
+    </message>
+    <message>
+        <source>Apply anyway</source>
+        <translation>Apply anyway</translation>
+    </message>
+    <message>
+        <source>Keep the original</source>
+        <translation>Keep the original</translation>
+    </message>
+    <message>
+        <source>Copy text</source>
+        <translation>Copy text</translation>
+    </message>
+    <message>
+        <source>Copied.</source>
+        <translation>Copied.</translation>
+    </message>
+    <message>
+        <source>The text could not be copied.</source>
+        <translation>The text could not be copied.</translation>
+    </message>
+    <message>
+        <source>Kept the original value.</source>
+        <translation>Kept the original value.</translation>
+    </message>
+    <message>
+        <source>%count embedded object</source>
+        <translation>%count embedded object</translation>
+    </message>
+    <message>
+        <source>%count embedded objects</source>
+        <translation>%count embedded objects</translation>
+    </message>
+    <message>
+        <source>%count table</source>
+        <translation>%count table</translation>
+    </message>
+    <message>
+        <source>%count tables</source>
+        <translation>%count tables</translation>
+    </message>
+    <message>
+        <source>%count custom tag</source>
+        <translation>%count custom tag</translation>
+    </message>
+    <message>
+        <source>%count custom tags</source>
+        <translation>%count custom tags</translation>
+    </message>
+    <message>
+        <source>%count anchor</source>
+        <translation>%count anchor</translation>
+    </message>
+    <message>
+        <source>%count anchors</source>
+        <translation>%count anchors</translation>
+    </message>
+    <message>
+        <source>%count literal block</source>
+        <translation>%count literal block</translation>
+    </message>
+    <message>
+        <source>%count literal blocks</source>
+        <translation>%count literal blocks</translation>
+    </message>
+    <message>
+        <source>%count internal link</source>
+        <translation>%count internal link</translation>
+    </message>
+    <message>
+        <source>%count internal links</source>
+        <translation>%count internal links</translation>
+    </message>
+    <message>
+        <source>%count formatting attribute</source>
+        <translation>%count formatting attribute</translation>
+    </message>
+    <message>
+        <source>%count formatting attributes</source>
+        <translation>%count formatting attributes</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/error</name>

@@ -232,6 +232,21 @@
 .exp-ai-busy { cursor: progress; }
 .exp-ai-note { margin: 0.4em 0; }
 .exp-ai-note:empty { display: none; }
+/* edit form: the review of an answer that would lose structure or overwrite a change */
+.exp-ai-review-host:empty { display: none; }
+.exp-ai-review {
+    flex: 1 0 100%;
+    margin: 0.3em 0 0.4em;
+    padding: 0.5em 0.75em;
+    border: 1px solid var(--exp-ai-line);
+    border-left: 3px solid var(--exp-ai-accent);
+    border-radius: 4px;
+    font-size: 0.95em;
+}
+.exp-ai-review-reason { margin: 0 0 0.4em; }
+.exp-ai-review-text { max-height: 16em; overflow: auto; padding: 0.3em 0.5em; border: 1px dashed var(--exp-ai-line); border-radius: 4px; }
+.exp-ai-review-text p, .exp-ai-review-text ul, .exp-ai-review-text ol { margin: 0.3em 0; }
+.exp-ai-review-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4em; margin: 0.5em 0 0; }
 
 @media (max-width: 640px) {
     .exp-ai-msg-user { margin-left: 0; }

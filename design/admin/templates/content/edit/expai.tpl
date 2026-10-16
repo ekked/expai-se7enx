@@ -62,7 +62,32 @@
             'undone', 'Restored the previous value.'|i18n( 'extension/expai/edit' ),
             'error', 'Something went wrong:'|i18n( 'extension/expai/edit' ),
             'timeout', 'The server did not answer in time. Please try again.'|i18n( 'extension/expai/edit' ),
-            'nothing', 'Exponential Intelligence suggested no values.'|i18n( 'extension/expai/edit' )
+            'nothing', 'Exponential Intelligence suggested no values.'|i18n( 'extension/expai/edit' ),
+            'review_title', 'Review the answer'|i18n( 'extension/expai/edit' ),
+            'review_note', 'Nothing was written into the field yet: review the answer below.'|i18n( 'extension/expai/edit' ),
+            'review_changed', 'The field changed while the answer was written.'|i18n( 'extension/expai/edit' ),
+            'review_lost', '%list would be lost.'|i18n( 'extension/expai/edit' ),
+            'review_count', '%count answer(s) not written: review them at their fields.'|i18n( 'extension/expai/edit' ),
+            'apply_anyway', 'Apply anyway'|i18n( 'extension/expai/edit' ),
+            'keep_original', 'Keep the original'|i18n( 'extension/expai/edit' ),
+            'copy_text', 'Copy text'|i18n( 'extension/expai/edit' ),
+            'copied', 'Copied.'|i18n( 'extension/expai/edit' ),
+            'copy_failed', 'The text could not be copied.'|i18n( 'extension/expai/edit' ),
+            'kept', 'Kept the original value.'|i18n( 'extension/expai/edit' ),
+            'lost_embed_1', '%count embedded object'|i18n( 'extension/expai/edit' ),
+            'lost_embed_n', '%count embedded objects'|i18n( 'extension/expai/edit' ),
+            'lost_table_1', '%count table'|i18n( 'extension/expai/edit' ),
+            'lost_table_n', '%count tables'|i18n( 'extension/expai/edit' ),
+            'lost_custom_1', '%count custom tag'|i18n( 'extension/expai/edit' ),
+            'lost_custom_n', '%count custom tags'|i18n( 'extension/expai/edit' ),
+            'lost_anchor_1', '%count anchor'|i18n( 'extension/expai/edit' ),
+            'lost_anchor_n', '%count anchors'|i18n( 'extension/expai/edit' ),
+            'lost_literal_1', '%count literal block'|i18n( 'extension/expai/edit' ),
+            'lost_literal_n', '%count literal blocks'|i18n( 'extension/expai/edit' ),
+            'lost_link_1', '%count internal link'|i18n( 'extension/expai/edit' ),
+            'lost_link_n', '%count internal links'|i18n( 'extension/expai/edit' ),
+            'lost_attribute_1', '%count formatting attribute'|i18n( 'extension/expai/edit' ),
+            'lost_attribute_n', '%count formatting attributes'|i18n( 'extension/expai/edit' )
         )
     ) )}</script>
 </section>

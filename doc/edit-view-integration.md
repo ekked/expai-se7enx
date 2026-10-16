@@ -41,7 +41,8 @@ and Cancel. The request `expai::field` sends the object, version, language, attr
 value (as the form has it now), the editor's input and the other fields' current values (as context, at most about 30
 KB). The server checks that the version is the editor's own draft and editable, that the attribute belongs to it and
 that the action is offered for its datatype, runs the action's handler and returns `{value, note}`. expai.js puts the
-value into the field, highlights it, shows the note and an **Undo** link.
+value into the field, highlights it, shows the note and an **Undo** link, unless the answer would lose structure of
+the field or the field changed while the answer was written (see [below](#structure-is-never-lost-silently)).
 
 The answer also carries `record` (`expAiEditForm::requestRecord()`: `usage_id`, `log` = `expai/log/(request)/<id>`,
 and `job` = `expqueue/job/<uuid>` when the request ran as a job and the user has `expqueue/view`). The note shows it
@@ -64,6 +65,46 @@ expai.js reads and writes a field through an adapter per datatype (`ExpAi.fieldA
 
 The `input`/`change` events are what ezautosave watches, so a filled field is autosaved like a typed one. Rich text
 is the HTML subset `p, h2, h3, h4, strong, em, ul, ol, li, a href` (cleaned on the server).
+
+## Structure is never lost silently
+
+Writing an answer replaces the whole field (`setContent()`), and the answer only has the subset above. Everything
+else the field holds would be gone, and ezautosave would store the loss a moment later. So before an answer is put
+into a field, expai.js (`ExpAi.guardedApply()`) checks two things:
+
+- **Structure** (ezxmltext only): `expai_structure.js` (`window.ExpAiStructure`, loaded before expai.js through
+  `BackendJavaScriptList[]`) counts the structure-bearing elements of the field as it is now and of the answer:
+
+  | Kind | Counted |
+  | --- | --- |
+  | embedded objects | `<img>`, elements with `id="eZObject_<id>"`/`eZNode_<id>`, `ezoeItemNonEditable`/`ezoeItemContentType*` embeds of both editors, `data-ezelement="ezembed*"`, `<embed>`/`<embed-inline>` of the simplified XML, `<object>`, `<iframe>`, `<video>`, `<audio>`; the preview inside an embed is not counted |
+  | tables | `<table>` |
+  | custom tags | `class="ezoeItemCustomTag ..."`, `type="custom"`, `data-ezelement="eztemplate*"`, `<custom>`, `<sub>`, `<sup>` |
+  | anchors | `<a name>`/`<a id>` without `href`, `<anchor>`, `<header anchor_name>` |
+  | literals | `<pre>`, `<literal>` |
+  | internal links | links to `ezobject://`, `eznode://`, a path on the site, or with `object_id`/`node_id`/`url_id` (the answer keeps only `http(s)` and `mailto` links) |
+  | formatting attributes | blocks, list items, cells, strong and emphasize with `align`, `customattributes`, `custom:*` or a class of their own (the editors' `ezoe*`/`mce*` classes do not count) |
+
+  It reads the HTML of the Online Editor (TinyMCE) and of Tiptap (exp_oe_tiptap) and the simplified XML of a textarea
+  without an editor alike, with a small tag scanner (no DOM). When the answer has fewer of any kind, it is not
+  written.
+- **A change meanwhile** (every datatype, also the parts of an xrowmetadata field): the value the request sent is kept;
+  when the field differs once the answer is there (white space between tags aside), the answer is not written.
+
+Instead of writing, the field's bar shows a review: the answer (as plain text, rendered safely), the reason ("2
+embedded objects, 1 table would be lost.", "The field changed while the answer was written.") and the buttons **Apply
+anyway**, **Keep the original** and, where the browser offers the clipboard API, **Copy text**. Only **Apply anyway**
+writes; it reads the field again at that moment, so **Undo** restores what was there right before. The note says
+"Nothing was written into the field yet". A new request in the same field removes an open review.
+
+The same check runs for the field actions, the presets and the Improve menu (`expai_presets.js`) and "Fill the
+fields": a field of a fill that needs a review gets it in its bar (or in a box of its own after the label when the
+field has no bar), and the note of the fill counts the answers not written. The strings come from the edit form's
+configuration (`content/edit/expai.tpl`, context `extension/expai/edit`): `review_*`, `apply_anyway`,
+`keep_original`, `copy_text`, `copied`, `copy_failed`, `kept` and `lost_<kind>_1`/`lost_<kind>_n` per kind.
+
+An extension that writes answers into fields itself calls
+`ExpAi.guardedApply( { ctx, adapter, value, sent, host, strings, apply, kept } )`; it returns `{written, review}`.
 
 ## Presets and the Improve menu
 

@@ -21,6 +21,14 @@ the siteaccess `EXPAI_TEST_SITEACCESS` (default `admin`). `EXPONENTIAL_ROOT` nam
 the whole run goes to the file transport, whatever the site's settings say. Without a database or without the expai
 tables, the tests that need them are skipped and give the reason. The rest still runs.
 
+The structure detector of the edit form (`design/admin/javascript/expai_structure.js`) has a test of its own that
+runs with node (20 or later), without a browser; `expAiStructureScriptTest` runs it from the unit suite when node is
+installed and is skipped otherwise:
+
+```
+node --test extension/expai/tests/js/expai_structure.test.mjs
+```
+
 The script tests can still be run on their own, exactly as before:
 
 ```
