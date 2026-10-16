@@ -3,8 +3,8 @@
 /**
  * The probe of a model's tool calling (expAiProbe): scripted tasks with the panel's tool definitions, graded on the
  * calls the model makes. The tools are never run; nothing is read from or written to the content. The result is
- * stored in expai_probe_result; a live result of at least [ProbeSettings] WritePassRate percent lets a model with
- * ToolUse=native and WriteTools=enabled write drafts.
+ * stored in expai_probe_result; a live result of at least [ProbeSettings] WritePassRate percent, with every task of
+ * [ProbeSettings] MandatoryTasks[] passed, lets a model with ToolUse=native and WriteTools=enabled write drafts.
  *
  *   php extension/expai/bin/php/expaiprobe.php --model=<alias>                  dry run: the tasks and the first request body, no call
  *   php extension/expai/bin/php/expaiprobe.php --model=<alias> --live           calls the model, stores the result (mode live)
@@ -114,7 +114,11 @@ $cli->output( "probe of $alias ({$model['provider']}, {$model['id']}, tools {$mo
 $start = microtime( true );
 $result = $probe->run( $recorder, $nodeID, $objectID, strtolower( (string) $config->get( 'ProbeSettings', 'ClassIdentifier', 'folder' ) ), function ( $line ) use ( $cli ) { $cli->output( '  ' . $line ); } );
 $row = expAiProbe::store( $alias, $model['provider'], $model['id'], $model['tool_use'], $mode, $result );
-$cli->output( sprintf( '%s %d/%d tasks (%d%%) in %.1f s, stored as probe result %d (%s); write gate: %s',
-    $result['pass_rate'] >= expAiProbe::threshold( $config ) ? 'PASS' : 'BELOW', $result['passed'], $result['tasks'], $result['pass_rate'],
+// the gate needs the pass rate and every mandatory task ([ProbeSettings] MandatoryTasks[]); say which one blocked it
+$blocked = expAiProbe::failedMandatory( $result['results'], $config );
+foreach ( $blocked as $id )
+    $cli->output( '  mandatory task ' . $id . ' did not pass: the write gate stays closed' );
+$cli->output( sprintf( '%s %d/%d tasks (%d%%) in %.1F s, stored as probe result %d (%s); write gate: %s',
+    expAiProbe::gateOpens( $result['pass_rate'], $result['results'], $config ) ? 'PASS' : ( $blocked ? 'BLOCKED' : 'BELOW' ), $result['passed'], $result['tasks'], $result['pass_rate'],
     microtime( true ) - $start, (int) $row->attribute( 'id' ), $mode, expAiProbe::writeAllowed( $alias, $config ) ? 'may write' : 'read only (' . expAiProbe::writeRefusal( $alias, $config ) . ')' ) );
 $script->shutdown( 0 );

@@ -208,6 +208,9 @@ class expAiRequestHandler extends expQueueHandlerBase
 
     /**
      * The checkpointed answer: text, value, tokens and cost (never the request, never the full provider answer).
+     * An answer cut off at the token limit (stop_reason max_tokens) has no value: the JSON in its text is cut, and a
+     * complete object inside it (e.g. the first element of a list) is not the answer. Appliers then report the cut
+     * instead of a missing part.
      * @return array
      */
     public static function storedAnswer( array $answer, $lane, $usageRow = null )
@@ -217,12 +220,14 @@ class expAiRequestHandler extends expQueueHandlerBase
             if ( is_array( $block ) && isset( $block['type'], $block['text'] ) && $block['type'] === 'text' )
                 $text .= $block['text'];
         $max = (int) expAiConfig::instance()->int( 'QueueSettings', 'MaxStoredAnswerBytes', 200000, 1000 );
-        $value = json_decode( trim( preg_replace( '/^```(?:json)?\s*|\s*```$/', '', trim( $text ) ) ), true );
+        $stopReason = isset( $answer['stop_reason'] ) ? (string) $answer['stop_reason'] : '';
+        $value = $stopReason === 'max_tokens' ? null : expAiText::extractJson( expAiText::stripReasoning( $text ) );
         $cost = $usageRow ? $usageRow->cost() : null;
         return array(
-            'text' => strlen( $text ) > $max ? substr( $text, 0, $max ) : $text,
+            // mb_strcut: a cut inside a multibyte character would make the stored JSON drop the whole text
+            'text' => strlen( $text ) > $max ? mb_strcut( $text, 0, $max, 'UTF-8' ) : $text,
             'value' => is_array( $value ) ? $value : null,
-            'stop_reason' => isset( $answer['stop_reason'] ) ? (string) $answer['stop_reason'] : '',
+            'stop_reason' => $stopReason,
             'model' => isset( $answer['model'] ) ? (string) $answer['model'] : '',
             'tokens' => isset( $answer['tokens'] ) ? (array) $answer['tokens'] : array(),
             'lane' => (string) $lane,

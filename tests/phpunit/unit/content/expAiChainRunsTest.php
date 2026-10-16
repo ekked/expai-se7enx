@@ -206,7 +206,7 @@ class expAiChainRunsTest extends expAiContentTestCase
         $run = $engine->start( 'xt', (int) $folder->attribute( 'node_id' ), 'A brief' )[0];
         $this->assertSame( 'running', $run->attribute( 'state' ) );
         $job = new expQueueJob( array( 'uuid' => expAiChainEngine::uuid() ) );
-        $answer = $engine->onAnswer( $job, array( 'text' => 'Here is your article, without any JSON.', 'stop_reason' => 'max_tokens' ),
+        $answer = $engine->onAnswer( $job, array( 'text' => 'Here is your article, without any JSON.', 'stop_reason' => 'end_turn' ),
                                      array( 'run' => (int) $run->attribute( 'id' ), 'step' => 'write', 'iteration' => 0 ) );
         $this->assertSame( array( 'failed', 'write' ), array( $answer['chain'], $answer['step'] ) );
         $run = expAiChainRun::fetch( (int) $run->attribute( 'id' ) );
@@ -214,8 +214,27 @@ class expAiChainRunsTest extends expAiContentTestCase
         $this->assertStringContainsString( 'the step write did not answer in the expected format', $run->attribute( 'last_error' ) );
         $step = $run->steps()[0];
         $this->assertSame( 'failed', $step->attribute( 'state' ) );
-        $this->assertSame( 'the answer was not the JSON the step asks for (stop reason max_tokens)', $step->attribute( 'note' ) );
+        $this->assertSame( 'the answer was not the JSON the step asks for (stop reason end_turn)', $step->attribute( 'note' ) );
         $this->assertSame( array( 'text' => 'Here is your article, without any JSON.' ), $step->outputArray(), 'the text is kept for the editor' );
+    }
+
+    public function testAnAnswerCutOffAtTheTokenLimitEndsTheRunWithAHint(): void
+    {
+        $config = $this->siteSettings( self::chainSettings() );
+        $folder = $this->folder();
+        $this->forgetRuns( $folder );
+        $this->asUser( 'admin' );
+        $engine = new expAiChainEngine( $config );
+        $run = $engine->start( 'xt', (int) $folder->attribute( 'node_id' ), 'A brief' )[0];
+        $job = new expQueueJob( array( 'uuid' => expAiChainEngine::uuid() ) );
+        // a complete object inside the cut text is not taken for the answer
+        $answer = $engine->onAnswer( $job, array( 'text' => '{"fields": {"title": "Spring"}, "note": "', 'value' => array( 'fields' => array( 'title' => 'Spring' ) ), 'stop_reason' => 'max_tokens' ),
+                                     array( 'run' => (int) $run->attribute( 'id' ), 'step' => 'write', 'iteration' => 0 ) );
+        $this->assertSame( array( 'failed', 'write' ), array( $answer['chain'], $answer['step'] ) );
+        $run = expAiChainRun::fetch( (int) $run->attribute( 'id' ) );
+        $this->assertSame( 'failed', $run->attribute( 'state' ) );
+        $this->assertStringContainsString( 'Raise MaxTokens or lower Effort for this model.', $run->attribute( 'last_error' ) );
+        $this->assertSame( 'the answer was cut off at the token limit (stop reason max_tokens)', $run->steps()[0]->attribute( 'note' ) );
     }
 
     public function testAChainWithAMissingClassIsRefused(): void

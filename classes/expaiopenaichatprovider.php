@@ -38,6 +38,12 @@ class expAiOpenAiChatProvider extends expAiProviderBase
     /** @var string[] */
     protected $defaultRateLimitHeaders = array( 'x-ratelimit-*', 'retry-after', 'x-request-id' );
 
+    /** @var array optional fields the server refused with a 400 (name => true): left out for the rest of the request */
+    protected $droppedParameters = array();
+
+    /** @var string[] optional fields that are left out and sent again when a 400 names them */
+    protected static $optionalParameters = array( 'reasoning_effort', 'stream_options', 'reasoning' );
+
     protected function defaultProviderId()
     {
         return 'openai_chat';
@@ -312,7 +318,15 @@ class expAiOpenAiChatProvider extends expAiProviderBase
         // from a server that streams; the answer is the same, with timings first_token and eval (ms)
         if ( !empty( $request['stream_timing'] ) && $this->streams() )
             return $this->sendStreamed( $endpoint, $headers, $payload );
+        $payload = array_diff_key( $payload, $this->droppedParameters );
         list( $status, $received, $rateHeaders, $retries ) = $this->post( $endpoint, $headers, $this->encode( $payload ) );
+        // a 400 that names an optional field the server does not support: once more without it
+        for ( $i = 0; $i < count( self::$optionalParameters ) && $status === 400 && ( $field = $this->unsupportedParameter( $received, $payload ) ) !== ''; $i++ )
+        {
+            $this->dropParameter( $field, $payload );
+            list( $status, $received, $rateHeaders, $more ) = $this->post( $endpoint, $headers, $this->encode( $payload ) );
+            $retries += 1 + $more;
+        }
         $data = json_decode( $received, true );
         if ( $status < 200 || $status >= 300 )
             throw $this->httpError( $status, $data, $rateHeaders, $retries );
@@ -323,14 +337,85 @@ class expAiOpenAiChatProvider extends expAiProviderBase
     }
 
     /**
+     * The optional field of the payload a 400 answer refuses as unknown: reasoning_effort, stream_options or
+     * reasoning. It counts when the error's structured param or code is the field, or when the error text names the
+     * field and says it is not accepted ("unsupported", "unknown", "unrecognized", "not supported", "not allowed",
+     * "extra inputs", "additional properties", "unexpected"). A refused value of a known field ("Invalid value for
+     * reasoning_effort", code invalid_value) is a configuration error and fails as it is; so does a text that merely
+     * mentions the field.
+     * @return string the field, '' when the 400 is about something else
+     */
+    public function unsupportedParameter( $received, array $payload )
+    {
+        $data = json_decode( (string) $received, true );
+        $error = is_array( $data ) && isset( $data['error'] ) ? $data['error'] : null;
+        $param = is_array( $error ) && isset( $error['param'] ) && is_string( $error['param'] ) ? $error['param'] : '';
+        $code = is_array( $error ) && isset( $error['code'] ) && is_string( $error['code'] ) ? $error['code'] : '';
+        if ( $error !== null )
+            $text = is_array( $error ) ? json_encode( $error, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) : (string) $error;
+        elseif ( is_array( $data ) && isset( $data['message'] ) && is_string( $data['message'] ) )
+            $text = $data['message'];
+        else
+            $text = substr( (string) $received, 0, 2000 );
+        // the field is known, its value is not
+        if ( preg_match( '/invalid[ _-]?value|unsupported[ _-]?value|supported values|must be one of|invalid type/i', $text ) )
+            return '';
+        $refused = preg_match( '/unsupported|unknown|unrecognized|not[ _-]supported|not[ _-]allowed|extra[ _-]inputs|additional[ _-]?properties|unexpected/i', $text );
+        foreach ( self::$optionalParameters as $field )
+        {
+            if ( !isset( $payload[$field] ) || isset( $this->droppedParameters[$field] ) )
+                continue;
+            if ( $param === $field || $code === $field )
+                return $field;
+            if ( $refused && preg_match( '/(?<![A-Za-z0-9_])' . $field . '(?![A-Za-z0-9_])/i', $text ) )
+                return $field;
+        }
+        return '';
+    }
+
+    /** Leaves an optional field out of this and the following requests of this provider object, with a debug notice. */
+    protected function dropParameter( $field, array &$payload )
+    {
+        $this->droppedParameters[$field] = true;
+        unset( $payload[$field] );
+        if ( class_exists( 'eZDebug' ) )
+            eZDebug::writeNotice( 'expai: provider ' . $this->providerId() . ' refused the optional field ' . $field . '; sent once more without it', __METHOD__ );
+    }
+
+    /**
      * #392 The request as an event stream (stream: true, stream_options.include_usage), timing the first event that
-     * carries text or reasoning. No retry: a test prompt is short and is repeated by the editor.
+     * carries text or reasoning. No retry of a failure (a test prompt is short and is repeated by the editor); a 400 that
+     * names an optional field (stream_options, reasoning_effort) is sent once more without it.
      * @return array the answer of parseAnswer() with timings first_token and eval (ms)
      */
     protected function sendStreamed( $endpoint, array $headers, array $payload )
     {
         $payload['stream'] = true;
         $payload['stream_options'] = array( 'include_usage' => true );
+        $payload = array_diff_key( $payload, $this->droppedParameters );
+        for ( $i = 0; ; $i++ )
+        {
+            $answer = $this->streamOnce( $endpoint, $headers, $payload );
+            if ( !isset( $answer['refused'] ) )
+            {
+                $answer['retries'] = $i;
+                return $answer;
+            }
+            list( $status, $received, $rateHeaders ) = $answer['refused'];
+            if ( $i >= count( self::$optionalParameters ) || ( $field = $this->unsupportedParameter( $received, $payload ) ) === '' )
+                throw $this->httpError( $status, json_decode( $received, true ), $rateHeaders, $i );
+            $this->dropParameter( $field, $payload );
+        }
+    }
+
+    /**
+     * One streamed request.
+     * @return array the answer of parseAnswer() with its timings, or for a 400 array( refused => array( status, body,
+     *               rate limit headers ) )
+     * @throws expAiException
+     */
+    protected function streamOnce( $endpoint, array $headers, array $payload )
+    {
         $start = microtime( true );
         $first = null;
         $buffer = '';
@@ -354,9 +439,19 @@ class expAiOpenAiChatProvider extends expAiProviderBase
             throw $this->named( $e );
         }
         $total = (int) round( ( microtime( true ) - $start ) * 1000 );
+        if ( $status === 400 )
+            return array( 'refused' => array( $status, $received, $rateHeaders ) );
         if ( $status < 200 || $status >= 300 )
             throw $this->httpError( $status, json_decode( $received, true ), $rateHeaders, 0 );
-        $answer = $this->parseAnswer( self::assembleStream( $received ), $status );
+        try
+        {
+            $assembled = self::assembleStream( $received );
+        }
+        catch ( expAiException $e )
+        {
+            throw $this->named( $e );
+        }
+        $answer = $this->parseAnswer( $assembled, $status );
         $answer['retries'] = 0;
         $answer['rate_limits'] = $rateHeaders;
         $answer['timings'] = array( 'first_token' => $first, 'eval' => $first !== null ? max( 1, $total - $first ) : null, 'total' => $total );
@@ -366,9 +461,11 @@ class expAiOpenAiChatProvider extends expAiProviderBase
     /**
      * #392 A Chat Completions response from the events of a stream (data: {chunk} lines, data: [DONE]): the text, the
      * reasoning, the tool calls (by index, their arguments joined), the finish reason, the usage of the last chunk and
-     * the other top-level fields of the last chunk (billing_cost of Melious, model).
+     * the other top-level fields of the last chunk (billing_cost of Melious, model). An error in the stream (a chunk
+     * { error: ... }, or the data of an "event: error") is returned as that error object, for parseAnswer() to raise.
      * @param string $sse
      * @return array
+     * @throws expAiException when the stream ended without data: [DONE] and without a finish reason (it broke off)
      */
     public static function assembleStream( $sse )
     {
@@ -377,18 +474,35 @@ class expAiOpenAiChatProvider extends expAiProviderBase
         $calls = array();
         $finish = '';
         $top = array();
+        $done = false;
+        $event = '';
         foreach ( preg_split( '/\r?\n/', (string) $sse ) as $line )
         {
+            if ( strpos( $line, 'event:' ) === 0 )
+            {
+                $event = strtolower( trim( substr( $line, 6 ) ) );
+                continue;
+            }
+            if ( trim( $line ) === '' )
+                $event = '';
             if ( strpos( $line, 'data:' ) !== 0 )
                 continue;
             $json = trim( substr( $line, 5 ) );
+            if ( $json === '[DONE]' )
+                $done = true;
             if ( $json === '' || $json === '[DONE]' )
                 continue;
             $chunk = json_decode( $json, true );
             if ( !is_array( $chunk ) )
+            {
+                if ( $event === 'error' )
+                    return array( 'error' => array( 'message' => $json ) );
                 continue;
+            }
             if ( isset( $chunk['error'] ) )
                 return $chunk;
+            if ( $event === 'error' )
+                return array( 'error' => $chunk );
             foreach ( $chunk as $key => $value )
                 if ( $key !== 'choices' && $value !== null )
                     $top[$key] = $value;
@@ -413,6 +527,8 @@ class expAiOpenAiChatProvider extends expAiProviderBase
             if ( !empty( $chunk['choices'][0]['finish_reason'] ) )
                 $finish = (string) $chunk['choices'][0]['finish_reason'];
         }
+        if ( !$done && $finish === '' )
+            throw new expAiException( 'The answer stream ended early.', 'stream ended without data: [DONE] and without a finish_reason' );
         if ( $reasoning !== '' )
             $message['reasoning_content'] = $reasoning;
         if ( $calls )
@@ -455,8 +571,9 @@ class expAiOpenAiChatProvider extends expAiProviderBase
                     if ( is_array( $part ) && isset( $part['text'] ) && ( !isset( $part['type'] ) || $part['type'] === 'text' ) )
                         $text .= $part['text'];
         }
-        // some local models write their reasoning into the text: <think>...</think> is not part of the answer
-        $text = trim( preg_replace( '~<think>.*?</think>~s', '', $text ) );
+        // some models write their reasoning into the text (<think>...</think>, Harmony channels): it is not part of
+        // the answer; reasoning_content and reasoning never are
+        $text = expAiText::stripReasoning( $text );
         if ( $text !== '' )
             $content[] = array( 'type' => 'text', 'text' => $text );
         $invalid = array();

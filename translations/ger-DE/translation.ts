@@ -395,6 +395,18 @@
         <source>The draft could not be written.</source>
         <translation>Der Entwurf konnte nicht geschrieben werden.</translation>
     </message>
+    <message>
+        <source>The model gave no answer. Try again, or choose another model.</source>
+        <translation>Das Modell hat nicht geantwortet. Versuchen Sie es noch einmal, oder wählen Sie ein anderes Modell.</translation>
+    </message>
+    <message>
+        <source>The answer was cut off at the token limit. Raise MaxTokens or lower Effort for this model.</source>
+        <translation>Die Antwort wurde an der Token-Grenze abgeschnitten. Erhöhen Sie MaxTokens oder senken Sie Effort für dieses Modell.</translation>
+    </message>
+    <message>
+        <source>The answer stream ended early.</source>
+        <translation>Die Antwort brach vorzeitig ab.</translation>
+    </message>
 </context>
 <!-- expai chains: end -->
 <!-- expai lanes/budgets/packages: begin -->

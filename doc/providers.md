@@ -52,7 +52,9 @@ The answer: `choices[0].message` becomes text and `tool_use` blocks. Arguments a
 JSON object are answered with an error asking for valid JSON (the call is never run). A call without an id gets one
 (Mistral: 9 letters and digits). `finish_reason` `tool_calls` → `tool_use`, `length` → `max_tokens`, `stop` →
 `end_turn` (or `tool_use` when calls came with it, as Ollama does), `content_filter` → `refusal`, `error` → an error.
-An error object inside an HTTP 200 answer (OpenRouter) is an error. `<think>...</think>` in the text is removed.
+An error object inside an HTTP 200 answer (OpenRouter) is an error. Reasoning markup is removed: a leading
+`<think>...</think>` block, the text before a lone `</think>` and a line break, everything but the final channel of
+the Harmony format; a text that only mentions such a tag keeps it.
 
 Usage: `prompt_tokens` minus `prompt_tokens_details.cached_tokens` and `cache_write_tokens` is the input (as Anthropic
 counts it), the cached tokens are cache reads, `completion_tokens` the output (it includes reasoning),
@@ -131,8 +133,13 @@ See [probe.md](probe.md).
 
 401/403 "refused the request (access)", 402 "no credit left", 404 "does not know the configured model", 408/504 "did
 not answer in time", 413 "too long", 429/503/529 "busy or over its limit": each names the provider's `Label`; the log
-row has the status, the provider's error type and message. One retry: after a 429/503/529 whose `retry-after` is at
-most `RetryAfterMax` seconds, and after a 500/502/504 or a failed connection; never after a timeout. The response
+row has the status, the provider's error type and message. Up to two retries within one deadline (the provider's `Timeout` over all attempts), waiting 1 s, then 2 s (with a
+little jitter), or the `retry-after` (seconds or an HTTP date) when it is at most `RetryAfterMax` seconds: after a
+408/425/429 (also without `retry-after`), a 500/502/503/504/529, or a connection that was never made (refused, name
+not found). Never after a timeout or an answer that broke off, nor after a 408/502/504 of an attempt that took longer
+than 30 seconds: the provider may already bill the request. A 400 that refuses an optional parameter as unknown or
+unsupported (`reasoning_effort`, `reasoning`, `stream_options`) is sent once more without it; an invalid value of it
+fails as it is. The response
 headers of `RateLimitHeaders[]` are stored with the row.
 
 ## Examples

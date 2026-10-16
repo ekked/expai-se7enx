@@ -395,6 +395,18 @@
         <source>The draft could not be written.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>The model gave no answer. Try again, or choose another model.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The answer was cut off at the token limit. Raise MaxTokens or lower Effort for this model.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The answer stream ended early.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <!-- expai chains: end -->
 <!-- expai lanes/budgets/packages: begin -->

@@ -126,7 +126,7 @@ ReviseStep=revise         # the generate step a failed check sends the text to
 OnExhausted=escalate | stop
 Checkpoint=human | none   # human: the run waits for an editor after this step
 Next=review               # the step after this one (for a revise step: back to the review)
-MaxTokens=6000            # the longest answer of the step
+MaxTokens=6000            # the longest answer of the step (a reasoning model gets at least 1000)
 OutputFields[]=short_title   # transform steps: the fields they may write; generate steps: instead of Fields[]
 Languages[]=all           # translate steps: target languages (all: every language of the site but the run's)
 ```

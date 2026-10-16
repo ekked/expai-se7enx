@@ -121,27 +121,13 @@ class expAiPromptedToolProvider implements expAiProvider
     }
 
     /**
-     * The JSON object in a text: the whole text, a fenced block, or the first {...} that decodes.
+     * The JSON object in a text, without the model's reasoning (expAiText::stripReasoning()): the whole text, a
+     * fenced block, or the longest balanced {...} that decodes (expAiText::extractJson()).
      * @return array|null
      */
     public static function extractJson( $text )
     {
-        $text = trim( (string) $text );
-        $text = trim( preg_replace( '~<think>.*?</think>~s', '', $text ) );
-        $candidates = array( $text );
-        if ( preg_match( '~```(?:json)?\s*(.*?)```~s', $text, $m ) )
-            $candidates[] = trim( $m[1] );
-        $start = strpos( $text, '{' );
-        $end = strrpos( $text, '}' );
-        if ( $start !== false && $end !== false && $end > $start )
-            $candidates[] = substr( $text, $start, $end - $start + 1 );
-        foreach ( $candidates as $candidate )
-        {
-            $data = json_decode( $candidate, true );
-            if ( is_array( $data ) )
-                return $data;
-        }
-        return null;
+        return expAiText::extractJson( expAiText::stripReasoning( $text ) );
     }
 
     /**
@@ -214,7 +200,7 @@ class expAiPromptedToolProvider implements expAiProvider
                 // give up: what the model wrote is the answer
                 $data = self::extractJson( $text );
                 $kind = 'answer';
-                $value = is_array( $data ) && isset( $data['answer'] ) && is_scalar( $data['answer'] ) ? (string) $data['answer'] : trim( preg_replace( '~<think>.*?</think>~s', '', $text ) );
+                $value = is_array( $data ) && isset( $data['answer'] ) && is_scalar( $data['answer'] ) ? (string) $data['answer'] : expAiText::stripReasoning( $text );
             }
         }
         if ( $kind === 'tool' )

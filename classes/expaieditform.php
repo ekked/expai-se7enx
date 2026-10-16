@@ -140,11 +140,14 @@ class expAiEditForm
         }, $fallback );
         if ( $answer['stop_reason'] === 'refusal' )
             throw new expAiException( 'Exponential Intelligence declined this request.', 'stop_reason refusal' );
+        // a cut answer is not parsed: its JSON would be incomplete or wrong
+        if ( $answer['stop_reason'] === 'max_tokens' )
+            throw new expAiException( 'The answer was cut off at the token limit. Raise MaxTokens or lower Effort for this model.', 'stop_reason max_tokens' );
         $text = '';
         foreach ( $answer['content'] as $block )
             if ( isset( $block['type'] ) && $block['type'] === 'text' )
                 $text .= $block['text'];
-        $data = expAiPromptedToolProvider::extractJson( $text );
+        $data = expAiText::extractJson( expAiText::stripReasoning( $text ) );
         if ( !is_array( $data ) || !isset( $data['fields'] ) || !is_array( $data['fields'] ) )
             throw new expAiException( 'The answer of Exponential Intelligence could not be read.', 'no structured fields' );
         $out = array();

@@ -10,7 +10,8 @@
 
 /**
  * An HTTP client that never goes on the network: it answers from a queue of canned answers (array( status, body,
- * headers ) or an exception to throw) and records every request.
+ * headers ) or an exception to throw) and records every request. Its clock is virtual: a retry's wait is recorded
+ * in $waits and moves $clock on instead of sleeping.
  */
 class expAiProviderTestHttp extends expAiHttpClient
 {
@@ -19,6 +20,15 @@ class expAiProviderTestHttp extends expAiHttpClient
 
     /** @var array list of array( url, headers, body, options ) */
     public $requests = array();
+
+    /** @var float the virtual time (seconds) */
+    public $clock = 1767225600.0;
+
+    /** @var float[] the waits before retries, in seconds */
+    public $waits = array();
+
+    /** @var array|null what lastTransfer() reports (null: as the real client before any request) */
+    public $transfer = null;
 
     /**
      * @param array $answers
@@ -45,6 +55,22 @@ class expAiProviderTestHttp extends expAiHttpClient
         if ( is_callable( $answer ) )
             $answer = $answer( $url, $headers, $body, $options );
         return array_pad( $answer, 3, array() );
+    }
+
+    public function now()
+    {
+        return $this->clock;
+    }
+
+    public function pause( $seconds )
+    {
+        $this->waits[] = $seconds;
+        $this->clock += $seconds;
+    }
+
+    public function lastTransfer()
+    {
+        return $this->transfer !== null ? $this->transfer : parent::lastTransfer();
     }
 
     /** @return array the JSON body of request $i, decoded */

@@ -28,10 +28,19 @@ class expAiProbeGateTest extends expAiProviderTestCase
         ) );
     }
 
+    /** @return array the task results of a probe row: a read task and the mandatory tasks, all passed */
+    private static function details()
+    {
+        $details = array( array( 'id' => 'read', 'ok' => true ) );
+        foreach ( array( 'use_result', 'injection', 'create_draft', 'update_draft' ) as $id )
+            $details[] = array( 'id' => $id, 'ok' => true );
+        return $details;
+    }
+
     private static function probeRow( $alias, $model, $rate, $mode = 'live' )
     {
         $row = new expAiProbeResult( array( 'model_alias' => $alias, 'provider' => 'xtep', 'model' => $model, 'tool_mode' => 'native', 'probe_mode' => $mode,
-                                            'tasks' => 10, 'passed' => (int) ( $rate / 10 ), 'pass_rate' => $rate, 'details' => json_encode( array( array( 'id' => 'read', 'ok' => true ) ) ),
+                                            'tasks' => 10, 'passed' => (int) ( $rate / 10 ), 'pass_rate' => $rate, 'details' => json_encode( self::details() ),
                                             'user_id' => 14, 'created' => time() ) );
         $row->store();
         return $row;
@@ -59,7 +68,7 @@ class expAiProbeGateTest extends expAiProviderTestCase
         $this->assertSame( '', expAiProbe::writeRefusal( 'xtep.gated', $config ) );
         $this->assertTrue( expAiProbe::writeAllowed( 'xtep.gated', $config ) );
         $this->assertSame( (int) $passed->attribute( 'id' ), (int) expAiProbe::latest( 'xtep.gated' )->attribute( 'id' ) );
-        $this->assertSame( array( array( 'id' => 'read', 'ok' => true ) ), $passed->results() );
+        $this->assertSame( self::details(), $passed->results() );
         $passed->setAttribute( 'details', 'not json' );
         $this->assertSame( array(), $passed->results() );
     }

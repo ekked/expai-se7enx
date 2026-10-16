@@ -30,7 +30,7 @@ class expAiAnthropicProvider extends expAiProviderBase
 
     public function providerLabel()
     {
-        // the texts of the Anthropic provider name the assistant, as before the provider registry
+        // the error texts name the provider like those of every other provider: its Label, otherwise "Anthropic"
         return (string) $this->setting( 'Label', 'Anthropic' );
     }
 
@@ -102,9 +102,9 @@ class expAiAnthropicProvider extends expAiProviderBase
 
         $body = $this->encode( $payload );
 
-        list( $status, $received, $rateHeaders ) = array_pad( $this->http->postJson( $endpoint, $headers, $body ), 3, array() );
+        // transient failures (busy, server errors, no connection) are retried by post()
+        list( $status, $received, $rateHeaders, $retries ) = $this->post( $endpoint, $headers, $body );
         $data = json_decode( $received, true );
-        $retries = 0;
         // Thinking blocks are bound to the exact start of the conversation. When that start changed (a conversation
         // stored before its instructions were kept with it), the API refuses the old blocks: retry once and let it
         // drop them (the conversation goes on without the earlier reasoning).
@@ -119,27 +119,12 @@ class expAiAnthropicProvider extends expAiProviderBase
             $retryHeaders = array_values( array_filter( $headers, function ( $h ) { return stripos( $h, 'anthropic-beta:' ) !== 0; } ) );
             $retryHeaders[] = 'anthropic-beta: ' . implode( ',', $betas );
             $body = json_encode( $payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE );
-            list( $status, $received, $rateHeaders ) = array_pad( $this->http->postJson( $endpoint, $retryHeaders, $body ), 3, array() );
+            list( $status, $received, $rateHeaders, $more ) = $this->post( $endpoint, $retryHeaders, $body );
             $data = json_decode( $received, true );
-            $retries = 1;
+            $retries += 1 + $more;
         }
         if ( $status < 200 || $status >= 300 )
-        {
-            $type = is_array( $data ) && isset( $data['error']['type'] ) && is_string( $data['error']['type'] )
-                  ? preg_replace( '/[^\w.-]/', '', substr( $data['error']['type'], 0, 60 ) ) : '';
-            $apiMessage = is_array( $data ) && isset( $data['error']['message'] ) && is_string( $data['error']['message'] )
-                        ? substr( preg_replace( '/[\x00-\x1f]/', ' ', $data['error']['message'] ), 0, 300 ) : '';
-            $message = 'Exponential Intelligence reported an error.';
-            if ( $status === 401 || $status === 403 )
-                $message = 'Exponential Intelligence refused the request (access). Please tell the administrator.';
-            elseif ( $status === 429 || $status === 529 )
-                $message = 'Exponential Intelligence is busy or over its limit. Please try again later.';
-            elseif ( $status === 413 )
-                $message = 'The request is too long for Exponential Intelligence.';
-            $error = new expAiException( $message, 'HTTP ' . $status . ( $type !== '' ? ' ' . $type : '' ) . ( $apiMessage !== '' ? ': ' . $apiMessage : '' ), $status );
-            $error->rateLimits = $rateHeaders;
-            throw $error;
-        }
+            throw $this->httpError( $status, $data, $rateHeaders, $retries );
         $object = json_decode( $received );
         if ( !is_array( $data ) || !isset( $data['content'] ) || !is_array( $data['content'] ) || !is_object( $object ) )
             throw new expAiException( 'The answer of Exponential Intelligence could not be read.', 'HTTP ' . $status . ', no content[]', $status );

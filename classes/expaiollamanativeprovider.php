@@ -118,7 +118,7 @@ class expAiOllamaNativeProvider implements expAiProvider
     {
         if ( !is_array( $data ) || !isset( $data['message'] ) || !is_array( $data['message'] ) )
             throw new expAiException( 'The answer of Exponential Intelligence could not be read.', 'ollama /api/chat: no message' );
-        $text = trim( preg_replace( '~<think>.*?</think>~s', '', isset( $data['message']['content'] ) ? (string) $data['message']['content'] : '' ) );
+        $text = expAiText::stripReasoning( isset( $data['message']['content'] ) ? (string) $data['message']['content'] : '' );
         $ms = function ( $name ) use ( $data )
         {
             return isset( $data[$name] ) && is_numeric( $data[$name] ) ? (int) round( $data[$name] / 1000000 ) : null;

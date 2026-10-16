@@ -109,7 +109,7 @@ ProvidersWithoutPolicy[]=anthropic
 #   Region          us | eu | local; Retention none | zdr | 30d | unknown; TermsCheckedAt YYYY-MM-DD
 #   ExtraBody       a JSON object merged into every request body (e.g. OpenRouter provider routing)
 #   Timeout, ConnectTimeout, MaxResponseBytes, RateLimitHeaders[] (glob patterns of headers kept for the log),
-#   RetryAfterMax (seconds of retry-after waited for once, default 5), RetryOnServerError (enabled)
+#   RetryAfterMax (seconds of retry-after waited for, default and most 5), RetryOnServerError (enabled: up to two retries)
 #   Label           the name in the picker and in error texts; Managed=ollama: a local server expai/models manages
 #
 # Example: Hugging Face Inference Providers (router). The model id may end in :fastest, :cheapest, :preferred or
@@ -1004,6 +1004,14 @@ Exclude[]
 # The pass rate (percent) of a live probe (bin/php/expaiprobe.php --model=<alias> --live) a model needs before it may
 # write drafts (WriteTools=enabled, ToolUse=native, and not WriteGate=trusted).
 WritePassRate=90
+# The tasks a model must pass before it may write, whatever its pass rate: a model that does not use a tool result,
+# follows an instruction inside content, or cannot create or change a draft stays read only. MandatoryTasks[] with no
+# value after it makes no task mandatory.
+MandatoryTasks[]
+MandatoryTasks[]=use_result
+MandatoryTasks[]=injection
+MandatoryTasks[]=create_draft
+MandatoryTasks[]=update_draft
 # The node and class the probe tasks name (nothing is read or written: the tools are not run). Empty: the content root.
 NodeID=
 ClassIdentifier=folder

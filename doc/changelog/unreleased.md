@@ -18,3 +18,52 @@ as one provider's product.
   Anthropic Console) only where an Anthropic provider is set up; otherwise the price note names "the provider".
 - Unchanged on purpose: the Anthropic provider itself, the pricing table, the 0.0.1.0 settings (an empty
   `Providers[]` still builds the provider `anthropic` from `[AISettings]`), and the column defaults of the schema.
+
+## Robust calls to reasoning models and OpenAI-compatible services
+
+Measured with gpt-oss-120b and Qwen models on an OpenAI-compatible service (mittwald AI Hosting) and with long-running
+integrations of the same models: reasoning models spend output tokens thinking, answer with reasoning only, leak
+reasoning markup, and gateways reject optional parameters.
+
+- **Reasoning leftovers**: `expAiText::stripReasoning()` handles only real reasoning markup: the final channel of a
+  text in the Harmony format (known chat template tokens in it end or are removed), complete `<think>` blocks at the
+  start, an open `<think>` at the start (no answer), and a lone `</think>` followed by a line break (Qwen; the text
+  after it is the answer). A text that mentions `<think>` or a `<|...|>` token keeps it. Used by the
+  OpenAI-compatible, prompted-tool and Ollama providers. Reasoning fields never become the answer.
+- **Empty answers**: an answer without text and without a tool call is asked for once more ("Answer the editor in words
+  now, or call a tool."), then reported as "The model gave no answer"; it no longer ends a turn as done. After tools
+  ran in the turn (lookups, drafts written), an empty final answer ends the turn without words. An empty answer cut off
+  at the token limit is not asked again with the same limit; the editor is told to raise MaxTokens or lower Effort.
+  The second request fails like the first (a model that cannot be reached hands the step to the site default).
+- **Cut answers**: chain steps, alt text, field actions and "Fill the fields" do not parse an answer cut off at the
+  token limit; the editor is told to raise MaxTokens or lower Effort. A queued answer cut off at the token limit
+  stores no value, so the translation sync and the Vector plan items report the cut instead of a missing part.
+- **JSON**: `expAiText::extractJson()` finds the JSON in prose (the whole text or a fenced block, which may be a list;
+  else the longest balanced object that decodes) instead of cutting from the first `{` to the last `}`; also for answers stored by the queue.
+- **Token budgets**: reasoning models (capability `reasoning_effort`, an `Effort`, or `Reasoning=true`) get at least
+  1000 output tokens in the model test, alt text, plan batches and chains; the model test used 120.
+- **Retries**: up to two retries within one deadline on 408/425/429 (also without `retry-after`), 5xx and 529, and on a
+  connection that was never made; never after a timeout or an answer that broke off, nor after a gateway timeout
+  (408/502/504) of an attempt that took longer than 30 seconds (the request may already be billed). `retry-after` as an HTTP date is understood. The Anthropic provider uses the same retries.
+- **Optional parameters**: a 400 that refuses `reasoning_effort`, `reasoning` or `stream_options` as unknown or
+  unsupported is sent once more without it (with a debug notice); a 400 for an invalid value of the field is a
+  configuration error and is shown as it is.
+- **Error texts of the Anthropic provider** name the provider (its `Label`, otherwise "Anthropic"), like those of every
+  other provider: "Anthropic is busy or over its limit." instead of "Exponential Intelligence is busy ...".
+- **Streams** that end without `[DONE]` and without a finish reason are incomplete; error objects in a stream are
+  reported.
+- **Error texts** mask keys, tokens, secrets, passwords and authorization values in more forms.
+- **Write gate**: the probe tasks `use_result`, `injection`, `create_draft` and `update_draft` are mandatory
+  (`[ProbeSettings] MandatoryTasks[]`); a high pass rate with one of them failed keeps the gate closed. "empty answer"
+  is reported as its own reason.
+- **Locale**: the translation sync reason and the probe output use `%F` (a decimal comma under a German locale broke
+  the stored reason).
+
+## Upgrading
+
+- Live probe results stored before this update in which a mandatory task (`use_result`, `injection`, `create_draft`,
+  `update_draft`) failed now close the write gate of that model, also when the pass rate was high. Run the probe again
+  for those models: `php extension/expai/bin/php/expaiprobe.php --model=<alias> --live` (`--list` shows the stored
+  results; [probe.md](../probe.md)).
+- Reasoning models get at least 1000 output tokens per request in the model test, alt text, plan batches and chains;
+  a lower `MaxTokens` is raised for them, which can make those requests cost more.

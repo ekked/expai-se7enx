@@ -62,10 +62,11 @@ class expAiPlanBatch
 
     /**
      * The request of one item: the instruction, the current values of its fields, and the JSON it must answer with.
+     * @param string $alias the model of the request: a reasoning model gets at least expAiModelTest::REASONING_MIN_TOKENS
      * @return array( array request, array apply_params-without-run, int[] objects )
      * @throws expAiException the item's target is gone or names no writable field
      */
-    public static function request( array $item, $language, expAiConfig $config )
+    public static function request( array $item, $language, expAiConfig $config, $alias = '' )
     {
         $objects = array();
         $values = array();
@@ -109,7 +110,8 @@ class expAiPlanBatch
             'summary' => array( 'type' => 'string' ) ), 'required' => array( 'changes', 'summary' ), 'additionalProperties' => false );
         $request = array( 'system' => 'You edit the content of a website built with Exponential, for its editors. You answer with JSON only.',
                           'messages' => array( array( 'role' => 'user', 'content' => $text ) ),
-                          'max_tokens' => min( 16000, 600 + (int) ceil( mb_strlen( implode( '', $values ), 'UTF-8' ) / 2 ) ), 'output_schema' => $schema );
+                          'max_tokens' => expAiModelTest::outputBudget( $alias, min( 16000, 600 + (int) ceil( mb_strlen( implode( '', $values ), 'UTF-8' ) / 2 ) ), $config ),
+                          'output_schema' => $schema );
         return array( $request, array( 'action' => (string) $item['action'], 'object_id' => (int) $item['target']['object_id'],
                                        'parent_node_id' => (int) $item['target']['parent_node_id'], 'class' => (string) $item['class'],
                                        'language' => (string) $language, 'fields' => array_keys( $fields ) ), $objects );
@@ -145,7 +147,7 @@ class expAiPlanBatch
             $jobs = array();
             foreach ( $item['languages'] as $language )
             {
-                list( $request, $params, $objects ) = self::request( $item, $language, $config );
+                list( $request, $params, $objects ) = self::request( $item, $language, $config, $alias );
                 $params += array( 'thread_id' => (int) $thread->attribute( 'id' ), 'run_id' => (int) $child->attribute( 'id' ), 'plan_id' => (int) $plan->attribute( 'id' ),
                                   'item' => $index, 'languages' => count( $item['languages'] ) );
                 $r = expAiQueue::request( $alias, $request, array( 'purpose' => 'bulk', 'lane' => $lane->name(), 'group' => $group, 'objects' => $objects,
