@@ -276,6 +276,10 @@
         <source>%count runs started. Watch them here:</source>
         <translation>%count runs started. Watch them here:</translation>
     </message>
+    <message>
+        <source>No runs yet.</source>
+        <translation>No runs yet.</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/error</name>
@@ -2640,6 +2644,22 @@
         <source>All drafts written with Exponential Intelligence</source>
         <translation>All drafts written with Exponential Intelligence</translation>
     </message>
+    <message>
+        <source>Your session has expired. Reload the page and sign in again.</source>
+        <translation>Your session has expired. Reload the page and sign in again.</translation>
+    </message>
+    <message>
+        <source>The connection to the run was lost. Reload the page to follow it.</source>
+        <translation>The connection to the run was lost. Reload the page to follow it.</translation>
+    </message>
+    <message>
+        <source>The answer is ready.</source>
+        <translation>The answer is ready.</translation>
+    </message>
+    <message>
+        <source>This draft no longer exists.</source>
+        <translation>This draft no longer exists.</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/step</name>
@@ -3130,6 +3150,14 @@
     <message>
         <source>Show the shortcuts</source>
         <translation>Show the shortcuts</translation>
+    </message>
+    <message>
+        <source>%count result</source>
+        <translation>%count result</translation>
+    </message>
+    <message>
+        <source>%count results</source>
+        <translation>%count results</translation>
     </message>
 </context>
 <context>
@@ -3837,6 +3865,14 @@
         <source>Bulk work is always reviewed before it is written.</source>
         <translation>Bulk work is always reviewed before it is written.</translation>
     </message>
+    <message>
+        <source>Your session has expired. Reload the page and sign in again.</source>
+        <translation>Your session has expired. Reload the page and sign in again.</translation>
+    </message>
+    <message>
+        <source>The connection to the run was lost. Reload the page to follow it.</source>
+        <translation>The connection to the run was lost. Reload the page to follow it.</translation>
+    </message>
 </context>
 <!-- expai threads/vector/keyboard: end -->
 <!-- expai translation sync: begin -->
@@ -4368,6 +4404,10 @@
     <message>
         <source>The field is empty: there is nothing to improve.</source>
         <translation>The field is empty: there is nothing to improve.</translation>
+    </message>
+    <message>
+        <source>The model returned no text, so nothing was written.</source>
+        <translation>The model returned no text, so nothing was written.</translation>
     </message>
 </context>
 <context>
@@ -5511,6 +5551,14 @@
         <source>The test of %model runs in the background.</source>
         <translation>The test of %model runs in the background.</translation>
     </message>
+    <message>
+        <source>Request in the log</source>
+        <translation>Request in the log</translation>
+    </message>
+    <message>
+        <source>Job</source>
+        <translation>Job</translation>
+    </message>
 </context>
 <!-- expai vector parallel/checkpoints: begin -->
 <context>
@@ -5534,14 +5582,6 @@
     <message>
         <source>This checkpoint does not exist any more.</source>
         <translation>This checkpoint does not exist any more.</translation>
-    </message>
-    <message>
-        <source>Request in the log</source>
-        <translation>Request in the log</translation>
-    </message>
-    <message>
-        <source>Job</source>
-        <translation>Job</translation>
     </message>
 </context>
 <context>

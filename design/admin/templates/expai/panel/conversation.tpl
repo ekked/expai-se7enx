@@ -7,7 +7,8 @@
             <button type="button" class="exp-ai-link exp-ai-collapse-all">{'Collapse all'|i18n( 'extension/expai/panel' )}</button>
         </span>
     </div>
-    <ol class="exp-ai-log" aria-live="polite" aria-label="{'Conversation'|i18n( 'extension/expai/panel' )}"></ol>
+    <ol class="exp-ai-log" aria-label="{'Conversation'|i18n( 'extension/expai/panel' )}"></ol>
+    <p class="exp-ai-sr exp-ai-steps-live" role="status" aria-live="polite" aria-atomic="true"></p>
     <p class="exp-ai-working" hidden="hidden"><span class="exp-ai-spinner" aria-hidden="true"></span> <span class="exp-ai-working-text">{'Exponential Intelligence is working...'|i18n( 'extension/expai/panel' )}</span></p>
     {* "Watch this run": the live state of the turn just sent, with links to its requests, its job, the thread (expAiTurnRecord) *}
     <p class="exp-ai-watch" hidden="hidden" aria-live="polite"></p>

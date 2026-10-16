@@ -24,7 +24,7 @@
             return;
         }
         var C;
-        try { C = JSON.parse( node.textContent ) || {}; } catch ( e ) { return; }
+        try { C = JSON.parse( node.textContent ) || {}; } catch ( e ) { ( window.console && console.warn && console.warn( 'expai: a configuration block is not valid JSON', e ) ); return; }
         var S = C.strings || {};
         var esc = ExpAi.esc;
         var form = node.closest( 'form' ) || document.getElementById( 'editform' );

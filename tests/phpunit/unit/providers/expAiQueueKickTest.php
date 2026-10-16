@@ -34,6 +34,12 @@ class expAiQueueKickTest extends expAiProviderTestCase
         } );
     }
 
+    /** @return string a binary that does nothing and succeeds (/bin/true is /usr/bin/true on macOS) */
+    private static function trueBinary(): string
+    {
+        return is_executable( '/bin/true' ) ? '/bin/true' : '/usr/bin/true';
+    }
+
     public function testToStartFillsUpToTheLimitAndCountsIdleWorkers(): void
     {
         $this->assertSame( 2, expAiQueueKick::toStart( 2, 0, 0, 0, 4 ) );
@@ -68,7 +74,7 @@ class expAiQueueKickTest extends expAiProviderTestCase
     public function testKickStartsTheMissingWorkersAndRecordsTheStarts(): void
     {
         $this->requireDatabase();
-        $this->site( array( 'VectorSettings' => array( 'KickWorker' => 'true', 'PhpCli' => '/bin/true', 'MaxKickedWorkers' => 16 ) ) );
+        $this->site( array( 'VectorSettings' => array( 'KickWorker' => 'true', 'PhpCli' => self::trueBinary(), 'MaxKickedWorkers' => 16 ) ) );
         @mkdir( dirname( $this->record ), 0775, true );
         file_put_contents( $this->record, json_encode( array( 'starts' => array( time() - 3600 ) ) ) );
         list( $live, $idle ) = expAiQueueKick::workers( array() );
@@ -98,8 +104,23 @@ class expAiQueueKickTest extends expAiProviderTestCase
 
     public function testLaunchRunsTheCommandInTheBackground(): void
     {
-        $this->assertTrue( self::invoke( 'expAiQueueKick', 'launch', array( 'true' ) ) );
-        $config = $this->config( array( 'VectorSettings' => array( 'PhpCli' => '/bin/true' ) ) );
+        $this->assertGreaterThan( 0, self::invoke( 'expAiQueueKick', 'launch', array( 'true' ) ), 'the shell reports the process id' );
+        $this->assertSame( 0, self::invoke( 'expAiQueueKick', 'processId', array( '' ) ) );
+        $this->assertSame( 4711, self::invoke( 'expAiQueueKick', 'processId', array( "warning\n4711\n" ) ) );
+        $config = $this->config( array( 'VectorSettings' => array( 'PhpCli' => self::trueBinary() ) ) );
         $this->assertSame( 2, self::invoke( 'expAiQueueKick', 'start', array( 2, 9999, 'bulk', $config ) ) );
+    }
+
+    public function testTheRootFlagIsPassedOnlyWhenTheSiteAllowsIt(): void
+    {
+        foreach ( array( 'disabled', 'enabled' ) as $allow )
+        {
+            $config = $this->config( array( 'VectorSettings' => array( 'PhpCli' => self::trueBinary(), 'WorkerAllowRoot' => $allow ) ) );
+            $this->assertSame( 1, self::invoke( 'expAiQueueKick', 'start', array( 1, 60, 'bulk', $config ) ) );
+        }
+        $source = file_get_contents( EXPAI_TEST_CHECKOUT . '/classes/queue/expaiqueuekick.php' );
+        $this->assertStringContainsString( "'WorkerAllowRoot', false", $source );
+        $this->assertStringContainsString( 'command -v setsid', $source );
+        $this->assertStringNotContainsString( 'nohup setsid', $source );
     }
 }

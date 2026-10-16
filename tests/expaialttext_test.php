@@ -50,7 +50,6 @@ $png = function ( $w, $h, $alpha = false )
         imagesetpixel( $gd, mt_rand( 0, $w - 1 ), mt_rand( 0, $h - 1 ), imagecolorallocatealpha( $gd, mt_rand( 0, 255 ), mt_rand( 0, 255 ), mt_rand( 0, 255 ), $alpha ? 60 : 0 ) );
     ob_start();
     imagepng( $gd );
-    imagedestroy( $gd );
     return ob_get_clean();
 };
 $jpeg = function ( $w, $h, $noise = false )
@@ -63,7 +62,6 @@ $jpeg = function ( $w, $h, $noise = false )
                 imagesetpixel( $gd, $x, $y, imagecolorallocate( $gd, mt_rand( 0, 255 ), mt_rand( 0, 255 ), mt_rand( 0, 255 ) ) );
     ob_start();
     imagejpeg( $gd, null, 95 );
-    imagedestroy( $gd );
     return ob_get_clean();
 };
 $limits = array( 'max_edge' => 1568, 'max_bytes' => 3750000, 'quality' => 85 );

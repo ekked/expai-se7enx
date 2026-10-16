@@ -23,7 +23,7 @@
         }
         var esc = ExpAi.esc, fmt = ExpAi.format, url = ExpAi.url;
         var S = {};
-        try { S = JSON.parse( root.querySelector( '.exp-ai-v-strings' ).textContent ) || {}; } catch ( e ) { S = {}; }
+        try { S = JSON.parse( root.querySelector( '.exp-ai-v-strings' ).textContent ) || {}; } catch ( e ) { S = {}; ( window.console && console.warn && console.warn( 'expai: a configuration block is not valid JSON', e ) ); }
         function T( key, args ) { return fmt( S[key] || key, args || {} ); }
         function api( fn, data ) { return ExpAi.api( 'expaivector::' + fn, data ); }
         function q( sel, ctx ) { return ( ctx || root ).querySelector( sel ); }
@@ -61,7 +61,8 @@
             if ( !box ) { return; }
             if ( !err ) { box.hidden = true; box.textContent = ''; return; }
             box.hidden = false;
-            box.textContent = err.kind === 'timeout' ? T( 'timeout' ) : T( 'error' ) + ' ' + ( err.message || '' );
+            box.textContent = err.kind === 'timeout' ? T( 'timeout' )
+                : err.expired ? T( 'session_expired' ) : err.lost ? ( err.message || '' ) : T( 'error' ) + ' ' + ( err.message || '' );
         }
         var toastTimer = null, toastUndo = null;
         function toast( text, undo ) {
@@ -978,8 +979,12 @@
             // its own cursor (T373 stream): the open stream advances app.cursor too, and a shared one let it take the
             // steps away from here, so the exchange was never reloaded and the answer never shown
             var seen = app.cursor[uuid] || 0;
+            var guard = ExpAi.pollGuard( 3000, { session_expired: T( 'session_expired' ), poll_lost: T( 'poll_lost' ) } );
             return new Promise( function ( resolve ) {
                 function tick() {
+                    guard.whenVisible( poll );
+                }
+                function poll() {
                     if ( !app.current || app.current.uuid !== uuid ) { resolve( null ); return; }
                     var after = {};
                     after[uuid] = seen;
@@ -987,6 +992,7 @@
                     ask.then( function () {
                         return api( 'events', { threads: uuid, after: JSON.stringify( after ), open: uuid } );
                     } ).then( function ( data ) {
+                        guard.ok();
                         var news = ( data.events || [] ).filter( function ( ev ) { return ev.thread === uuid; } );
                         news.forEach( function ( ev ) {
                             seen = Math.max( seen, ev.id );
@@ -1023,7 +1029,15 @@
                                 window.setTimeout( tick, Math.min( data.next_ms || 1000, 3000 ) );
                             }
                         } );
-                    } ).catch( function () { window.setTimeout( tick, 3000 ); } );
+                    } ).catch( function ( err ) {
+                        var verdict = guard.fail( err );
+                        if ( verdict.stop ) {
+                            showError( el.error, verdict.error );
+                            resolve( null );
+                        } else {
+                            window.setTimeout( tick, verdict.delay );
+                        }
+                    } );
                 }
                 window.setTimeout( tick, 800 );
             } );
@@ -1493,6 +1507,10 @@
             for ( var i = 0; i < ids.length; i++ ) {
                 var id = ids[i], b = app.bindings[id];
                 if ( !actions[id] || !Keys.allowed( e, b.when, b.keys, root ) ) { continue; }
+                // a keystroke with Cmd/Ctrl held (the palette's, when it was not handled, as in a field) never runs
+                // a single-key shortcut such as j or k
+                if ( ( e.ctrlKey || e.metaKey ) && !/(^|\s)(Mod|Ctrl|Meta)\+/.test( b.keys ) ) { continue; }
+                if ( e.isComposing ) { return; }
                 if ( Keys.matches( e, b.keys ) ) {
                     e.preventDefault();
                     if ( id === 'stop' ) { escAt = 0; }

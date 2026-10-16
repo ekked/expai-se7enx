@@ -88,3 +88,57 @@ anchors, literals, internal links and formatting attributes were lost, and ezaut
   results; [probe.md](../probe.md)).
 - Reasoning models get at least 1000 output tokens per request in the model test, alt text, plan batches and chains;
   a lower `MaxTokens` is raised for them, which can make those requests cost more.
+
+## Admin interface: polling, dark mode, accessibility, small fixes
+
+- **Polling** (the panel and Vector follow a queued turn): after five failed polls in a row the loop stops with a visible
+  message ("The connection to the run was lost. Reload the page to follow it.") instead of retrying silently; the
+  interval grows 6, 12, 24, 48 s up to 60 s, as on the dashboard. A 401 or 403 stops at once ("Your session has
+  expired ..."). A hidden tab does not poll and continues when it is shown. `ExpAi.api()` rejects with `kind: 'http'`,
+  `status` and `expired: true` for 401/403.
+- **Dark mode in CSS**: the dark tokens apply under `html[data-a4-theme="dark"]`, so bars
+  and previews created after the page loaded are right at once; `exp-ai-on-dark` stays for other dark designs, `exp-ai-on-light` is new (admin4l). Accent text uses `--a4-accent-text`; `--exp-ai-warn`, `--exp-ai-danger`
+  and `--exp-ai-ok` follow the admin4 tokens; z-indexes follow `--a4-z-*`; forced colours and reduced motion are handled
+  ([customization.md](../customization.md#colors-and-look)).
+- **JSON in script blocks**: the template operator `expai_json` replaces `json_encode` for every
+  `<script type="application/json">` block (`<`, `>`, `&`, `'` and `"` are escaped, invalid UTF-8 is substituted, not
+  dropped). A block that does not parse is reported in the browser console.
+- **Accessibility**: the conversation log is no longer a live region (a long answer or a reloaded history was read out
+  whole); step messages and the end of a turn go through a polite status line of their own. The palette: `aria-expanded`
+  follows the results, groups are labelled, the number of results is announced, the page behind does not scroll, a key
+  held down or an IME composition does not act. The palette's local-storage key is per user.
+- **Cmd+K on macOS** is detected case-insensitively (`macOS`, `MacIntel`) and shows as ⌘K; Cmd/Ctrl never also fires a
+  single-key shortcut.
+- **Fixes**: the collapsed conversation header shows the text without Markdown marks; a preset whose model returned no
+  text (a "Write summary" on an empty field) shows the model's note and marks nothing as filled (`refused` in the answer
+  of `expaipreset::preset`); a draft chip in the history is checked (HEAD) before it is followed and shows a note for a
+  discarded draft; the chain page does not suggest starting a chain without `expqueue`; "unknown" retentions are
+  translated (`expai_retention`); "Job" and "Request in the log" of the model test are translated (they sat in the wrong
+  context); the key placement warning accepts a key in any settings directory that git does not track, configurable
+  with `[ProviderSettings] KeyLocations[]` (default `settings/override`, `extension/*/settings`).
+- **Alternative text report**: the images without alt text under a node are read with one query per 200 objects instead
+  of one data map per object and language.
+- **Script cache busting**: the scripts the templates load directly carry `?v=<change time>`; for
+  `BackendJavaScriptList` the packer's `AppendLastModifiedTime` does the same in production
+  ([architecture.md](../architecture.md)).
+- **Workers**: `expAiQueueKick` detaches with `setsid` only where the system has it (else `nohup` alone) and reports a
+  start where the shell gives no process id as failed (this detects only that the shell could not be started, not a worker
+  that exits at once); `--allow-root-user` is passed only with `[VectorSettings] WorkerAllowRoot=enabled`
+  (default `disabled`); `worker-kick.json` is created with mode 0660.
+- **web_fetch** uses `expAiHttpClient` (with its `resolve` option for the checked address) instead of a second curl
+  client; the SSRF guard is unchanged. The client gained the options `user_agent`, `accept_language`, `encoding`,
+  `header_max` and `truncate`.
+- **list_children**: `total` counts the children of the given class, `has_more` says whether another page follows and
+  `withheld` counts the children of the page that the data policy keeps away. `get_tree_context` counts through the same
+  function.
+- Requires PHP 8.1 or later (`composer.json` `^8.1`); `imagedestroy()` is no longer called (no effect since PHP 8.0,
+  deprecated in 8.5).
+
+## Upgrading (admin interface)
+
+- New setting `[VectorSettings] WorkerAllowRoot` (default `disabled`): a site whose PHP runs as root and relies on kicked
+  workers enables it.
+- New setting `[ProviderSettings] KeyLocations[]`; a site that put a key into a git-ignored extension of secrets needs
+  no change (the default accepts it).
+- New strings in the contexts `panel`, `vector`, `preset`, `keyboard` and `chain` (ger-DE and eng-US included).
+

@@ -220,9 +220,13 @@ class expAiEditPresets extends expAiEditForm
         {
             return $action->run( $request, $recorder );
         }, $fallback );
-        self::mark( $object, $version, $language, 'field', $kind . ':' . $name . ( $part !== '' ? ' (' . $identifier . '.' . $part . ')' : '' ),
-                    $result['model'], $recorder->providerId() );
+        // an empty value is a refusal ("there is nothing to summarize"), not a result: the page shows the note and writes nothing
+        $refused = trim( strip_tags( (string) $result['value'] ) ) === '';
+        // the draft log labels a version as written by the assistant: not for an answer that wrote nothing
+        if ( !$refused )
+            self::mark( $object, $version, $language, 'field', $kind . ':' . $name . ( $part !== '' ? ' (' . $identifier . '.' . $part . ')' : '' ),
+                        $result['model'], $recorder->providerId() );
         return array( 'value' => $result['value'], 'note' => $result['note'], 'action' => $name, 'kind' => $kind, 'part' => $part,
-                      'datatype' => $datatype, 'fallback' => $fallback, 'record' => self::requestRecord() );
+                      'datatype' => $datatype, 'refused' => $refused, 'fallback' => $fallback, 'record' => self::requestRecord() );
     }
 }

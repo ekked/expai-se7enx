@@ -24,7 +24,7 @@
     }
     var esc = ExpAi.esc;
     var fmt = ExpAi.format;
-    var isMac = /Mac|iPhone|iPad|iPod/.test( ( navigator.userAgentData && navigator.userAgentData.platform ) || navigator.platform || navigator.userAgent || '' );
+    var isMac = /mac|iphone|ipad|ipod/i.test( ( navigator.userAgentData && navigator.userAgentData.platform ) || navigator.platform || navigator.userAgent || '' );
 
     /* ------------------------------------------------------------------- keys */
 
@@ -242,9 +242,10 @@
         overlay.hidden = true;
         overlay.innerHTML = '<div class="exp-ai-palette" role="dialog" aria-modal="true" aria-label="' + esc( S( 'title' ) ) + '">'
             + '<div class="exp-ai-palette-search"><span class="exp-ai-mark" aria-hidden="true"></span>'
-            + '<input type="text" class="exp-ai-palette-input" role="combobox" aria-expanded="true" aria-controls="exp-ai-palette-list" aria-autocomplete="list" autocomplete="off" spellcheck="false" placeholder="' + esc( S( 'placeholder' ) ) + '" />'
+            + '<input type="text" class="exp-ai-palette-input" role="combobox" aria-expanded="false" aria-controls="exp-ai-palette-list" aria-autocomplete="list" autocomplete="off" spellcheck="false" placeholder="' + esc( S( 'placeholder' ) ) + '" />'
             + '<button type="button" class="exp-ai-palette-close" aria-label="' + esc( S( 'close' ) ) + '">Esc</button></div>'
             + '<ul class="exp-ai-palette-list" id="exp-ai-palette-list" role="listbox" aria-label="' + esc( S( 'title' ) ) + '"></ul>'
+            + '<p class="exp-ai-sr exp-ai-palette-status" role="status" aria-live="polite" aria-atomic="true"></p>'
             + '<p class="exp-ai-palette-foot">' + esc( S( 'hint' ) ) + '</p></div>';
         document.body.appendChild( overlay );
         var input = overlay.querySelector( 'input' );
@@ -256,6 +257,10 @@
         overlay.querySelector( '.exp-ai-palette-close' ).addEventListener( 'click', close );
         input.addEventListener( 'input', function () { refresh(); } );
         overlay.addEventListener( 'keydown', function ( e ) {
+            // an input method composing text (Enter confirms the composition) or a key held down does not act
+            if ( e.isComposing || e.keyCode === 229 || ( e.repeat && e.key !== 'ArrowDown' && e.key !== 'ArrowUp' ) ) {
+                return;
+            }
             if ( e.key === 'Escape' ) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -357,28 +362,46 @@
         return out;
     }
 
+    /** The live region: the number of results, or that the search runs / found nothing */
+    function announce( text ) {
+        var box = overlay && overlay.querySelector( '.exp-ai-palette-status' );
+        if ( box ) {
+            box.textContent = text;
+        }
+    }
+
     function render() {
         var list = overlay.querySelector( '.exp-ai-palette-list' );
         var input = overlay.querySelector( 'input' );
         if ( !state.items.length ) {
-            list.innerHTML = '<li class="exp-ai-palette-empty" role="presentation">' + esc( state.loading ? S( 'searching' ) : S( 'empty' ) ) + '</li>';
+            var none = state.loading ? S( 'searching' ) : S( 'empty' );
+            list.innerHTML = '<li class="exp-ai-palette-empty" role="presentation">' + esc( none ) + '</li>';
             input.removeAttribute( 'aria-activedescendant' );
+            input.setAttribute( 'aria-expanded', 'false' );
+            announce( none );
             return;
         }
         var html = '';
         var group = null;
         state.items.forEach( function ( item, i ) {
             if ( item.group !== group ) {
+                if ( group !== null ) {
+                    html += '</ul></li>';
+                }
                 group = item.group;
-                html += '<li class="exp-ai-palette-group" role="presentation">' + esc( group ) + '</li>';
+                html += '<li role="group" aria-label="' + esc( group ) + '" class="exp-ai-palette-groupbox"><div class="exp-ai-palette-group" aria-hidden="true">' + esc( group ) + '</div>'
+                      + '<ul class="exp-ai-palette-sub" role="presentation">';
             }
             html += '<li id="exp-ai-palette-opt-' + i + '" role="option" data-index="' + i + '" aria-selected="' + ( i === state.active ? 'true' : 'false' ) + '"'
                   + ( i === state.active ? ' class="exp-ai-active"' : '' ) + '><span class="exp-ai-palette-label">' + esc( item.label ) + '</span>'
                   + ( item.hint ? '<span class="exp-ai-palette-hint">' + esc( item.hint ) + '</span>' : '' )
                   + ( item.keys ? '<kbd>' + esc( display( item.keys ) ) + '</kbd>' : '' ) + '</li>';
         } );
-        list.innerHTML = html;
+        list.innerHTML = html + '</ul></li>';
+        input.setAttribute( 'aria-expanded', 'true' );
         input.setAttribute( 'aria-activedescendant', 'exp-ai-palette-opt-' + state.active );
+        // while the search for threads and nodes still runs the count is not final: say so, then the number
+        announce( state.loading ? S( 'searching' ) : S( state.items.length === 1 ? 'results_1' : 'results_n', { '%count': state.items.length } ) );
         var active = list.querySelector( '.exp-ai-active' );
         if ( active && active.scrollIntoView ) {
             active.scrollIntoView( { block: 'nearest' } );
@@ -611,7 +634,7 @@
 
     function applied( data ) {
         config.bindings = data.bindings || config.bindings;
-        try { window.localStorage.setItem( 'exp-ai-palette-keys', config.bindings.palette ? config.bindings.palette.keys : '' ); } catch ( e ) { /* storage may be off */ }
+        try { window.localStorage.setItem( ExpAi.paletteStoreKey ? ExpAi.paletteStoreKey() : 'exp-ai-palette-keys', config.bindings.palette ? config.bindings.palette.keys : '' ); } catch ( e ) { /* storage may be off */ }
         if ( window.ExpAiVectorApp ) {
             window.ExpAiVectorApp.bindingsChanged( config.bindings );
         }

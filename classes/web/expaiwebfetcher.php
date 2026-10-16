@@ -166,62 +166,25 @@ class expAiWebFetcher
             return array_values( call_user_func( self::$transport, $url, $pin, $timeout, $maxBytes ) ) + array( 0, '', '', '', false );
         if ( !function_exists( 'curl_init' ) )
             throw new expAiException( 'Exponential Intelligence is not available on this server.', 'the PHP curl extension is missing' );
-        $body = '';
-        $truncated = false;
-        $type = '';
-        $location = '';
-        $ch = curl_init( $url );
-        curl_setopt_array( $ch, array(
-            CURLOPT_HTTPGET => true,
-            CURLOPT_FOLLOWLOCATION => false,
-            CURLOPT_TIMEOUT => (int) $timeout,
-            CURLOPT_CONNECTTIMEOUT => min( 5, (int) $timeout ),
-            CURLOPT_NOSIGNAL => true,
-            CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_SSL_VERIFYHOST => 2,
-            CURLOPT_USERAGENT => self::userAgent(),
-            CURLOPT_HTTPHEADER => array( 'Accept: text/html,application/xhtml+xml,text/plain,text/markdown;q=0.9,*/*;q=0.1', 'Accept-Language: en' ),
-            CURLOPT_ENCODING => '',
-            CURLOPT_HEADERFUNCTION => static function ( $handle, $line ) use ( &$type, &$location )
-            {
-                if ( preg_match( '/^HTTP\//', $line ) )
-                    $type = $location = '';
-                elseif ( preg_match( '/^content-type:\s*(.*?)\s*$/i', $line, $m ) )
-                    $type = substr( $m[1], 0, 200 );
-                elseif ( preg_match( '/^location:\s*(.*?)\s*$/i', $line, $m ) )
-                    $location = substr( $m[1], 0, 2048 );
-                return strlen( $line );
-            },
-            CURLOPT_WRITEFUNCTION => static function ( $handle, $chunk ) use ( &$body, &$truncated, $maxBytes )
-            {
-                $room = $maxBytes - strlen( $body );
-                if ( strlen( $chunk ) >= $room )
-                {
-                    $body .= substr( $chunk, 0, max( 0, $room ) );
-                    $truncated = true;
-                    return 0;
-                }
-                $body .= $chunk;
-                return strlen( $chunk );
-            },
-        ) );
-        if ( $pin )
-            curl_setopt( $ch, CURLOPT_RESOLVE, $pin );
-        if ( defined( 'CURLOPT_PROTOCOLS_STR' ) )
-            curl_setopt( $ch, CURLOPT_PROTOCOLS_STR, 'http,https' );
-        elseif ( defined( 'CURLOPT_PROTOCOLS' ) )
-            curl_setopt( $ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS );
-        $ok = curl_exec( $ch );
-        $errno = curl_errno( $ch );
-        $status = (int) curl_getinfo( $ch, CURLINFO_RESPONSE_CODE );
-        unset( $ch );
-        // 23: the write callback stopped reading at MaxBytes, which is a cut page, not an error
-        if ( ( $ok === false || $errno ) && !( $truncated && $errno === 23 ) )
+        // the shared client: http(s) only, no redirects (followed here, host by host), the checked address pinned
+        // through CURLOPT_RESOLVE, the answer cut at MaxBytes, nothing sent but the URL
+        $client = new expAiHttpClient( (int) $timeout, min( 5, (int) $timeout ), (int) $maxBytes, array( 'content-type', 'location' ) );
+        try
         {
-            if ( $errno === 28 )
-                throw new expAiException( 'The page %host did not answer in time.', 'web: timeout after ' . $timeout . ' s', 0, array( '%host' => (string) parse_url( $url, PHP_URL_HOST ) ) );
-            throw new expAiException( 'The page %host could not be reached.', 'web: curl error ' . $errno, 0, array( '%host' => (string) parse_url( $url, PHP_URL_HOST ) ) );
+            list( $status, $body, $headers ) = $client->request( $url, array(), '', array(
+                'method' => 'GET', 'accept' => 'text/html,application/xhtml+xml,text/plain,text/markdown;q=0.9,*/*;q=0.1', 'accept_language' => 'en',
+                'user_agent' => self::userAgent(), 'encoding' => '', 'resolve' => $pin, 'truncate' => true, 'header_max' => 2048 ) );
         }
-        return array( $status, $type, $location, $body, $truncated );
+        catch ( expAiException $e )
+        {
+            $host = (string) parse_url( $url, PHP_URL_HOST );
+            $transfer = $client->lastTransfer();
+            if ( $transfer['errno'] === 28 )
+                throw new expAiException( 'The page %host did not answer in time.', 'web: timeout after ' . $timeout . ' s', 0, array( '%host' => $host ) );
+            throw new expAiException( 'The page %host could not be reached.', 'web: ' . ( $transfer['errno'] ? 'curl error ' . $transfer['errno'] : $e->detail() ), 0, array( '%host' => $host ) );
+        }
+        $truncated = $client->truncated();
+        return array( $status, isset( $headers['content-type'] ) ? substr( $headers['content-type'], 0, 200 ) : '',
+                      isset( $headers['location'] ) ? $headers['location'] : '', $body, $truncated );
     }
 }

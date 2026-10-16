@@ -6,7 +6,7 @@ The short version is the [checklist](#checklist-install-and-upgrade) at the end.
 
 ## 1. Requirements
 
-- Exponential 6.0.14 or later (the legacy kernel), PHP 8.0 or later with `curl`, `dom`, `json` and `mbstring`.
+- Exponential 6.0.14 or later (the legacy kernel), PHP 8.1 or later with `curl`, `dom`, `json` and `mbstring`.
 - The extensions **ezjscore** (the browser talks to expai through `ezjscore/call`) and, recommended, **ezformtoken**
   (every expai request carries the form token).
 - For queued work the extension **expqueue** (0.0.1.0 or later): lanes and provider batches, budgets, AI chains,
@@ -266,7 +266,7 @@ If something does not work, see [doc/troubleshooting.md](doc/troubleshooting.md)
 
 Install:
 
-- [ ] Requirements met (kernel 6.0.14+, PHP 8.0+, ezjscore, ezformtoken; expqueue for queued work)
+- [ ] Requirements met (kernel 6.0.14+, PHP 8.1+, ezjscore, ezformtoken; expqueue for queued work)
 - [ ] `extension/expai` in place (Composer or clone)
 - [ ] `ActiveAccessExtensions[]=expai` in the `site.ini.append.php` of **each** admin siteaccess (or `ActiveExtensions[]`)
 - [ ] `AdditionalTabs[]=expai` and `expai_media` where a siteaccess lists its own tabs

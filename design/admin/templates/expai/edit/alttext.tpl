@@ -22,7 +22,7 @@
 {/foreach}
 {if and( $exp_ai_alt_images|count, ezini( 'EditViewSettings', 'FieldActions', 'expai.ini' )|contains( 'alt_text' ) )}
 {def $exp_ai_alt_model = fetch( 'expai', 'alt_text_model', hash( 'object', $object ) )}
-    <script type="application/json" class="exp-ai-alttext-config">{json_encode( hash(
+    <script type="application/json" class="exp-ai-alttext-config">{hash(
         'object_id', $object.id,
         'version', $edit_version,
         'language', $edit_language,
@@ -51,8 +51,8 @@
             'error', 'Something went wrong:'|i18n( 'extension/expai/edit' ),
             'timeout', 'The server did not answer in time. Please try again.'|i18n( 'extension/expai/edit' )
         )
-    ) )}</script>
-    <script src={'javascript/expai_alttext.js'|ezdesign}></script>
+    )|expai_json}</script>
+    <script src="{'javascript/expai_alttext.js'|ezdesign( 'no' )}?v={'javascript/expai_alttext.js'|expai_version}"></script>
 {undef $exp_ai_alt_model}
 {/if}
 {undef $exp_ai_alt_images $exp_ai_alt_companions $exp_ai_alt_texts $exp_ai_alt_names}

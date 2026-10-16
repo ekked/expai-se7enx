@@ -35,15 +35,24 @@ tokens where they exist (light and dark) and fall back otherwise:
 
 | Token | Default | Used for |
 | --- | --- | --- |
-| `--exp-ai-accent` | `var(--a4-orange, #c55a11)` | the mark, links, highlights |
+| `--exp-ai-accent` | `var(--a4-accent, var(--a4-orange, #c55a11))` | the mark, borders, highlights |
+| `--exp-ai-accent-text` | `var(--a4-accent-text, #b4470c)` | accent-coloured text and links (readable on the surface in light and dark) |
 | `--exp-ai-accent-ink` | `#fff` | text on the accent |
-| `--exp-ai-accent-soft` | `var(--a4-orange-soft, rgba(197, 90, 17, 0.10))` | the label, the banner |
+| `--exp-ai-accent-soft` | `var(--a4-accent-soft, var(--a4-orange-soft, rgba(197, 90, 17, 0.10)))` | the label, the banner |
 | `--exp-ai-muted` | `var(--a4-muted, #5d6573)` | secondary text |
 | `--exp-ai-line` | `var(--a4-line, #d9dde3)` | borders |
 | `--exp-ai-surface` | `rgba(127, 127, 127, 0.06)` | cards, open history rows |
 | `--exp-ai-user` | `rgba(127, 127, 127, 0.10)` | your messages |
-| `--exp-ai-ok`, `--exp-ai-error` | `#2e7d32`, `#b3261e` | published, errors |
+| `--exp-ai-ok`, `--exp-ai-warn`, `--exp-ai-danger`, `--exp-ai-error` | `--a4-ok`, `--a4-warn`, `--a4-bad` of admin4, else `#2e7d32`, `#8a4b00`, `#b42318`, `#b3261e` | published, caution, refusal, errors |
+| `--exp-ai-z-overlay`, `--exp-ai-z-toast`, `--exp-ai-z-popover` | `10000`, `10001`, `--a4-z-popover` (fallback 50) | the palette and toasts sit over everything (debug bar, full-screen editors, drag masks), drop-downs over their page |
 | `--exp-ai-radius` | `var(--a4-radius-s, 6px)` | corners |
+
+**Dark mode** needs no script on admin4: the tokens have their dark values under `html[data-a4-theme="dark"] .exp-ai`
+so a field bar added after the page
+loaded is right from its first paint. `expai.js` only marks the exceptions by the surface behind an element:
+`exp-ai-on-dark` (a design that is dark without admin4's theme attribute; the older admin designs have no dark mode and stay light) and `exp-ai-on-light` (admin4l keeps
+its content boxes light in dark mode; until the script has run, admin4l shows the dark tokens on its light boxes for a moment). Forced colours (high contrast) and `prefers-reduced-motion` are handled in the
+stylesheets: the mark and the bars get borders and system colours, the spinner stops and there are no transitions.
 
 Override them in a stylesheet of your own (BackendCSSFileList after expai.css), for example:
 

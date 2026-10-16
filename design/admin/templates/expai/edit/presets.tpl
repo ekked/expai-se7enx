@@ -19,7 +19,7 @@
     </p>
 {undef $exp_ai_region}
 {/if}
-    <script type="application/json" class="exp-ai-preset-config">{json_encode( hash(
+    <script type="application/json" class="exp-ai-preset-config">{hash(
         'presets', $exp_ai_presets.presets,
         'improve', $exp_ai_presets.improve,
         'improve_datatypes', $exp_ai_presets.improve_datatypes,
@@ -35,9 +35,10 @@
             'undone', 'Restored the previous value.'|i18n( 'extension/expai/edit' ),
             'error', 'Something went wrong:'|i18n( 'extension/expai/edit' ),
             'timeout', 'The server did not answer in time. Please try again.'|i18n( 'extension/expai/edit' ),
-            'empty', 'The field is empty: there is nothing to improve.'|i18n( 'extension/expai/preset' )
+            'empty', 'The field is empty: there is nothing to improve.'|i18n( 'extension/expai/preset' ),
+            'no_text', 'The model returned no text, so nothing was written.'|i18n( 'extension/expai/preset' )
         )
-    ) )}</script>
-    <script src={'javascript/expai_presets.js'|ezdesign}></script>
+    )|expai_json}</script>
+    <script src="{'javascript/expai_presets.js'|ezdesign( 'no' )}?v={'javascript/expai_presets.js'|expai_version}"></script>
 {/if}
 {undef $exp_ai_presets}

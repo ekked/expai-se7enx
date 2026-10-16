@@ -41,7 +41,8 @@ ModelLabels[claude-sonnet-5-5]=Claude Sonnet 5.5
 ModelLabels[claude-opus-5-5]=Claude Opus 5.5
 ModelLabels[claude-haiku-5-5]=Claude Haiku 5.5
 
-# The API key. Put it ONLY in settings/override/expai.ini.append.php.
+# The API key. Put it in settings/override/expai.ini.append.php (or in an untracked location of
+# [ProviderSettings] KeyLocations[]), never in a file git tracks.
 ApiKey=
 # Only for a key that is not scoped to a workspace: the workspace every request names.
 AnthropicWorkspaceId=
@@ -100,9 +101,16 @@ DefaultModel=
 # to require the policy for every choice but the site default.
 ProvidersWithoutPolicy[]=anthropic
 
+# Where an ApiKey or Token may be set besides settings/override: fnmatch patterns relative to the installation. A file
+# there is accepted only when it is not shipped with the code (git does not track it; in a release without git: it
+# lies outside the release, e.g. a symlinked shared directory). The default is the settings directory of any
+# extension, for a git-ignored extension of secrets. A tracked file is always reported.
+KeyLocations[]=settings/override
+KeyLocations[]=extension/*/settings
+
 # A provider: Type=anthropic | openai_chat | custom (Class=<class implementing expAiProvider>)
 #   BaseURL         the API (openai_chat: the base, /chat/completions is added; anthropic: the messages URL)
-#   ApiKey          ONLY in settings/override; ApiKeyHeader authorization (Bearer, default of openai_chat) |
+#   ApiKey          in settings/override or a [ProviderSettings] KeyLocations[] location git does not track; ApiKeyHeader authorization (Bearer, default of openai_chat) |
 #                   x-api-key (default of anthropic) | api-key (Azure) | x-goog-api-key | none (a local server)
 #   Headers[]       extra request headers ("Name: value"; key headers are refused)
 #   Flavor          openai | huggingface | openrouter | mistral | xai | ollama | llamacpp | generic (small differences)
@@ -1054,7 +1062,7 @@ Servers[]
 Label=Documentation search
 # https only; http only for a loopback address with AllowLoopback=enabled
 URL=https://mcp.example.org/mcp
-# ONLY in settings/override
+# in settings/override or a [ProviderSettings] KeyLocations[] location that git does not track
 Token=
 # The tools the panel may call; everything else the server offers is ignored.
 AllowedTools[]=search_docs
@@ -1120,6 +1128,9 @@ Background=auto
 # expqueue stays the safety net). PhpCli: the PHP command line binary for it (empty: the one of this PHP).
 KickWorker=enabled
 PhpCli=
+# Pass --allow-root-user to the started worker. Off: a worker refuses to run as root. Enable it only for a site whose
+# PHP itself runs as root (then the files the worker writes belong to root).
+WorkerAllowRoot=disabled
 # Streams open at once (one PHP process each: at most 25 % of PHP-FPM pm.max_children); over it the browser polls
 MaxStreams=4
 # Seconds one stream is held before the browser reconnects (Last-Event-ID)
@@ -1309,7 +1320,7 @@ SearchResultsFetchable=disabled
 Label=Brave Search
 Class=expAiWebSearchBrave
 Endpoint=https://api.search.brave.com/res/v1/web/search
-# ONLY in settings/override (X-Subscription-Token)
+# in settings/override or a [ProviderSettings] KeyLocations[] location that git does not track (X-Subscription-Token)
 ApiKey=
 # The query leaves the site: the data policy checks the panel's node against these
 Region=us

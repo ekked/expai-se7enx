@@ -9,7 +9,7 @@
         <span aria-hidden="true">&middot;</span>
         <a href={'expai/vector'|ezurl}>{'All threads'|i18n( 'extension/expai/threads' )}</a>
     </p>
-    <script type="application/json" class="exp-ai-thread-strings">{json_encode( hash(
+    <script type="application/json" class="exp-ai-thread-strings">{hash(
         'open', 'Open in Vector'|i18n( 'extension/expai/threads' ),
         'this_conversation', 'This conversation'|i18n( 'extension/expai/threads' ),
         'state_idle', 'Idle'|i18n( 'extension/expai/threads' ),
@@ -22,5 +22,5 @@
         'state_stopped', 'Stopped'|i18n( 'extension/expai/threads' ),
         'origin_panel', 'Intelligence tab'|i18n( 'extension/expai/threads' ),
         'origin_vector', 'Vector'|i18n( 'extension/expai/threads' )
-    ) )}</script>
+    )|expai_json}</script>
 </div>

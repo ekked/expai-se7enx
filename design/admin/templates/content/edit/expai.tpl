@@ -37,7 +37,7 @@
         {include uri=concat( 'design:', ezini( concat( 'EditSection_', $exp_ai_section ), 'Template', 'expai.ini' ) ) section=$exp_ai_section}
 {/foreach}
     </div>
-    <script type="application/json" class="exp-ai-edit-config">{json_encode( hash(
+    <script type="application/json" class="exp-ai-edit-config">{hash(
         'object_id', $object.id,
         'version', $edit_version,
         'language', $edit_language,
@@ -96,7 +96,7 @@
             'lost_attribute_1', '%count formatting attribute'|i18n( 'extension/expai/edit' ),
             'lost_attribute_n', '%count formatting attributes'|i18n( 'extension/expai/edit' )
         )
-    ) )}</script>
+    )|expai_json}</script>
 </section>
 {undef $exp_ai_attributes $exp_ai_actions $exp_ai_languages}
 {/if}

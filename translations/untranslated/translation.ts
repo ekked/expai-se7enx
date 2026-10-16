@@ -276,6 +276,10 @@
         <source>%count runs started. Watch them here:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>No runs yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/error</name>
@@ -2640,6 +2644,22 @@
         <source>All drafts written with Exponential Intelligence</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Your session has expired. Reload the page and sign in again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The connection to the run was lost. Reload the page to follow it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The answer is ready.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This draft no longer exists.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/step</name>
@@ -3129,6 +3149,14 @@
     </message>
     <message>
         <source>Show the shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count result</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count results</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3837,6 +3865,14 @@
         <source>Bulk work is always reviewed before it is written.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Your session has expired. Reload the page and sign in again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The connection to the run was lost. Reload the page to follow it.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <!-- expai threads/vector/keyboard: end -->
 <!-- expai translation sync: begin -->
@@ -4367,6 +4403,10 @@
     </message>
     <message>
         <source>The field is empty: there is nothing to improve.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The model returned no text, so nothing was written.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5511,6 +5551,14 @@
         <source>The test of %model runs in the background.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Request in the log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <!-- expai vector parallel/checkpoints: begin -->
 <context>
@@ -5533,14 +5581,6 @@
     </message>
     <message>
         <source>This checkpoint does not exist any more.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Request in the log</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Job</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -15,7 +15,7 @@
 .exp-ai-ms-model { font-weight: 600; min-width: 11em; }
 .exp-ai-ms-badges { display: flex; flex-wrap: wrap; gap: 0.3em; margin-top: 0.25em; font-weight: 400; }
 .exp-ai-ms-badge { display: inline-block; padding: 0 0.45em; border: 1px solid var(--exp-ai-line); border-radius: 999px; font-size: 0.8em; line-height: 1.6; color: var(--exp-ai-muted); }
-.exp-ai-ms-flag { border-color: var(--exp-ai-accent); color: var(--exp-ai-accent); background: var(--exp-ai-accent-soft); }
+.exp-ai-ms-flag { border-color: var(--exp-ai-accent); color: var(--exp-ai-accent-text); background: var(--exp-ai-accent-soft); }
 .exp-ai-ms-alias { display: block; margin-top: 0.2em; font-size: 0.78em; font-weight: 400; color: var(--exp-ai-muted); white-space: nowrap; }
 .exp-ai-ms-big { display: block; font-weight: 600; white-space: nowrap; }
 .exp-ai-ms-small { display: block; font-size: 0.85em; color: var(--exp-ai-muted); }

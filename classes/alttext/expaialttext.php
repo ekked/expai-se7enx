@@ -385,34 +385,97 @@ class expAiAltText
         $nodes = array_merge( $nodes, is_array( $children ) ? $children : array() );
         $truncated = count( $nodes ) > $max;
         $nodes = array_slice( $nodes, 0, $max );
+        // the ezimage attributes of all these objects at once (one query per chunk of objects), not one data map per
+        // object and language
+        $readable = array();
         foreach ( $nodes as $node )
         {
             $object = $node->object();
-            if ( !$object || !$object->canRead() )
+            if ( $object && $object->canRead() )
+                $readable[(int) $object->attribute( 'id' )] = $object;
+        }
+        $attributes = self::imageAttributes( array_keys( $readable ) );
+        $classNames = array();
+        foreach ( $nodes as $node )
+        {
+            $object = $node->object();
+            if ( !$object || !isset( $readable[(int) $object->attribute( 'id' )] ) )
                 continue;
+            $objectID = (int) $object->attribute( 'id' );
             $version = (int) $object->attribute( 'current_version' );
             foreach ( array_keys( $object->allLanguages() ) as $language )
             {
-                foreach ( $object->fetchDataMap( $version, $language ) as $identifier => $attribute )
+                foreach ( isset( $attributes[$objectID][$language] ) ? $attributes[$objectID][$language] : array() as $identifier => $attribute )
                 {
-                    if ( (string) $attribute->attribute( 'data_type_string' ) !== 'ezimage' )
-                        continue;
                     $handler = $attribute->attribute( 'content' );
                     $original = $handler instanceof eZImageAliasHandler ? $handler->imageAlias( 'original' ) : null;
                     if ( !is_array( $original ) || empty( $original['is_valid'] ) )
                         continue;
                     if ( trim( (string) $handler->attribute( 'alternative_text' ) ) !== '' )
                         continue;
-                    $rows[] = array( 'object_id' => (int) $object->attribute( 'id' ), 'node_id' => (int) $node->attribute( 'node_id' ),
+                    $classAttributeID = (int) $attribute->attribute( 'contentclassattribute_id' );
+                    if ( !isset( $classNames[$classAttributeID] ) )
+                        $classNames[$classAttributeID] = (string) $attribute->contentClassAttribute()->attribute( 'name' );
+                    $rows[] = array( 'object_id' => $objectID, 'node_id' => (int) $node->attribute( 'node_id' ),
                                      'name' => (string) $object->attribute( 'name' ), 'class' => (string) $object->attribute( 'class_name' ),
                                      'language' => (string) $language, 'attribute_id' => (int) $attribute->attribute( 'id' ),
-                                     'identifier' => (string) $identifier, 'field' => (string) $attribute->contentClassAttribute()->attribute( 'name' ),
+                                     'identifier' => (string) $identifier, 'field' => $classNames[$classAttributeID],
                                      'version' => $version, 'width' => (int) $original['width'], 'height' => (int) $original['height'],
                                      'url_alias' => (string) $node->attribute( 'url_alias' ) );
                 }
             }
         }
         return array( 'rows' => $rows, 'checked' => count( $nodes ), 'truncated' => $truncated );
+    }
+
+    /**
+     * The ezimage attributes of the current version of each object, for all languages, in the order fetchDataMap()
+     * gives them (the class's placement): objectID => language => identifier => eZContentObjectAttribute. One query
+     * per 200 objects instead of one per object and language. Without SQL (MongoDB) the data maps are read one by one.
+     *
+     * @param int[] $objectIDs
+     * @return array
+     */
+    public static function imageAttributes( array $objectIDs )
+    {
+        $out = array();
+        $objectIDs = array_values( array_unique( array_map( 'intval', $objectIDs ) ) );
+        if ( !$objectIDs )
+            return $out;
+        $db = eZDB::instance();
+        if ( $db->databaseName() === 'mongo' )
+        {
+            foreach ( $objectIDs as $objectID )
+            {
+                $object = eZContentObject::fetch( $objectID );
+                if ( !$object )
+                    continue;
+                foreach ( array_keys( $object->allLanguages() ) as $language )
+                    foreach ( $object->fetchDataMap( (int) $object->attribute( 'current_version' ), $language ) as $identifier => $attribute )
+                        if ( (string) $attribute->attribute( 'data_type_string' ) === 'ezimage' )
+                            $out[$objectID][$language][$identifier] = $attribute;
+            }
+            return $out;
+        }
+        foreach ( array_chunk( $objectIDs, 200 ) as $chunk )
+        {
+            $rows = $db->arrayQuery( 'SELECT ezcontentobject_attribute.*, ezcontentclass_attribute.identifier AS identifier '
+                . 'FROM ezcontentobject_attribute, ezcontentobject, ezcontentclass_attribute '
+                . 'WHERE ezcontentobject.id = ezcontentobject_attribute.contentobject_id '
+                . 'AND ezcontentobject.current_version = ezcontentobject_attribute.version '
+                . 'AND ezcontentclass_attribute.id = ezcontentobject_attribute.contentclassattribute_id '
+                . 'AND ezcontentclass_attribute.version = 0 '
+                . "AND ezcontentobject_attribute.data_type_string = 'ezimage' "
+                . 'AND ' . $db->generateSQLINStatement( $chunk, 'ezcontentobject_attribute.contentobject_id', false, false, 'int' ) . ' '
+                . 'ORDER BY ezcontentclass_attribute.placement ASC, ezcontentobject_attribute.language_code ASC' );
+            foreach ( $rows as $row )
+            {
+                $attribute = new eZContentObjectAttribute( $row );
+                $attribute->setContentClassAttributeIdentifier( $row['identifier'] );
+                $out[(int) $row['contentobject_id']][(string) $row['language_code']][(string) $row['identifier']] = $attribute;
+            }
+        }
+        return $out;
     }
 
     /* ----------------------------------------------------------------- queue */

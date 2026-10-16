@@ -113,7 +113,7 @@ What has been run, and how ([doc/provider-support.md](doc/provider-support.md) h
 
 ## Requirements
 
-- Exponential 6.0.14 or later, PHP 8.0 or later with `curl`, `dom`, `json` and `mbstring`.
+- Exponential 6.0.14 or later, PHP 8.1 or later with `curl`, `dom`, `json` and `mbstring`.
 - The extension **ezjscore**; recommended **ezformtoken**. For queued work (lanes, batches, chains, translation sync,
   alt text reports, large package imports, background runs of Vector) the extension **expqueue**.
 - An API key of at least one provider, or a local model. Outbound HTTPS to the hosted providers you use.

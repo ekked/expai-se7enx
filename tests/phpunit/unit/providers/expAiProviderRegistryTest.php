@@ -115,10 +115,33 @@ class expAiProviderRegistryTest extends expAiProviderTestCase
         $this->assertCount( 2, $problems );
         foreach ( $problems as $problem )
         {
-            $this->assertStringContainsString( 'keys belong in settings/override only', $problem );
+            $this->assertStringContainsString( 'keys belong in settings/override', $problem );
             $this->assertStringNotContainsString( 'not-a-key', $problem );
         }
         $this->assertStringStartsWith( '[Provider_xtek] ApiKey is set in ', $problems[0] );
         $this->assertStringStartsWith( '[McpServer_x] Token is set in ', $problems[1] );
+    }
+
+    public function testAnUntrackedFileInAKeyLocationIsAccepted(): void
+    {
+        $dir = expAiTestMockServer::tmp( 'xte-ini' );
+        $this->cleanup( static function () use ( $dir ) { expAiTestMockServer::removeTree( $dir ); } );
+        file_put_contents( $dir . '/expai.ini', "[Provider_xtek]\nApiKey=test-not-a-key\n" );
+        chmod( $dir . '/expai.ini', 0640 );
+        $relative = substr( $dir, strlen( EXPAI_TEST_ROOT ) + 1 );
+        $ini = eZINI::fetchFromFile( $relative . '/expai.ini' );
+        $ini->setVariable( 'ProviderSettings', 'KeyLocations', array( $relative ) );
+        $problems = ( new expAiProviderRegistry( new expAiConfig( $ini ) ) )->keyPlacementProblems();
+        $this->assertSame( array(), $problems, 'a key in an untracked file of a listed location is no problem' );
+    }
+
+    public function testAKeyOutsideTheListedLocationsStillIsReported(): void
+    {
+        $dir = expAiTestMockServer::tmp( 'xte-ini' );
+        $this->cleanup( static function () use ( $dir ) { expAiTestMockServer::removeTree( $dir ); } );
+        file_put_contents( $dir . '/expai.ini', "[Provider_xtek]\nApiKey=test-not-a-key\n" );
+        $ini = eZINI::fetchFromFile( substr( $dir, strlen( EXPAI_TEST_ROOT ) + 1 ) . '/expai.ini' );
+        $ini->setVariable( 'ProviderSettings', 'KeyLocations', array( 'extension/*/settings' ) );
+        $this->assertCount( 1, ( new expAiProviderRegistry( new expAiConfig( $ini ) ) )->keyPlacementProblems() );
     }
 }

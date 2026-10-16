@@ -70,7 +70,7 @@ One queue worker runs one job at a time. Right after a job is queued, expai star
 tests, field actions): when ready jobs wait and no live worker is free (none runs, or every live one is busy with a
 long job), up to `[VectorSettings] MaxKickedWorkers` (4) live workers in all, cron and systemd workers included.
 Each started worker leaves when nothing is ready. The start record `var/<site>/cache/expai/worker-kick.json` is shared
-by PHP-FPM and Velocity (created writable for both). `KickWorker=disabled` leaves everything to the cron part.
+by PHP-FPM and Velocity (mode 0660; a user who cannot open it gets `worker-kick-<uid>.json`). `KickWorker=disabled` leaves everything to the cron part.
 
 ## Steering
 

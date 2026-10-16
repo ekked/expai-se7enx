@@ -32,6 +32,9 @@ Checks: `canRead()` on the node, else "Node %id does not exist or you may not re
 | `offset` | integer | 0 |
 | `limit` | integer | `ListLimit` (and at most that) |
 
+The answer carries `total` (the children of the given class the user may read), `offset`, `has_more` (another page
+follows) and `withheld` (children of this page the data policy keeps away: they are not in `children`).
+
 Result: `parent_node_id`, `total`, `offset`, `children` (node_id, object_id, name, class_identifier, modified), in
 the node's sort order. Checks: `canRead()`; `subTree()` with the user's limitations.
 

@@ -43,7 +43,7 @@ page sums it up for a data protection officer ([summary.md](summary.md)).
 
 ## Several providers
 
-- Keys of every provider live in settings/override only; expai/models shows "key present" and warns about a key in
+- Keys of every provider live in settings/override or in an untracked `KeyLocations[]` location; expai/models shows "key present" and warns about a key in
   any other file or in a file every user of the server can read. A key-like string in a provider's error message is
   redacted before it is logged.
 - The data policy keeps sections and classes away from providers outside the regions they allow or without zero

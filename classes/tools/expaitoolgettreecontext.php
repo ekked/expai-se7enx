@@ -39,7 +39,7 @@ class expAiToolGetTreeContext extends expAiTool
                     $siblings[] = $sibling;
         }
         return array( 'node' => $context->reader->shortNode( $node ), 'path' => $path, 'siblings' => $siblings,
-                      'children_count' => (int) $node->subTreeCount( array( 'Depth' => 1, 'DepthOperator' => 'eq' ) ) );
+                      'children_count' => expAiToolListChildren::total( $node ) );
     }
 
     public function stepText( array $input )

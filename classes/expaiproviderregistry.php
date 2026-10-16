@@ -396,12 +396,62 @@ class expAiProviderRegistry
                 $path = is_array( $names[$name] ) ? (string) reset( $names[$name] ) : (string) $names[$name];
                 $file = ltrim( str_replace( eZSys::rootDir(), '', $path ), '/' );
                 $placement = $path !== '' ? (string) $ini->findSettingPlacement( $path ) : '';
-                if ( $placement !== 'override' && strpos( $file, 'settings/override/' ) !== 0 && !preg_match( '~^settings/siteaccess/~', $file ) )
-                    $problems[] = "[$group] $name is set in $file ($placement); keys belong in settings/override only";
+                if ( $placement !== 'override' && strpos( $file, 'settings/override/' ) !== 0 && !preg_match( '~^settings/siteaccess/~', $file )
+                     && !$this->acceptedKeyLocation( $file, $path ) )
+                    $problems[] = "[$group] $name is set in $file ($placement); keys belong in settings/override or in a listed location that git does not track";
                 elseif ( is_file( $path ) && ( fileperms( $path ) & 0004 ) )
                     $problems[] = "$file holds [$group] $name and is readable by every user of the server (use mode 0640)";
             }
         }
         return array_values( array_unique( $problems ) );
+    }
+
+    /**
+     * A file that matches [ProviderSettings] KeyLocations[] (fnmatch patterns relative to the installation, default
+     * settings/override and the settings directory of any extension) and is not shipped with the code: git does not track it, or, in a
+     * release directory without git, it lies outside the release (a symlink to shared files). A tracked file never
+     * qualifies: its key is in the repository.
+     *
+     * @param string $file the path relative to the installation
+     * @param string $path the path as the INI placement names it
+     * @return bool
+     */
+    protected function acceptedKeyLocation( $file, $path )
+    {
+        $patterns = array_filter( array_map( 'trim', array_map( 'strval', $this->config->arr( 'ProviderSettings', 'KeyLocations' ) ) ), 'strlen' );
+        if ( !$patterns )
+            $patterns = array( 'settings/override', 'extension/*/settings' );
+        $matches = false;
+        foreach ( $patterns as $pattern )
+        {
+            $pattern = rtrim( $pattern, '/' );
+            if ( fnmatch( $pattern . '/*', $file ) || fnmatch( $pattern, $file ) )
+            {
+                $matches = true;
+                break;
+            }
+        }
+        // true: in the repository; false: not; null: git could not say (dubious ownership, a broken checkout): no warning
+        return $matches && self::shippedWithTheCode( $file, $path ) !== true;
+    }
+
+    /** @return bool|null the file is part of the code: tracked by git (true), not tracked (false), git cannot say (null); without a git work tree: inside the release's real path (true) or outside it (false) */
+    protected static function shippedWithTheCode( $file, $path )
+    {
+        $root = rtrim( (string) eZSys::rootDir(), '/' );
+        if ( file_exists( $root . '/.git' ) && function_exists( 'exec' ) )
+        {
+            $output = array();
+            $status = 1;
+            @exec( 'git -C ' . escapeshellarg( $root ) . ' ls-files --error-unmatch -- ' . escapeshellarg( $file ) . ' 2>/dev/null', $output, $status );
+            // 0: tracked. 1: not tracked. Anything else (128 dubious ownership, 127 no git): git works here but cannot
+            // say, so nothing is claimed in either direction
+            if ( $status === 0 )
+                return true;
+            return $status === 1 ? false : null;
+        }
+        $real = realpath( $path !== '' && $path[0] === '/' ? $path : $root . '/' . $file );
+        $realRoot = realpath( $root );
+        return $real === false || $realRoot === false || strpos( $real, $realRoot . '/' ) === 0;
     }
 }

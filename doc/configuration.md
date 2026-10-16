@@ -28,7 +28,7 @@ a list, empty it where you set it: a line with only `FieldActions[]`, then the e
 | `AllowUserModelChoice` | `enabled` | Users may pick another model from `AllowedModels[]` (dashboard, panel, edit form); the choice is the preference `expai_model`. A choice that is no longer allowed falls back to `Model`. |
 | `AllowedModels[]` | `claude-sonnet-5-5`, `claude-opus-5-5`, `claude-haiku-5-5` | The models offered. `Model` is always offered. |
 | `ModelLabels[<id>]` | Claude Sonnet 5.5, ... | The name shown for a model id (the id when not set). |
-| `ApiKey` | (empty) | The API key. Only in settings/override, never committed. Without it expai is "not configured". |
+| `ApiKey` | (empty) | The API key. In settings/override or an untracked `KeyLocations[]` location, never committed. Without it expai is "not configured". |
 | `AnthropicWorkspaceId` | (empty) | For a key that is not scoped to a workspace: sent as `anthropic-workspace-id`. |
 | `MaxTokens` | `8000` | The longest answer of one call, in tokens. |
 | `Effort` | `medium` | How much the model thinks: `low`, `medium`, `high` (`xhigh`, `max` where the model has them); empty: the model's default. |
@@ -53,6 +53,7 @@ settings keep working unchanged). More providers: the next three sections and [p
 | `Providers[]` | `anthropic` | The active providers, in the order the model picker shows them. Each needs a `[Provider_<id>]` group, except `anthropic`, which falls back to `[AISettings]`. |
 | `DefaultModel` | (empty) | The alias of the site default model; empty: `anthropic.<[AISettings] Model>`. |
 | `ProvidersWithoutPolicy[]` | `anthropic` | The models of these providers can be chosen by everyone with `expai/write` (as in 0.0.1.0); every other provider's models need `expai/model_use` (limitation Provider). Empty it to require the policy for everything but the default. |
+| `KeyLocations[]` | `settings/override`, `extension/*/settings` | Where an `ApiKey` or `Token` may be set besides `settings/override` (fnmatch patterns relative to the installation). A file there is accepted only when it is not shipped with the code: git does not track it, or, in a release without git, it lies outside the release (a symlink to shared files). A tracked file is always reported on `expai/models`. |
 
 ## [Provider_<id>]: one provider
 
@@ -62,7 +63,7 @@ settings keep working unchanged). More providers: the next three sections and [p
 | `Flavor` | `openai_chat` only: `openai`, `huggingface`, `openrouter`, `mistral`, `xai`, `ollama`, `llamacpp`, `melious`, `generic`: the small differences (tool_choice support, Mistral's tool names, `max_completion_tokens`, OpenRouter's `reasoning` object, the cost Melious reports in `billing_cost.credits`). |
 | `Label` | The name in the picker, in error texts and on expai/models. |
 | `BaseURL` | The API: for `openai_chat` the base (`https://router.huggingface.co/v1`; `/chat/completions` is added, a query such as Azure's `api-version` is kept); for `anthropic` the messages URL. |
-| `ApiKey` | The key, ONLY in settings/override. expai/models warns about a key in any other file. |
+| `ApiKey` | The key, in settings/override or an untracked `[ProviderSettings] KeyLocations[]` location. expai/models warns about a key in any other file (and about one in a tracked file). |
 | `ApiKeyHeader` | `authorization` (Bearer, default of `openai_chat`), `x-api-key` (default of `anthropic`), `api-key` (Azure), `x-goog-api-key`, or `none` (a local server). |
 | `KeyOptional` | `true`: send no key header when `ApiKey` is empty (a server that accepts both). |
 | `Headers[]` | Extra request headers, `Name: value` (e.g. OpenRouter's `X-OpenRouter-Title`). Key headers, `Host` and line breaks are refused. |
@@ -400,7 +401,7 @@ See [mcp.md](mcp.md).
 | --- | --- |
 | `Label` | The name shown with its tools. |
 | `URL` | The endpoint: https, or http to a loopback address with `AllowLoopback=enabled`. |
-| `Token` | Sent as a Bearer token; ONLY in settings/override. |
+| `Token` | Sent as a Bearer token; in settings/override or an untracked `KeyLocations[]` location. |
 | `AllowedTools[]` | The tools the panel may call (`mcp__<id>__<tool>`); everything else the server offers is ignored. |
 | `Region`, `Retention` | Checked against the panel node's data policy before every call. |
 | `MaxResultBytes` | The longest result passed to the model (default 16000). |
@@ -459,7 +460,8 @@ See [mcp.md](mcp.md).
 | `MaxStreams` | 4 | streams open at once (one PHP process each: at most 25 % of PHP-FPM `pm.max_children`) |
 | `StreamSeconds` | 25 | how long one stream is held before the browser reconnects |
 | `Background` | auto | turns of slow models run as queue jobs (`auto`), every turn (`always`), none (`never`); [vector.md](vector.md#background-runs) |
-| `KickWorker` | enabled | without a running worker, start one detached worker for interactive jobs after queueing |
+| `KickWorker` | enabled | without a running worker, start one detached worker for interactive jobs after queueing (setsid where the system has it, else nohup alone) |
+| `WorkerAllowRoot` | disabled | pass `--allow-root-user` to the started worker; only for a site whose PHP runs as root |
 | `PhpCli` | (empty) | the PHP command line binary of that worker (empty: the one of this PHP) |
 | `MaxStagedChanges` | 500 | staged changes one thread may hold open ([review.md](review.md)); over it the write tools ask for a review first |
 | `MaxEditLength` | 20000 | the longest text of an edited part in the Changes tab (characters) |
@@ -539,7 +541,7 @@ configured.
 | `Label` | The name in results and the data policy. |
 | `Class` | A class extending `expAiWebSearchProvider` (`expAiWebSearchBrave` for `[SearchProvider_brave]`). |
 | `Endpoint` | The API address (https). |
-| `ApiKey` | ONLY in settings/override; without it web_search is not offered. |
+| `ApiKey` | In settings/override or an untracked `KeyLocations[]` location; without it web_search is not offered. |
 | `Region`, `Retention` | Checked against the panel node's data policy before every search (the query leaves the site). |
 | `Timeout` | Seconds per search (default 10). |
 | `SafeSearch`, `Country`, `SearchLang` | Brave's `safesearch`, `country` and `search_lang` parameters (optional). |

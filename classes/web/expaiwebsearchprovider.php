@@ -11,7 +11,7 @@
  * A web search service for web_search. [SearchSettings] Provider=<id> names a [SearchProvider_<id>] group with
  * Class=<a subclass>; the group's settings arrive in the constructor. Brave Search (expAiWebSearchBrave) ships;
  * another service (Bing, SerpAPI, Tavily ...) is one subclass with search() and a group in expai.ini. The API key is
- * read from [SearchProvider_<id>] ApiKey, which belongs in settings/override only.
+ * read from [SearchProvider_<id>] ApiKey, which belongs in settings/override (or an untracked [ProviderSettings] KeyLocations[] location).
  */
 abstract class expAiWebSearchProvider
 {

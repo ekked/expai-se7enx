@@ -10,24 +10,50 @@
  * Override them in a stylesheet of your own (doc/customization.md).
  */
 .exp-ai, .exp-ai-badge {
-    --exp-ai-accent: var(--a4-orange, #c55a11);
+    --exp-ai-accent: var(--a4-accent, var(--a4-orange, #c55a11));
+    --exp-ai-accent-text: var(--a4-accent-text, #b4470c);
     --exp-ai-accent-ink: #fff;
-    --exp-ai-accent-soft: var(--a4-orange-soft, rgba(197, 90, 17, 0.10));
+    --exp-ai-accent-soft: var(--a4-accent-soft, var(--a4-orange-soft, rgba(197, 90, 17, 0.10)));
     --exp-ai-ink: inherit;
     --exp-ai-muted: var(--a4-muted, #5d6573);
     --exp-ai-line: var(--a4-line, #d9dde3);
     --exp-ai-surface: rgba(127, 127, 127, 0.06);
     --exp-ai-user: rgba(127, 127, 127, 0.10);
-    --exp-ai-ok: #2e7d32;
-    --exp-ai-error: #b3261e;
+    --exp-ai-ok: var(--a4-ok, #2e7d32);
+    --exp-ai-warn: var(--a4-warn, #8a4b00);
+    --exp-ai-danger: var(--a4-bad, #b42318);
+    --exp-ai-error: var(--a4-bad, #b3261e);
     --exp-ai-radius: var(--a4-radius-s, 6px);
+    --exp-ai-z-overlay: 10000;
+    --exp-ai-z-toast: 10001;
+    --exp-ai-z-popover: var(--a4-z-popover, 50);
 }
+/* Dark: admin4's own switch needs no script, so elements added after the page loaded (field
+   bars, the alternative text bars, the preset bars) are right from their first paint. admin4 moves its --a4-* tokens
+   under html[data-a4-theme="dark"], which the tokens above follow; the literal values are for the rest. The class
+   exp-ai-on-dark (expai.js, from the computed background) covers every other design that is dark: the older admin
+   designs have no dark mode of their own and stay light. */
+html[data-a4-theme="dark"] .exp-ai, html[data-a4-theme="dark"] .exp-ai-badge,
 .exp-ai.exp-ai-on-dark, .exp-ai-badge.exp-ai-on-dark {
     --exp-ai-line: rgba(255, 255, 255, 0.14);
     --exp-ai-surface: rgba(255, 255, 255, 0.05);
     --exp-ai-user: rgba(255, 255, 255, 0.09);
-    --exp-ai-ok: #81c784;
-    --exp-ai-error: #ff8a80;
+    --exp-ai-accent-text: var(--a4-accent-text, #ff9a5c);
+    --exp-ai-ok: var(--a4-ok, #81c784);
+    --exp-ai-warn: var(--a4-warn, #fcd34d);
+    --exp-ai-danger: var(--a4-bad, #ff8a80);
+    --exp-ai-error: var(--a4-bad, #ff8a80);
+}
+/* admin4l keeps its content boxes light in dark mode: expai.js marks them exp-ai-on-light, the light values return */
+html[data-a4-theme="dark"] .exp-ai.exp-ai-on-light, html[data-a4-theme="dark"] .exp-ai-badge.exp-ai-on-light {
+    --exp-ai-line: #d9dde3;
+    --exp-ai-surface: rgba(127, 127, 127, 0.06);
+    --exp-ai-user: rgba(127, 127, 127, 0.10);
+    --exp-ai-accent-text: #b4470c;
+    --exp-ai-ok: #2e7d32;
+    --exp-ai-warn: #8a4b00;
+    --exp-ai-danger: #b42318;
+    --exp-ai-error: #b3261e;
 }
 
 /* the mark: a small four-point star drawn in CSS, no image */
@@ -49,7 +75,7 @@
     padding: 0.1em 0.55em;
     border-radius: 999px;
     background: var(--exp-ai-accent-soft);
-    color: var(--exp-ai-accent);
+    color: var(--exp-ai-accent-text);
     font-size: 0.78em;
     font-weight: 600;
     line-height: 1.5;
@@ -129,7 +155,7 @@
     padding: 0;
     border: 0;
     background: none;
-    color: var(--exp-ai-accent);
+    color: var(--exp-ai-accent-text);
     font: inherit;
     text-decoration: underline;
     cursor: pointer;
@@ -142,6 +168,10 @@
     padding: 0;
     max-height: 32em;
     overflow-y: auto;
+}
+.exp-ai .exp-ai-sr {
+    position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
 .exp-ai-log:empty { display: none; }
 .exp-ai-msg {
@@ -186,7 +216,10 @@
     vertical-align: -0.15em;
 }
 @keyframes exp-ai-spin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .exp-ai-spinner { animation-duration: 3s; } }
+@media (prefers-reduced-motion: reduce) {
+    .exp-ai-spinner { animation: none; border-top-color: var(--exp-ai-line); border-right-color: var(--exp-ai-accent); }
+    .exp-ai, .exp-ai *, .exp-ai *::before, .exp-ai *::after { transition: none !important; animation: none !important; }
+}
 
 /* drafts */
 .exp-ai-draft-table { width: 100%; border-collapse: collapse; }
@@ -196,9 +229,9 @@
 .exp-ai-draft-meta { font-size: 0.85em; color: var(--exp-ai-muted); margin-top: 0.15em; }
 .exp-ai-draft-links { text-align: right; white-space: nowrap; }
 .exp-ai-draft-links a, .exp-ai-draft-links button { margin-left: 0.5em; }
-.exp-ai-status-pending { color: var(--exp-ai-accent); font-weight: 600; }
+.exp-ai-status-pending { color: var(--exp-ai-accent-text); font-weight: 600; }
 .exp-ai-status-published { color: var(--exp-ai-ok); font-weight: 600; }
-.exp-ai-approval-approval, .exp-ai-approval-possible { color: var(--exp-ai-accent); }
+.exp-ai-approval-approval, .exp-ai-approval-possible { color: var(--exp-ai-accent-text); }
 .exp-ai-send-summary { font-size: 0.9em; margin: 0.5em 0 0; min-height: 1.2em; }
 .exp-ai-empty { color: var(--exp-ai-muted); }
 
@@ -222,7 +255,7 @@
     line-height: 1.5;
     cursor: pointer;
 }
-.exp-ai .exp-ai-chip:hover, .exp-ai .exp-ai-chip:focus-visible { border-color: var(--exp-ai-accent); color: var(--exp-ai-accent); }
+.exp-ai .exp-ai-chip:hover, .exp-ai .exp-ai-chip:focus-visible { border-color: var(--exp-ai-accent); color: var(--exp-ai-accent-text); }
 .exp-ai-field-form { flex: 1 0 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 0.4em; }
 .exp-ai-field-form .exp-ai-label { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4em; flex: 1 1 18em; margin: 0; font-weight: normal; }
 .exp-ai-field-form input.exp-ai-field-input { flex: 1 1 12em; min-width: 0; }
@@ -231,6 +264,7 @@
 .exp-ai-filled { outline: 2px solid var(--exp-ai-accent); outline-offset: 3px; transition: outline-color 0.6s; }
 .exp-ai-busy { cursor: progress; }
 .exp-ai-note { margin: 0.4em 0; }
+.exp-ai-note-refused { color: var(--exp-ai-warn); }
 .exp-ai-note:empty { display: none; }
 /* edit form: the review of an answer that would lose structure or overwrite a change */
 .exp-ai-review-host:empty { display: none; }
@@ -350,7 +384,7 @@ div#node-tab-expai_media-content.tab-content {
     padding: 0.05em 0.55em;
     border-radius: 999px;
     background: var(--exp-ai-accent-soft);
-    color: var(--exp-ai-accent);
+    color: var(--exp-ai-accent-text);
     font-size: 0.82em;
     font-weight: 600;
     text-decoration: none;
@@ -366,7 +400,7 @@ div#node-tab-expai_media-content.tab-content {
 /* expai/log */
 .exp-ai-tabs { display: flex; flex-wrap: wrap; gap: 0.3em; list-style: none; margin: 0.5em 0 0.8em; padding: 0; }
 .exp-ai-tabs li a { display: inline-block; padding: 0.3em 0.8em; border: 1px solid var(--exp-ai-line); border-radius: 999px; text-decoration: none; }
-.exp-ai-tabs li.exp-ai-current a { background: var(--exp-ai-accent-soft); color: var(--exp-ai-accent); border-color: transparent; font-weight: 600; }
+.exp-ai-tabs li.exp-ai-current a { background: var(--exp-ai-accent-soft); color: var(--exp-ai-accent-text); border-color: transparent; font-weight: 600; }
 .exp-ai-filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.6em 1em; }
 .exp-ai-filters label { display: flex; flex-direction: column; gap: 0.2em; font-size: 0.9em; font-weight: 600; }
 .exp-ai-filters label.exp-ai-check-label { flex-direction: row; align-items: center; }
@@ -403,7 +437,7 @@ div#node-tab-expai_media-content.tab-content {
 .exp-ai-model label { display: inline-flex; align-items: center; gap: 0.4em; font-weight: 600; white-space: normal; }
 .exp-ai-model-compact { font-size: 0.9em; margin-left: auto; }
 .exp-ai-model-note:empty { display: none; }
-.exp-ai-model-note { color: var(--exp-ai-accent); }
+.exp-ai-model-note { color: var(--exp-ai-accent-text); }
 /* the fallback to the default model: the line saying which model answered instead */
 .exp-ai-fallback-notice { margin: 0.3em 0; padding: 0.25em 0.6em; border-left: 3px solid var(--exp-ai-accent); background: var(--exp-ai-accent-soft); font-size: 0.92em; }
 span.exp-ai-fallback-notice { display: inline-block; }
@@ -439,7 +473,7 @@ span.exp-ai-fallback-notice { display: inline-block; }
 .exp-ai-summary-head h2, .exp-ai-chart-head h3 { margin: 0; flex: 1 1 auto; }
 .exp-ai-switch { display: inline-flex; flex-wrap: wrap; gap: 0.25em; }
 .exp-ai-switch a { padding: 0.15em 0.6em; border: 1px solid var(--exp-ai-line); border-radius: 999px; font-size: 0.85em; text-decoration: none; }
-.exp-ai-switch a.exp-ai-on { background: var(--exp-ai-accent-soft); color: var(--exp-ai-accent); border-color: transparent; font-weight: 600; }
+.exp-ai-switch a.exp-ai-on { background: var(--exp-ai-accent-soft); color: var(--exp-ai-accent-text); border-color: transparent; font-weight: 600; }
 .exp-ai-summary-figures { margin: 0.6em 0; }
 .exp-ai-change { font-size: 0.78em !important; font-weight: normal !important; color: var(--exp-ai-muted); }
 .exp-ai-chart {
@@ -477,7 +511,7 @@ span.exp-ai-fallback-notice { display: inline-block; }
     text-decoration: none;
     white-space: nowrap;
 }
-.exp-ai-segmented a[aria-current="true"] { background: var(--a4-card-bg, #fff); color: var(--exp-ai-accent); box-shadow: 0 1px 3px rgba(16, 24, 40, 0.12); }
+.exp-ai-segmented a[aria-current="true"] { background: var(--a4-card-bg, #fff); color: var(--exp-ai-accent-text); box-shadow: 0 1px 3px rgba(16, 24, 40, 0.12); }
 .exp-ai-on-dark .exp-ai-segmented a[aria-current="true"] { background: rgba(255, 255, 255, 0.12); }
 .exp-ai-segmented-small a { padding: 0.2rem 0.7rem; font-size: 0.8rem; }
 
@@ -488,7 +522,7 @@ span.exp-ai-fallback-notice { display: inline-block; }
 .exp-ai-pill-ok { color: inherit; }
 .exp-ai-pill-warn .exp-ai-dot { background: var(--exp-ai-accent); }
 .exp-ai-details { font-size: 0.8rem; }
-.exp-ai-details > summary { cursor: pointer; color: var(--exp-ai-accent); padding: 0.15rem 0.4rem; }
+.exp-ai-details > summary { cursor: pointer; color: var(--exp-ai-accent-text); padding: 0.15rem 0.4rem; }
 .exp-ai-details[open] { flex: 1 0 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--exp-ai-line); border-radius: var(--exp-ai-radius); }
 .exp-ai-details dl { margin: 0.4rem 0 0; display: grid; gap: 0.35rem; }
 .exp-ai-details dl > div { display: grid; grid-template-columns: minmax(9rem, 14rem) 1fr; gap: 0.6rem; }
@@ -512,7 +546,7 @@ span.exp-ai-fallback-notice { display: inline-block; }
 .exp-ai-kpi-value { font-size: 1.9rem; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; }
 .exp-ai-kpi-small { font-size: 0.8rem; color: var(--exp-ai-muted); }
 .exp-ai-trend { position: absolute; top: 0.9rem; right: 1rem; font-size: 0.78rem; font-weight: 700; }
-.exp-ai-trend-up { color: var(--exp-ai-accent); }
+.exp-ai-trend-up { color: var(--exp-ai-accent-text); }
 .exp-ai-trend-down { color: var(--exp-ai-ok); }
 .exp-ai-trend-flat { color: var(--exp-ai-muted); }
 
@@ -520,7 +554,7 @@ span.exp-ai-fallback-notice { display: inline-block; }
 .exp-ai-side { display: flex; flex-direction: column; gap: var(--exp-ai-gap); min-width: 0; }
 .exp-ai-start { border: 1px solid var(--exp-ai-accent-soft); box-shadow: inset 4px 0 0 var(--exp-ai-accent); }
 .exp-ai-location { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.5rem; margin: 0 0 0.6rem; }
-.exp-ai-chip-location { display: inline-flex; align-items: center; padding: 0.2rem 0.7rem; border-radius: 999px; background: var(--exp-ai-accent-soft); color: var(--exp-ai-accent); font-weight: 700; }
+.exp-ai-chip-location { display: inline-flex; align-items: center; padding: 0.2rem 0.7rem; border-radius: 999px; background: var(--exp-ai-accent-soft); color: var(--exp-ai-accent-text); font-weight: 700; }
 .exp-ai .exp-ai-location .exp-ai-link { font-size: 0.85rem; }
 .exp-ai-input-large { min-height: 7.5rem; font-size: 1rem; }
 .exp-ai-start-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.6rem; margin-top: 0.7rem; }
@@ -567,7 +601,7 @@ span.exp-ai-fallback-notice { display: inline-block; }
 .exp-ai-recent-meta { font-size: 0.8rem; color: var(--exp-ai-muted); }
 .exp-ai-state { padding: 0.1rem 0.55rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; background: var(--exp-ai-user); white-space: nowrap; }
 .exp-ai-state-published { color: var(--exp-ai-ok); }
-.exp-ai-state-pending { color: var(--exp-ai-accent); background: var(--exp-ai-accent-soft); }
+.exp-ai-state-pending { color: var(--exp-ai-accent-text); background: var(--exp-ai-accent-soft); }
 
 @media (max-width: 1100px) {
     .exp-ai-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -596,7 +630,7 @@ span.exp-ai-fallback-notice { display: inline-block; }
 
 /* the palette and the shortcut sheet (appended to body, on any admin page) */
 .exp-ai-palette-overlay {
-    position: fixed; inset: 0; z-index: 10000; display: flex; align-items: flex-start; justify-content: center;
+    position: fixed; inset: 0; z-index: var(--exp-ai-z-overlay, 10000); display: flex; align-items: flex-start; justify-content: center;
     padding: 12vh 1em 1em; background: rgba(16, 24, 40, 0.38);
 }
 .exp-ai-palette-overlay[hidden] { display: none; }
@@ -613,6 +647,9 @@ span.exp-ai-fallback-notice { display: inline-block; }
 }
 .exp-ai-palette kbd { cursor: default; }
 .exp-ai-palette-list { list-style: none; margin: 0; padding: 0.3em; overflow: auto; }
+.exp-ai-palette-groupbox { list-style: none; margin: 0; padding: 0; }
+.exp-ai-palette-sub { list-style: none; margin: 0; padding: 0; }
+html.exp-ai-palette-open { overflow: hidden; }
 .exp-ai-palette-group { padding: 0.6em 0.6em 0.2em; color: var(--exp-ai-muted); font-size: 0.72em; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
 .exp-ai-palette-list [role="option"] { display: flex; align-items: center; gap: 0.6em; padding: 0.45em 0.6em; border-radius: 6px; cursor: pointer; }
 .exp-ai-palette-list [role="option"].exp-ai-active, .exp-ai-palette-list [role="option"]:hover { background: var(--exp-ai-accent-soft); }
@@ -630,7 +667,7 @@ span.exp-ai-fallback-notice { display: inline-block; }
 .exp-ai-sheet-error { margin: 0.6em 1em 0; color: var(--exp-ai-error); }
 .exp-ai-sheet-foot { margin: 0.6em 1em 0; }
 .exp-ai-palette-toast {
-    position: fixed; left: 50%; bottom: calc(1.25em + var(--exp-debug-bar-h, 0px)); z-index: 10001; transform: translateX(-50%); max-width: calc(100vw - 2em);
+    position: fixed; left: 50%; bottom: calc(1.25em + var(--exp-debug-bar-h, 0px)); z-index: var(--exp-ai-z-toast, 10001); transform: translateX(-50%); max-width: calc(100vw - 2em);
     padding: 0.6em 1em; border-radius: 6px; background: #1f2430; color: #fff; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
 }
 .exp-ai-palette-toast[hidden] { display: none; }
@@ -644,12 +681,12 @@ span.exp-ai-fallback-notice { display: inline-block; }
 .exp-ai-chain-plan li { counter-increment: exp-ai-chain; padding: 0.25em 0.7em; border: 1px solid var(--exp-ai-line); border-radius: 999px; color: var(--exp-ai-muted); }
 .exp-ai-chain-plan li::before { content: counter(exp-ai-chain) ". "; }
 .exp-ai-chain-plan li.exp-ai-chain-done { color: var(--exp-ai-ok); border-color: currentColor; }
-.exp-ai-chain-plan li.exp-ai-chain-current { color: var(--exp-ai-accent); border-color: currentColor; background: var(--exp-ai-accent-soft); font-weight: 600; }
-.exp-ai-chain-pill-waiting_human, .exp-ai-chain-pill-held { background: var(--exp-ai-accent-soft); color: var(--exp-ai-accent); }
+.exp-ai-chain-plan li.exp-ai-chain-current { color: var(--exp-ai-accent-text); border-color: currentColor; background: var(--exp-ai-accent-soft); font-weight: 600; }
+.exp-ai-chain-pill-waiting_human, .exp-ai-chain-pill-held { background: var(--exp-ai-accent-soft); color: var(--exp-ai-accent-text); }
 .exp-ai-chain-pill-failed, .exp-ai-chain-verdict-fail { color: var(--exp-ai-error); }
 .exp-ai-chain-pill-done, .exp-ai-chain-verdict-pass { color: var(--exp-ai-ok); }
 .exp-ai-chain-checkpoint { border-color: var(--exp-ai-accent); }
-.exp-ai-chain-flags { margin: 0 0 0.8em; padding-left: 1.2em; color: var(--exp-ai-accent); }
+.exp-ai-chain-flags { margin: 0 0 0.8em; padding-left: 1.2em; color: var(--exp-ai-accent-text); }
 .exp-ai-chain-field { padding: 0.4em 0.8em; border-left: 3px solid var(--exp-ai-line); margin-bottom: 0.8em; }
 .exp-ai-chain-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4em 0.8em; }
 .exp-ai-chain-count, .exp-ai .exp-ai-chain-count { width: 4.5em; min-height: 0; height: auto; padding: 0.3em 0.45em; }
@@ -672,13 +709,13 @@ span.exp-ai-fallback-notice { display: inline-block; }
     line-height: 1.5;
     cursor: pointer;
 }
-.exp-ai .exp-ai-preset-chip:hover, .exp-ai .exp-ai-preset-chip:focus-visible { color: var(--exp-ai-accent); }
+.exp-ai .exp-ai-preset-chip:hover, .exp-ai .exp-ai-preset-chip:focus-visible { color: var(--exp-ai-accent-text); }
 .exp-ai .exp-ai-preset-chip[disabled] { opacity: 0.55; cursor: progress; }
 .exp-ai .exp-ai-improve-button { background: transparent; border-color: var(--exp-ai-line); }
 .exp-ai-improve { position: relative; display: inline-block; }
 .exp-ai-improve-menu {
     position: absolute;
-    z-index: 50;
+    z-index: var(--exp-ai-z-popover, 50);
     top: calc(100% + 0.25em);
     left: 0;
     display: flex;
@@ -700,7 +737,7 @@ span.exp-ai-fallback-notice { display: inline-block; }
     text-align: left;
     cursor: pointer;
 }
-.exp-ai .exp-ai-improve-item:hover, .exp-ai .exp-ai-improve-item:focus { background: var(--exp-ai-accent-soft); color: var(--exp-ai-accent); outline: none; }
+.exp-ai .exp-ai-improve-item:hover, .exp-ai .exp-ai-improve-item:focus { background: var(--exp-ai-accent-soft); color: var(--exp-ai-accent-text); outline: none; }
 .exp-ai .exp-ai-improve-item:focus-visible { outline: 2px solid var(--exp-ai-accent); outline-offset: -2px; }
 
 /* ---- Help (expai/help, the "?" links; classes/expaihelp.php) ---------------------------------------------------- */
@@ -720,14 +757,14 @@ span.exp-ai-fallback-notice { display: inline-block; }
     line-height: 1;
     text-decoration: none;
 }
-a.exp-ai-help-link:hover, a.exp-ai-help-link:focus-visible { color: var(--exp-ai-accent); border-color: var(--exp-ai-accent); text-decoration: none; }
+a.exp-ai-help-link:hover, a.exp-ai-help-link:focus-visible { color: var(--exp-ai-accent-text); border-color: var(--exp-ai-accent); text-decoration: none; }
 a.exp-ai-help-link:focus-visible { outline: 2px solid var(--exp-ai-accent); outline-offset: 2px; }
 .exp-ai-help-layout { display: grid; grid-template-columns: minmax(12em, 16em) minmax(0, 1fr); gap: 1.5em; align-items: start; }
 .exp-ai-help-nav { position: sticky; top: 0.5em; max-height: calc(100vh - 2em); overflow-y: auto; padding: 0.6em 0.8em; border: 1px solid var(--exp-ai-line); border-radius: var(--exp-ai-radius); }
 .exp-ai-help-nav-title { margin: 0 0 0.4em; font-weight: 600; }
 .exp-ai-help-nav ul { margin: 0; padding: 0; list-style: none; }
 .exp-ai-help-nav li { margin: 0.15em 0; }
-.exp-ai-help-nav a[aria-current="page"] { color: var(--exp-ai-accent); font-weight: 600; }
+.exp-ai-help-nav a[aria-current="page"] { color: var(--exp-ai-accent-text); font-weight: 600; }
 .exp-ai-help-doc { min-width: 0; max-width: 60em; line-height: 1.55; }
 .exp-ai-help-doc h1 { font-size: 1.5em; margin: 0 0 0.6em; padding: 0; border: 0; }
 .exp-ai-help-doc h2 { font-size: 1.25em; margin: 1.4em 0 0.5em; padding: 0; border: 0; }
@@ -764,6 +801,17 @@ a.exp-ai-help-link:focus-visible { outline: 2px solid var(--exp-ai-accent); outl
 .exp-ai-watch { margin: 0.35em 0; font-size: 0.86em; color: var(--exp-ai-muted); overflow-wrap: anywhere; }
 .exp-ai-watch[hidden] { display: none; }
 .exp-ai-watch-chip { display: inline-block; padding: 0 0.5em; border: 1px solid currentColor; border-radius: 999px; font-weight: 600; }
-.exp-ai-watch-running, .exp-ai-watch-queued { color: var(--exp-ai-accent); }
+.exp-ai-watch-running, .exp-ai-watch-queued { color: var(--exp-ai-accent-text); }
 .exp-ai-watch-done { color: var(--exp-ai-ok, #15803d); }
 .exp-ai-watch-failed { color: var(--exp-ai-error); }
+
+/* Forced colours (Windows high contrast): the mark and the bars stay visible without their background colours */
+@media (forced-colors: active) {
+    .exp-ai-mark { forced-color-adjust: none; background: CanvasText; }
+    .exp-ai-badge { border: 1px solid CanvasText; }
+    .exp-ai-field-bar, .exp-ai-banner, .exp-ai-review, .exp-ai-review-host:not(:empty) { border: 1px solid CanvasText; }
+    .exp-ai-filled { outline-color: Highlight; }
+    .exp-ai-spinner { border-color: GrayText; border-top-color: Highlight; }
+    .exp-ai-chip { border: 1px solid ButtonText; }
+    .exp-ai-palette-list [role="option"].exp-ai-active, .exp-ai-palette-list [role="option"]:hover { outline: 2px solid Highlight; }
+}

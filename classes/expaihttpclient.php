@@ -27,6 +27,9 @@ class expAiHttpClient
     /** @var string[] lower-case glob patterns of the response headers to keep */
     protected $keepHeaders;
 
+    /** @var bool */
+    protected $truncated = false;
+
     /** @var array errno, connect_time (seconds, null when unknown) and status of the last request */
     protected $lastTransfer = array( 'errno' => 0, 'connect_time' => null, 'status' => 0 );
 
@@ -58,6 +61,12 @@ class expAiHttpClient
     public function lastTransfer()
     {
         return $this->lastTransfer;
+    }
+
+    /** @return bool the last answer was cut at the size limit (option truncate) */
+    public function truncated()
+    {
+        return $this->truncated;
     }
 
     /** @return float the current time in seconds (the clock of the retry deadline; tests replace it) */
@@ -100,7 +109,11 @@ class expAiHttpClient
      *                       used to pin a checked address), method (GET, POST, DELETE; default POST),
      *                       content_type (of the body, default application/json), on_chunk (a callable that gets
      *                       every piece of the body as it arrives, e.g. to time the first event of a stream),
-     *                       timeout (seconds, at most the client's timeout: the time left of a retry deadline)
+     *                       timeout (seconds, at most the client's timeout: the time left of a retry deadline),
+     *                       user_agent (default "Exponential expai"), accept_language, encoding (CURLOPT_ENCODING; ''
+     *                       accepts every encoding curl can decode, default none), header_max (longest kept header
+     *                       value, default 200), truncate (true: an answer over the limit is cut, not an error; the
+     *                       cut shows in truncated())
      * @return array( int status, string body, array kept headers )
      * @throws expAiException
      */
@@ -112,10 +125,13 @@ class expAiHttpClient
             throw new expAiException( 'Exponential Intelligence is not available on this server.', 'the PHP curl extension is missing' );
 
         $this->lastTransfer = array( 'errno' => 0, 'connect_time' => null, 'status' => 0 );
+        $this->truncated = false;
         $received = '';
         $tooLarge = false;
         $responseHeaders = array();
         $limit = $this->maxResponseBytes;
+        $truncate = !empty( $options['truncate'] );
+        $headerMax = isset( $options['header_max'] ) ? max( 1, min( 8192, (int) $options['header_max'] ) ) : 200;
         $client = $this;
         $accept = isset( $options['accept'] ) ? (string) $options['accept'] : 'application/json';
         $ch = curl_init( $url );
@@ -126,29 +142,37 @@ class expAiHttpClient
         // DELETE without a body sends no content type (batch APIs); content_type: e.g. multipart/form-data; boundary=...
         $noBody = $get || ( $method === 'DELETE' && (string) $body === '' );
         $timeout = isset( $options['timeout'] ) && is_numeric( $options['timeout'] ) ? max( 1, min( $this->timeout, (int) $options['timeout'] ) ) : $this->timeout;
+        $agent = isset( $options['user_agent'] ) && !preg_match( '/[\r\n]/', (string) $options['user_agent'] ) ? (string) $options['user_agent'] : 'Exponential expai';
         $contentType = isset( $options['content_type'] ) && !preg_match( '/[\r\n]/', (string) $options['content_type'] ) ? (string) $options['content_type'] : 'application/json';
         curl_setopt_array( $ch, array(
             CURLOPT_POST => $method === 'POST',
             CURLOPT_HTTPGET => $get,
-            CURLOPT_HTTPHEADER => array_merge( $noBody ? array( 'Accept: ' . $accept ) : array( 'Content-Type: ' . $contentType, 'Accept: ' . $accept ), $headers ),
+            CURLOPT_HTTPHEADER => array_merge( $noBody ? array( 'Accept: ' . $accept ) : array( 'Content-Type: ' . $contentType, 'Accept: ' . $accept ),
+                                               isset( $options['accept_language'] ) && !preg_match( '/[\r\n]/', (string) $options['accept_language'] ) ? array( 'Accept-Language: ' . $options['accept_language'] ) : array(),
+                                               $headers ),
             CURLOPT_FOLLOWLOCATION => false,
             CURLOPT_TIMEOUT => $timeout,
             CURLOPT_CONNECTTIMEOUT => min( $timeout, $this->connectTimeout ),
             CURLOPT_NOSIGNAL => true,
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
-            CURLOPT_USERAGENT => 'Exponential expai',
+            CURLOPT_USERAGENT => $agent,
             // only the headers of the allowlist (rate limits, retry-after, content-type, mcp-session-id ...) are kept
-            CURLOPT_HEADERFUNCTION => static function ( $handle, $line ) use ( &$responseHeaders, $client )
+            CURLOPT_HEADERFUNCTION => static function ( $handle, $line ) use ( &$responseHeaders, $client, $headerMax )
             {
-                if ( preg_match( '/^([A-Za-z0-9-]+):\s*(.*?)\s*$/', $line, $m ) && $client->keeps( $m[1] ) )
-                    $responseHeaders[strtolower( $m[1] )] = substr( $m[2], 0, 200 );
+                // the headers of a redirect answer do not carry over to the answer after it
+                if ( preg_match( '/^HTTP\//', $line ) )
+                    $responseHeaders = array();
+                elseif ( preg_match( '/^([A-Za-z0-9-]+):\s*(.*?)\s*$/', $line, $m ) && $client->keeps( $m[1] ) )
+                    $responseHeaders[strtolower( $m[1] )] = substr( $m[2], 0, $headerMax );
                 return strlen( $line );
             },
-            CURLOPT_WRITEFUNCTION => static function ( $handle, $chunk ) use ( &$received, &$tooLarge, $limit, $options )
+            CURLOPT_WRITEFUNCTION => static function ( $handle, $chunk ) use ( &$received, &$tooLarge, $limit, $options, $truncate )
             {
                 if ( strlen( $received ) + strlen( $chunk ) > $limit )
                 {
+                    if ( $truncate )
+                        $received .= substr( $chunk, 0, max( 0, $limit - strlen( $received ) ) );
                     $tooLarge = true;
                     return 0;
                 }
@@ -163,6 +187,8 @@ class expAiHttpClient
             curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, 'DELETE' );
         if ( !$noBody )
             curl_setopt( $ch, CURLOPT_POSTFIELDS, $body );
+        if ( isset( $options['encoding'] ) )
+            curl_setopt( $ch, CURLOPT_ENCODING, (string) $options['encoding'] );
         if ( !empty( $options['resolve'] ) )
             curl_setopt( $ch, CURLOPT_RESOLVE, (array) $options['resolve'] );
         if ( defined( 'CURLOPT_PROTOCOLS_STR' ) )
@@ -175,10 +201,14 @@ class expAiHttpClient
         $status = (int) curl_getinfo( $ch, CURLINFO_RESPONSE_CODE );
         $connectTime = curl_getinfo( $ch, CURLINFO_CONNECT_TIME );
         $this->lastTransfer = array( 'errno' => (int) $errno, 'connect_time' => is_numeric( $connectTime ) ? (float) $connectTime : null, 'status' => $status );
+        $this->truncated = $truncate && $tooLarge;
         if ( PHP_VERSION_ID < 80000 )
             curl_close( $ch );
         unset( $ch );
 
+        // a cut page is the answer (curl error 23: the write callback stopped the transfer), not an error
+        if ( $truncate && $tooLarge )
+            return array( $status, $received, $responseHeaders );
         if ( $tooLarge )
             throw new expAiException( 'The answer of Exponential Intelligence was too long.', 'response larger than ' . $limit . ' bytes', $status );
         if ( $ok === false || $errno )

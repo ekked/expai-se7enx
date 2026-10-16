@@ -58,7 +58,7 @@
                     <td>{$l.name|wash}{if eq( $l.type, 'batch' )} <span class="exp-ai-badge">{'batch'|i18n( 'extension/expai/budget' )}</span>{/if}</td>
                     <td>{if $l.factor}&times;{$l.factor|wash}{else}<span class="exp-ai-muted">{'not confirmed'|i18n( 'extension/expai/budget' )}</span>{/if}</td>
                     <td>{if ge( $l.latency, 3600 )}{'%h h'|i18n( 'extension/expai/budget',, hash( '%h', $l.latency|div( 3600 )|round ) )}{elseif ge( $l.latency, 60 )}{'%m min'|i18n( 'extension/expai/budget',, hash( '%m', $l.latency|div( 60 )|round ) )}{else}{'%s s'|i18n( 'extension/expai/budget',, hash( '%s', $l.latency ) )}{/if}</td>
-                    <td>{$l.retention|wash}</td>
+                    <td>{$l.retention|expai_retention|wash}</td>
                     <td>{if $l.usable}{'in use'|i18n( 'extension/expai/budget' )}{elseif $l.enabled|not}{'disabled'|i18n( 'extension/expai/budget' )}{else}{'no confirmed price'|i18n( 'extension/expai/budget' )}{/if}{if $l.verified}<br /><small>{'checked %date'|i18n( 'extension/expai/budget',, hash( '%date', $l.verified ) )}</small>{/if}</td>
                 </tr>
 {/foreach}

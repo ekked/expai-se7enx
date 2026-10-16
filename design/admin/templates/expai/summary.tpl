@@ -40,7 +40,7 @@
             <h3>{$p.label|wash} <small>({$p.id|wash}{if $p.host}, {$p.host|wash}{/if})</small></h3>
             <dl class="exp-ai-figures">
                 <div><dt>{'Region'|i18n( 'extension/expai/summary' )}</dt><dd>{$p.region_label|wash}</dd></div>
-                <div><dt>{'Retention'|i18n( 'extension/expai/summary' )}</dt><dd>{$p.retention|wash}</dd></div>
+                <div><dt>{'Retention'|i18n( 'extension/expai/summary' )}</dt><dd>{$p.retention|expai_retention|wash}</dd></div>
                 <div><dt>{'Terms checked'|i18n( 'extension/expai/summary' )}</dt><dd>{if $p.terms_checked_at}{$p.terms_checked_at|wash}{else}{'not checked'|i18n( 'extension/expai/summary' )}{/if}</dd></div>
                 <div><dt>{'Key'|i18n( 'extension/expai/summary' )}</dt><dd>{if $p.key.set}{'From %file (%placement)'|i18n( 'extension/expai/summary',, hash( '%file', $p.key.file, '%placement', $p.key.placement ) )|wash}{elseif $p.key.needed|not}{'No key needed'|i18n( 'extension/expai/summary' )}{else}<span class="exp-ai-step-failed">{'No key'|i18n( 'extension/expai/summary' )}</span>{/if}</dd></div>
                 <div><dt>{'Who may use it'|i18n( 'extension/expai/summary' )}</dt><dd>{if $p.everyone}{'every user with expai/write'|i18n( 'extension/expai/summary' )}{else}{'users with expai/model_use for this provider'|i18n( 'extension/expai/summary' )}{/if}{if $p.roles|count}: {$p.roles|implode( ', ' )|wash}{/if}</dd></div>
@@ -75,7 +75,7 @@
                     <td>{$p.label|wash}</td>
                     <td>{$l.name|wash}</td>
                     <td>{if $l.batch}{'batch'|i18n( 'extension/expai/summary' )}{else}{'direct'|i18n( 'extension/expai/summary' )}{/if}</td>
-                    <td>{$l.retention|wash}{if $l.zero_retention} ({'nothing kept'|i18n( 'extension/expai/summary' )}){/if}{if $l.delete_after_fetch}<br /><small>{'deleted by expai after the results are fetched'|i18n( 'extension/expai/summary' )}</small>{/if}</td>
+                    <td>{$l.retention|expai_retention|wash}{if $l.zero_retention} ({'nothing kept'|i18n( 'extension/expai/summary' )}){/if}{if $l.delete_after_fetch}<br /><small>{'deleted by expai after the results are fetched'|i18n( 'extension/expai/summary' )}</small>{/if}</td>
                     <td>{$l.factor}%</td>
                     <td>{if $l.usable}{$yes}{else}{$no}{/if}</td>
                 </tr>

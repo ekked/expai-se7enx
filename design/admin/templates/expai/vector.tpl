@@ -199,7 +199,7 @@
     <div class="exp-ai-v-toast" role="status" aria-live="polite" hidden="hidden"><span class="exp-ai-v-toast-text"></span> <button type="button" class="exp-ai-v-link exp-ai-v-undo">{'Undo'|i18n( $exp_ai_i18n )}</button></div>
 {/if}
 
-    <script type="application/json" class="exp-ai-v-strings">{json_encode( hash(
+    <script type="application/json" class="exp-ai-v-strings">{hash(
         'new_thread', 'New thread'|i18n( 'extension/expai/threads' ),
         'section_working', 'Working'|i18n( 'extension/expai/threads' ),
         'section_needs', 'Needs you'|i18n( 'extension/expai/threads' ),
@@ -261,6 +261,8 @@
         'continue', 'Continue'|i18n( $exp_ai_i18n ),
         'error', 'Something went wrong:'|i18n( $exp_ai_i18n ),
         'timeout', 'The server did not answer in time. Please try again.'|i18n( $exp_ai_i18n ),
+        'session_expired', 'Your session has expired. Reload the page and sign in again.'|i18n( $exp_ai_i18n ),
+        'poll_lost', 'The connection to the run was lost. Reload the page to follow it.'|i18n( $exp_ai_i18n ),
         'not_found', 'This thread does not exist or you may not open it.'|i18n( $exp_ai_i18n ),
         'empty_scope', 'Choose the scope first.'|i18n( $exp_ai_i18n ),
         'search_min', 'Type at least 2 characters or a node id.'|i18n( $exp_ai_i18n ),
@@ -388,6 +390,6 @@
         'cp_conversation_only', 'This checkpoint was too large to keep the field values: the conversation and the decisions are restored.'|i18n( $exp_ai_i18n ),
         'cp_restored', 'Restored. "Before restore" lets you go back.'|i18n( $exp_ai_i18n ),
         'cp_owner', 'Only the owner can restore.'|i18n( $exp_ai_i18n )
-    ) )}</script>
+    )|expai_json}</script>
 </div>
 {undef $exp_ai_i18n}

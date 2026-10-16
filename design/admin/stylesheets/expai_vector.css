@@ -24,10 +24,16 @@
     font-family: var(--a4-font, inherit);
     line-height: 1.45;
 }
-.exp-ai-vector.exp-ai-on-dark {
+html[data-a4-theme="dark"] .exp-ai-vector, .exp-ai-vector.exp-ai-on-dark {
     --exp-ai-v-pane: rgba(255, 255, 255, 0.04);
     --exp-ai-v-pane-alt: rgba(255, 255, 255, 0.07);
     --exp-ai-v-shadow: none;
+}
+/* admin4l: light content boxes in dark mode (expai.js sets exp-ai-on-light) */
+html[data-a4-theme="dark"] .exp-ai-vector.exp-ai-on-light {
+    --exp-ai-v-pane: #fff;
+    --exp-ai-v-pane-alt: #f6f7f9;
+    --exp-ai-v-shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 8px 24px -8px rgba(16, 24, 40, 0.12);
 }
 .exp-ai-vector *, .exp-ai-vector *::before, .exp-ai-vector *::after { box-sizing: border-box; }
 .exp-ai-sr {
@@ -73,8 +79,8 @@
     border: 1px solid transparent; border-radius: var(--exp-ai-radius); background: transparent; color: var(--exp-ai-muted); font: inherit; font-weight: 700; cursor: pointer;
 }
 .exp-ai-v-icon:hover:not(:disabled) { border-color: var(--exp-ai-line); color: inherit; }
-.exp-ai-v-icon[aria-pressed="true"] { color: var(--exp-ai-accent); }
-.exp-ai-v-link { padding: 0; border: 0; background: none; color: var(--exp-ai-accent); font: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.exp-ai-v-icon[aria-pressed="true"] { color: var(--exp-ai-accent-text); }
+.exp-ai-v-link { padding: 0; border: 0; background: none; color: var(--exp-ai-accent-text); font: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
 .exp-ai-v-threads-toggle, .exp-ai-v-side-toggle { display: none; }
 
 /* the grid */
@@ -111,10 +117,10 @@
 .exp-ai-v-st-failed .exp-ai-v-glyph { border-color: var(--exp-ai-error); background: var(--exp-ai-error); }
 .exp-ai-v-st-done .exp-ai-v-glyph { border-color: var(--exp-ai-ok); }
 @keyframes exp-ai-v-pulse { 50% { opacity: 0.35; } }
-@media (prefers-reduced-motion: reduce) { .exp-ai-v-glyph { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .exp-ai-v-glyph, .exp-ai-v-badge-run-running { animation: none !important; } }
 .exp-ai-v-unread { grid-area: unread; align-self: center; width: 0.5em; height: 0.5em; border-radius: 50%; background: var(--exp-ai-accent); }
 .exp-ai-v-badge {
-    display: inline-block; padding: 0 0.45em; border-radius: 999px; background: var(--exp-ai-accent-soft); color: var(--exp-ai-accent);
+    display: inline-block; padding: 0 0.45em; border-radius: 999px; background: var(--exp-ai-accent-soft); color: var(--exp-ai-accent-text);
     font-size: 0.78em; font-weight: 700; line-height: 1.55; vertical-align: middle;
 }
 .exp-ai-v-list-empty { margin: 1em 0.5em; color: var(--exp-ai-muted); font-size: 0.9em; }
@@ -140,7 +146,7 @@
 }
 .exp-ai-v-title:hover:not([readonly]), .exp-ai-v-title:focus { border-color: var(--exp-ai-line); }
 .exp-ai-v-state { flex: 0 0 auto; padding: 0.05em 0.6em; border-radius: 999px; background: var(--exp-ai-surface); color: var(--exp-ai-muted); font-size: 0.8em; font-weight: 700; }
-.exp-ai-v-state.exp-ai-v-st-running, .exp-ai-v-state.exp-ai-v-st-queued, .exp-ai-v-state.exp-ai-v-st-review { background: var(--exp-ai-accent-soft); color: var(--exp-ai-accent); }
+.exp-ai-v-state.exp-ai-v-st-running, .exp-ai-v-state.exp-ai-v-st-queued, .exp-ai-v-state.exp-ai-v-st-review { background: var(--exp-ai-accent-soft); color: var(--exp-ai-accent-text); }
 .exp-ai-v-state.exp-ai-v-st-failed { color: var(--exp-ai-error); }
 .exp-ai-v-thread-actions { display: inline-flex; gap: 0.1em; }
 .exp-ai-v-readonly { margin: 0.4em 0 0; color: var(--exp-ai-muted); font-size: 0.88em; }
@@ -152,7 +158,7 @@
     display: inline-flex; align-items: center; gap: 0.3em; max-width: 18em; padding: 0.08em 0.6em; border: 1px solid var(--exp-ai-line); border-radius: 999px;
     font-size: 0.85em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.exp-ai-v-chip-kind { color: var(--exp-ai-accent); font-size: 0.85em; }
+.exp-ai-v-chip-kind { color: var(--exp-ai-accent-text); font-size: 0.85em; }
 .exp-ai-v-chip-class, .exp-ai-v-chip-lang { background: var(--exp-ai-surface); }
 .exp-ai-v-chip-none { color: var(--exp-ai-muted); font-style: italic; font-size: 0.88em; }
 .exp-ai-v-settings { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.5em 0.75em; }
@@ -211,7 +217,7 @@
     background: transparent; color: var(--exp-ai-muted); font: inherit; font-weight: 700; font-size: 0.9em; cursor: pointer;
 }
 .exp-ai-v-tabs [role="tab"][aria-selected="true"] { color: inherit; border-bottom-color: var(--exp-ai-accent); }
-.exp-ai-v-tab-count:not(:empty) { padding: 0 0.4em; border-radius: 999px; background: var(--exp-ai-accent-soft); color: var(--exp-ai-accent); font-size: 0.82em; }
+.exp-ai-v-tab-count:not(:empty) { padding: 0 0.4em; border-radius: 999px; background: var(--exp-ai-accent-soft); color: var(--exp-ai-accent-text); font-size: 0.82em; }
 .exp-ai-v-pane { flex: 1; min-height: 0; overflow: auto; padding: 0.75em 0.85em; outline: none; }
 .exp-ai-v-pane-title { margin: 0.8em 0 0.35em; font-size: 0.78em; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--exp-ai-muted); }
 .exp-ai-v-placeholder { margin: 0; color: var(--exp-ai-muted); font-size: 0.88em; }
@@ -249,7 +255,7 @@
 
 /* undo toast */
 .exp-ai-v-toast {
-    position: fixed; left: 50%; bottom: calc(1.25em + var(--exp-debug-bar-h, 0px)); z-index: 1000; transform: translateX(-50%); display: flex; align-items: center; gap: 0.9em;
+    position: fixed; left: 50%; bottom: calc(1.25em + var(--exp-debug-bar-h, 0px)); z-index: var(--exp-ai-z-toast, 1000); transform: translateX(-50%); display: flex; align-items: center; gap: 0.9em;
     max-width: calc(100vw - 2em); padding: 0.6em 1em; border-radius: var(--exp-ai-radius); background: #1f2430; color: #fff; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
 }
 .exp-ai-v-toast[hidden] { display: none; }
@@ -260,7 +266,7 @@
     .exp-ai-v-grid { grid-template-columns: minmax(12em, 14em) minmax(0, 1fr); }
     .exp-ai-v-side-toggle { display: inline-flex; }
     .exp-ai-v-side {
-        position: absolute; top: 3.2em; right: 0; z-index: 20; width: min(20em, 92%); max-height: calc(100vh - 4em);
+        position: absolute; top: 3.2em; right: 0; z-index: var(--exp-ai-z-popover, 20); width: min(20em, 92%); max-height: calc(100vh - 4em);
         box-shadow: 0 18px 48px rgba(16, 24, 40, 0.22); display: none;
     }
     .exp-ai-v-side-open .exp-ai-v-side { display: flex; }
@@ -270,7 +276,7 @@
     .exp-ai-v-grid { grid-template-columns: minmax(0, 1fr); }
     .exp-ai-v-threads-toggle { display: inline-flex; }
     .exp-ai-v-threads {
-        position: absolute; top: 3.2em; left: 0; z-index: 20; width: min(18em, 92%); max-height: calc(100vh - 4em);
+        position: absolute; top: 3.2em; left: 0; z-index: var(--exp-ai-z-popover, 20); width: min(18em, 92%); max-height: calc(100vh - 4em);
         box-shadow: 0 18px 48px rgba(16, 24, 40, 0.22); display: none;
     }
     .exp-ai-v-threads-open .exp-ai-v-threads { display: flex; }
@@ -286,8 +292,8 @@
 .exp-ai-v-review-summary { color: var(--exp-ai-muted); font-size: 0.9em; }
 .exp-ai-v-review-all { display: inline-flex; gap: 0.4em; }
 .exp-ai-v-review-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6em; margin: 0.75em 0; padding: 0.6em 0; border-top: 1px solid var(--exp-ai-line);
-    position: sticky; bottom: -0.75em; z-index: 2; background: var(--a4-card-bg, #fff); }
-.exp-ai-on-dark .exp-ai-v-review-foot { background: var(--a4-card-bg, #1b1f27); }
+    position: sticky; bottom: -0.75em; z-index: var(--a4-z-raised, 2); background: var(--a4-card-bg, #fff); }
+html[data-a4-theme="dark"] .exp-ai-vector:not(.exp-ai-on-light) .exp-ai-v-review-foot, .exp-ai-on-dark .exp-ai-v-review-foot { background: var(--a4-card-bg, #1b1f27); }
 .exp-ai-v-review-bar[hidden], .exp-ai-v-review-foot[hidden], .exp-ai-v-plan-actions[hidden], .exp-ai-v-review-all[hidden] { display: none; }
 .exp-ai-v-cg { margin: 0 0 0.9em; padding: 0.6em; border: 1px solid var(--exp-ai-line); border-radius: var(--exp-ai-radius); background: var(--exp-ai-v-pane); }
 .exp-ai-v-cg-conflict { border-color: var(--exp-ai-warn, #b45309); }
@@ -299,7 +305,7 @@
 .exp-ai-v-badge { display: inline-block; padding: 0 0.45em; border-radius: 999px; font-size: 0.78em; font-weight: 600; border: 1px solid var(--exp-ai-line); color: var(--exp-ai-muted); }
 .exp-ai-v-badge-accepted, .exp-ai-v-badge-applied { color: var(--exp-ai-ok, #15803d); border-color: currentColor; }
 .exp-ai-v-badge-rejected, .exp-ai-v-badge-stale { color: var(--exp-ai-muted); text-decoration: line-through; }
-.exp-ai-v-badge-partial { color: var(--exp-ai-accent); border-color: currentColor; }
+.exp-ai-v-badge-partial { color: var(--exp-ai-accent-text); border-color: currentColor; }
 .exp-ai-v-badge-conflict { color: var(--exp-ai-warn, #b45309); border-color: currentColor; }
 .exp-ai-v-badge-new { color: var(--exp-ai-accent-ink); background: var(--exp-ai-accent); border-color: var(--exp-ai-accent); }
 .exp-ai-v-hunk { margin: 0.4em 0 0; padding: 0.4em 0.5em; border: 1px solid var(--exp-ai-line); border-left-width: 4px; border-radius: var(--exp-ai-radius); background: var(--exp-ai-v-pane-alt); }
@@ -315,8 +321,8 @@
 .exp-ai-v-hl-ins { background: rgba(22, 163, 74, 0.1); }
 .exp-ai-v-hl del { background: rgba(220, 38, 38, 0.22); color: inherit; }
 .exp-ai-v-hl ins { background: rgba(22, 163, 74, 0.25); color: inherit; text-decoration: none; }
-.exp-ai-on-dark .exp-ai-v-hl del { background: rgba(248, 113, 113, 0.3); }
-.exp-ai-on-dark .exp-ai-v-hl ins { background: rgba(74, 222, 128, 0.28); }
+html[data-a4-theme="dark"] .exp-ai-vector:not(.exp-ai-on-light) .exp-ai-v-hl del, .exp-ai-on-dark .exp-ai-v-hl del { background: rgba(248, 113, 113, 0.3); }
+html[data-a4-theme="dark"] .exp-ai-vector:not(.exp-ai-on-light) .exp-ai-v-hl ins, .exp-ai-on-dark .exp-ai-v-hl ins { background: rgba(74, 222, 128, 0.28); }
 .exp-ai-v-hunk-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4em; }
 .exp-ai-v-hunk-actions [aria-pressed="true"] { border-color: var(--exp-ai-accent); background: var(--exp-ai-accent-soft); }
 .exp-ai-v-hunk-edit { width: 100%; font: inherit; padding: 0.4em; border: 1px solid var(--exp-ai-line); border-radius: var(--exp-ai-radius); background: var(--exp-ai-v-pane); color: inherit; }
@@ -366,9 +372,9 @@
 .exp-ai-v-cost-table { width: 100%; border-collapse: collapse; font-size: 0.86em; }
 .exp-ai-v-cost-table th, .exp-ai-v-cost-table td { padding: 0.25em 0.3em; border-bottom: 1px solid var(--exp-ai-line); text-align: left; vertical-align: top; }
 .exp-ai-v-cost-table td + td, .exp-ai-v-cost-table th + th { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.exp-ai-v-badge-steer { color: var(--exp-ai-accent); border: 1px solid currentColor; background: transparent; }
+.exp-ai-v-badge-steer { color: var(--exp-ai-accent-text); border: 1px solid currentColor; background: transparent; }
 .exp-ai-v-queue-steer > span:not(.exp-ai-v-badge) { font-style: italic; }
-.exp-ai-step-steer { color: var(--exp-ai-accent); font-style: italic; }
+.exp-ai-step-steer { color: var(--exp-ai-accent-text); font-style: italic; }
 .exp-ai-slow { margin: 0.4em 0; color: var(--exp-ai-muted); font-size: 0.9em; } .exp-ai-slow-time { font-variant-numeric: tabular-nums; } .exp-ai-slow .exp-ai-slow-switch { margin-left: 0.4em; }
 
 /* Checkpoints (doc/checkpoints.md): the strip under the conversation and the restore preview */
@@ -376,8 +382,14 @@
 .exp-ai-v-checkpoints[hidden] { display: none; }
 .exp-ai-v-cp-list { display: flex; flex-wrap: wrap; gap: 0.25em 0.8em; margin: 0; padding: 0; list-style: none; min-width: 0; }
 .exp-ai-v-cp { display: inline-flex; align-items: baseline; gap: 0.3em; max-width: 100%; }
-.exp-ai-v-cp-mark { color: var(--exp-ai-accent); }
+.exp-ai-v-cp-mark { color: var(--exp-ai-accent-text); }
 .exp-ai-v-cp-label { color: var(--exp-ai-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 22em; }
 .exp-ai-v-restore-list h3 { margin: 0.6em 0 0.2em; font-size: 0.95em; }
 .exp-ai-v-restore-list ul { margin: 0; padding-left: 1.2em; }
 .exp-ai-v-restore-list .exp-ai-v-restore-counts { margin-top: 0.6em; }
+
+@media (forced-colors: active) {
+    .exp-ai-v-glyph { forced-color-adjust: none; background: CanvasText; border-color: CanvasText; }
+    .exp-ai-v-hl del, .exp-ai-v-hl ins { text-decoration: underline; }
+    .exp-ai-v-hl del { text-decoration-style: wavy; }
+}

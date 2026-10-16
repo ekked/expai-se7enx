@@ -21,10 +21,17 @@
  *   [VectorSettings] KickWorker=enabled   start workers at all (the cron part of expqueue stays the safety net)
  *                    MaxKickedWorkers=4   live workers at most
  *                    PhpCli=              the PHP command line binary (empty: the one of this PHP)
+ *                    WorkerAllowRoot=disabled  pass --allow-root-user to the worker (only for a site whose PHP runs
+ *                                         as root; a worker as root writes files the web server's user cannot)
  *
  * The start record (var/<site>/cache/expai/worker-kick.json) is shared by PHP-FPM (the site's user) and Velocity or
- * the command line (often root): it is created writable for both, and a record that cannot be opened is replaced by
- * one of the process's own user.
+ * the command line: it is created with mode 0660 (owner and group), and a record that cannot be opened by the
+ * process's user is replaced by one of its own (worker-kick-<uid>.json).
+ *
+ * The worker is detached with setsid where the system has it (Linux; not macOS) and with nohup alone elsewhere. The
+ * shell reports the process id of what it put in the background. That detects only that the shell itself could not
+ * be started; a worker that dies right after (a wrong PHP binary, a refused root user) is not noticed here, and the
+ * cron part of expqueue stays the safety net.
  */
 class expAiQueueKick
 {
@@ -99,7 +106,7 @@ class expAiQueueKick
             if ( !$handle )
                 continue;
             if ( $new )
-                @chmod( $path, 0666 );
+                @chmod( $path, 0660 );
             if ( flock( $handle, LOCK_EX ) )
                 return $handle;
             fclose( $handle );
@@ -143,38 +150,51 @@ class expAiQueueKick
     }
 
     /**
-     * Runs a shell command that puts the worker in the background: proc_open, else popen, else exec (a pool worker
-     * of Velocity cannot always use proc_open; the command returns at once in every case).
-     * @return bool
+     * Runs a shell command in the background and returns its process id: proc_open, else popen, else exec (a pool
+     * worker of Velocity cannot always use proc_open). The shell prints $! of the command it put in the background; no
+     * number means the shell could not be started. A number says nothing about the worker itself (it may exit at
+     * once; a worker that finds nothing to do leaves at once by design, so its life is not checked).
+     * @return int the process id, 0 when nothing was started
      */
     protected static function launch( $command )
     {
+        $line = $command . ' & echo $!';
+        $output = '';
         if ( function_exists( 'proc_open' ) )
         {
-            $proc = @proc_open( array( '/bin/sh', '-c', $command ), array( 0 => array( 'file', '/dev/null', 'r' ), 1 => array( 'file', '/dev/null', 'w' ), 2 => array( 'file', '/dev/null', 'w' ) ), $pipes );
+            $proc = @proc_open( array( '/bin/sh', '-c', $line ), array( 0 => array( 'file', '/dev/null', 'r' ), 1 => array( 'pipe', 'w' ), 2 => array( 'file', '/dev/null', 'w' ) ), $pipes );
             if ( is_resource( $proc ) )
             {
+                $output = (string) stream_get_contents( $pipes[1] );
+                fclose( $pipes[1] );
                 proc_close( $proc );
-                return true;
+                return self::processId( $output );
             }
         }
         if ( function_exists( 'popen' ) )
         {
-            $handle = @popen( $command, 'r' );
+            $handle = @popen( $line, 'r' );
             if ( is_resource( $handle ) )
             {
+                $output = (string) stream_get_contents( $handle );
                 pclose( $handle );
-                return true;
+                return self::processId( $output );
             }
         }
         if ( function_exists( 'exec' ) )
         {
             $out = array();
             $code = 1;
-            @exec( $command, $out, $code );
-            return $code === 0;
+            @exec( $line, $out, $code );
+            return $code === 0 ? self::processId( implode( "\n", $out ) ) : 0;
         }
-        return false;
+        return 0;
+    }
+
+    /** @return int the last number the shell printed, 0 when there is none */
+    protected static function processId( $output )
+    {
+        return preg_match( '/(\d+)\s*$/', (string) $output, $m ) ? (int) $m[1] : 0;
     }
 
     /** @return int detached workers started (ext:expqueue:work --until-empty) */
@@ -198,16 +218,19 @@ class expAiQueueKick
             return 0;
         }
         $class = preg_replace( '/[^a-z0-9_]/', '', (string) $class );
-        $command = 'cd ' . escapeshellarg( $root ) . ' && nohup setsid ' . escapeshellarg( $php ) . ' ' . escapeshellarg( $script )
-                 . ' --until-empty --max-seconds=' . max( 30, min( 3600, (int) $maxSeconds ) ) . ( $class !== '' ? ' --class=' . $class : '' ) . ' --origin=cli --allow-root-user'
+        // setsid only where the system has it (macOS has not), else nohup alone; root only when the site says so
+        $command = 'cd ' . escapeshellarg( $root ) . ' && D=; command -v setsid > /dev/null 2>&1 && D=setsid; nohup $D ' . escapeshellarg( $php ) . ' ' . escapeshellarg( $script )
+                 . ' --until-empty --max-seconds=' . max( 30, min( 3600, (int) $maxSeconds ) ) . ( $class !== '' ? ' --class=' . $class : '' ) . ' --origin=cli'
+                 . ( $config->flag( 'VectorSettings', 'WorkerAllowRoot', false ) ? ' --allow-root-user' : '' )
                  // the siteaccess of this request: expai may be active for the admin siteaccesses only
-                 . ( $access !== '' ? ' -s ' . escapeshellarg( $access ) : '' ) . ' > /dev/null 2>&1 &';
+                 . ( $access !== '' ? ' -s ' . escapeshellarg( $access ) : '' ) . ' > /dev/null 2>&1';
         $started = 0;
         for ( $i = 0; $i < $count; $i++ )
         {
             if ( !self::launch( $command ) )
             {
-                self::$lastError = 'the worker process could not be started';
+                self::$lastError = 'the shell for the worker process could not be started (no process id)';
+                eZDebug::writeWarning( 'expai: ' . self::$lastError, __METHOD__ );
                 break;
             }
             $started++;
