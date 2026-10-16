@@ -1,5 +1,5 @@
 /*!
- * expai - Exponential Intelligence (Powered by Claude from Anthropic)
+ * expai - Exponential Intelligence
  * Copyright (C) 1998 - 2026 7x & Exponential Foundation. All rights reserved.
  * GNU General Public License v2.0 (or any later version)
  *

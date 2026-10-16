@@ -1,6 +1,6 @@
 <?php /* #?ini charset="utf-8"?
 
-# expai - Exponential Intelligence (Powered by Claude from Anthropic)
+# expai - Exponential Intelligence
 # The lists below (Tools[], WritableDatatypes[], Sections[], FieldActions[], Datatypes[]) are not emptied first, so
 # another extension can add to them whatever its place in the extension order; to replace a list, empty it in
 # settings/override (e.g. "FieldActions[]" alone on a line, then the entries you want).
@@ -18,7 +18,8 @@ Enabled=false
 # from). A siteaccess can also set Enabled in its own settings/siteaccess/<siteaccess>/expai.ini.append.php.
 DisabledSiteAccesses[]
 
-# anthropic: the Anthropic Messages API (the only built-in provider)
+# anthropic: the Anthropic Messages API (the provider of the 0.0.1.0 settings; every other provider, OpenAI-compatible
+#            services and local models included, is set up under [ProviderSettings] below)
 # custom:    the class named in ProviderClass (implements expAiProvider)
 Provider=anthropic
 ProviderClass=

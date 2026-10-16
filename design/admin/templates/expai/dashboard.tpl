@@ -9,7 +9,8 @@
      $p = $summary.previous
      $ch = $summary.change
      $tokens_total = $c.tokens
-     $prices_note = 'Estimated at prices as of %date; Anthropic\'s invoice is authoritative.'|i18n( 'extension/expai/usage',, hash( '%date', $pricing.as_of ) )}
+     $prices_note = cond( $anthropic_in_use, 'Estimated at prices as of %date; Anthropic\'s invoice is authoritative.'|i18n( 'extension/expai/usage',, hash( '%date', $pricing.as_of ) ),
+                          'Estimated at prices as of %date; the provider\'s invoice is authoritative.'|i18n( 'extension/expai/usage',, hash( '%date', $pricing.as_of ) ) )}
 <div class="exp-ai exp-ai-dash" id="exp-ai-dashboard">
 
     <header class="exp-ai-dash-head">
@@ -17,7 +18,6 @@
             <span class="exp-ai-mark" aria-hidden="true"></span>
             <div>
                 <h1>{'Exponential Intelligence'|i18n( 'extension/expai/dashboard' )}</h1>
-                <p class="exp-ai-sub">{'Powered by Claude from Anthropic'|i18n( 'extension/expai/dashboard' )}</p>
             </div>
             {include uri='design:expai/parts/help_link.tpl' page='dashboard' label='the dashboard'|i18n( 'extension/expai/help' ) text='?'}
         </div>
@@ -63,7 +63,9 @@
 {if $rate_limits|not}
                 <div><dt>{'API rate limits'|i18n( 'extension/expai/limits' )}</dt><dd>{'No request has reported its rate limits yet.'|i18n( 'extension/expai/limits' )}</dd></div>
 {/if}
+{if $anthropic_in_use}
                 <div><dt>{'Spend limit'|i18n( 'extension/expai/limits' )}</dt><dd>{'The organization\'s monthly spend limit is not available through an API key; see it in the Anthropic Console.'|i18n( 'extension/expai/limits' )} <a href="https://console.anthropic.com/settings/limits" rel="noopener noreferrer" target="_blank">console.anthropic.com</a></dd></div>
+{/if}
             </dl>
         </details>
     </div>
@@ -216,7 +218,7 @@
                 <h2 id="exp-ai-waiting-title">{'Waiting for my approval'|i18n( 'extension/expai/dashboard' )}</h2>
                 <ul class="exp-ai-compact-list">
 {foreach $waiting as $item}
-                    <li><a href={$item.url|ezurl}>{$item.title|wash}</a> <span class="exp-ai-badge" title="{'Exponential Intelligence (Powered by Claude from Anthropic)'|i18n( 'extension/expai/label' )}"><span class="exp-ai-mark" aria-hidden="true"></span>{'Exponential Intelligence'|i18n( 'extension/expai/label' )}</span></li>
+                    <li><a href={$item.url|ezurl}>{$item.title|wash}</a> <span class="exp-ai-badge" title="{'Exponential Intelligence'|i18n( 'extension/expai/label' )}"><span class="exp-ai-mark" aria-hidden="true"></span>{'Exponential Intelligence'|i18n( 'extension/expai/label' )}</span></li>
 {/foreach}
                 </ul>
             </section>

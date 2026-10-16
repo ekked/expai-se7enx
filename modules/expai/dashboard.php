@@ -106,6 +106,12 @@ $tpl->setVariable( 'summary', $summary );
 $tpl->setVariable( 'series', expAiUsage::dailySeries( $summaryUser, $chartDays[$period], $chart ) );
 $tpl->setVariable( 'cost_enabled', expAiCost::enabled() );
 $tpl->setVariable( 'pricing', expAiUsage::pricingInfo() );
+// the Anthropic-specific notes (invoice, Console spend limit) only where an Anthropic provider is set up
+$anthropicInUse = false;
+foreach ( $config->registry()->providers() as $providerSettings )
+    if ( isset( $providerSettings['Type'] ) && $providerSettings['Type'] === 'anthropic' )
+        $anthropicInUse = true;
+$tpl->setVariable( 'anthropic_in_use', $anthropicInUse );
 $tpl->setVariable( 'status', expAiDashboard::status() );
 $tpl->setVariable( 'model_label', isset( $models[$config->effectiveModel()] ) ? $models[$config->effectiveModel()] : $config->effectiveModel() );
 // expai/dashboard/(node)/<id> ("Prompt again") preselects that location; /(again)/<draft log id> fills the request

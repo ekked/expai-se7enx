@@ -700,7 +700,7 @@ class expAiChainEngine
             expAiDraftLog::record( array( 'contentobject_id' => (int) $object->attribute( 'id' ), 'version' => (int) $version->attribute( 'version' ),
                                           'user_id' => (int) $run->attribute( 'user_id' ), 'parent_node_id' => (int) $run->attribute( 'node_id' ),
                                           'language_code' => $language, 'action' => $action, 'source' => 'chain',
-                                          'model' => $this->writerModel( $run ), 'provider' => 'anthropic',
+                                          'model' => $this->writerModel( $run ), 'provider' => $this->config->registry()->providerOf( $this->writerModel( $run ) ),
                                           'job_uuid' => $this->lastJob( $run ), 'prompt_summary' => 'Chain ' . $chain->label() . ': ' . (string) $run->attribute( 'brief' ) ) );
         if ( !empty( $result['errors'] ) )
             $this->flag( $run, 'Fields not written: ' . implode( '; ', array_map( function ( $k, $v ) { return $k . ' (' . $v . ')'; }, array_keys( $result['errors'] ), $result['errors'] ) ) );

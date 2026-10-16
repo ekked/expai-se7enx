@@ -28,16 +28,16 @@ class expAiPrompts
     }
 
     /**
-     * ", powered by <model> from <provider>" for the model the current user uses (", powered by Claude from
-     * Anthropic" for the Anthropic models, as before).
+     * ", powered by the model <label> via <provider>" for the model that answers (the given alias, else the model the
+     * current user uses); nothing when the model is not known, so the prompt never names a model that does not answer.
      * @return string
      */
     public static function poweredBy( expAiConfig $config, $alias = null )
     {
         $registry = $config->registry();
         $model = $registry->getModel( $alias !== null ? $alias : $config->effectiveModel() );
-        if ( !$model || $model['provider'] === 'anthropic' )
-            return ', powered by Claude from Anthropic';
+        if ( !$model )
+            return '';
         $provider = $registry->getProvider( $model['provider'] );
         return ', powered by the model ' . expAiText::oneLine( $model['label'] ) . ( $provider ? ' via ' . expAiText::oneLine( (string) $provider['Label'] ) : '' );
     }

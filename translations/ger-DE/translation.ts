@@ -787,10 +787,6 @@
         <translation>Wählen Sie den Ordner (oder den Inhalt), an dem gearbeitet werden soll. Seine Vollansicht öffnet sich mit dem Exponential-Intelligence-Bereich und Ihrer Anfrage.</translation>
     </message>
     <message>
-        <source>Powered by Claude from Anthropic</source>
-        <translation>Bereitgestellt von Claude von Anthropic</translation>
-    </message>
-    <message>
         <source>Ready</source>
         <translation>Bereit</translation>
     </message>
@@ -1006,20 +1002,12 @@
         <translation>Exponential Intelligence</translation>
     </message>
     <message>
-        <source>Powered by Claude from Anthropic</source>
-        <translation>Bereitgestellt von Claude von Anthropic</translation>
-    </message>
-    <message>
         <source>Show</source>
         <translation>Anzeigen</translation>
     </message>
     <message>
         <source>Hide</source>
         <translation>Ausblenden</translation>
-    </message>
-    <message>
-        <source>Exponential Intelligence (Powered by Claude from Anthropic)</source>
-        <translation>Exponential Intelligence (Bereitgestellt von Claude von Anthropic)</translation>
     </message>
     <message>
         <source>What should be written?</source>
@@ -1399,12 +1387,8 @@
         <translation>Exponential Intelligence</translation>
     </message>
     <message>
-        <source>Exponential Intelligence (Powered by Claude from Anthropic)</source>
-        <translation>Exponential Intelligence (Bereitgestellt von Claude von Anthropic)</translation>
-    </message>
-    <message>
-        <source>This version was written with Exponential Intelligence (Powered by Claude from Anthropic).</source>
-        <translation>Diese Version wurde mit Exponential Intelligence (Bereitgestellt von Claude von Anthropic) geschrieben.</translation>
+        <source>This version was written with Exponential Intelligence.</source>
+        <translation>Diese Version wurde mit Exponential Intelligence geschrieben.</translation>
     </message>
     <message>
         <source>Model</source>
@@ -1626,10 +1610,6 @@
     <message>
         <source>Day</source>
         <translation>Tag</translation>
-    </message>
-    <message>
-        <source>Powered by Claude from Anthropic</source>
-        <translation>Bereitgestellt von Claude von Anthropic</translation>
     </message>
     <message>
         <source>Requests and usage</source>
@@ -2341,10 +2321,6 @@
         <translation>Exponential Intelligence</translation>
     </message>
     <message>
-        <source>Powered by Claude from Anthropic</source>
-        <translation>Bereitgestellt von Claude von Anthropic</translation>
-    </message>
-    <message>
         <source>Ask for new content under "%name" or for changes to it. Everything is written as drafts that you own; nothing is published until you decide.</source>
         <translation>Bitten Sie um neue Inhalte unter "%name" oder um Änderungen daran. Alles wird als Entwürfe geschrieben, die Ihnen gehören; nichts wird veröffentlicht, bevor Sie es entscheiden.</translation>
     </message>
@@ -2471,10 +2447,6 @@
     <message>
         <source>"%name" was not published: the publishing workflow stopped it. It is still a draft.</source>
         <translation>"%name" wurde nicht veröffentlicht: Der Veröffentlichungs-Workflow hat es angehalten. Es ist weiterhin ein Entwurf.</translation>
-    </message>
-    <message>
-        <source>Exponential Intelligence (Powered by Claude from Anthropic)</source>
-        <translation>Exponential Intelligence (Bereitgestellt von Claude von Anthropic)</translation>
     </message>
     <message>
         <source>Show older</source>
@@ -2644,6 +2616,10 @@
     <message>
         <source>Estimated at prices as of %date; Anthropic's invoice is authoritative.</source>
         <translation>Geschätzt mit den Preisen vom %date; maßgeblich ist die Rechnung von Anthropic.</translation>
+    </message>
+    <message>
+        <source>Estimated at prices as of %date; the provider's invoice is authoritative.</source>
+        <translation>Geschätzt mit den Preisen vom %date; maßgeblich ist die Rechnung des Anbieters.</translation>
     </message>
     <message>
         <source>Period</source>

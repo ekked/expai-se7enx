@@ -1,4 +1,4 @@
-# expai: Exponential Intelligence (Powered by Claude from Anthropic)
+# expai: Exponential Intelligence
 
 Exponential Intelligence is a writing assistant for the administration interface of Exponential 6. Editors ask in
 plain language for new content or for changes ("write three short articles about our spring events under this

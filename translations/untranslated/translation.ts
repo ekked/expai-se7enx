@@ -787,10 +787,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Powered by Claude from Anthropic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Ready</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1006,19 +1002,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Powered by Claude from Anthropic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Show</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Hide</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Exponential Intelligence (Powered by Claude from Anthropic)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1399,11 +1387,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Exponential Intelligence (Powered by Claude from Anthropic)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This version was written with Exponential Intelligence (Powered by Claude from Anthropic).</source>
+        <source>This version was written with Exponential Intelligence.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1625,10 +1609,6 @@
     </message>
     <message>
         <source>Day</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Powered by Claude from Anthropic</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2341,10 +2321,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Powered by Claude from Anthropic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Ask for new content under "%name" or for changes to it. Everything is written as drafts that you own; nothing is published until you decide.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2470,10 +2446,6 @@
     </message>
     <message>
         <source>"%name" was not published: the publishing workflow stopped it. It is still a draft.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Exponential Intelligence (Powered by Claude from Anthropic)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2643,6 +2615,10 @@
     </message>
     <message>
         <source>Estimated at prices as of %date; Anthropic's invoice is authoritative.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Estimated at prices as of %date; the provider's invoice is authoritative.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

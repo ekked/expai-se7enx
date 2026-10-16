@@ -240,7 +240,7 @@ class expAiEditForm
     }
 
     /** Marks the version in the log (once per version; later actions update it) */
-    public static function mark( eZContentObject $object, eZContentObjectVersion $version, $language, $action, $summary, $model, $provider = 'anthropic' )
+    public static function mark( eZContentObject $object, eZContentObjectVersion $version, $language, $action, $summary, $model, $provider = '' )
     {
         $existing = expAiDraftLog::fetchByVersion( $object->attribute( 'id' ), $version->attribute( 'version' ) );
         if ( $existing )

@@ -333,8 +333,8 @@ class expAiServerFunctions extends ezjscServerFunctions
         {
             $result = array( 'labels' => array(), 'collab' => array(),
                              'texts' => array( 'short' => ezpI18n::tr( 'extension/expai/label', 'Exponential Intelligence' ),
-                                               'full' => ezpI18n::tr( 'extension/expai/label', 'Exponential Intelligence (Powered by Claude from Anthropic)' ),
-                                               'written' => ezpI18n::tr( 'extension/expai/label', 'This version was written with Exponential Intelligence (Powered by Claude from Anthropic).' ),
+                                               'full' => ezpI18n::tr( 'extension/expai/label', 'Exponential Intelligence' ),
+                                               'written' => ezpI18n::tr( 'extension/expai/label', 'This version was written with Exponential Intelligence.' ),
                                                'model' => ezpI18n::tr( 'extension/expai/label', 'Model' ) ) );
             if ( !$config->flag( 'LabelSettings', 'Enabled', true ) || !eZUser::currentUser()->isRegistered() )
                 return $result;
