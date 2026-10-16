@@ -39,7 +39,12 @@ class expAiChainPolicy
         return expAiPolicy::allows( 'chain', 'Chain', (string) $chainID, $user );
     }
 
-    /** @return bool the user may see the run */
+    /**
+     * @return bool the user may see the run (its document holds the values of the content): the user who started it,
+     *              a holder of expai/log, or a user who may use the chain and edit the run's object. A run that has
+     *              no object yet (the chain is still to create it below its node) is seen by the first two only:
+     *              who may edit the parent node does not see another editor's unpublished document.
+     */
     public static function maySee( expAiChainRun $run, ?eZUser $user = null )
     {
         $user = $user ?: eZUser::currentUser();
@@ -50,8 +55,26 @@ class expAiChainPolicy
         $log = $user->hasAccessTo( 'expai', 'log' );
         if ( isset( $log['accessWord'] ) && $log['accessWord'] !== 'no' )
             return true;
-        $node = $run->node();
-        return self::mayUse( $run->attribute( 'chain' ), $user ) && $node && $node->canRead();
+        if ( !self::mayUse( $run->attribute( 'chain' ), $user ) )
+            return false;
+        return static::mayEditObject( $run, $user );
+    }
+
+    /**
+     * @return bool the user (not necessarily the current one) may edit the run's object; false when the run has no
+     *              object (yet)
+     */
+    public static function mayEditObject( expAiChainRun $run, eZUser $user )
+    {
+        $object = (int) $run->attribute( 'object_id' ) ? static::fetchObject( (int) $run->attribute( 'object_id' ) ) : null;
+        return $object instanceof eZContentObject
+            && (int) $object->checkAccess( 'edit', false, false, false, false, (int) $user->attribute( 'contentobject_id' ) ) === 1;
+    }
+
+    /** @return eZContentObject|null */
+    protected static function fetchObject( $objectID )
+    {
+        return expAiObjects::fetch( (int) $objectID );
     }
 
     /** @return bool the user may approve, ask for changes, stop or continue the run */
@@ -62,7 +85,6 @@ class expAiChainPolicy
             return false;
         if ( (int) $run->attribute( 'user_id' ) === (int) $user->attribute( 'contentobject_id' ) )
             return true;
-        $object = (int) $run->attribute( 'object_id' ) ? expAiObjects::fetch( (int) $run->attribute( 'object_id' ) ) : null;
-        return $object instanceof eZContentObject && $object->canEdit();
+        return static::mayEditObject( $run, $user );
     }
 }

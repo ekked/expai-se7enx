@@ -1,5 +1,50 @@
 # Unreleased
 
+## Transactions, scripts, access and retention
+
+- **Transactions**: every `begin()` of expai is followed by a `try` whose `catch` rolls back before the exception
+  leaves the method (content writer, publisher, diff, alt text, planner, slow model switch, thread migration, change
+  stager, thread removal and step bookkeeping, Vector decisions and rebase). A failure no longer leaves the rest of
+  the request inside an open transaction that the end of the request rolls back (drafts, usage rows and the
+  conversation were lost with it). `expAiContentWriter::createDraft()` refuses unknown fields before it opens one.
+  The test base class fails a test that leaves a transaction open.
+- **Command line scripts** (`bin/php/*.php`): `-s <siteaccess>` is mandatory, the siteaccess and its database are
+  printed (stderr) at the start, and a script does not run where expai is not active (`expAiScript`).
+  `expaischema.php --print` and `--write-files` need no siteaccess.
+- **Veto per object**: the `[RequestVeto]` rules with a content condition (`Sections[]`, `Classes[]`, `Subtrees[]`)
+  apply to every object the tools read (`expAiGate::objectVeto()`, `expAiContentReader`): an object read on its own
+  is refused, in lists it is withheld with the rule's reason. Every location of an object counts; a missing fact
+  (no location, section or class) or an unknown part of the request meets the condition (fail closed). A rule with an
+  invalid name or without its group is reported in the debug log.
+- **Retention**: `[RetentionSettings] ThreadKeepDays`, `ConversationKeepDays`, `PromptSummaryKeepDays` (365 each; 0
+  keeps). The cronjob part `expai` and `expaithreads.php --prune` remove old threads (with their runs, events and
+  conversations) and conversations, blank old request summaries of the draft log, and remove the threads and
+  conversations of users that no longer exist (`expAiThreadRetention::pruneRecords()`).
+- **Vector for approvers**: an approver who opens another editor's thread sees nothing of objects they may not read
+  (staged changes, plan items, drafts, checkpoint names) and none of the thread's words (title, requests, answers,
+  steps, turn records, run labels, checkpoint labels, the plan's assumptions); the events of the poll and the stream
+  are reduced to states, ids, counts and costs, and to drafts and changes of readable objects. What cannot be told
+  apart is withheld.
+- **Optional extensions**: expqueue, expservices and expmcp are used only when they are active in the siteaccess,
+  not merely because their classes can be loaded (`expAiConfig::extensionActive()`).
+- **AI label**: a draft log entry older than the version that now has its number (the kernel reuses the number of a
+  discarded draft) no longer labels that version (`expAiDraftLog::fetchByVersion()`, `fetchForVersions()`).
+- **CSV export** of expai/log: a value starting with `=`, `+`, `-`, `@`, a tab or a carriage return gets a leading
+  `'`. **Chain runs**: the run page is shown to its starter, holders of `expai/log`, and users who may use the chain
+  and edit its object (checked for that user); a run without its object yet only to the first two.
+  **Local model helper**: spool files are opened with `O_NOFOLLOW` and checked on the open handle (regular file, at
+  most 4 KB).
+
+### Upgrading (retention)
+
+- **The retention deletes by default.** From the first cron run after the update, the cronjob part `expai` removes
+  threads and conversations not modified for **365 days** and blanks request summaries of the draft log older than
+  365 days; the threads and conversations of removed users go at once. Pinned threads, threads in review or waiting
+  for an answer, and running threads stay.
+- To see first what would go: `php extension/expai/bin/php/expaithreads.php --prune --dry-run -s <siteaccess>`, or
+  set `[RetentionSettings] Mode=report` (the cronjob then only reports). Set a `*KeepDays` to `0` to keep rows.
+- `-s <siteaccess>` is now mandatory for every script in `bin/php`; a siteaccess that does not exist stops the script.
+
 ## Provider-neutral
 
 expai works with any provider (Anthropic, every OpenAI-compatible service, local models); it no longer presents itself
@@ -154,7 +199,7 @@ anchors, literals, internal links and formatting attributes were lost, and ezaut
   discarded draft; the chain page does not suggest starting a chain without `expqueue`; "unknown" retentions are
   translated (`expai_retention`); "Job" and "Request in the log" of the model test are translated (they sat in the wrong
   context); the key placement warning accepts a key in any settings directory that git does not track, configurable
-  with `[ProviderSettings] KeyLocations[]` (default `settings/override`, `extension/*/settings`).
+  with `[ProviderSettings] KeyLocations[]` (default `settings/override`, `extension/*settings`).
 - **Alternative text report**: the images without alt text under a node are read with one query per 200 objects instead
   of one data map per object and language.
 - **Script cache busting**: the scripts the templates load directly carry `?v=<change time>`; for

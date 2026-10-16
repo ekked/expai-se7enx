@@ -118,7 +118,9 @@ ProvidersWithoutPolicy[]=anthropic
 # lies outside the release, e.g. a symlinked shared directory). The default is the settings directory of any
 # extension, for a git-ignored extension of secrets. A tracked file is always reported.
 KeyLocations[]=settings/override
-KeyLocations[]=extension/*/settings
+# (a star directly followed by a slash would end the PHP comment around this file; fnmatch() lets the star match
+# slashes, so extension/*settings covers extension/<name>/settings/...)
+KeyLocations[]=extension/*settings
 
 # A provider: Type=anthropic | openai_chat | custom (Class=<class implementing expAiProvider>)
 #   BaseURL         the API (openai_chat: the base, /chat/completions is added; anthropic: the messages URL)
@@ -884,6 +886,22 @@ RetentionDays=365
 # enabled: the full request (instructions, messages, tool definitions) is stored with each row, for debugging.
 # It contains content and the editors' words: leave it disabled in production.
 LogRequests=disabled
+
+[RetentionSettings]
+# How long the editors' words are kept, in days; 0 keeps them. Applied on every run of the cronjob part "expai"
+# (cronjobs/expai_prune.php) and by bin/php/expaithreads.php --prune (--dry-run counts only).
+# delete: the rows go; report: the cronjob only says what it would remove (to check the periods before they apply)
+Mode=delete
+# A thread (with its runs, events, proposals, checkpoints, plans and conversations) not modified for ThreadKeepDays
+# is removed, unless it is pinned, in review, waiting for an answer, or running (a run that stopped reporting for
+# 4 x [ThreadSettings] StaleRunSeconds does not count as running).
+ThreadKeepDays=365
+# A conversation not modified for ConversationKeepDays is removed, unless it belongs to a thread that stays.
+ConversationKeepDays=365
+# The summary of the editor's request in the draft log (expai_draft_log.prompt_summary) is blanked after
+# PromptSummaryKeepDays; the row itself stays as the record of the draft.
+PromptSummaryKeepDays=365
+# Independent of these periods: the threads and conversations of a user that no longer exists are removed.
 
 [Limits]
 # Every limit is optional: empty or 0 means no limit. Tokens are input + output + cache write + cache read; costs are

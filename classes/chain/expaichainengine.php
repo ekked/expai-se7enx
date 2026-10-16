@@ -95,7 +95,7 @@ class expAiChainEngine
             $run->store();
             if ( (int) $run->attribute( 'id' ) <= 0 )
             {
-                if ( class_exists( 'expQueueGroup' ) && method_exists( $group, 'remove' ) )
+                if ( class_exists( 'expQueueGroup' ) && expAiConfig::extensionActive( 'expqueue' ) && method_exists( $group, 'remove' ) )
                     $group->remove();
                 throw new expAiException( 'The chain could not be started. Please try again.', 'the run could not be stored' );
             }
@@ -282,6 +282,8 @@ class expAiChainEngine
             return '';
         $registry = new expAiToolRegistry( $this->config, false );
         $context = new expAiToolContext( $this->config, (int) $run->attribute( 'node_id' ) );
+        // the steps of a chain run in the queue (purpose queue.chain, as the gate sees them)
+        $context->reader->setRequest( array( 'purpose' => 'queue.chain' ) );
         $max = $this->config->int( 'ChainSettings', 'MaxContextChars', 12000, 500 );
         $out = array();
         foreach ( $step['tools'] as $name )

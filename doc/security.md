@@ -106,10 +106,13 @@ the conversation. The rules:
 
 - `expai_draft_log` keeps, per version written: object, version, user id, node, language, action, source, state,
   model, time and a summary of the request (the first `[LogSettings] MaxPromptSummaryLength` characters). The request
-  text may contain whatever the editor wrote; keep that in mind for data protection requests (delete the rows of a
-  user with the user).
+  text may contain whatever the editor wrote; the cronjob part `expai` blanks it after
+  `[RetentionSettings] PromptSummaryKeepDays` (365); the row stays as the record of the draft.
 - `expai_conversation` keeps the conversation (messages, answers, tool results) per user and node until "New
-  conversation" or until removed. Delete old rows by your own retention policy.
+  conversation", until it has not been modified for `[RetentionSettings] ConversationKeepDays` (365), or, when it
+  belongs to a thread, until the thread goes after `ThreadKeepDays` (365). The threads and conversations of a user
+  that no longer exists are removed by the next cron run (the kernel sends no event when a user is removed; the rows
+  are found by their user id).
 - Errors go to the debug log as warnings with the provider's error type and message (never the key, request or
   answer).
 - The browser stores only which history rows were opened and whether the edit form area is open (localStorage).

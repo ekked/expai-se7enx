@@ -77,6 +77,33 @@ condition refuses every request (a maintenance window with a message, unlike the
 A request without content (the model test, a probe) never matches a rule with a content condition (`Sections[]`,
 `Classes[]`, `Subtrees[]`).
 
+### Content the request reads
+
+The content of a request is not only the node it starts on: the tools read further objects (get_node, the children of
+a node, the tree context, service tools, MCP bridge results). The rules with a content condition (`Sections[]`,
+`Classes[]`, `Subtrees[]`) are checked for every object read, the way the data policy is (`expAiGate::objectVeto()`,
+called by `expAiContentReader`):
+
+- the object's section, class and **every** location (a second location inside a listed subtree is enough), the
+  siteaccess, and what is known of the request: the provider and its region (from the data policy of the reader) and
+  the purpose (`expAiContentReader::setRequest()`: `panel` or the thread's action such as `vector` in a conversation,
+  `queue.chain` for the steps of a chain, `queue.bulk` for the answers of a plan's batch; the edit form's field
+  actions and the fallback's node check leave it unknown);
+- a condition on a part of the request that is not known counts as met: a rule that could refuse the object does;
+  so does a condition on a missing fact of the content (an object without a location, such as a new draft, meets
+  `Subtrees[]`; section 0 meets `Sections[]`; no class meets `Classes[]`), unless another condition of the rule that
+  is known excludes the object. The request-level check keeps its rule: a request without content matches no content
+  condition;
+- a rule with an invalid name or without its group is skipped, with a warning in the debug log (once per process);
+- an object read on its own is refused with "This request was refused: <reason>" (the tool fails, the request goes
+  on); in a list the object is withheld, with `withheld: "refused: <reason>"` and counted like the objects the data
+  policy withholds;
+- the names of related objects in a relation field follow the same rule: a related object the policy or the veto
+  keeps away is named `(object <id> withheld)`;
+- the answers of service tools and of the MCP bridge are filtered row by row as soon as a data policy is set **or** a
+  rule names content (`expAiContentReader::filters()`); `search_content` withholds and counts such hits too;
+- the listeners of `expai/request/veto` are not asked per object: they decide on the request as a whole.
+
 ### A listener: the ezpEvent filter `expai/request/veto`
 
 For decisions the settings cannot express (a compliance service, office hours, a per-user flag), register a filter in

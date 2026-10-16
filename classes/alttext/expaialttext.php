@@ -586,32 +586,41 @@ class expAiAltText
         $written = array();
         $db = eZDB::instance();
         $db->begin();
-        $dataMap = $object->fetchDataMap( (int) $version->attribute( 'version' ), $language );
-        $classAttributeID = 0;
-        $source = eZContentObjectAttribute::fetch( (int) $attributeID, (int) $object->attribute( 'current_version' ) );
-        if ( $source )
-            $classAttributeID = (int) $source->attribute( 'contentclassattribute_id' );
-        foreach ( $dataMap as $identifier => $attribute )
+        try
         {
-            if ( (int) $attribute->attribute( 'contentclassattribute_id' ) === $classAttributeID && (string) $attribute->attribute( 'data_type_string' ) === 'ezimage' )
+            $dataMap = $object->fetchDataMap( (int) $version->attribute( 'version' ), $language );
+            $classAttributeID = 0;
+            $source = eZContentObjectAttribute::fetch( (int) $attributeID, (int) $object->attribute( 'current_version' ) );
+            if ( $source )
+                $classAttributeID = (int) $source->attribute( 'contentclassattribute_id' );
+            foreach ( $dataMap as $identifier => $attribute )
             {
-                $handler = $attribute->attribute( 'content' );
-                $handler->setAttribute( 'alternative_text', (string) $altText );
-                $handler->store( $attribute );
-                $attribute->store();
-                $written[] = $identifier;
+                if ( (int) $attribute->attribute( 'contentclassattribute_id' ) === $classAttributeID && (string) $attribute->attribute( 'data_type_string' ) === 'ezimage' )
+                {
+                    $handler = $attribute->attribute( 'content' );
+                    $handler->setAttribute( 'alternative_text', (string) $altText );
+                    $handler->store( $attribute );
+                    $attribute->store();
+                    $written[] = $identifier;
+                }
+                elseif ( in_array( $identifier, self::companions( $config ), true ) && (string) $attribute->attribute( 'data_type_string' ) === 'ezstring'
+                         && trim( (string) $attribute->toString() ) === '' )
+                {
+                    $attribute->fromString( (string) $altText );
+                    $attribute->store();
+                    $written[] = $identifier;
+                }
             }
-            elseif ( in_array( $identifier, self::companions( $config ), true ) && (string) $attribute->attribute( 'data_type_string' ) === 'ezstring'
-                     && trim( (string) $attribute->toString() ) === '' )
-            {
-                $attribute->fromString( (string) $altText );
-                $attribute->store();
-                $written[] = $identifier;
-            }
+            $version->setAttribute( 'modified', time() );
+            $version->store();
+            $db->commit();
         }
-        $version->setAttribute( 'modified', time() );
-        $version->store();
-        $db->commit();
+        catch ( Throwable $e )
+        {
+            if ( $db->transactionCounter() > 0 )
+                $db->rollback();
+            throw $e;
+        }
         if ( !$written )
             throw new expAiException( 'The image field was not found in the new draft.' );
         return array( 'version' => $version, 'language' => $language, 'written' => $written );

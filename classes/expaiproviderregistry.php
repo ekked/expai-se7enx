@@ -420,7 +420,7 @@ class expAiProviderRegistry
     {
         $patterns = array_filter( array_map( 'trim', array_map( 'strval', $this->config->arr( 'ProviderSettings', 'KeyLocations' ) ) ), 'strlen' );
         if ( !$patterns )
-            $patterns = array( 'settings/override', 'extension/*/settings' );
+            $patterns = array( 'settings/override', 'extension/*settings' );
         $matches = false;
         foreach ( $patterns as $pattern )
         {

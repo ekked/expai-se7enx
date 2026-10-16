@@ -52,7 +52,7 @@ class expAiMcpBridgeTool extends expAiTool
             eZDebug::writeNotice( "expai: the expmcp tool $mcpName needs expmcp 0.3.1 or later for the bridge and is not offered", __METHOD__ );
             return null;
         }
-        if ( !class_exists( $tools[$mcpName][0] ) || !class_exists( 'expMcpSecurity' ) || !class_exists( 'Psr\\Log\\NullLogger' ) )
+        if ( !expAiConfig::extensionActive( 'expmcp' ) || !class_exists( $tools[$mcpName][0] ) || !class_exists( 'expMcpSecurity' ) || !class_exists( 'Psr\\Log\\NullLogger' ) )
             return null;
         $tool = new self( 'exp__' . $mcpName );
         $tool->mcpName = $mcpName;
@@ -126,7 +126,7 @@ class expAiMcpBridgeTool extends expAiTool
      */
     public static function applyDataPolicy( array $result, expAiContentReader $reader )
     {
-        if ( !$reader->policy() || isset( $result['error'] ) )
+        if ( !$reader->filters() || isset( $result['error'] ) )
             return $result;
         // an answer about one object (exp_content_get, exp_content_meta, the object of relations and versions)
         $object = self::rowObject( $result );

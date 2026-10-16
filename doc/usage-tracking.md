@@ -59,7 +59,8 @@ another provider without prices has an unknown cost rather than a Claude price. 
 - **Dashboard** (`expai/dashboard`): the figures, the chart, the limits of the chosen period; the user's own usage,
   or with `expai/log` the whole site and the top users. See [dashboard.md](dashboard.md).
 - **Log** (`expai/log`): every turn and request, filtered by date, user, node, action, model and errors, sortable,
-  with totals per day and per user, and a CSV export (no request texts, user ids only). `(model)/<alias>` filters by
+  with totals per day and per user, and a CSV export (no request texts, user ids only; a value that starts with `=`, `+`, `-`, `@`, a tab or a carriage
+  return gets a leading `'`, so that a spreadsheet shows it as text instead of running it as a formula). `(model)/<alias>` filters by
   the model alias, `(request)/<id>` shows one request, `(thread)/<id>` the requests of one thread. The edit form
   links `(request)/<id>` as **View record** after each field action, preset and Improve entry.
 - **Models card** of the dashboard: per model the requests, success rate, errors by kind (timeout, unreachable,

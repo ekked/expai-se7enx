@@ -222,7 +222,7 @@ class expAiEditForm
         $id = (int) $row->attribute( 'id' );
         $uuid = (string) $row->attribute( 'job_uuid' );
         $job = '';
-        if ( $uuid !== '' && class_exists( 'expQueue' ) )
+        if ( $uuid !== '' && expAiQueue::available() )
         {
             $access = eZUser::currentUser()->hasAccessTo( 'expqueue', 'view' );
             if ( isset( $access['accessWord'] ) && $access['accessWord'] !== 'no' )

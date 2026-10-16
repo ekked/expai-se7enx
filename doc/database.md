@@ -3,6 +3,10 @@
 ## The tables
 
 **expai_draft_log**: one row per version expai wrote or filled.
+The kernel reuses the number of a discarded version (an edit draft removed by the editor or the draft cleanup): a
+row older than the `created` of the version that now has its number belongs to the removed version, and the label and
+every lookup of the version (`expAiDraftLog::fetchByVersion()`, `fetchForVersions()`) ignore it. The prompt summary
+is blanked after `[RetentionSettings] PromptSummaryKeepDays`.
 
 | Column | Type | Meaning |
 | --- | --- | --- |

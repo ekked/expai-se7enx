@@ -177,7 +177,8 @@ class expAiVector
     /** @return array a thread for the list (no node names: cheap for 100 rows) */
     public static function listRow( expAiThread $thread, $userID )
     {
-        $title = (string) $thread->attribute( 'title' );
+        // the title is the owner's first request: an approver does not see it (it may name content)
+        $title = $thread->isOwner( $userID ) ? (string) $thread->attribute( 'title' ) : '';
         $state = (string) $thread->attribute( 'state' );
         // a foreground run whose browser went away (closed tab, timed out request) never reports its end: after
         // [ThreadSettings] StaleRunSeconds without a change it is shown as stopped
@@ -188,6 +189,7 @@ class expAiVector
             'uuid' => (string) $thread->attribute( 'uuid' ),
             'title' => $title !== '' ? $title : ezpI18n::tr( 'extension/expai/threads', 'New thread' ),
             'untitled' => $title === '',
+            'withheld' => !$thread->isOwner( $userID ),
             'origin' => (string) $thread->attribute( 'origin' ),
             'node_id' => (int) $thread->attribute( 'node_id' ),
             'state' => $state,
@@ -274,6 +276,11 @@ class expAiVector
             // checkpoints (doc/checkpoints.md): the newest ones for the strip under the conversation
             'checkpoints' => expAiCheckpoint::listFor( $thread, 12 ),
         );
+        if ( !$thread->isOwner( $userID ) )
+        {
+            $row['runs'] = self::visibleRuns( $row['runs'], false );
+            $row['checkpoints'] = self::visibleCheckpoints( $row['checkpoints'], false );
+        }
         return $row;
     }
 
@@ -291,16 +298,29 @@ class expAiVector
     /**
      * The staged changes of a thread for the Changes tab: grouped by object (or proposed new object) and language,
      * fields in class order, each with its hunks (texts only) and whether its base changed since staging.
+     * For a viewer who is not the owner, changes of objects the viewer may not read (for a new object: its parent
+     * node) are left out and counted in $withheld (changeHidden()).
      * @return array list of { key, object_id, new_key, is_new, language, language_name, name, class_name, parent_name,
      *               base_version, conflict, fields: list of change rows + name, base_changed }
      */
-    public static function changeGroups( expAiThread $thread )
+    public static function changeGroups( expAiThread $thread, &$withheld = 0, $viewerID = null )
     {
+        $owner = $thread->isOwner( $viewerID === null ? (int) eZUser::currentUserID() : (int) $viewerID );
         $groups = array();
         $languages = array();
+        $hidden = array();
+        $withheld = 0;
         foreach ( expAiChange::fetchForThread( (int) $thread->attribute( 'id' ) ) as $change )
         {
             $key = $change->targetKey();
+            // a reviewer who may not read the object (or the parent of a new one) sees none of its values
+            if ( !$owner && !isset( $groups[$key] ) && !isset( $hidden[$key] ) )
+                $hidden[$key] = self::changeHidden( $change );
+            if ( !empty( $hidden[$key] ) )
+            {
+                $withheld++;
+                continue;
+            }
             if ( !isset( $groups[$key] ) )
             {
                 $code = (string) $change->attribute( 'language_code' );
@@ -366,10 +386,263 @@ class expAiVector
             if ( isset( $seen[$key] ) || $log->attribute( 'status' ) === expAiDraftLog::STATUS_DISCARDED || $log->objectExists() === false )
                 continue;
             $seen[$key] = true;
+            if ( !self::objectReadable( (int) $log->attribute( 'contentobject_id' ) ) )
+                continue;
             $row = expAiAssistant::draftRow( $log );
             if ( $row )
                 $out[] = $row;
         }
         return $out;
+    }
+
+    /* ------------------------------------------------ what the viewer may read */
+
+    /** @var array object id => bool, for the current user */
+    protected static $readable = array();
+
+    /** @return bool the current user may read the object (false when it does not exist) */
+    public static function objectReadable( $objectID )
+    {
+        $objectID = (int) $objectID;
+        $key = (int) eZUser::currentUserID() . ':' . $objectID;
+        if ( !isset( self::$readable[$key] ) )
+        {
+            $object = $objectID ? expAiObjects::fetch( $objectID ) : null;
+            self::$readable[$key] = $object instanceof eZContentObject && $object->canRead();
+        }
+        return self::$readable[$key];
+    }
+
+    /** @return bool the current user may read the node (false when it does not exist) */
+    public static function nodeReadable( $nodeID )
+    {
+        $node = (int) $nodeID ? eZContentObjectTreeNode::fetch( (int) $nodeID ) : null;
+        return $node instanceof eZContentObjectTreeNode && $node->canRead();
+    }
+
+    /** Forgets what objectReadable() found (the current user changed, or an object's rights). */
+    public static function resetReadable()
+    {
+        self::$readable = array();
+    }
+
+    /**
+     * A staged change the viewer may not see: an existing object (contentobject_id) the viewer may not read, or a new
+     * object (contentobject_id 0) whose parent node (parent_node_id) the viewer may not read, or that has none.
+     * @param callable|null $mayReadObject object id => bool (default objectReadable())
+     * @param callable|null $mayReadNode node id => bool (default nodeReadable())
+     * @return bool
+     */
+    public static function changeHidden( expAiChange $change, ?callable $mayReadObject = null, ?callable $mayReadNode = null )
+    {
+        $mayReadObject = $mayReadObject ?: array( 'expAiVector', 'objectReadable' );
+        $mayReadNode = $mayReadNode ?: array( 'expAiVector', 'nodeReadable' );
+        if ( !$change->isNew() )
+            return !$mayReadObject( (int) $change->attribute( 'contentobject_id' ) );
+        $parentID = (int) $change->attribute( 'parent_node_id' );
+        return !$parentID || !$mayReadNode( $parentID );
+    }
+
+    /**
+     * The items of a plan as a viewer who is not the owner may see them: an item whose target (target.object_id,
+     * target.node_id, or target.parent_node_id of a new object, as expAiPlanner::newItem() stores them) the viewer may
+     * not read, or whose target cannot be told, keeps its action and state, but not its name, instruction or fields.
+     * @param array $items expAiPlan::items()
+     * @param bool $owner the viewer owns the thread: the items are returned as they are
+     * @param callable|null $mayReadObject object id => bool (default objectReadable())
+     * @param callable|null $mayReadNode node id => bool (default nodeReadable())
+     * @return array
+     */
+    public static function visiblePlanItems( array $items, $owner = false, ?callable $mayReadObject = null, ?callable $mayReadNode = null )
+    {
+        if ( $owner )
+            return $items;
+        $mayReadObject = $mayReadObject ?: array( 'expAiVector', 'objectReadable' );
+        $mayReadNode = $mayReadNode ?: array( 'expAiVector', 'nodeReadable' );
+        foreach ( $items as $i => $item )
+        {
+            $target = isset( $item['target'] ) && is_array( $item['target'] ) ? $item['target'] : array();
+            $objectID = isset( $target['object_id'] ) ? (int) $target['object_id'] : 0;
+            $nodeID = isset( $target['node_id'] ) ? (int) $target['node_id'] : 0;
+            $parentID = isset( $target['parent_node_id'] ) ? (int) $target['parent_node_id'] : 0;
+            if ( $objectID )
+                $readable = (bool) $mayReadObject( $objectID );
+            elseif ( $nodeID )
+                $readable = (bool) $mayReadNode( $nodeID );
+            elseif ( $parentID )
+                $readable = (bool) $mayReadNode( $parentID );
+            else
+                // no target that can be checked: withheld (fail closed)
+                $readable = false;
+            if ( $readable )
+                continue;
+            $items[$i]['target_name'] = ( $objectID ?: ( $nodeID ?: $parentID ) ) ? '#' . ( $objectID ?: ( $nodeID ?: $parentID ) ) : '';
+            $items[$i]['summary'] = '';
+            $items[$i]['fields'] = array();
+            $items[$i]['withheld'] = true;
+        }
+        return $items;
+    }
+
+    /**
+     * The history of a conversation as a viewer who is not the owner may see it: the drafts of an exchange (key
+     * "<object id>:<version>", as expAiAssistant stores them) on objects the viewer may not read, or whose key cannot
+     * be read, are left out (with their names and the notes of what became of them).
+     * @param array $history expAiAssistant::history()
+     * @param bool $owner the viewer owns the thread: the history is returned as it is
+     * @param callable|null $mayReadObject object id => bool (default objectReadable())
+     * @return array
+     */
+    public static function visibleHistory( array $history, $owner = false, ?callable $mayReadObject = null )
+    {
+        if ( $owner )
+            return $history;
+        $mayReadObject = $mayReadObject ?: array( 'expAiVector', 'objectReadable' );
+        // the turn records name the tools and link the requests of the log: not for an approver
+        if ( isset( $history['records'] ) )
+            $history['records'] = array();
+        if ( empty( $history['exchanges'] ) || !is_array( $history['exchanges'] ) )
+            return $history;
+        foreach ( $history['exchanges'] as $i => $exchange )
+        {
+            // the words of the exchange (the owner's request, the answer, the steps with the names of what the tools
+            // read) cannot be told apart by object: an approver does not see them (fail closed)
+            foreach ( array( 'user', 'reply', 'snippet', 'user_snippet', 'notice' ) as $key )
+                if ( isset( $history['exchanges'][$i][$key] ) )
+                    $history['exchanges'][$i][$key] = '';
+            if ( isset( $exchange['steps'] ) && is_array( $exchange['steps'] ) )
+                foreach ( $exchange['steps'] as $n => $step )
+                    $history['exchanges'][$i]['steps'][$n] = array( 'text' => '', 'ok' => !empty( $step['ok'] ), 'writes' => !empty( $step['writes'] ), 'withheld' => true );
+            $history['exchanges'][$i]['texts_withheld'] = true;
+            if ( empty( $exchange['drafts'] ) || !is_array( $exchange['drafts'] ) )
+                continue;
+            $kept = array();
+            foreach ( $exchange['drafts'] as $draft )
+                if ( is_array( $draft ) && isset( $draft['key'] ) && preg_match( '/^(\d+):(\d+)$/', (string) $draft['key'], $m ) && $mayReadObject( (int) $m[1] ) )
+                    $kept[] = $draft;
+            if ( count( $kept ) !== count( $exchange['drafts'] ) )
+            {
+                $history['exchanges'][$i]['drafts'] = $kept;
+                // the notes of what became of the drafts name them: made again from the drafts that stay
+                $history['exchanges'][$i]['outcomes'] = $kept ? expAiAssistant::outcomes( $kept ) : array();
+                $history['exchanges'][$i]['withheld'] = count( $exchange['drafts'] ) - count( $kept );
+            }
+        }
+        return $history;
+    }
+
+    /**
+     * An event of a thread (expAiThreadEvent::present()) as a viewer who is not the owner may see it: the events that
+     * name an object (draft, change, held) only when the viewer may read it (an event of a new object, or one whose
+     * object cannot be told, is withheld); the words of the model and its tools (step_end, text, error) never, as
+     * they cannot be told apart by object. The other kinds carry states, ids, counts and costs ($plainEventKeys).
+     * @param bool $owner the viewer owns the thread: the event is returned as it is
+     * @param callable|null $mayReadObject object id => bool (default objectReadable())
+     * @return array
+     */
+    /** @var array kind => the payload keys an approver sees (the payloads of these kinds carry no content) */
+    public static $plainEventKeys = array(
+        'status' => array( 'state', 'from', 'held', 'run_id', 'applied', 'conflicts', 'runs', 'lane', 'job', 'switched' ),
+        'cost' => array( 'micros', 'tokens', 'requests', 'run_id' ),
+        'plan' => array( 'plan_id', 'items', 'refused', 'expected_micros', 'state', 'reserved_micros', 'actual_micros' ),
+        'run' => array( 'run_id', 'item', 'state', 'micros', 'op', 'plan_id', 'runs', 'requests', 'lane', 'parallel' ),
+        'checkpoint' => array( 'op', 'id', 'before', 'kind' ),
+        'followup' => array( 'op', 'id' ),
+    );
+
+    public static function visibleEvent( array $event, $owner = false, ?callable $mayReadObject = null )
+    {
+        if ( $owner )
+            return $event;
+        $mayReadObject = $mayReadObject ?: array( 'expAiVector', 'objectReadable' );
+        $kind = isset( $event['kind'] ) ? (string) $event['kind'] : '';
+        $payload = isset( $event['payload'] ) && is_array( $event['payload'] ) ? $event['payload'] : array();
+        $runID = isset( $payload['run_id'] ) ? array( 'run_id' => (int) $payload['run_id'] ) : array();
+        if ( in_array( $kind, array( 'draft', 'change', 'held' ), true ) )
+        {
+            $objectID = isset( $payload['object_id'] ) ? (int) $payload['object_id'] : 0;
+            if ( !$objectID || !$mayReadObject( $objectID ) )
+                $event['payload'] = array( 'withheld' => true ) + $runID;
+            elseif ( $kind === 'held' && isset( $payload['fields'] ) && is_array( $payload['fields'] ) )
+                // "held by run N (label)": the label of another run may name another object
+                $event['payload']['fields'] = array_fill_keys( array_keys( $payload['fields'] ), 'held by another run' );
+        }
+        elseif ( $kind === 'step_end' )
+            $event['payload'] = array( 'text' => '', 'ok' => !empty( $payload['ok'] ), 'writes' => !empty( $payload['writes'] ), 'withheld' => true ) + $runID;
+        elseif ( in_array( $kind, array( 'text', 'error' ), true ) )
+            $event['payload'] = array( 'withheld' => true ) + $runID;
+        elseif ( isset( self::$plainEventKeys[$kind] ) )
+            // states, ids, counts and costs only: a key this code does not know is left out (fail closed)
+            $event['payload'] = array_intersect_key( $payload, array_flip( self::$plainEventKeys[$kind] ) );
+        else
+            // a kind this code does not know (or one with words: step_start, question, text_delta): withheld
+            $event['payload'] = array( 'withheld' => true ) + $runID;
+        return $event;
+    }
+
+    /**
+     * The runs of a plan (expAiThreadFanout::present()) as a viewer who is not the owner may see them: no label (the
+     * item's target and instruction) and no last step (the words of the model).
+     * @return array
+     */
+    public static function visibleRuns( array $present, $owner = false )
+    {
+        if ( $owner || empty( $present['runs'] ) || !is_array( $present['runs'] ) )
+            return $present;
+        foreach ( $present['runs'] as $i => $run )
+        {
+            $present['runs'][$i]['label'] = '';
+            $present['runs'][$i]['last'] = '';
+            $present['runs'][$i]['withheld'] = true;
+        }
+        return $present;
+    }
+
+    /**
+     * Checkpoints (expAiCheckpoint::listFor()) as a viewer who is not the owner may see them: no label (it is the
+     * owner's request of the turn).
+     * @return array
+     */
+    public static function visibleCheckpoints( array $checkpoints, $owner = false )
+    {
+        if ( $owner )
+            return $checkpoints;
+        foreach ( $checkpoints as $i => $checkpoint )
+        {
+            $checkpoints[$i]['label'] = '';
+            $checkpoints[$i]['withheld'] = true;
+        }
+        return $checkpoints;
+    }
+
+    /**
+     * A plan for the browser (expAiPlan::present()) as a viewer who is not the owner may see it: the items through
+     * visiblePlanItems(), and no assumptions, questions or risks (the model's words).
+     * @return array
+     */
+    public static function visiblePlan( array $plan, $owner = false, ?callable $mayReadObject = null, ?callable $mayReadNode = null )
+    {
+        if ( $owner )
+            return $plan;
+        $plan['items'] = self::visiblePlanItems( isset( $plan['items'] ) ? (array) $plan['items'] : array(), false, $mayReadObject, $mayReadNode );
+        $plan['meta'] = array( 'withheld' => true );
+        if ( isset( $plan['estimate']['meta'] ) )
+            $plan['estimate']['meta'] = array( 'withheld' => true );
+        return $plan;
+    }
+
+    /**
+     * The waiting follow-ups of a thread: the owner gets them (with their text), a viewer who is not the owner only
+     * how many wait (the text is the owner's message).
+     * @param expAiFollowup[] $followups
+     * @return array list (expAiFollowup::present() rows, empty for others), count
+     */
+    public static function visibleFollowups( array $followups, $owner = false )
+    {
+        $list = array();
+        if ( $owner )
+            foreach ( $followups as $followup )
+                $list[] = $followup->present();
+        return array( 'list' => $list, 'count' => count( $followups ) );
     }
 }

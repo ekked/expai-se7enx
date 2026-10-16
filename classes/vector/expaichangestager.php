@@ -311,74 +311,83 @@ class expAiChangeStager
         $now = time();
         $db = eZDB::instance();
         $db->begin();
-        foreach ( $fields as $identifier => $value )
+        try
         {
-            $identifier = (string) $identifier;
-            $classAttribute = $classAttributes[$identifier];
-            $datatype = (string) $classAttribute->attribute( 'data_type_string' );
-            if ( !in_array( $datatype, $writable, true ) )
+            foreach ( $fields as $identifier => $value )
             {
-                $result['skipped'][$identifier] = "the datatype $datatype is not written by the assistant; the editor sets it in the edit form";
-                continue;
-            }
-            if ( $translation && !$classAttribute->attribute( 'can_translate' ) )
-            {
-                $result['skipped'][$identifier] = 'not translatable: it keeps the value of the main language';
-                continue;
-            }
-            list( $proposed, $error ) = $this->storageValue( $datatype, $value, $classAttribute, $parserObject );
-            if ( $proposed === null )
-            {
-                $result['errors'][$identifier] = $error;
-                continue;
-            }
-            $baseValue = isset( $values[$identifier] ) ? (string) $values[$identifier]['value'] : '';
-            $existing = expAiChange::fetchTarget( $threadID, $objectID, $newKey, $language, $identifier );
-            // one field is staged by one run at a time (doc/parallel-runs.md): another run that still works holds it
-            $holder = $objectID ? self::holder( $existing, $runID, $objectID, $language, $identifier ) : null;
-            if ( $holder )
-            {
-                $result['held'][$identifier] = 'held by ' . $holder->shortName();
-                continue;
-            }
-            if ( $proposed === $baseValue )
-            {
-                // the proposal is the published value: nothing to review (an earlier proposal of the field goes)
-                if ( $existing )
+                $identifier = (string) $identifier;
+                $classAttribute = $classAttributes[$identifier];
+                $datatype = (string) $classAttribute->attribute( 'data_type_string' );
+                if ( !in_array( $datatype, $writable, true ) )
                 {
-                    $existing->setAttribute( 'decision', 'stale' );
-                    $existing->setAttribute( 'modified', $now );
-                    $existing->store();
+                    $result['skipped'][$identifier] = "the datatype $datatype is not written by the assistant; the editor sets it in the edit form";
+                    continue;
                 }
-                $result['unchanged'][] = $identifier;
-                continue;
+                if ( $translation && !$classAttribute->attribute( 'can_translate' ) )
+                {
+                    $result['skipped'][$identifier] = 'not translatable: it keeps the value of the main language';
+                    continue;
+                }
+                list( $proposed, $error ) = $this->storageValue( $datatype, $value, $classAttribute, $parserObject );
+                if ( $proposed === null )
+                {
+                    $result['errors'][$identifier] = $error;
+                    continue;
+                }
+                $baseValue = isset( $values[$identifier] ) ? (string) $values[$identifier]['value'] : '';
+                $existing = expAiChange::fetchTarget( $threadID, $objectID, $newKey, $language, $identifier );
+                // one field is staged by one run at a time (doc/parallel-runs.md): another run that still works holds it
+                $holder = $objectID ? self::holder( $existing, $runID, $objectID, $language, $identifier ) : null;
+                if ( $holder )
+                {
+                    $result['held'][$identifier] = 'held by ' . $holder->shortName();
+                    continue;
+                }
+                if ( $proposed === $baseValue )
+                {
+                    // the proposal is the published value: nothing to review (an earlier proposal of the field goes)
+                    if ( $existing )
+                    {
+                        $existing->setAttribute( 'decision', 'stale' );
+                        $existing->setAttribute( 'modified', $now );
+                        $existing->store();
+                    }
+                    $result['unchanged'][] = $identifier;
+                    continue;
+                }
+                $hunks = self::hunksFor( $datatype, $baseValue, $proposed, $language, $identifier, $existing ? $existing->hunks() : array() );
+                $change = $existing ?: new expAiChange( array( 'thread_id' => $threadID, 'contentobject_id' => (int) $objectID, 'new_key' => (string) $newKey,
+                                                               'parent_node_id' => (int) $parentNodeID, 'class_identifier' => (string) $class->attribute( 'identifier' ),
+                                                               'language_code' => (string) $language, 'attribute_identifier' => $identifier, 'created' => $now ) );
+                $change->setAttribute( 'run_id', $runID );
+                $change->setAttribute( 'datatype', $datatype );
+                $change->setAttribute( 'base_version', (int) $baseVersion );
+                $change->setAttribute( 'base_hash', expAiChange::hash( $baseValue ) );
+                $change->setAttribute( 'proposed', $proposed );
+                $change->setHunks( $hunks );
+                $change->setAttribute( 'decision', 'pending' );
+                $change->setAttribute( 'decision', $change->deriveDecision() );
+                $change->setAttribute( 'modified', $now );
+                $change->store();
+                $result['change_ids'][] = (int) $change->attribute( 'id' );
+                $result['staged'][] = $identifier;
             }
-            $hunks = self::hunksFor( $datatype, $baseValue, $proposed, $language, $identifier, $existing ? $existing->hunks() : array() );
-            $change = $existing ?: new expAiChange( array( 'thread_id' => $threadID, 'contentobject_id' => (int) $objectID, 'new_key' => (string) $newKey,
-                                                           'parent_node_id' => (int) $parentNodeID, 'class_identifier' => (string) $class->attribute( 'identifier' ),
-                                                           'language_code' => (string) $language, 'attribute_identifier' => $identifier, 'created' => $now ) );
-            $change->setAttribute( 'run_id', $runID );
-            $change->setAttribute( 'datatype', $datatype );
-            $change->setAttribute( 'base_version', (int) $baseVersion );
-            $change->setAttribute( 'base_hash', expAiChange::hash( $baseValue ) );
-            $change->setAttribute( 'proposed', $proposed );
-            $change->setHunks( $hunks );
-            $change->setAttribute( 'decision', 'pending' );
-            $change->setAttribute( 'decision', $change->deriveDecision() );
-            $change->setAttribute( 'modified', $now );
-            $change->store();
-            $result['change_ids'][] = (int) $change->attribute( 'id' );
-            $result['staged'][] = $identifier;
+            if ( $result['change_ids'] )
+                $this->thread->addEvent( 'change', array( 'object_id' => (int) $objectID, 'new_key' => (string) $newKey, 'language' => (string) $language,
+                                                          'fields' => $result['staged'], 'changes' => $result['change_ids'] ), $runID );
+            if ( $result['held'] )
+                $this->thread->addEvent( 'held', array( 'object_id' => (int) $objectID, 'language' => (string) $language, 'fields' => $result['held'] ), $runID );
+            // only the events and the time: other runs of the thread may change its state meanwhile
+            if ( $result['change_ids'] || $result['held'] )
+                $this->thread->storeActivity();
+            $db->commit();
         }
-        if ( $result['change_ids'] )
-            $this->thread->addEvent( 'change', array( 'object_id' => (int) $objectID, 'new_key' => (string) $newKey, 'language' => (string) $language,
-                                                      'fields' => $result['staged'], 'changes' => $result['change_ids'] ), $runID );
-        if ( $result['held'] )
-            $this->thread->addEvent( 'held', array( 'object_id' => (int) $objectID, 'language' => (string) $language, 'fields' => $result['held'] ), $runID );
-        // only the events and the time: other runs of the thread may change its state meanwhile
-        if ( $result['change_ids'] || $result['held'] )
-            $this->thread->storeActivity();
-        $db->commit();
+        catch ( Throwable $e )
+        {
+            if ( $db->transactionCounter() > 0 )
+                $db->rollback();
+            throw $e;
+        }
         if ( !$result['change_ids'] && !$result['unchanged'] && $result['held'] )
             throw new expAiException( 'Not staged: another run is changing these fields (%fields). Leave them alone: do the rest of your item, or end your turn and say which fields were held.',
                                       '', 0, array( '%fields' => implode( '; ', array_map( function ( $k, $v ) { return "$k $v"; }, array_keys( $result['held'] ), $result['held'] ) ) ) );

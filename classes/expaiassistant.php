@@ -231,6 +231,9 @@ class expAiAssistant
         // the data policy of that provider: the panel's node first (a refusal names the rule)
         $policy = expAiDataPolicy::forProvider( $this->config, $providerID );
         $reader = new expAiContentReader( $this->config, $policy );
+        // the purpose of the request, for the veto of every object read (the provider and region come from the policy)
+        $vetoRequest = array( 'purpose' => $this->bound ? (string) $this->threadOptions['action'] : 'panel' );
+        $reader->setRequest( $vetoRequest );
         $node = $reader->readableNode( $nodeID );
         $conversation = $this->bound ?: expAiConversation::fetchCurrent( $user->attribute( 'contentobject_id' ), $nodeID );
         // one step at a time per conversation (before the thread hears of this step: a refused step changes nothing)
@@ -477,6 +480,7 @@ class expAiAssistant
         if ( $toolUses )
         {
             $context = new expAiToolContext( $this->config, $nodeID, $conversation, $policy );
+            $context->reader->setRequest( $vetoRequest );
             $context->model = (string) $answer['model'];
             $context->provider = $providerID;
             $context->modelAlias = $alias;

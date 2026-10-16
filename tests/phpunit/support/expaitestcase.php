@@ -57,6 +57,13 @@ abstract class expAiTestCase extends PHPUnit\Framework\TestCase
                 $errors[] = $e->getMessage();
             }
         }
+        // the code under test must close every transaction it opens: one left open would hold the rest of a request
+        // and be rolled back at its end
+        if ( class_exists( 'eZDB', false ) && eZDB::hasInstance() && eZDB::instance()->transactionCounter() > 0 )
+        {
+            $errors[] = 'the test left ' . eZDB::instance()->transactionCounter() . ' transaction(s) open';
+            eZDB::instance()->rollback();
+        }
         if ( $this->previousUser instanceof eZUser )
             eZUser::setCurrentlyLoggedInUser( $this->previousUser, (int) $this->previousUser->attribute( 'contentobject_id' ), eZUser::NO_SESSION_REGENERATE );
         $this->previousUser = null;
@@ -100,6 +107,7 @@ abstract class expAiTestCase extends PHPUnit\Framework\TestCase
 
     /**
      * Opens a transaction that is rolled back after the test: the rows the test writes through eZDB never stay.
+     * The test fails when the code under test left a transaction of its own open inside it.
      * Keep such tests short (the site's writers wait for the transaction), and do not create content inside one
      * (content writes files and caches too; use folder() and publish(), which remove what they made).
      */
@@ -110,8 +118,11 @@ abstract class expAiTestCase extends PHPUnit\Framework\TestCase
         $db->begin();
         $this->cleanup( static function () use ( $db )
         {
-            while ( $db->transactionCounter() > 0 )
+            $open = $db->transactionCounter();
+            if ( $open > 0 )
                 $db->rollback();
+            if ( $open > 1 )
+                throw new RuntimeException( ( $open - 1 ) . ' transaction(s) of the code under test were left open' );
         } );
     }
 

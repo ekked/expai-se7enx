@@ -44,7 +44,7 @@ class expAiTurnRecord
     /** @return bool the user may open the job pages of the queue */
     protected static function mayViewJobs()
     {
-        if ( !class_exists( 'expQueue' ) )
+        if ( !class_exists( 'expQueue' ) || !expAiConfig::extensionActive( 'expqueue' ) )
             return false;
         $access = eZUser::currentUser()->hasAccessTo( 'expqueue', 'view' );
         return isset( $access['accessWord'] ) && $access['accessWord'] !== 'no';

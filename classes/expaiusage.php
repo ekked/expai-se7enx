@@ -175,7 +175,25 @@ class expAiUsage
                       'currency' => self::currency(), 'multiplier' => (string) $config->get( 'Pricing', 'Multiplier', '1.0' ) );
     }
 
-    /** @return string the currency of [Pricing] */
+    /**
+     * A row of the CSV export, safe to open in a spreadsheet: a text value that starts with = + - @, a tab or a
+     * carriage return gets a leading ' so that it is shown as text and never run as a formula (a model name, an error
+     * message or a tool name comes from outside). Numbers (also negative ones) stay as they are.
+     * @param array $values
+     * @return array
+     */
+    public static function csvRow( array $values )
+    {
+        return array_map( function ( $value )
+        {
+            $value = $value === null ? '' : (string) $value;
+            if ( $value === '' || is_numeric( $value ) )
+                return $value;
+            return strpos( "=+-@\t\r", $value[0] ) !== false ? "'" . $value : $value;
+        }, array_values( $values ) );
+    }
+
+    /** @return string the currency of the costs */
     public static function currency()
     {
         return (string) expAiConfig::instance()->get( 'Pricing', 'Currency', 'USD' );

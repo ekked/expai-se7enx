@@ -28,10 +28,10 @@ class expAiQueue
     const TYPE_SUBMIT = 'expai.batch.submit';
     const TYPE_POLL = 'expai.batch.poll';
 
-    /** @return bool the queue can be used (expqueue active and installed) */
+    /** @return bool the queue can be used (expqueue active in this siteaccess and installed) */
     public static function available()
     {
-        return class_exists( 'expQueue' ) && expQueue::installed();
+        return class_exists( 'expQueue' ) && expAiConfig::extensionActive( 'expqueue' ) && expQueue::installed();
     }
 
     /**

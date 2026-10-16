@@ -58,54 +58,63 @@ class expAiThreadMigration
                 continue;
             }
             $db->begin();
-            if ( $existingRun )
+            try
             {
-                // an earlier run of the migration created the thread; only the link back was lost
-                $thread = expAiThread::fetchByID( (int) $existingRun->attribute( 'thread_id' ) );
-                $run = $existingRun;
-                $report['linked']++;
-            }
-            else
-            {
-                $thread = null;
-                $run = null;
-            }
-            if ( !$thread )
-            {
-                $title = self::firstRequest( $conversation );
-                $thread = new expAiThread( array(
-                    'uuid' => expAiThread::newUuid(), 'user_id' => (int) $conversation->attribute( 'user_id' ),
-                    'title' => expAiText::cut( expAiText::oneLine( $title ), $titleLength ), 'origin' => expAiThread::ORIGIN_PANEL,
-                    'node_id' => (int) $conversation->attribute( 'node_id' ), 'run_mode' => 'write', 'review_policy' => 'direct',
-                    'model_alias' => (string) $conversation->attribute( 'model_alias' ), 'provider' => (string) $conversation->attribute( 'provider' ),
-                    'lane' => 'auto', 'state' => 'idle', 'shelf' => $shelf,
-                    'created' => (int) $conversation->attribute( 'created' ), 'modified' => (int) $conversation->attribute( 'modified' ) ) );
-                $thread->setScope( array( 'nodes' => array( (int) $conversation->attribute( 'node_id' ) ) ) );
+                if ( $existingRun )
+                {
+                    // an earlier run of the migration created the thread; only the link back was lost
+                    $thread = expAiThread::fetchByID( (int) $existingRun->attribute( 'thread_id' ) );
+                    $run = $existingRun;
+                    $report['linked']++;
+                }
+                else
+                {
+                    $thread = null;
+                    $run = null;
+                }
+                if ( !$thread )
+                {
+                    $title = self::firstRequest( $conversation );
+                    $thread = new expAiThread( array(
+                        'uuid' => expAiThread::newUuid(), 'user_id' => (int) $conversation->attribute( 'user_id' ),
+                        'title' => expAiText::cut( expAiText::oneLine( $title ), $titleLength ), 'origin' => expAiThread::ORIGIN_PANEL,
+                        'node_id' => (int) $conversation->attribute( 'node_id' ), 'run_mode' => 'write', 'review_policy' => 'direct',
+                        'model_alias' => (string) $conversation->attribute( 'model_alias' ), 'provider' => (string) $conversation->attribute( 'provider' ),
+                        'lane' => 'auto', 'state' => 'idle', 'shelf' => $shelf,
+                        'created' => (int) $conversation->attribute( 'created' ), 'modified' => (int) $conversation->attribute( 'modified' ) ) );
+                    $thread->setScope( array( 'nodes' => array( (int) $conversation->attribute( 'node_id' ) ) ) );
+                    $thread->store();
+                    $run = new expAiThreadRun( array( 'thread_id' => (int) $thread->attribute( 'id' ), 'conversation_id' => $conversationID, 'kind' => 'turn',
+                                                      'state' => 'idle', 'label' => $thread->attribute( 'title' ), 'model_alias' => (string) $conversation->attribute( 'model_alias' ),
+                                                      'started' => (int) $conversation->attribute( 'created' ), 'finished' => (int) $conversation->attribute( 'modified' ),
+                                                      'created' => (int) $conversation->attribute( 'created' ), 'modified' => (int) $conversation->attribute( 'modified' ) ) );
+                    $run->store();
+                    $thread->setAttribute( 'lead_run_id', (int) $run->attribute( 'id' ) );
+                    if ( !$existingRun )
+                        $report['created']++;
+                }
+                $threadID = (int) $thread->attribute( 'id' );
+                $runID = (int) $run->attribute( 'id' );
+                // the links, without rewriting the conversation's messages
+                eZPersistentObject::updateObjectList( array( 'definition' => expAiConversation::definition(),
+                                                             'update_fields' => array( 'thread_id' => $threadID, 'run_id' => $runID ),
+                                                             'conditions' => array( 'id' => $conversationID ) ) );
+                eZPersistentObject::updateObjectList( array( 'definition' => expAiUsageLog::definition(),
+                                                             'update_fields' => array( 'thread_id' => $threadID, 'run_id' => $runID ),
+                                                             'conditions' => array( 'conversation_id' => $conversationID, 'thread_id' => 0 ) ) );
+                eZPersistentObject::updateObjectList( array( 'definition' => expAiDraftLog::definition(),
+                                                             'update_fields' => array( 'thread_id' => $threadID ),
+                                                             'conditions' => array( 'conversation_id' => $conversationID, 'thread_id' => 0 ) ) );
+                $thread->refreshCost();
                 $thread->store();
-                $run = new expAiThreadRun( array( 'thread_id' => (int) $thread->attribute( 'id' ), 'conversation_id' => $conversationID, 'kind' => 'turn',
-                                                  'state' => 'idle', 'label' => $thread->attribute( 'title' ), 'model_alias' => (string) $conversation->attribute( 'model_alias' ),
-                                                  'started' => (int) $conversation->attribute( 'created' ), 'finished' => (int) $conversation->attribute( 'modified' ),
-                                                  'created' => (int) $conversation->attribute( 'created' ), 'modified' => (int) $conversation->attribute( 'modified' ) ) );
-                $run->store();
-                $thread->setAttribute( 'lead_run_id', (int) $run->attribute( 'id' ) );
-                if ( !$existingRun )
-                    $report['created']++;
+                $db->commit();
             }
-            $threadID = (int) $thread->attribute( 'id' );
-            $runID = (int) $run->attribute( 'id' );
-            // the links, without rewriting the conversation's messages
-            eZPersistentObject::updateObjectList( array( 'definition' => expAiConversation::definition(),
-                                                         'update_fields' => array( 'thread_id' => $threadID, 'run_id' => $runID ),
-                                                         'conditions' => array( 'id' => $conversationID ) ) );
-            eZPersistentObject::updateObjectList( array( 'definition' => expAiUsageLog::definition(),
-                                                         'update_fields' => array( 'thread_id' => $threadID, 'run_id' => $runID ),
-                                                         'conditions' => array( 'conversation_id' => $conversationID, 'thread_id' => 0 ) ) );
-            eZPersistentObject::updateObjectList( array( 'definition' => expAiDraftLog::definition(),
-                                                         'update_fields' => array( 'thread_id' => $threadID ),
-                                                         'conditions' => array( 'conversation_id' => $conversationID, 'thread_id' => 0 ) ) );
-            $thread->refreshCost();
-            $thread->store();
-            $db->commit();
+            catch ( Throwable $e )
+            {
+                if ( $db->transactionCounter() > 0 )
+                    $db->rollback();
+                throw $e;
+            }
             $entry['thread_id'] = $threadID;
             $entry['run_id'] = $runID;
             $report['threads'][] = $entry;

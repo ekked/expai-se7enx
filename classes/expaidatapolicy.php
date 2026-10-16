@@ -164,6 +164,18 @@ class expAiDataPolicy
         return implode( '; ', $parts ) . ( $requirement['reasons'] ? ' (' . implode( ', ', $requirement['reasons'] ) . ')' : '' );
     }
 
+    /** @return string the id of the provider the policy is for ('' when not known) */
+    public function providerID()
+    {
+        return (string) $this->provider['ProviderId'];
+    }
+
+    /** @return string the region of the provider ('' when not known) */
+    public function providerRegion()
+    {
+        return (string) $this->provider['Region'];
+    }
+
     /** @return array the provider's region and retention for display */
     public function providerFacts()
     {

@@ -56,6 +56,8 @@ class expAiPlanItemApplier implements expAiRequestApplier
         // a conversation in memory only: the stager names the run of the changes by it
         $conversation = new expAiConversation( array( 'thread_id' => (int) $thread->attribute( 'id' ), 'run_id' => (int) $run->attribute( 'id' ) ) );
         $tool = new expAiToolContext( $config, 0, $conversation );
+        // the answers of a plan's batch (purpose queue.bulk, as the gate sees them)
+        $tool->reader->setRequest( array( 'purpose' => 'queue.bulk' ) );
         $tool->staged = true;
         $stager = new expAiChangeStager( $tool, $thread );
         $language = (string) $params['language'];

@@ -40,7 +40,8 @@ class expAiMcp
     {
         if ( self::$bridgeSeam !== null )
             return self::$bridgeSeam && class_exists( 'expMcpBridge' );
-        return class_exists( 'expMcpBridge' ) && method_exists( 'expMcpBridge', 'call' ) && method_exists( 'expMcpBridge', 'isBridgeSafe' );
+        return class_exists( 'expMcpBridge' ) && method_exists( 'expMcpBridge', 'call' ) && method_exists( 'expMcpBridge', 'isBridgeSafe' )
+            && expAiConfig::extensionActive( 'expmcp' );
     }
 
     /** @return bool expmcp may run the tool in process as the current user */
@@ -56,7 +57,7 @@ class expAiMcp
     {
         if ( self::hasBridgeSeam() )
             return expMcpBridge::toolNames();
-        return class_exists( 'expMcpContentTool' ) ? array_keys( self::LEGACY_BRIDGE_TOOLS ) : array();
+        return class_exists( 'expMcpContentTool' ) && expAiConfig::extensionActive( 'expmcp' ) ? array_keys( self::LEGACY_BRIDGE_TOOLS ) : array();
     }
 
     /** @return bool the name is an MCP tool (bridge or external) */

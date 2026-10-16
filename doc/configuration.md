@@ -54,7 +54,7 @@ settings keep working unchanged). More providers: the next three sections and [p
 | `Providers[]` | `anthropic` | The active providers, in the order the model picker shows them. Each needs a `[Provider_<id>]` group, except `anthropic`, which falls back to `[AISettings]`. |
 | `DefaultModel` | (empty) | The alias of the site default model; empty: `anthropic.<[AISettings] Model>`. |
 | `ProvidersWithoutPolicy[]` | `anthropic` | The models of these providers can be chosen by everyone with `expai/write` (as in 0.0.1.0); every other provider's models need `expai/model_use` (limitation Provider). Empty it to require the policy for everything but the default. |
-| `KeyLocations[]` | `settings/override`, `extension/*/settings` | Where an `ApiKey` or `Token` may be set besides `settings/override` (fnmatch patterns relative to the installation). A file there is accepted only when it is not shipped with the code: git does not track it, or, in a release without git, it lies outside the release (a symlink to shared files). A tracked file is always reported on `expai/models`. |
+| `KeyLocations[]` | `settings/override`, `extension/*settings` | Where an `ApiKey` or `Token` may be set besides `settings/override` (fnmatch patterns relative to the installation). A file there is accepted only when it is not shipped with the code: git does not track it, or, in a release without git, it lies outside the release (a symlink to shared files). A tracked file is always reported on `expai/models`. |
 
 ## [Provider_<id>]: one provider
 
@@ -177,6 +177,19 @@ Each `[FieldAction_<name>]`:
 | `LogRequests` | `disabled` | `enabled` stores the full request with each row (debugging only: it contains content and the editors' words), and lets "Prompt again" fill in the earlier request. |
 
 See [usage-tracking.md](usage-tracking.md).
+
+## [RetentionSettings]: how long the editors' words are kept
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `Mode` | `delete` | `report`: the cronjob only says what it would remove. |
+| `ThreadKeepDays` | `365` | A thread not modified for this many days is removed with its runs, events, proposals, checkpoints, plans and conversations; not when it is pinned, in review, waiting for an answer, or running. |
+| `ConversationKeepDays` | `365` | A conversation not modified for this many days is removed, unless it belongs to a thread that stays. |
+| `PromptSummaryKeepDays` | `365` | The request summary of a draft log row is blanked after this many days; the row stays. |
+
+`0` keeps the rows. Independent of the periods, the threads and conversations of a user that no longer exists are
+removed. The cronjob part `expai` (`expai_prune.php`) and `bin/php/expaithreads.php --prune` do it
+([threads.md](threads.md#retention)).
 
 ## [Limits]: optional limits
 
@@ -429,7 +442,7 @@ See [mcp.md](mcp.md).
 | `admininterface.ini` | the tabs `expai` (content navigation part) and `expai_media` (media), header template `expai_header.tpl`, body `expai.tpl` |
 | `content.ini` | `[EditSettings] AdditionalTemplates[]=content/edit/expai.tpl` |
 | `menu.ini` | the entries of the Dashboard menu (`[Leftmenu_my]`: Exponential Intelligence, EI: Vector, EI: Chains, EI: Log, EI: Help), of Setup (`[Leftmenu_setup]`: EI: Summary, EI: Models, EI: Budgets, Job queue) and of Design (`[Leftmenu_design]`: Missing alt text), each with its policies ([dashboard.md](dashboard.md)) |
-| `cronjob.ini` | the cronjob part `expai`: `expai_queue.php` (resumes held jobs, releases lost batch submits), `expai_prune.php` (usage rows older than `RetentionDays`; draft log rows of removed objects marked `deleted`), `expai_thread_prune.php` (thread events, proposals, checkpoints); run it with `-s <admin siteaccess>` |
+| `cronjob.ini` | the cronjob part `expai`: `expai_queue.php` (resumes held jobs, releases lost batch submits), `expai_prune.php` (usage rows older than `RetentionDays`; draft log rows of removed objects marked `deleted`; threads, conversations and request summaries after `[RetentionSettings]`, and those of removed users), `expai_thread_prune.php` (thread events, proposals, checkpoints); run it with `-s <admin siteaccess>` |
 | `dashboard.ini` | the dashboard block `expai_drafts` (Priority 35, 5 items, `expai/write`) |
 | `browse.ini` | `[ExpAiStartWriting]`: the content browser of "Change location" (single node) |
 | `site.ini` | `TranslationExtensions[]=expai`, `[TemplateSettings] ExtensionAutoloadPath[]=expai` (the template operators `expai_money`, `expai_tokens`, `expai_number`) |

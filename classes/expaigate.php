@@ -131,7 +131,7 @@ class expAiGate
         $config = $config ?: expAiConfig::instance();
         foreach ( $config->arr( 'RequestVeto', 'Rules' ) as $rule )
         {
-            if ( !preg_match( '/^[A-Za-z0-9_]{1,40}$/', $rule ) || !$config->ini()->hasGroup( 'RequestVeto_' . $rule ) )
+            if ( !self::validRule( $config, $rule ) )
                 continue;
             if ( self::ruleMatches( $config, $rule, $context ) )
             {
@@ -151,8 +151,109 @@ class expAiGate
         return array( '', '' );
     }
 
-    /** @return bool every condition the rule sets is met by the request (a rule without conditions meets every request) */
-    public static function ruleMatches( expAiConfig $config, $rule, array $context )
+    /**
+     * The veto of the rules for one object a request reads (a tool's read, a list, a service result): the rules with a
+     * condition on the content (Sections[], Classes[], Subtrees[]) are checked against the object (its section, class
+     * and every location), the siteaccess, and what is known of the request (provider, region, purpose). A condition
+     * on a part of the request that is not known counts as met: a rule that could refuse the object does (fail
+     * closed); so does a condition on a fact of the content that is missing (no location, section or class). Rules
+     * without a condition on the content concern the request as a whole and are checked by check().
+     *
+     * @param array $request siteaccess (default: the current one), provider, region, purpose
+     * @return array( string reason ('' when allowed), string source (rule:<name>) )
+     */
+    public static function objectVeto( eZContentObject $object, array $request = array(), ?expAiConfig $config = null )
+    {
+        $config = $config ?: expAiConfig::instance();
+        $paths = array();
+        foreach ( (array) $object->assignedNodes( false ) as $node )
+            $paths[] = (string) ( is_array( $node ) ? $node['path_string'] : $node->attribute( 'path_string' ) );
+        $context = array( 'section_id' => (int) $object->attribute( 'section_id' ), 'class_identifier' => (string) $object->attribute( 'class_identifier' ),
+                          'path' => implode( '', $paths ) );
+        return self::contentVeto( $context, $request, $config );
+    }
+
+    /**
+     * objectVeto() on the facts of the content: section_id, class_identifier, path (the path strings of every location
+     * of the object, joined).
+     * @return array( string reason, string source )
+     */
+    public static function contentVeto( array $content, array $request, expAiConfig $config )
+    {
+        $context = $content + array( 'siteaccess' => isset( $request['siteaccess'] ) ? (string) $request['siteaccess'] : self::siteAccess() );
+        $unknown = array();
+        foreach ( array( 'provider', 'region', 'purpose' ) as $key )
+        {
+            $context[$key] = isset( $request[$key] ) ? (string) $request[$key] : '';
+            if ( $context[$key] === '' )
+                $unknown[] = $key;
+        }
+        if ( $context['siteaccess'] === '' )
+            $unknown[] = 'siteaccess';
+        // the facts of the content fail closed as well: an object without a location (a new draft), without a
+        // section or without a class meets the condition on it
+        if ( !isset( $context['section_id'] ) || (int) $context['section_id'] <= 0 )
+            $unknown[] = 'section_id';
+        if ( !isset( $context['class_identifier'] ) || (string) $context['class_identifier'] === '' )
+            $unknown[] = 'class_identifier';
+        if ( !isset( $context['path'] ) || (string) $context['path'] === '' )
+            $unknown[] = 'path';
+        foreach ( $config->arr( 'RequestVeto', 'Rules' ) as $rule )
+        {
+            $group = 'RequestVeto_' . $rule;
+            if ( !self::validRule( $config, $rule ) )
+                continue;
+            if ( !$config->arr( $group, 'Sections' ) && !$config->arr( $group, 'Classes' ) && !$config->arr( $group, 'Subtrees' ) )
+                continue;
+            if ( self::ruleMatches( $config, $rule, $context, $unknown ) )
+            {
+                $reason = trim( (string) $config->get( $group, 'Reason', '' ) );
+                return array( $reason !== '' ? expAiText::cut( $reason, 200 ) : 'This request is not allowed on this site.', 'rule:' . $rule );
+            }
+        }
+        return array( '', '' );
+    }
+
+    /** @return bool a valid rule of [RequestVeto] has a condition on the content (Sections[], Classes[], Subtrees[]) */
+    public static function hasContentRules( expAiConfig $config )
+    {
+        foreach ( $config->arr( 'RequestVeto', 'Rules' ) as $rule )
+        {
+            $group = 'RequestVeto_' . $rule;
+            if ( self::validRule( $config, $rule )
+                 && ( $config->arr( $group, 'Sections' ) || $config->arr( $group, 'Classes' ) || $config->arr( $group, 'Subtrees' ) ) )
+                return true;
+        }
+        return false;
+    }
+
+    /** @var array rule names already reported as invalid (one warning per process) */
+    protected static $invalidRules = array();
+
+    /**
+     * @return bool the rule has a valid name and its group [RequestVeto_<rule>] exists; else it is skipped, with a
+     *              warning in the debug log (once per process), so that a typing error is visible
+     */
+    public static function validRule( expAiConfig $config, $rule )
+    {
+        $rule = (string) $rule;
+        if ( preg_match( '/^[A-Za-z0-9_]{1,40}$/', $rule ) && $config->ini()->hasGroup( 'RequestVeto_' . $rule ) )
+            return true;
+        if ( !isset( self::$invalidRules[$rule] ) )
+        {
+            self::$invalidRules[$rule] = true;
+            eZDebug::writeWarning( "expai: [RequestVeto] Rules[]=$rule is skipped: " . ( preg_match( '/^[A-Za-z0-9_]{1,40}$/', $rule )
+                ? "there is no group [RequestVeto_$rule]" : 'the name may only have letters, digits and _ (at most 40)' ), __METHOD__ );
+        }
+        return false;
+    }
+
+    /**
+     * @param string[] $unknown keys of the context (siteaccess, provider, region, purpose, section_id, class_identifier,
+     *                          path) whose value is not known: a condition on them counts as met
+     * @return bool every condition the rule sets is met by the request (a rule without conditions meets every request)
+     */
+    public static function ruleMatches( expAiConfig $config, $rule, array $context, array $unknown = array() )
     {
         $group = 'RequestVeto_' . $rule;
         $lists = array( 'Sections' => (string) ( isset( $context['section_id'] ) ? $context['section_id'] : '' ),
@@ -160,14 +261,18 @@ class expAiGate
                         'SiteAccesses' => isset( $context['siteaccess'] ) ? (string) $context['siteaccess'] : '',
                         'Providers' => isset( $context['provider'] ) ? (string) $context['provider'] : '',
                         'Regions' => isset( $context['region'] ) ? (string) $context['region'] : '' );
+        $keys = array( 'Sections' => 'section_id', 'Classes' => 'class_identifier', 'SiteAccesses' => 'siteaccess', 'Providers' => 'provider',
+                       'Regions' => 'region' );
         foreach ( $lists as $name => $value )
         {
             $allowed = $config->arr( $group, $name );
+            if ( $allowed && in_array( $keys[$name], $unknown, true ) )
+                continue;
             if ( $allowed && ( $value === '' || $value === '0' || !in_array( $value, $allowed, true ) ) )
                 return false;
         }
         $subtrees = $config->arr( $group, 'Subtrees' );
-        if ( $subtrees )
+        if ( $subtrees && !in_array( 'path', $unknown, true ) )
         {
             $path = isset( $context['path'] ) ? (string) $context['path'] : '';
             $inside = false;
@@ -178,7 +283,7 @@ class expAiGate
                 return false;
         }
         $purposes = $config->arr( $group, 'Purposes' );
-        if ( $purposes )
+        if ( $purposes && !in_array( 'purpose', $unknown, true ) )
         {
             $purpose = isset( $context['purpose'] ) ? (string) $context['purpose'] : '';
             $hit = false;
@@ -231,7 +336,7 @@ class expAiGate
         $config = $config ?: expAiConfig::instance();
         $resumed = 0;
         $held = 0;
-        if ( !class_exists( 'expQueue' ) || !expQueue::installed() )
+        if ( !expAiQueue::available() )
             return array( 'resumed' => 0, 'still_held' => 0 );
         $rows = (array) eZPersistentObject::fetchObjectList( expQueueJob::definition(), null,
             array( 'state' => 'held', 'last_error' => array( 'like', self::HELD_PREFIX . '%' ) ), array( 'id' => 'asc' ),

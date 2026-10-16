@@ -13,6 +13,9 @@
  *           [--group=<label>] [--group-budget=<amount>]  queues one request (the queue's workers run it)
  *   --login=<user>   the user (required for request)
  *
+ * -s <siteaccess> is mandatory: the script prints the siteaccess and its database (stderr) and does not run
+ * where expai is not active (expAiScript).
+ *
  * @copyright Copyright (C) 1998 - 2026 7x & Exponential Foundation. All rights reserved.
  * @license GNU General Public License v2.0 (or any later version)
  * @package expai
@@ -30,7 +33,9 @@ $options = $script->getOptions( '[model:][purpose:][class:][priority:][deadline:
     'priority' => '0..100', 'deadline' => 'seconds from now', 'state' => 'jobs: only this state', 'limit' => 'rows', 'prompt' => 'request: the text',
     'lane' => 'request: a lane or auto', 'max-tokens' => 'request: the longest answer', 'group' => 'request: a new job group with this label',
     'group-budget' => 'request: the budget of the new group', 'login' => 'the user' ) );
+expAiScript::requireSiteAccess( $script, $options );
 $script->initialize();
+expAiScript::announce( $script );
 
 $command = isset( $options['arguments'][0] ) ? (string) $options['arguments'][0] : '';
 $config = expAiConfig::instance();

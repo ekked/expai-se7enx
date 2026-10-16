@@ -79,7 +79,11 @@ nothing.
 
 The run page `expai/chain/(run)/<id>` shows the state, cost, tokens, time, the draft (version view and edit links),
 the planned steps, every step with its model, lane, verdict, score, issues, checklist and cost, the meta data and the
-link check, and the text so far.
+link check, and the text so far. It shows the content's values, so only the editor who started the run, holders of
+`expai/log`, and users who may use the chain (`expai/chain`) and edit the run's object see it. A run that has not
+created its object yet is seen by its starter and the holders of `expai/log` only: who may edit the parent node does
+not see another editor's unpublished document. The same rule decides who may act on a run; it is checked for the user
+asked about, not for whoever is logged in.
 
 While the run waits, an editor who may act on it (below) has three buttons:
 
