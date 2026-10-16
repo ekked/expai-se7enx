@@ -1110,6 +1110,34 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>The structure of the field could not be checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count table cell</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count table cells</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count header cell</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count header cells</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count merged cell</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count merged cells</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>%count embedded object</source>
         <translation type="unfinished"></translation>
     </message>

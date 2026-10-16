@@ -1110,6 +1110,34 @@
         <translation>Der ursprüngliche Wert wurde beibehalten.</translation>
     </message>
     <message>
+        <source>The structure of the field could not be checked.</source>
+        <translation>Die Struktur des Felds konnte nicht geprüft werden.</translation>
+    </message>
+    <message>
+        <source>%count table cell</source>
+        <translation>%count Tabellenzelle</translation>
+    </message>
+    <message>
+        <source>%count table cells</source>
+        <translation>%count Tabellenzellen</translation>
+    </message>
+    <message>
+        <source>%count header cell</source>
+        <translation>%count Kopfzelle</translation>
+    </message>
+    <message>
+        <source>%count header cells</source>
+        <translation>%count Kopfzellen</translation>
+    </message>
+    <message>
+        <source>%count merged cell</source>
+        <translation>%count verbundene Zelle</translation>
+    </message>
+    <message>
+        <source>%count merged cells</source>
+        <translation>%count verbundene Zellen</translation>
+    </message>
+    <message>
         <source>%count embedded object</source>
         <translation>%count eingebettetes Objekt</translation>
     </message>

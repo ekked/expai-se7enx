@@ -47,12 +47,12 @@ class expAiStructureScriptTest extends expAiCoreTestCase
 
     public function testEveryStringOfTheReviewIsInTheEditFormAndTranslated(): void
     {
-        $this->assertSame( array( 'embed', 'table', 'custom', 'anchor', 'literal', 'link', 'attribute' ), self::kinds() );
+        $this->assertSame( array( 'embed', 'table', 'cell', 'th', 'merge', 'custom', 'anchor', 'literal', 'link', 'attribute' ), self::kinds() );
         $template = file_get_contents( self::root() . '/design/admin/templates/content/edit/expai.tpl' );
         preg_match_all( "/'([a-z0-9_]+)', '((?:[^'\\\\]|\\\\.)*)'\|i18n\( 'extension\/expai\/edit' \)/", $template, $m );
         $strings = array_combine( $m[1], $m[2] );
 
-        $keys = array( 'review_title', 'review_note', 'review_changed', 'review_lost', 'review_count', 'apply_anyway',
+        $keys = array( 'review_title', 'review_note', 'review_changed', 'review_lost', 'review_count', 'review_unchecked', 'apply_anyway',
                        'keep_original', 'copy_text', 'copied', 'copy_failed', 'kept' );
         foreach ( self::kinds() as $kind )
         {
@@ -62,7 +62,7 @@ class expAiStructureScriptTest extends expAiCoreTestCase
         // the keys the scripts read
         $scripts = file_get_contents( self::root() . '/design/admin/javascript/expai.js' )
                  . file_get_contents( self::root() . '/design/admin/javascript/expai_presets.js' );
-        foreach ( array( 'review_title', 'review_note', 'review_changed', 'review_lost', 'review_count', 'apply_anyway', 'keep_original', 'copy_text', 'copied', 'copy_failed', 'kept' ) as $key )
+        foreach ( array( 'review_title', 'review_note', 'review_changed', 'review_lost', 'review_count', 'review_unchecked', 'apply_anyway', 'keep_original', 'copy_text', 'copied', 'copy_failed', 'kept' ) as $key )
             $this->assertMatchesRegularExpression( '/\b[SR]\.' . $key . '\b/', $scripts, "a script reads $key" );
 
         foreach ( glob( self::root() . '/translations/*/translation.ts' ) as $file )
@@ -96,11 +96,11 @@ class expAiStructureScriptTest extends expAiCoreTestCase
         $node = self::node();
         if ( $node === '' )
             $this->markTestSkipped( 'node is not installed' );
-        $field = '<p class="lead">Intro <a href="ezobject://12">obj</a> <a href="https://example.invalid/">ext</a></p>'
+        $field = '<p class="lead">Intro <a href="ezobject://12">obj</a> <a href="https://example.invalid/" target="_blank" title="Ext">ext</a></p>'
                . '<p><img id="eZObject_57" src="/a.jpg" alt="medium" /></p>'
-               . '<table border="1"><tbody><tr><td>cell</td></tr></tbody></table>'
+               . '<table border="1"><tbody><tr><th>head</th><th>head</th></tr><tr><td colspan="2">cell</td></tr></tbody></table>'
                . '<div class="ezoeItemCustomTag factbox" type="custom"><p>box</p></div>'
-               . '<h2><a name="top" class="mceItemAnchor"></a>Top</h2><pre>code</pre>';
+               . '<h2><a name="top" class="mceItemAnchor"></a>Top</h2><pre>code</pre><literal><![CDATA[<table>]]></literal>';
         $answer = expAiText::sanitizeHtml( $field );
         $script = 'const S = require( ' . json_encode( self::root() . '/design/admin/javascript/expai_structure.js' ) . ' );'
                 . 'process.stdout.write( JSON.stringify( S.loss( process.argv[1], process.argv[2] ) ) );';
@@ -108,7 +108,7 @@ class expAiStructureScriptTest extends expAiCoreTestCase
         $loss = array();
         foreach ( json_decode( (string) $out, true ) ?: array() as $l )
             $loss[$l['kind']] = $l['lost'];
-        $this->assertSame( array( 'embed' => 1, 'table' => 1, 'custom' => 1, 'anchor' => 1, 'literal' => 1, 'link' => 1, 'attribute' => 1 ), $loss,
+        $this->assertSame( array( 'embed' => 1, 'table' => 1, 'cell' => 3, 'th' => 2, 'merge' => 1, 'custom' => 1, 'anchor' => 1, 'literal' => 2, 'link' => 1, 'attribute' => 4 ), $loss,
                            'the cleaned answer: ' . $answer );
     }
 

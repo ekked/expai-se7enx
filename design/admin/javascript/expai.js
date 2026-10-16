@@ -218,6 +218,8 @@
 
     /* --------------------------------------------- structure and stale guard */
 
+    var structureWarned = false;
+
     function clearReview( host ) {
         Array.prototype.forEach.call( host ? host.querySelectorAll( ':scope > .exp-ai-review' ) : [], function ( box ) { box.remove(); } );
     }
@@ -225,8 +227,9 @@
     /**
      * Puts an answer into a field unless that would lose structure or overwrite a change (doc/edit-view-integration.md
      * "Structure is never lost silently"). A rich text field (ezxmltext, not a part of a field) whose answer has fewer
-     * embedded objects, tables, custom tags, anchors, literals, internal links or formatted blocks than the field now
-     * has (ExpAiStructure), and any field that changed since the request was sent, is not written: a review in `host`
+     * embedded objects, tables, table cells, header cells, merged cells, custom tags, anchors, literals, internal links
+     * or formatting and link attributes than the field now has (ExpAiStructure), every rich text answer when the
+     * detector is missing, and any field that changed since the request was sent, is not written: a review in `host`
      * shows the answer, what would be lost or that the field changed, and "Apply anyway", "Keep the original" and,
      * with the clipboard API, "Copy text". Only "Apply anyway" writes.
      *
@@ -242,8 +245,14 @@
         var rich = !!( o.ctx.attribute && o.ctx.attribute.datatype === 'ezxmltext' && !o.ctx.part );
         var stale = o.sent !== undefined && o.sent !== null && !( Structure ? Structure.same( current, o.sent ) : current === o.sent );
         var lost = rich && Structure ? Structure.loss( current, o.value ) : [];
+        // without the detector rich text is never overwritten unseen
+        var unchecked = rich && !Structure;
+        if ( unchecked && !structureWarned && window.console ) {
+            structureWarned = true;
+            window.console.warn( 'expai: expai_structure.js is not loaded; answers to rich text fields are shown for review' );
+        }
         clearReview( o.host );
-        if ( !stale && !lost.length ) {
+        if ( !stale && !lost.length && !unchecked ) {
             return { written: o.apply() !== false, review: false };
         }
         var text = Structure ? Structure.toText( o.value ) : String( o.value || '' );
@@ -253,6 +262,9 @@
         }
         if ( lost.length ) {
             reasons.push( fmt( S.review_lost, { '%list': Structure.describe( lost, S ) } ) );
+        }
+        if ( unchecked ) {
+            reasons.push( S.review_unchecked );
         }
         var clipboard = window.navigator && window.navigator.clipboard && window.navigator.clipboard.writeText;
         var box = document.createElement( 'div' );

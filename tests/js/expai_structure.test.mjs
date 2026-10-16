@@ -7,7 +7,7 @@ import { createRequire } from 'node:module';
 const require = createRequire( import.meta.url );
 const S = require( '../../design/admin/javascript/expai_structure.js' );
 
-const none = { embed: 0, table: 0, custom: 0, anchor: 0, literal: 0, link: 0, attribute: 0 };
+const none = { embed: 0, table: 0, cell: 0, th: 0, merge: 0, custom: 0, anchor: 0, literal: 0, link: 0, attribute: 0 };
 const counts = ( over ) => Object.assign( {}, none, over );
 
 test( 'plain answer markup has no structure', () => {
@@ -34,7 +34,7 @@ test( 'tables, custom tags, anchors, literals and internal links', () => {
         + '<pre>code<br>line</pre>'
         + '<p><a href="ezobject://12">obj</a> <a href="eznode://3#x">node</a> <a href="/about">path</a>'
         + ' <a href="#top">jump</a> <a href="mailto:a@b.c">mail</a></p>';
-    assert.deepEqual( S.count( html ), counts( { table: 1, custom: 4, anchor: 2, literal: 1, link: 3 } ) );
+    assert.deepEqual( S.count( html ), counts( { table: 1, cell: 1, custom: 4, anchor: 2, literal: 1, link: 3, attribute: 1 } ) );
 } );
 
 test( 'formatting attributes on blocks, without the editors\' own classes', () => {
@@ -49,7 +49,7 @@ test( 'the simplified XML of a textarea without an editor', () => {
         + '<embed href="ezobject://7" size="medium" /><embed-inline href="eznode://8"/></paragraph>'
         + '<paragraph><anchor name="a1"/><custom name="factbox">f</custom><literal class="html">&lt;b&gt;</literal></paragraph>'
         + '<paragraph><table><tr><td>x</td></tr></table></paragraph></section>';
-    assert.deepEqual( S.count( xml ), counts( { embed: 2, table: 1, custom: 1, anchor: 2, literal: 1, link: 1, attribute: 1 } ) );
+    assert.deepEqual( S.count( xml ), counts( { embed: 2, table: 1, cell: 1, custom: 1, anchor: 2, literal: 1, link: 1, attribute: 2 } ) );
 } );
 
 test( 'data-ezelement markup', () => {
@@ -59,11 +59,11 @@ test( 'data-ezelement markup', () => {
 
 test( 'loss lists the kinds the answer has fewer of', () => {
     const current = '<p><img id="eZObject_1" src="a" /></p><p><img id="eZObject_2" src="b" /></p><table><tr><td>x</td></tr></table><p>t</p>';
-    assert.deepEqual( S.loss( current, '<p>Shorter text.</p>' ), [ { kind: 'embed', lost: 2 }, { kind: 'table', lost: 1 } ] );
+    assert.deepEqual( S.loss( current, '<p>Shorter text.</p>' ), [ { kind: 'embed', lost: 2 }, { kind: 'table', lost: 1 }, { kind: 'cell', lost: 1 } ] );
     assert.deepEqual( S.loss( current, current + '<p>more</p>' ), [] );
     assert.deepEqual( S.loss( '<p>a</p>', '<p>b</p>' ), [] );
     // a new element does not make up for another kind
-    assert.deepEqual( S.loss( '<table><tr><td>x</td></tr></table>', '<pre>x</pre>' ), [ { kind: 'table', lost: 1 } ] );
+    assert.deepEqual( S.loss( '<table><tr><td>x</td></tr></table>', '<pre>x</pre>' ), [ { kind: 'table', lost: 1 }, { kind: 'cell', lost: 1 } ] );
 } );
 
 test( 'describe uses singular and plural strings', () => {
@@ -76,8 +76,58 @@ test( 'describe uses singular and plural strings', () => {
 test( 'toText keeps paragraphs and list items and drops markup', () => {
     assert.equal( S.toText( '<p>One &amp; <strong>two</strong></p><ul><li>a</li><li>b</li></ul><p>x<br>y</p><script>alert(1)</script>' ),
                   'One & two\n\n- a\n- b\n\nx\ny' );
-    assert.equal( S.toText( 'plain &lt;b&gt;' ), 'plain <b>' );
+    // plain text stays as it is, also with < and > in it
+    assert.equal( S.toText( '3 < 5 und 7 > 2' ), '3 < 5 und 7 > 2' );
+    assert.equal( S.toText( 'plain &lt;b&gt;' ), 'plain &lt;b&gt;' );
+    assert.equal( S.toText( '<p>3 < 5 und 7 > 2</p>' ), '3 < 5 und 7 > 2' );
     assert.equal( S.toText( '<p>&#169; &#x263A;</p>' ), '© ☺' );
+} );
+
+test( 'the layout of a table: cells, header cells, merged cells, table and cell attributes', () => {
+    const table = '<table border="1" width="100%" class="list"><tbody>'
+        + '<tr><th>A</th><th colspan="2">B</th></tr>'
+        + '<tr><td rowspan="2" align="right">1</td><td>2</td><td>3</td></tr>'
+        + '<tr><td colspan="1" rowspan="1">4</td><td>5</td></tr></tbody></table>';
+    assert.deepEqual( S.count( table ), counts( { table: 1, cell: 7, th: 2, merge: 2, attribute: 4 } ) );
+    // the same table with the merged cells undone, the header cells turned into data cells and no attributes
+    const flat = '<table><tbody><tr><td>A</td><td>B</td><td></td></tr><tr><td>1</td><td>2</td><td>3</td></tr>'
+        + '<tr><td></td><td>4</td><td>5</td></tr></tbody></table>';
+    assert.deepEqual( S.loss( table, flat ), [ { kind: 'th', lost: 2 }, { kind: 'merge', lost: 2 }, { kind: 'attribute', lost: 4 } ] );
+    // a row less
+    assert.deepEqual( S.loss( table, table.replace( /<tr><td colspan[\s\S]*?<\/tr>/, '' ) ), [ { kind: 'cell', lost: 2 } ] );
+} );
+
+test( 'link attributes count, also on external links and anchors', () => {
+    const html = '<p><a href="https://example.com/" target="_blank" title="Example">x</a>'
+        + ' <a href="mailto:a@b.c" class="mail" id="m1">y</a> <a href="ezobject://4" view="full" customattributes="k|v">z</a>'
+        + ' <a name="top" class="jump"></a><link href="https://x.org/" target="_self">w</link></p>';
+    assert.deepEqual( S.count( html ), counts( { link: 1, anchor: 1, attribute: 8 } ) );
+    assert.deepEqual( S.loss( html, '<p><a href="https://example.com/">x</a> <a href="mailto:a@b.c">y</a> z <a name="top"></a> w</p>' ),
+                      [ { kind: 'link', lost: 1 }, { kind: 'attribute', lost: 8 } ] );
+} );
+
+test( 'CDATA and the content of script, style, literal and pre are no markup', () => {
+    assert.deepEqual( S.count( '<literal><![CDATA[<table><tr><td>x</td></tr></table>]]></literal>' ), counts( { literal: 1 } ) );
+    assert.deepEqual( S.count( '<![CDATA[<table>]]><p>a</p>' ), none );
+    assert.deepEqual( S.count( '<script>var t = "<table><img src=x>";</script><style>a:before{content:"<table>"}</style>' ), none );
+    assert.deepEqual( S.count( '<pre><span>a</span><br><table></pre><table></table>' ), counts( { literal: 1, table: 1 } ) );
+    assert.deepEqual( S.count( '<script>"<table>"' ), none );
+} );
+
+test( 'external links of every kind are no internal links', () => {
+    const html = '<p><a href="tel:+491234">t</a> <a href="www.example.de">w</a> <a href="ftp://x.org/f">f</a>'
+        + ' <a href="HTTPS://EXAMPLE.COM/">h</a> <a href="//cdn.example.com/x">c</a> <a href="#top">j</a> <link url_id="5">u</link></p>';
+    assert.deepEqual( S.count( html ), none );
+    assert.deepEqual( S.count( '<a href="/about">a</a><a href="eznode://2">b</a><link node_id="3">c</link>' ), counts( { link: 3 } ) );
+} );
+
+test( 'an unclosed embed or literal ends at the next block or at the end around it', () => {
+    assert.deepEqual( S.count( '<div id="eZObject_1" class="ezoeItemNonEditable"><span>preview</span><table><tr><td>x</td></tr></table>' ),
+                      counts( { embed: 1, table: 1, cell: 1 } ) );
+    assert.deepEqual( S.count( '<p><iframe src="https://v.example/"><a href="/x">x</a></p><h2 class="t">T</h2>' ), counts( { embed: 1, attribute: 1 } ) );
+    assert.deepEqual( S.count( '<section><pre>code</section><table></table>' ), counts( { literal: 1, table: 1 } ) );
+    // a closed embed keeps its preview out, blocks in it too
+    assert.deepEqual( S.count( '<div id="eZObject_1"><div><table></table></div></div><p>a</p>' ), counts( { embed: 1 } ) );
 } );
 
 test( 'an unclosed comment hides the rest, a closed one only itself', () => {
@@ -98,5 +148,9 @@ test( 'malformed markup does not hang the scanner', () => {
     S.count( '<p '.repeat( 50000 ) );
     S.count( '<!--'.repeat( 50000 ) );
     S.count( '<p a="'.repeat( 50000 ) );
+    S.count( '<![CDATA['.repeat( 50000 ) );
+    S.count( '<script>'.repeat( 50000 ) );
+    S.count( '<div id="eZObject_1">'.repeat( 50000 ) );
+    S.count( '<pre><span>'.repeat( 50000 ) );
     assert.ok( Date.now() - start < 2000 );
 } );

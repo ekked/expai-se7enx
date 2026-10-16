@@ -66,7 +66,11 @@ answer, which only has `p, h2-h4, strong, em, ul, ol, li, a href`: embedded obje
 anchors, literals, internal links and formatting attributes were lost, and ezautosave stored the loss.
 
 - `expai_structure.js` (new, loaded before expai.js) counts the structure-bearing elements of an ezxmltext field and of
-  the answer, in the HTML of the Online Editor and of Tiptap and in the simplified XML alike.
+  the answer, in the HTML of the Online Editor and of Tiptap and in the simplified XML alike: embedded objects, tables,
+  table cells, header cells, merged cells, custom tags, anchors, literals, internal links, and each formatting or link
+  attribute (`target`, `title`, a class ... also on external links). CDATA and the content of `script`, `style` and
+  literals are not read as markup; an unclosed embed does not hide the rest of the value.
+- Without the detector, every answer to a rich text field is shown for review; it is never written unseen.
 - When the answer has fewer of any kind, it is not written. The field's bar shows a review instead: the answer, what
   would be lost ("2 embedded objects, 1 table would be lost."), and **Apply anyway**, **Keep the original** and
   **Copy text**. Only **Apply anyway** writes, with Undo as before.

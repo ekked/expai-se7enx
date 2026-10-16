@@ -79,15 +79,22 @@ into a field, expai.js (`ExpAi.guardedApply()`) checks two things:
   | --- | --- |
   | embedded objects | `<img>`, elements with `id="eZObject_<id>"`/`eZNode_<id>`, `ezoeItemNonEditable`/`ezoeItemContentType*` embeds of both editors, `data-ezelement="ezembed*"`, `<embed>`/`<embed-inline>` of the simplified XML, `<object>`, `<iframe>`, `<video>`, `<audio>`; the preview inside an embed is not counted |
   | tables | `<table>` |
+  | table cells | `<td>`, `<th>` (a row or a cell less) |
+  | header cells | `<th>` (a header cell turned into a data cell) |
+  | merged cells | what `colspan`/`rowspan` above 1 span beyond their own cell (merged cells undone) |
   | custom tags | `class="ezoeItemCustomTag ..."`, `type="custom"`, `data-ezelement="eztemplate*"`, `<custom>`, `<sub>`, `<sup>` |
   | anchors | `<a name>`/`<a id>` without `href`, `<anchor>`, `<header anchor_name>` |
   | literals | `<pre>`, `<literal>` |
-  | internal links | links to `ezobject://`, `eznode://`, a path on the site, or with `object_id`/`node_id`/`url_id` (the answer keeps only `http(s)` and `mailto` links) |
-  | formatting attributes | blocks, list items, cells, strong and emphasize with `align`, `customattributes`, `custom:*` or a class of their own (the editors' `ezoe*`/`mce*` classes do not count) |
+  | internal links | links to `ezobject://`, `eznode://`, a path on the site (`/about`), or with `object_id`/`node_id`; links with a scheme of their own (`http`, `mailto`, `tel`, `ftp` ...), without one (`www.example.com`), protocol-relative ones and `#fragment` links are external and do not count |
+  | formatting attributes | each `align`, `valign`, `width`, `border`, `cellpadding`, `cellspacing`, `customattributes`, `target`, `title`, `view` and `custom:*` attribute, a class of its own (the editors' `ezoe*`/`mce*` classes do not count) and the `id` of a link, on any element but an embed: blocks, tables and cells, links (external ones too) and anchors |
 
   It reads the HTML of the Online Editor (TinyMCE) and of Tiptap (exp_oe_tiptap) and the simplified XML of a textarea
-  without an editor alike, with a small tag scanner (no DOM). When the answer has fewer of any kind, it is not
-  written.
+  without an editor alike, with a small tag scanner (no DOM). Comments, CDATA sections and the content of `script`,
+  `style`, `pre`/`literal` and of embeds (the editor's preview) are not read as markup. An embed or literal left open
+  does not swallow the rest: it ends with the element around it, and when it is still open at the end the value is
+  read once more with a skipped part also ending where the next block starts. When the answer has fewer of any kind,
+  it is not written. When `expai_structure.js` is not loaded, every answer to a rich text field is shown for review
+  ("The structure of the field could not be checked.") and the console says so once.
 - **A change meanwhile** (every datatype, also the parts of an xrowmetadata field): the value the request sent is kept;
   when the field differs once the answer is there (white space between tags aside), the answer is not written.
 
@@ -101,7 +108,7 @@ The same check runs for the field actions, the presets and the Improve menu (`ex
 fields": a field of a fill that needs a review gets it in its bar (or in a box of its own after the label when the
 field has no bar), and the note of the fill counts the answers not written. The strings come from the edit form's
 configuration (`content/edit/expai.tpl`, context `extension/expai/edit`): `review_*`, `apply_anyway`,
-`keep_original`, `copy_text`, `copied`, `copy_failed`, `kept` and `lost_<kind>_1`/`lost_<kind>_n` per kind.
+`keep_original`, `copy_text`, `copied`, `copy_failed`, `kept`, `review_unchecked` and `lost_<kind>_1`/`lost_<kind>_n` per kind.
 
 An extension that writes answers into fields itself calls
 `ExpAi.guardedApply( { ctx, adapter, value, sent, host, strings, apply, kept } )`; it returns `{written, review}`.
