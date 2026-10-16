@@ -38,7 +38,7 @@ class expAiChainSchema
                 'chain' => $varchar( 40 ),
                 'chain_hash' => $varchar( 40 ),
                 'class_identifier' => $varchar( 50 ),
-                'cost_micros' => $int,
+                'cost_micros' => expAiSchema::BIGINT,
                 'created' => $int,
                 'current_step' => $varchar( 40 ),
                 'data' => $text,
@@ -70,7 +70,7 @@ class expAiChainSchema
         $schema['expai_chain_step'] = array(
             'name' => 'expai_chain_step',
             'fields' => array(
-                'cost_micros' => $int,
+                'cost_micros' => expAiSchema::BIGINT,
                 'created' => $int,
                 'finished' => $int,
                 'id' => array( 'type' => 'auto_increment', 'default' => false ),

@@ -9,6 +9,8 @@ EXCEPTION WHEN OTHERS THEN
 END;
 /
 CREATE TABLE expai_conversation (
+  busy_owner VARCHAR2(60),
+  busy_until INTEGER DEFAULT 0 NOT NULL,
   created INTEGER DEFAULT 0 NOT NULL,
   draft_count INTEGER DEFAULT 0 NOT NULL,
   id INTEGER NOT NULL,
@@ -72,6 +74,8 @@ CREATE TABLE expai_usage_log (
   reported_cost_micros INTEGER DEFAULT 0 NOT NULL,
   request_debug CLOB,
   requested_model_alias VARCHAR2(100),
+  reserved_micros INTEGER DEFAULT 0 NOT NULL,
+  reserved_tokens INTEGER DEFAULT 0 NOT NULL,
   retention VARCHAR2(10),
   retries INTEGER DEFAULT 0 NOT NULL,
   run_id INTEGER DEFAULT 0 NOT NULL,

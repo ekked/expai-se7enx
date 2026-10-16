@@ -21,18 +21,80 @@ class expAiUsage
      * @param array $row fields of expAiUsageLog
      * @return expAiUsageLog
      */
-    public static function record( array $row )
+    public static function record( array $row, $audit = true )
     {
         $row += array( 'created' => time() );
-        foreach ( array( 'action' => 40, 'model' => 100, 'stop_reason' => 30, 'error_class' => 60, 'error_message' => 255 ) as $field => $max )
-            if ( isset( $row[$field] ) )
-                $row[$field] = expAiText::cut( (string) $row[$field], $max );
-        $log = new expAiUsageLog( $row );
+        $log = new expAiUsageLog( self::cutRow( $row ) );
         $log->store();
         // the audit trail (doc/audit-trail.md): who asked which model, never what
+        if ( $audit && class_exists( 'expAiAudit' ) )
+            expAiAudit::request( $log );
+        return $log;
+    }
+
+    /**
+     * Settles a reservation (a row written before the request with reserved_tokens and reserved_micros, see
+     * expAiLimits): the row gets the real numbers of the request, and its reservation goes.
+     * @return expAiUsageLog
+     */
+    public static function settle( expAiUsageLog $log, array $row )
+    {
+        foreach ( self::cutRow( $row ) as $field => $value )
+            $log->setAttribute( $field, $value );
+        $log->setAttribute( 'reserved_tokens', 0 );
+        $log->setAttribute( 'reserved_micros', 0 );
+        $log->store();
         if ( class_exists( 'expAiAudit' ) )
             expAiAudit::request( $log );
         return $log;
+    }
+
+    /** @return array the row with its text fields cut to their columns */
+    protected static function cutRow( array $row )
+    {
+        foreach ( array( 'action' => 40, 'model' => 100, 'stop_reason' => 30, 'error_class' => 60, 'error_message' => 255 ) as $field => $max )
+            if ( isset( $row[$field] ) )
+                $row[$field] = expAiText::cut( (string) $row[$field], $max );
+        return $row;
+    }
+
+    /**
+     * Conditions on expai_usage_log without the reservations of requests under way (expAiLimits): every reader of
+     * requests (latencies, health, turns, threads) uses it; only the limits count reservations.
+     * @param array $conds eZPersistentObject conditions
+     * @return array
+     */
+    public static function requestsOnly( array $conds )
+    {
+        return $conds + array( 'reserved_tokens' => 0 );
+    }
+
+    /**
+     * Removes the reservations older than expAiLimits::RESERVATION_SECONDS: a process that ended (killed, a fatal
+     * error) without settling its request. They no longer count anyway; this keeps the table clean.
+     * @return int rows removed
+     */
+    public static function removeStaleReservations( $now = null )
+    {
+        $before = ( $now === null ? time() : (int) $now ) - expAiLimits::RESERVATION_SECONDS;
+        $conds = array( 'reserved_tokens' => array( '>', 0 ), 'created' => array( '<', $before ) );
+        $count = (int) eZPersistentObject::count( expAiUsageLog::definition(), $conds );
+        if ( $count > 0 )
+            eZPersistentObject::removeObject( expAiUsageLog::definition(), $conds );
+        return $count;
+    }
+
+    /**
+     * Is a log row the reservation of a request under way (expAiLimits)? A reservation older than
+     * expAiLimits::RESERVATION_SECONDS belongs to a process that ended without settling it: it is not counted.
+     * @return string '' (a request), reserved (counted) or stale (not counted)
+     */
+    public static function reservationState( array $row, $now = null )
+    {
+        if ( (int) ( isset( $row['reserved_tokens'] ) ? $row['reserved_tokens'] : 0 ) <= 0 && (int) ( isset( $row['reserved_micros'] ) ? $row['reserved_micros'] : 0 ) <= 0 )
+            return '';
+        $now = $now === null ? time() : (int) $now;
+        return (int) ( isset( $row['created'] ) ? $row['created'] : 0 ) >= $now - expAiLimits::RESERVATION_SECONDS ? 'reserved' : 'stale';
     }
 
     /** @return int tokens (input + output + cache write + cache read) of a user since midnight */
@@ -41,7 +103,7 @@ class expAiUsage
         $sum = 0;
         $start = mktime( 0, 0, 0 );
         foreach ( (array) eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), array( 'input_tokens', 'output_tokens', 'cache_write_tokens', 'cache_read_tokens' ),
-                  array( 'user_id' => (int) $userID, 'created' => array( '>=', $start ) ), null, null, false ) as $row )
+                  self::requestsOnly( array( 'user_id' => (int) $userID, 'created' => array( '>=', $start ) ) ), null, null, false ) as $row )
             $sum += (int) $row['input_tokens'] + (int) $row['output_tokens'] + (int) $row['cache_write_tokens'] + (int) $row['cache_read_tokens'];
         return $sum;
     }
@@ -135,6 +197,12 @@ class expAiUsage
         foreach ( array( 'user_id', 'node_id', 'conversation_id', 'thread_id', 'id' ) as $field )
             if ( !empty( $filters[$field] ) )
                 $conds[$field] = (int) $filters[$field];
+        // one row left out: the reservation of the request whose limits are being checked
+        if ( !empty( $filters['exclude_id'] ) && empty( $filters['id'] ) )
+            $conds['id'] = array( '!=', (int) $filters['exclude_id'] );
+        // the reservations of requests under way only where they are asked for (the limits)
+        if ( empty( $filters['with_reservations'] ) )
+            $conds['reserved_tokens'] = 0;
         foreach ( array( 'action', 'model', 'model_alias', 'session_key', 'provider', 'region' ) as $field )
             if ( isset( $filters[$field] ) && $filters[$field] !== '' )
                 $conds[$field] = (string) $filters[$field];
@@ -189,7 +257,7 @@ class expAiUsage
     /** @return expAiUsageLog[] the requests of one turn */
     public static function fetchTurn( $conversationID, $turn, $action = '' )
     {
-        $conds = array( 'conversation_id' => (int) $conversationID, 'turn' => (int) $turn );
+        $conds = self::requestsOnly( array( 'conversation_id' => (int) $conversationID, 'turn' => (int) $turn ) );
         return self::rows( eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), null, $conds, array( 'id' => 'asc' ) ) );
     }
 
@@ -204,14 +272,27 @@ class expAiUsage
         $empty = array( 'requests' => 0, 'input' => 0, 'output' => 0, 'cache_write' => 0, 'cache_read' => 0, 'latency' => 0,
                         'errors' => 0, 'cost' => 0.0, 'cost_known' => true, 'tools' => 0, 'drafts' => 0, 'reasoning' => 0,
                         // #389 requests whose model has no price: the cost is the sum of the priced ones, with this count
-                        'unpriced' => 0, 'unpriced_models' => array() );
+                        'unpriced' => 0, 'unpriced_models' => array(),
+                        // the reservations of the requests under way (expAiLimits): not requests yet
+                        'reserved_tokens' => 0, 'reserved_cost' => 0.0 );
         $costEnabled = expAiCost::enabled();
         $perProvider = array();
         $totals = $empty;
         $perUser = array();
         $perDay = array();
-        $add = function ( array &$t, array $row ) use ( $costEnabled )
+        $now = time();
+        $add = function ( array &$t, array $row ) use ( $costEnabled, $now )
         {
+            $reservation = expAiUsage::reservationState( $row, $now );
+            if ( $reservation !== '' )
+            {
+                if ( $reservation === 'reserved' )
+                {
+                    $t['reserved_tokens'] += (int) $row['reserved_tokens'];
+                    $t['reserved_cost'] += (int) $row['reserved_micros'] / 1000000;
+                }
+                return;
+            }
             $t['requests']++;
             $t['input'] += (int) $row['input_tokens'];
             $t['output'] += (int) $row['output_tokens'];
@@ -467,7 +548,7 @@ class expAiUsage
         if ( !$model || !$model['slow'] )
             return '';
         $rows = self::rows( eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), array( 'latency_ms' ),
-            array( 'model_alias' => (string) $alias, 'error_class' => '' ), array( 'id' => 'desc' ), array( 'offset' => 0, 'length' => 20 ), false ) );
+            self::requestsOnly( array( 'model_alias' => (string) $alias, 'error_class' => '' ) ), array( 'id' => 'desc' ), array( 'offset' => 0, 'length' => 20 ), false ) );
         if ( !$rows )
             return ezpI18n::tr( 'extension/expai/model', 'This model runs on this server and is slow: an answer can take several minutes.' );
         $avg = array_sum( array_map( function ( $r ) { return (int) $r['latency_ms']; }, $rows ) ) / count( $rows ) / 1000;
@@ -478,6 +559,7 @@ class expAiUsage
     /** @return int rows removed: older than [UsageSettings] RetentionDays (0 keeps everything) */
     public static function prune( $days = null )
     {
+        self::removeStaleReservations();
         $days = $days === null ? expAiConfig::instance()->int( 'UsageSettings', 'RetentionDays', 365, 0 ) : (int) $days;
         if ( $days <= 0 )
             return 0;

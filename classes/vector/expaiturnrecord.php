@@ -63,7 +63,7 @@ class expAiTurnRecord
         foreach ( expAiThreadRun::fetchForThread( $threadID ) as $run )
             if ( !$run->isChild() )
                 $runs[(int) $run->attribute( 'id' )] = $run;
-        $rows = eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), null, array( 'thread_id' => $threadID ), array( 'id' => 'asc' ),
+        $rows = eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), null, expAiUsage::requestsOnly( array( 'thread_id' => $threadID ) ), array( 'id' => 'asc' ),
                                                       array( 'offset' => 0, 'length' => 2000 ) );
         $models = $config->allowedModels();
         $label = function ( $alias ) use ( $models ) { return isset( $models[$alias] ) ? (string) $models[$alias] : (string) $alias; };

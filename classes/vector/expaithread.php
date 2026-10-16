@@ -278,7 +278,7 @@ class expAiThread extends eZPersistentObject
         $micros = 0;
         $tokens = 0;
         $requests = 0;
-        $rows = eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), null, array( 'thread_id' => (int) $this->attribute( 'id' ) ),
+        $rows = eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), null, expAiUsage::requestsOnly( array( 'thread_id' => (int) $this->attribute( 'id' ) ) ),
                                                       array( 'id' => 'asc' ), array( 'offset' => 0, 'length' => 5000 ), false );
         foreach ( (array) $rows as $row )
         {
@@ -289,7 +289,8 @@ class expAiThread extends eZPersistentObject
             if ( $cost !== null )
                 $micros += (int) round( $cost * 1000000 );
         }
-        $this->setAttribute( 'cost_micros', min( 2147483647, $micros ) );
+        // cost_micros is 64 bits wide (expAiSchema::BIGINT)
+        $this->setAttribute( 'cost_micros', $micros );
         $this->setAttribute( 'tokens', min( 2147483647, $tokens ) );
         $this->setAttribute( 'requests', $requests );
     }

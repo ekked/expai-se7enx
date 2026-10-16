@@ -96,6 +96,14 @@ class expAiChangeStager
             if ( $node && self::nodeInScope( $thread, $node ) )
                 return true;
         }
+        // an object that was never published has no location: the parents its draft is assigned to decide
+        $version = $object->currentVersion();
+        foreach ( $version ? (array) $version->nodeAssignments() : array() as $assignment )
+        {
+            $parent = eZContentObjectTreeNode::fetch( (int) $assignment->attribute( 'parent_node' ) );
+            if ( $parent && self::nodeInScope( $thread, $parent, true ) )
+                return true;
+        }
         return false;
     }
 

@@ -69,6 +69,9 @@ class expAiUsageLog extends eZPersistentObject
                 // threads (classes/vector/): the thread and run of the request, 0 outside threads
                 'thread_id' => $int( 'ThreadID' ),
                 'run_id' => $int( 'RunID' ),
+                // a request under way: its estimate, counted by the limits until the row is settled (expAiLimits)
+                'reserved_tokens' => $int( 'ReservedTokens' ),
+                'reserved_micros' => $int( 'ReservedMicros' ),
             ),
             'keys' => array( 'id' ),
             'increment_key' => 'id',

@@ -3,6 +3,8 @@
 -- schema handler; bin/php/expaischema.php --install creates the same tables in a running installation.
 
 CREATE TABLE expai_conversation (
+  busy_owner varchar(60) NOT NULL DEFAULT '',
+  busy_until int(11) NOT NULL DEFAULT '0',
   created int(11) NOT NULL DEFAULT '0',
   draft_count int(11) NOT NULL DEFAULT '0',
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -50,9 +52,11 @@ CREATE TABLE expai_usage_log (
   rate_limits longtext,
   reasoning_tokens int(11) NOT NULL DEFAULT '0',
   region varchar(10) NOT NULL DEFAULT '',
-  reported_cost_micros int(11) NOT NULL DEFAULT '0',
+  reported_cost_micros bigint(20) NOT NULL DEFAULT '0',
   request_debug longtext,
   requested_model_alias varchar(100) NOT NULL DEFAULT '',
+  reserved_micros bigint(20) NOT NULL DEFAULT '0',
+  reserved_tokens int(11) NOT NULL DEFAULT '0',
   retention varchar(10) NOT NULL DEFAULT '',
   retries int(11) NOT NULL DEFAULT '0',
   run_id int(11) NOT NULL DEFAULT '0',
@@ -122,7 +126,7 @@ CREATE TABLE expai_probe_result (
 ) ENGINE=InnoDB;
 
 CREATE TABLE expai_thread (
-  cost_micros int(11) NOT NULL DEFAULT '0',
+  cost_micros bigint(20) NOT NULL DEFAULT '0',
   created int(11) NOT NULL DEFAULT '0',
   id int(11) NOT NULL AUTO_INCREMENT,
   lane varchar(16) NOT NULL DEFAULT 'auto',
@@ -136,7 +140,7 @@ CREATE TABLE expai_thread (
   position int(11) NOT NULL DEFAULT '0',
   provider varchar(40) NOT NULL DEFAULT '',
   requests int(11) NOT NULL DEFAULT '0',
-  reserved_micros int(11) NOT NULL DEFAULT '0',
+  reserved_micros bigint(20) NOT NULL DEFAULT '0',
   review_policy varchar(12) NOT NULL DEFAULT 'staged',
   run_mode varchar(10) NOT NULL DEFAULT 'write',
   scope_json longtext,
@@ -156,7 +160,7 @@ CREATE TABLE expai_thread (
 
 CREATE TABLE expai_thread_run (
   conversation_id int(11) NOT NULL DEFAULT '0',
-  cost_micros int(11) NOT NULL DEFAULT '0',
+  cost_micros bigint(20) NOT NULL DEFAULT '0',
   created int(11) NOT NULL DEFAULT '0',
   finished int(11) NOT NULL DEFAULT '0',
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -297,7 +301,7 @@ CREATE TABLE expai_chain_run (
   chain varchar(40) NOT NULL DEFAULT '',
   chain_hash varchar(40) NOT NULL DEFAULT '',
   class_identifier varchar(50) NOT NULL DEFAULT '',
-  cost_micros int(11) NOT NULL DEFAULT '0',
+  cost_micros bigint(20) NOT NULL DEFAULT '0',
   created int(11) NOT NULL DEFAULT '0',
   current_step varchar(40) NOT NULL DEFAULT '',
   data longtext,
@@ -325,7 +329,7 @@ CREATE TABLE expai_chain_run (
 ) ENGINE=InnoDB;
 
 CREATE TABLE expai_chain_step (
-  cost_micros int(11) NOT NULL DEFAULT '0',
+  cost_micros bigint(20) NOT NULL DEFAULT '0',
   created int(11) NOT NULL DEFAULT '0',
   finished int(11) NOT NULL DEFAULT '0',
   id int(11) NOT NULL AUTO_INCREMENT,

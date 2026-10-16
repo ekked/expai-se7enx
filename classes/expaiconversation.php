@@ -222,6 +222,88 @@ class expAiConversation extends eZPersistentObject
         $this->storeDocument( $document );
     }
 
+    /**
+     * The content objects whose content entered the window sent to the provider (through the read tools; the
+     * reader notes every object it lets through). A change of model checks them against the data policy of the new
+     * provider (expAiAssistant::step()). Kept short: the newest MAX_READ_OBJECTS.
+     * @return int[]
+     */
+    public function readObjects()
+    {
+        $document = $this->document();
+        return isset( $document['read_objects'] ) && is_array( $document['read_objects'] ) ? array_values( array_map( 'intval', $document['read_objects'] ) ) : array();
+    }
+
+    /** the most object ids a conversation keeps */
+    const MAX_READ_OBJECTS = 500;
+
+    /** Adds object ids to readObjects() */
+    public function addReadObjects( array $ids )
+    {
+        $ids = array_values( array_filter( array_map( 'intval', $ids ), function ( $id ) { return $id > 0; } ) );
+        if ( !$ids )
+            return;
+        $all = array_values( array_unique( array_merge( $this->readObjects(), $ids ) ) );
+        // more than the list keeps: the dropped ones are not known any more, so the content counts as untracked
+        if ( count( $all ) > self::MAX_READ_OBJECTS )
+            $this->markUntracked( 'read_overflow' );
+        $this->setReadObjects( array_slice( $all, -self::MAX_READ_OBJECTS ) );
+    }
+
+    /**
+     * Content entered the window that readObjects() does not cover: more objects than the list keeps
+     * (read_overflow), or the result of a tool that does not read through expAiContentReader (untracked_content: the
+     * in-process MCP bridge, external tools). A change of model then passes the editor's words only.
+     */
+    public function markUntracked( $reason = 'untracked_content' )
+    {
+        $document = $this->document();
+        $document[$reason === 'read_overflow' ? 'read_overflow' : 'untracked_content'] = true;
+        $this->storeDocument( $document );
+    }
+
+    /** @return bool content of the window may lie outside readObjects() (see markUntracked()) */
+    public function contentUntracked()
+    {
+        $document = $this->document();
+        return !empty( $document['read_overflow'] ) || !empty( $document['untracked_content'] );
+    }
+
+    /** Forgets what the window held: a window with the editor's words only (expAiAssistant::compactWordsOnly()) */
+    public function clearContentTracking()
+    {
+        $document = $this->document();
+        unset( $document['read_overflow'], $document['untracked_content'] );
+        $document['read_objects'] = array();
+        $this->storeDocument( $document );
+    }
+
+    public function setReadObjects( array $ids )
+    {
+        $document = $this->document();
+        $document['read_objects'] = array_values( array_map( 'intval', $ids ) );
+        $this->storeDocument( $document );
+    }
+
+    /**
+     * Is content of an external tool (web, MCP) part of the window sent to the provider? Writing stays locked while
+     * it is: a compaction keeps the earlier answers, which may repeat that content, so only a window with the editor's
+     * words only (expAiAssistant::compactWordsOnly()) or a new conversation ends it.
+     * @return bool
+     */
+    public function externalInContext()
+    {
+        $document = $this->document();
+        return !empty( $document['external_in_context'] );
+    }
+
+    public function setExternalInContext( $flag )
+    {
+        $document = $this->document();
+        $document['external_in_context'] = (bool) $flag;
+        $this->storeDocument( $document );
+    }
+
     /** @return int exchanges in the window sent to the provider */
     public function windowTurns()
     {

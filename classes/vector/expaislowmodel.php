@@ -31,7 +31,7 @@ class expAiSlowModel
         $alias = (string) $alias;
         if ( array_key_exists( $alias, self::$latency ) )
             return self::$latency[$alias];
-        $rows = eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), array( 'latency_ms' ), array( 'model_alias' => $alias ),
+        $rows = eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), array( 'latency_ms' ), expAiUsage::requestsOnly( array( 'model_alias' => $alias ) ),
                                                       array( 'id' => 'desc' ), array( 'offset' => 0, 'length' => 20 ), false );
         $values = array();
         foreach ( (array) $rows as $row )

@@ -26,6 +26,9 @@ class expAiSchema
     /** tables of earlier versions that --install drops (dropRemoved()) */
     const REMOVED_TABLES = array( 'expai_package' );
 
+    /** an amount in millionths of the currency: 64 bits, as 32 bits end at 2 147 currency units */
+    const BIGINT = array( 'length' => 20, 'type' => 'bigint', 'not_null' => '1', 'default' => 0 );
+
     /**
      * @param bool $withQueue with the tables and columns of lanes, batches and budgets (expAiQueueSchema)
      * @return array generic schema (without _info)
@@ -42,11 +45,15 @@ class expAiSchema
             return array( 'length' => $length, 'type' => 'varchar', 'not_null' => '1', 'default' => $default );
         };
         $primary = array( 'type' => 'primary', 'fields' => array( 'id' ) );
+        $bigint = self::BIGINT;
         // the thread tables and the thread columns of the tables below: expAiThreadSchema (classes/vector/)
         return expAiThreadSchema::extend( array(
             'expai_conversation' => array(
                 'name' => 'expai_conversation',
                 'fields' => array(
+                    // the lock of a step under way (expAiConversationLock): who holds it, and until when
+                    'busy_owner' => $varchar( 60 ),
+                    'busy_until' => $int,
                     'created' => $int,
                     'draft_count' => $int,
                     'id' => array( 'type' => 'auto_increment', 'default' => false ),
@@ -92,9 +99,12 @@ class expAiSchema
                     'rate_limits' => array( 'type' => 'longtext', 'default' => false ),
                     'reasoning_tokens' => $int,
                     'region' => $varchar( 10 ),
-                    'reported_cost_micros' => $int,
+                    'reported_cost_micros' => $bigint,
                     'request_debug' => array( 'type' => 'longtext', 'default' => false ),
                     'requested_model_alias' => $varchar( 100 ),
+                    // a request under way: its estimate until the row is settled (expAiLimits)
+                    'reserved_micros' => $bigint,
+                    'reserved_tokens' => $int,
                     'retention' => $varchar( 10 ),
                     'retries' => $int,
                     'session_key' => $varchar( 40 ),
@@ -471,6 +481,69 @@ class expAiSchema
     }
 
     /**
+     * The bigint columns of the definition (table => column list): an installation of an earlier state has int there.
+     * @return array
+     */
+    public static function bigintColumns()
+    {
+        $out = array();
+        foreach ( self::definition() as $table => $def )
+            foreach ( $def['fields'] as $field => $column )
+                if ( isset( $column['type'] ) && $column['type'] === 'bigint' )
+                    $out[$table][] = $field;
+        return $out;
+    }
+
+    /**
+     * The statements that widen int columns of an earlier state to bigint (the *_micros columns). SQLite stores
+     * every integer in 64 bits and Oracle's INTEGER is NUMBER(38): nothing to do there.
+     * @param array|null $types table => array( column => the column's type in the database, lower case ); null: asked
+     * @return string[]
+     */
+    public static function widenStatements( $db = null, $types = null )
+    {
+        $db = $db ?: eZDB::instance();
+        $engine = self::engineOf( $db );
+        if ( !in_array( $engine, array( 'mysql', 'postgresql' ), true ) )
+            return array();
+        $existing = $types === null ? self::existingTables( $db ) : array_keys( $types );
+        $statements = array();
+        foreach ( self::bigintColumns() as $table => $columns )
+        {
+            if ( !in_array( $table, $existing, true ) )
+                continue;
+            $have = $types === null ? self::columnTypes( $table, $db ) : $types[$table];
+            foreach ( $columns as $column )
+            {
+                // a column that is missing is added as bigint by upgradeStatements()
+                if ( !isset( $have[$column] ) || strpos( $have[$column], 'bigint' ) === 0 )
+                    continue;
+                $statements[] = $engine === 'mysql'
+                    ? "ALTER TABLE $table MODIFY $column bigint(20) NOT NULL DEFAULT '0'"
+                    : "ALTER TABLE $table ALTER COLUMN $column TYPE bigint";
+            }
+        }
+        return $statements;
+    }
+
+    /** @return array column => type (lower case) of a table in a MySQL or PostgreSQL database */
+    public static function columnTypes( $table, $db = null )
+    {
+        $db = $db ?: eZDB::instance();
+        $table = preg_replace( '/[^a-z_]/', '', (string) $table );
+        $sql = self::engineOf( $db ) === 'mysql'
+             ? "SELECT column_name AS name, data_type AS type FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = '$table'"
+             : "SELECT column_name AS name, data_type AS type FROM information_schema.columns WHERE table_name = '$table'";
+        $out = array();
+        foreach ( (array) $db->arrayQuery( $sql ) as $row )
+        {
+            $row = array_change_key_case( $row, CASE_LOWER );
+            $out[strtolower( (string) $row['name'] )] = strtolower( (string) $row['type'] );
+        }
+        return $out;
+    }
+
+    /**
      * Creates the missing expai tables in the database (idempotent).
      * @return array( string[] created, string[] errors )
      */
@@ -495,6 +568,14 @@ class expAiSchema
                 else
                     $created[] = 'upgrade: ' . substr( $statement, 0, 120 );
             }
+        // the int columns of an earlier state that are bigint now
+        foreach ( self::widenStatements( $db ) as $statement )
+        {
+            if ( $db->query( $statement ) === false )
+                $errors[] = $engine . ': ' . substr( $statement, 0, 120 );
+            else
+                $created[] = 'upgrade: ' . substr( $statement, 0, 120 );
+        }
         if ( !$missing )
             return array( $created, $errors );
         if ( $engine === 'mongodb' )

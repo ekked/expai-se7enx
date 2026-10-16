@@ -80,6 +80,39 @@ anchors, literals, internal links and formatting attributes were lost, and ezaut
 - New strings in the context `extension/expai/edit`; a node test of the detector in `tests/js/`
   ([edit-view-integration.md](../edit-view-integration.md#structure-is-never-lost-silently)).
 
+## Conversations, limits and the Anthropic request
+
+- **Data policy on a change of model**: a conversation notes every object whose content a tool returned. When it goes
+  on with another model (the editor's choice, the fallback), the objects are checked against the new provider's data
+  policy; when one may not go there, the new model gets the editor's words only, and the exchange says so. The
+  fallback prefers a model whose provider may take everything the conversation read.
+- **Fallback in the middle of a tool loop**: the next model gets the drafts the open exchange wrote so far and is told
+  not to create them again.
+- **One step at a time per conversation**: a second step while one runs is refused ("A step of this conversation is
+  already running.") instead of running the tools twice; the lock (`expai_conversation.busy_owner`, `busy_until`) ends
+  with the step or expires on its own.
+- **Limits under parallel requests**: with a limit set, every request reserves its estimate before it is sent
+  (`expai_usage_log.reserved_tokens`, `reserved_micros`) and is settled after it; the check counts the reservations,
+  so parallel requests cannot pass a limit together. `[Limits] UnpricedCost=block` (default) refuses a model without
+  a price while a cost limit applies; `ignore` counts it as free. Every failure leaves a usage row, also one that is
+  not a provider error.
+- **Prices**: Claude Sonnet 5.5 cache reads cost 0.20 per million tokens (was 0.10), and so does the fallback price
+  `DefaultCacheReadPerMTok`.
+- **Refusal fallback** (`fallbacks: "default"`) only for the models that accept it (Claude Fable 5.1, Mythos 5.1,
+  Opus 5.5, Opus 5, Sonnet 5.5), never for Claude Haiku 5.5; capabilities `refusal_fallback` and
+  `no_refusal_fallback` decide for other models. The usage log records the category of a refusal.
+- **Tool calls**: `[AISettings] MaxTokens` is 16000 (was 8000); Anthropic tool definitions go with `strict: true` where
+  the schema allows it (`StrictTools`); the arguments of every call are checked against the tool's schema before it
+  runs. The probe asks with the panel's instructions (with `ExtraInstructions[]`); `read_node` and `two_nodes` require
+  the node ids they name.
+- **Writes**: after an external tool's result (web, MCP), drafts stay locked while the result is part of the
+  conversation's window (until a new conversation, or a window with the editor's words only), not only for one turn. The write tools write only
+  inside the panel's subtree or the thread's scope (`[AssistantSettings] WriteScope=subtree`; `site` lifts it).
+- **search_content**: a new read tool, full-text search over the content (eZ Find when active, else the kernel's
+  search), as the current user and through the data policy ([tools.md](../tools.md#search_content)).
+- **Storage**: the `*_micros` columns of expai are `bigint`; a long queue payload is bound as a value on Oracle instead
+  of a string literal (which ends at 4000 bytes).
+
 ## Upgrading
 
 - Live probe results stored before this update in which a mandatory task (`use_result`, `injection`, `create_draft`,
@@ -88,6 +121,12 @@ anchors, literals, internal links and formatting attributes were lost, and ezaut
   results; [probe.md](../probe.md)).
 - Reasoning models get at least 1000 output tokens per request in the model test, alt text, plan batches and chains;
   a lower `MaxTokens` is raised for them, which can make those requests cost more.
+- Mandatory: run `php extension/expai/bin/php/expaischema.php --install -s <siteaccess>` with the update (on MySQL /
+  MariaDB the widening rebuilds `expai_usage_log` and blocks writes to it meanwhile; see database.md): it adds
+  `expai_conversation.busy_owner`, `busy_until`, `expai_usage_log.reserved_tokens`, `reserved_micros` (the code reads
+  them) and widens the `*_micros` columns to `bigint` on MySQL / MariaDB and PostgreSQL.
+- The write tools of the panel no longer write outside the open node's subtree; set `[AssistantSettings]
+  WriteScope=site` for the earlier behaviour.
 
 ## Admin interface: polling, dark mode, accessibility, small fixes
 

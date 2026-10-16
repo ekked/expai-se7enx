@@ -91,7 +91,7 @@ class expAiProviderRegistry
     protected function anthropicFromAISettings()
     {
         $settings = array( 'Type' => 'anthropic', 'Label' => 'Anthropic' );
-        foreach ( array( 'Endpoint', 'AnthropicVersion', 'ApiKey', 'AnthropicWorkspaceId', 'Effort', 'RefusalFallback', 'PromptCaching',
+        foreach ( array( 'Endpoint', 'AnthropicVersion', 'ApiKey', 'AnthropicWorkspaceId', 'Effort', 'RefusalFallback', 'PromptCaching', 'StrictTools', 'StrictToolsMax', 'StrictOptionalMax', 'StrictUnionMax',
                          'Timeout', 'ConnectTimeout', 'MaxResponseBytes', 'Region', 'Retention', 'TermsCheckedAt' ) as $name )
             $settings[$name] = $this->config->get( 'AISettings', $name, '' );
         if ( (string) $this->config->get( 'AISettings', 'Provider', 'anthropic' ) === 'custom' )

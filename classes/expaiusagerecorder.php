@@ -9,7 +9,8 @@
 
 /**
  * A provider that records every request of the provider it wraps in expai_usage_log (expAiUsage) and enforces
- * [Limits] MaxTokensPerUserPerDay before each request. expai wraps every provider it uses in one; the context
+ * [Limits] (expAiLimits) before each request: with a limit set, the request reserves its estimate first, and the row
+ * is settled with the real numbers after it. Every request leaves a row, also one that fails in an unexpected way. expai wraps every provider it uses in one; the context
  * (user, node, conversation, turn, action, iteration) is set by the caller.
  */
 class expAiUsageRecorder implements expAiProvider
@@ -72,7 +73,6 @@ class expAiUsageRecorder implements expAiProvider
             expAiGate::check( array( 'user_id' => (int) $this->context['user_id'], 'node_id' => (int) $this->context['node_id'], 'provider' => $providerID,
                                      'model' => $this->inner->modelName(), 'model_alias' => $this->modelAlias(), 'purpose' => (string) $this->context['action'] )
                               + ( !empty( $this->context['siteaccess'] ) ? array( 'siteaccess' => (string) $this->context['siteaccess'] ) : array() ), $config );
-        expAiLimits::check( $this->context + array( 'provider' => $providerID ) );
         $provider = $config->registry()->getProvider( $providerID );
         $row = array( 'model_alias' => $this->modelAlias(), 'tool_mode' => $this->toolUse(),
                       'region' => $provider ? (string) $provider['Region'] : '', 'retention' => $provider ? (string) $provider['Retention'] : '', 'user_id' => (int) $this->context['user_id'], 'node_id' => (int) $this->context['node_id'],
@@ -88,21 +88,115 @@ class expAiUsageRecorder implements expAiProvider
         if ( !empty( $this->context['requested_alias'] ) )
             $row += array( 'requested_model_alias' => expAiText::cut( (string) $this->context['requested_alias'], 100 ),
                            'fallback_reason' => expAiText::cut( isset( $this->context['fallback_reason'] ) ? (string) $this->context['fallback_reason'] : '', 20 ) );
+
+        // with limits set, the request reserves its estimate before the check (expAiLimits): parallel requests see it
+        $this->pending = null;
+        if ( expAiLimits::anySet( $config ) )
+        {
+            expAiUsage::removeStaleReservations();
+            $estimate = self::estimate( $request, $this->maxTokens( $request, $config ), $row['model'], $row['model_alias'] );
+            $this->pending = expAiUsage::record( $row + array( 'reserved_tokens' => $estimate['tokens'], 'reserved_micros' => $estimate['micros'] ), false );
+        }
+        try
+        {
+            expAiLimits::check( $this->context + array( 'provider' => $providerID, 'model' => $row['model'], 'model_alias' => $row['model_alias'],
+                                                        'reservation_id' => $this->pending ? (int) $this->pending->attribute( 'id' ) : 0 ) );
+        }
+        catch ( Throwable $e )
+        {
+            // a refused request was never sent: its reservation goes, it leaves no row
+            if ( $this->pending )
+                $this->pending->remove();
+            $this->pending = null;
+            throw $e;
+        }
+
         $start = microtime( true );
         try
         {
             $answer = $this->inner->send( $request );
         }
-        catch ( expAiException $e )
+        catch ( Throwable $e )
         {
+            // every failure leaves a row: a provider's error, and any other (a bug, a PHP error) as well
             $row['latency_ms'] = (int) round( ( microtime( true ) - $start ) * 1000 );
-            $row['http_status'] = (int) $e->getCode();
-            $row['error_class'] = get_class( $e );
-            $row['error_message'] = strtr( $e->getMessage(), $e->arguments() ) . ( $e->detail() !== '' ? ' (' . $e->detail() . ')' : '' );
-            $row['rate_limits'] = $e->rateLimits ? json_encode( $e->rateLimits ) : '';
-            $this->last = expAiUsage::record( $row );
+            $row += self::errorFields( $e );
+            $this->last = $this->store( $row );
             throw $e;
         }
+        try
+        {
+            $row = self::answerFields( $answer, $row );
+        }
+        catch ( Throwable $e )
+        {
+            $row += self::errorFields( $e );
+            $row['latency_ms'] = (int) round( ( microtime( true ) - $start ) * 1000 );
+            $this->last = $this->store( $row );
+            throw $e;
+        }
+        $row['latency_ms'] = (int) round( ( microtime( true ) - $start ) * 1000 );
+        $this->last = $this->store( $row );
+        return $answer;
+    }
+
+    /** @var expAiUsageLog|null the reservation of the request under way */
+    protected $pending = null;
+
+    /** @return expAiUsageLog the row of the request: the reservation settled, else a new row */
+    protected function store( array $row )
+    {
+        $pending = $this->pending;
+        $this->pending = null;
+        return $pending ? expAiUsage::settle( $pending, $row ) : expAiUsage::record( $row );
+    }
+
+    /** @return int the longest answer of the request (its max_tokens, else the model's MaxTokens) */
+    protected function maxTokens( array $request, expAiConfig $config )
+    {
+        if ( isset( $request['max_tokens'] ) && (int) $request['max_tokens'] > 0 )
+            return (int) $request['max_tokens'];
+        if ( method_exists( $this->inner, 'setting' ) && (int) $this->inner->setting( 'MaxTokens', 0 ) > 0 )
+            return (int) $this->inner->setting( 'MaxTokens', 0 );
+        return max( 1, (int) $config->get( 'AISettings', 'MaxTokens', 16000 ) );
+    }
+
+    /**
+     * The estimate a request reserves: its input (characters of the request / 3.5) and its longest answer.
+     * @return array tokens, micros (0 when the model has no price)
+     */
+    public static function estimate( array $request, $maxTokens, $model, $alias = '' )
+    {
+        unset( $request['_drop_block'] );
+        $input = (int) ceil( strlen( (string) json_encode( $request, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE ) ) / 3.5 ) + 10;
+        $output = max( 1, (int) $maxTokens );
+        $micros = 0;
+        if ( expAiCost::enabled() )
+        {
+            $cost = expAiCost::of( (string) $model, $input, $output, 0, 0, (string) $alias );
+            if ( $cost['source'] !== 'unknown' )
+                $micros = (int) round( $cost['amount'] * 1000000 );
+        }
+        return array( 'tokens' => $input + $output, 'micros' => $micros );
+    }
+
+    /** @return array the error fields of a usage row for a failure */
+    public static function errorFields( Throwable $e )
+    {
+        if ( $e instanceof expAiException )
+            return array( 'http_status' => (int) $e->getCode(), 'error_class' => get_class( $e ),
+                          'error_message' => strtr( $e->getMessage(), $e->arguments() ) . ( $e->detail() !== '' ? ' (' . $e->detail() . ')' : '' ),
+                          'rate_limits' => $e->rateLimits ? json_encode( $e->rateLimits ) : '' );
+        return array( 'http_status' => 0, 'error_class' => get_class( $e ), 'error_message' => $e->getMessage() );
+    }
+
+    /**
+     * The fields of a usage row from a provider's answer: tokens, cost, model, stop reason (with the category of a
+     * refusal), status, retries, rate limits.
+     * @return array the row
+     */
+    public static function answerFields( array $answer, array $row )
+    {
         // normalised token counts from the provider (the Anthropic usage fields when a provider gives none)
         $usage = isset( $answer['usage'] ) && is_array( $answer['usage'] ) ? $answer['usage'] : array();
         $tokens = isset( $answer['tokens'] ) && is_array( $answer['tokens'] ) ? $answer['tokens'] : array(
@@ -123,16 +217,20 @@ class expAiUsageRecorder implements expAiProvider
             $rate = expAiCost::rate( $tokens['reported_currency'] );
             $row['reported_cost_micros'] = $rate === null ? 0 : (int) round( (float) $tokens['reported_cost'] * $rate * 1000000 );
         }
-        $row['latency_ms'] = (int) round( ( microtime( true ) - $start ) * 1000 );
-        $row['model'] = isset( $answer['model'] ) && $answer['model'] !== '' ? (string) $answer['model'] : $row['model'];
+        $row['model'] = isset( $answer['model'] ) && $answer['model'] !== '' ? (string) $answer['model'] : ( isset( $row['model'] ) ? $row['model'] : '' );
         $row['stop_reason'] = isset( $answer['stop_reason'] ) ? (string) $answer['stop_reason'] : '';
         $row['http_status'] = isset( $answer['http_status'] ) ? (int) $answer['http_status'] : 200;
         $row['retries'] = isset( $answer['retries'] ) ? (int) $answer['retries'] : 0;
         $row['rate_limits'] = !empty( $answer['rate_limits'] ) ? json_encode( $answer['rate_limits'] ) : '';
         if ( $row['stop_reason'] === 'refusal' )
+        {
             $row['error_class'] = 'refusal';
-        $this->last = expAiUsage::record( $row );
-        return $answer;
+            // the category the provider names for the refusal (stop_details: cyber, bio, ...), never its content
+            $details = isset( $answer['stop_details'] ) && is_array( $answer['stop_details'] ) ? $answer['stop_details'] : array();
+            $category = isset( $details['category'] ) && is_string( $details['category'] ) ? preg_replace( '/[^a-z0-9_.-]/i', '', $details['category'] ) : '';
+            $row['error_message'] = 'refusal' . ( $category !== '' ? ', category ' . $category : ', no category' );
+        }
+        return $row;
     }
 
     /** Adds what happened after the request (the tool calls of the step, the drafts written) to its row */

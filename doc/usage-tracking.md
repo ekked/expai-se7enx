@@ -19,8 +19,16 @@ The texts of requests and answers are **not** stored. Only with `[UsageSettings]
 request kept with each row, for debugging; it contains content and the editors' words, so leave it disabled in
 production. The request summary of the draft log (`[LogSettings] MaxPromptSummaryLength`) is separate.
 
-Failed requests are recorded too, with their HTTP status and error. A request stopped by a limit of `[Limits]` is not
-sent and not recorded: the editor sees the limit and when it resets.
+Failed requests are recorded too, with their HTTP status and error, also a request that fails in an unexpected way (a
+PHP error: its class and message). A request stopped by a limit of `[Limits]` is not sent and not recorded: the
+editor sees the limit and when it resets. A refusal (stop reason `refusal`) records the category the provider named
+(`stop_details`, e.g. "refusal, category cyber"), never its explanation.
+
+While a limit is set, a request's row is written before it is sent, with its estimate in `reserved_tokens` and
+`reserved_micros`, and settled with the real numbers after the answer; until then the limits count it as reserved
+(never the request's own reservation in its own check), and every other reader (the log, turns, statistics,
+latencies, provider health, threads) leaves it out. A reservation older than 15 minutes (a process that ended
+without settling it) is removed on the next reservation and by the usage pruning.
 
 ### Turns
 
@@ -85,7 +93,7 @@ php bin/php/ezexec.php extension/expai/tests/expaicost_test.php
 
 - A row's tokens are the `usage` object of the API response, unchanged: compare a request in the log with the
   Usage page of the Claude Console for the same minute and model.
-- Compute one row by hand with the formula above. Example, Claude Sonnet 5.5 (2 / 2.50 / 0.10 / 10 per million): 4
+- Compute one row by hand with the formula above. Example, Claude Sonnet 5.5 (2 / 2.50 / 0.20 / 10 per million): 4
   input, 136 output, 6 324 cache write tokens = (4 × 2 + 136 × 10 + 6 324 × 2.50) / 1 000 000 = $0.017178.
 - The dashboard's total for a period equals the sum of the log's "Estimated cost" for the same dates.
 
@@ -94,7 +102,9 @@ php bin/php/ezexec.php extension/expai/tests/expaicost_test.php
 `[Limits]` (configuration.md) sets optional limits per conversation, per login session, per user and day or month,
 and for the whole site per month, in tokens or in estimated cost, plus the most requests one turn may make. Each is
 checked before a request is sent; when one is reached the editor sees which limit and when it resets, and the request
-is not sent. The dashboard shows a bar for every limit that is set.
+is not sent. Each request reserves its estimate first, and the check counts what the requests under way reserved:
+parallel requests cannot pass a limit together. A model without a price is refused while a cost limit applies
+(`UnpricedCost=block`, the default; `ignore` counts it as free). The dashboard shows a bar for every limit that is set.
 
 Anthropic's own limits apply in addition: the rate limits of the key (the dashboard shows what the last response
 reported; a rate-limited request is retried (up to twice) when its `retry-after` is short (at most `RetryAfterMax` seconds, [providers.md](providers.md)), otherwise it fails with "busy or over its limit, try again later" and is recorded with its `retry-after`) and the organization's

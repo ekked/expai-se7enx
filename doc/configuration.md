@@ -30,9 +30,10 @@ a list, empty it where you set it: a line with only `FieldActions[]`, then the e
 | `ModelLabels[<id>]` | Claude Sonnet 5.5, ... | The name shown for a model id (the id when not set). |
 | `ApiKey` | (empty) | The API key. In settings/override or an untracked `KeyLocations[]` location, never committed. Without it expai is "not configured". |
 | `AnthropicWorkspaceId` | (empty) | For a key that is not scoped to a workspace: sent as `anthropic-workspace-id`. |
-| `MaxTokens` | `8000` | The longest answer of one call, in tokens. |
+| `MaxTokens` | `16000` | The longest answer of one call, in tokens, thinking included. Requests are sent without streaming; with `Timeout=115` an answer this long may run out of time first. |
 | `Effort` | `medium` | How much the model thinks: `low`, `medium`, `high` (`xhigh`, `max` where the model has them); empty: the model's default. |
-| `RefusalFallback` | `enabled` | Sends `fallbacks: "default"`: a request the model declines for a safety reason is retried on the model Anthropic recommends (Claude API only; set `disabled` for other endpoints). |
+| `RefusalFallback` | `enabled` | Sends `fallbacks: "default"`: a request the model declines for a safety reason is retried on the model Anthropic recommends (Claude API only; set `disabled` for other endpoints). Only for the models that accept it: Claude Fable 5.1, Mythos 5.1, Opus 5.5, Opus 5 and Sonnet 5.5 (and their dated snapshots), never Claude Haiku 5.5; another model gets it with the capability `refusal_fallback` (`[Model_<alias>] Capabilities[]`), `no_refusal_fallback` turns it off for a listed one. |
+| `StrictTools` | `enabled` | Tool definitions go with `strict: true` where the tool's schema allows it (every object closed with `additionalProperties: false`, only `type`, `properties`, `required`, `items`, `enum`, `description`); other tools, MCP tools among them, as they are. `disabled`: none strict. `StrictToolsMax` (20), `StrictOptionalMax` (24) and `StrictUnionMax` (16) cap the strict tools of one request, their optional parameters and their parameters with more than one type; a tool that would pass a cap goes as it is. The arguments of every call are checked against the tool's schema before the tool runs, with any provider. |
 | `PromptCaching` | `enabled` | Asks the API to cache the stable start of each request (instructions, tools, earlier turns). |
 | `Timeout` | `115` | Seconds for one call. Keep it below the web server's and PHP's request limits (architecture.md, "Long turns"). |
 | `ConnectTimeout` | `10` | Seconds to connect. |
@@ -116,6 +117,7 @@ The alias is what users choose and what the usage log records (letters, digits, 
 | `ContextWindowTurns` | `8` | Exchanges in the window sent to the model. When it is full, the older exchanges become a short summary (cut from their own text, no extra call) and the last half are kept word for word. The panel still shows the whole history. |
 | `CompactContextChars` | `1800` | The longest snapshot of the open page in a compact prompt (`[Model_<alias>] PromptProfile=compact`), in characters: its writable text fields as plain text, each cut to 600. |
 | `ExtraInstructions[]` | (none) | Lines added to the instructions of the panel and the edit form, e.g. `ExtraInstructions[]=Write in British English.` New conversations get them; running ones keep the instructions they started with. |
+| `WriteScope` | `subtree` | Where the write tools may write: `subtree` (the open node and below in the panel, the thread's scope in Vector; a target outside is refused with an error the model can react to) or `site` (anywhere the editor may write). |
 
 ## [ToolSettings]: what the assistant may use
 
@@ -191,6 +193,13 @@ and when it resets. Days and months follow the site's time zone. The dashboard s
 | `MaxTokensPerSitePerMonth`, `MaxCostPerSitePerMonth` | on the 1st (all users together) |
 | `MaxRequestsPerTurn` | the most model calls one message may lead to; empty: `[AssistantSettings] MaxToolIterations` (a retry of the prompted tool protocol counts) |
 | `ProviderMaxTokensPerMonth[<provider>]`, `ProviderMaxCostPerMonth[<provider>]` | on the 1st: all users together on one provider; only requests to that provider are stopped |
+| `UnpricedCost` | `block` (default): a request to a model without a price is refused while a cost limit applies to it, as the limit could not be kept; `ignore`: it goes and counts as free |
+
+While any limit is set, every request reserves its estimate before it is sent (input from the length of the request,
+its `MaxTokens` as output) and counts with it until its row is settled with the real numbers. Parallel requests
+therefore cannot pass a limit together: a request that would pass it with the requests under way is refused ("would
+be passed together with the requests under way"). A reservation older than 15 minutes (a process that ended without
+settling it) no longer counts.
 
 Anthropic's own limits apply as well: the rate limits of the key (the dashboard shows the last values the API
 reported) and the spend limit of the organization, set in the Claude Console.

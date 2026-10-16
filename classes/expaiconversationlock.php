@@ -1,0 +1,129 @@
+<?php
+/**
+ * File containing the expAiConversationLock class.
+ *
+ * @copyright Copyright (C) 1998 - 2026 7x & Exponential Foundation. All rights reserved.
+ * @license GNU General Public License v2.0 (or any later version)
+ * @package expai
+ */
+
+/**
+ * The lock of a conversation while one step runs (expAiAssistant::step()): a second step of the same conversation -
+ * a second browser tab, a double click, the queue and the panel at once - is refused instead of running the tools
+ * a second time. The lock is a pair of columns of expai_conversation (busy_owner, busy_until) taken by compare-and-set
+ * with plain SQL, so it works the same on every relational engine and across the hosts of a cluster; it expires on
+ * its own after the step's time limit, so a process that ended without releasing it does not block the conversation.
+ * The columns are not part of expAiConversation::definition(): storing the conversation never touches the lock.
+ * MongoDB has no SQL: there the lock is not taken (a step runs as before).
+ */
+class expAiConversationLock
+{
+    /** @var eZDBInterface|object|null the database (null: eZDB::instance()) */
+    protected $db;
+
+    /** @var string this process's id as the owner of a lock */
+    protected $owner;
+
+    /** @var int|null the current time (tests) */
+    public $now = null;
+
+    public function __construct( $db = null, $owner = null )
+    {
+        $this->db = $db;
+        $this->owner = $owner !== null ? (string) $owner : self::processOwner();
+    }
+
+    /** @return string host:pid:random, at most 60 characters */
+    public static function processOwner()
+    {
+        static $id = null;
+        if ( $id === null )
+            $id = substr( preg_replace( '/[^A-Za-z0-9._-]/', '', (string) gethostname() ), 0, 30 ) . ':' . getmypid() . ':' . bin2hex( random_bytes( 6 ) );
+        return $id;
+    }
+
+    /** @return string */
+    public function owner()
+    {
+        return $this->owner;
+    }
+
+    /** @return eZDBInterface|object */
+    protected function db()
+    {
+        return $this->db ?: eZDB::instance();
+    }
+
+    /** @return int */
+    protected function now()
+    {
+        return $this->now !== null ? (int) $this->now : time();
+    }
+
+    /** @var bool|null the database of this process has the lock's columns (asked once per process) */
+    protected static $columns = null;
+
+    /**
+     * @return bool the engine runs SQL (every one but MongoDB) and the table has the lock's columns. An installation
+     *              that was not upgraded (expaischema.php --install) runs its steps without the lock, with one warning
+     *              per process instead of a failed statement on every step. A database given to the constructor
+     *              (tests) is taken as it is.
+     */
+    protected function usable()
+    {
+        $db = $this->db();
+        if ( method_exists( $db, 'databaseName' ) && strpos( strtolower( (string) $db->databaseName() ), 'mongo' ) === 0 )
+            return false;
+        if ( $this->db )
+            return true;
+        if ( self::$columns === null )
+        {
+            $have = expAiSchema::existingColumns( 'expai_conversation', $db );
+            self::$columns = $have === null || ( in_array( 'busy_owner', $have, true ) && in_array( 'busy_until', $have, true ) );
+            if ( !self::$columns )
+                eZDebug::writeWarning( 'expai: expai_conversation has no columns busy_owner and busy_until, so steps run without the conversation lock. '
+                                       . 'Run php extension/expai/bin/php/expaischema.php --install -s <siteaccess>.', __METHOD__ );
+        }
+        return self::$columns;
+    }
+
+    /**
+     * Takes the lock of a conversation for $seconds (free or expired locks are taken; the owner takes its own again
+     * and extends it).
+     * @return bool taken; false when another step holds it
+     */
+    public function acquire( $conversationID, $seconds )
+    {
+        $id = (int) $conversationID;
+        if ( $id <= 0 || !$this->usable() )
+            return true;
+        $db = $this->db();
+        $now = $this->now();
+        $until = $now + max( 1, (int) $seconds );
+        $me = $db->escapeString( $this->owner );
+        $db->query( "UPDATE expai_conversation SET busy_owner = '$me', busy_until = $until WHERE id = $id AND ( busy_until < $now OR busy_owner = '$me' )" );
+        $rows = $db->arrayQuery( "SELECT busy_owner FROM expai_conversation WHERE id = $id" );
+        if ( !is_array( $rows ) || !isset( $rows[0] ) )
+            // the conversation is gone: nothing to protect
+            return true;
+        $row = array_change_key_case( $rows[0], CASE_LOWER );
+        return isset( $row['busy_owner'] ) && (string) $row['busy_owner'] === $this->owner;
+    }
+
+    /** Gives the lock back (only the owner's own lock) */
+    public function release( $conversationID )
+    {
+        $id = (int) $conversationID;
+        if ( $id <= 0 || !$this->usable() )
+            return;
+        $db = $this->db();
+        $me = $db->escapeString( $this->owner );
+        $db->query( "UPDATE expai_conversation SET busy_owner = '', busy_until = 0 WHERE id = $id AND busy_owner = '$me'" );
+    }
+
+    /** @return expAiException the refusal of a second step */
+    public static function busy()
+    {
+        return new expAiException( 'A step of this conversation is already running. Wait until it has finished, then try again.', 'conversation lock held' );
+    }
+}

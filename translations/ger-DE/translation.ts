@@ -2055,6 +2055,10 @@
 <context>
     <name>extension/expai/model</name>
     <message>
+        <source>The earlier answers were not passed to %model: the data policy keeps content they were based on away from it.</source>
+        <translation>Die früheren Antworten wurden nicht an %model weitergegeben: Die Datenrichtlinie hält Inhalte, auf denen sie beruhen, von diesem Modell fern.</translation>
+    </message>
+    <message>
         <source>The model you chose is no longer available; the default is used.</source>
         <translation>Das gewählte Modell ist nicht mehr verfügbar; die Voreinstellung wird verwendet.</translation>
     </message>
@@ -2678,6 +2682,18 @@
     <message>
         <source>Writing refused after an external tool result (%tool)</source>
         <translation>Schreiben nach dem Ergebnis eines externen Werkzeugs abgelehnt (%tool)</translation>
+    </message>
+    <message>
+        <source>A tool call had invalid arguments; retrying</source>
+        <translation>Ein Werkzeugaufruf hatte ungültige Argumente; neuer Versuch</translation>
+    </message>
+    <message>
+        <source>Writing refused outside the scope of this conversation (%tool)</source>
+        <translation>Schreiben außerhalb des Bereichs dieser Unterhaltung abgelehnt (%tool)</translation>
+    </message>
+    <message>
+        <source>Searched the content for &quot;%query&quot;</source>
+        <translation>Inhalte nach „%query“ durchsucht</translation>
     </message>
     <message>
         <source>An answer was too long and was cut off; retrying</source>
@@ -6606,6 +6622,25 @@
     <message>
         <source>The rules that refuse a request (expai.ini [RequestVeto] Rules[], each with its [RequestVeto_&lt;rule&gt;]).</source>
         <translation>Die Regeln, die eine Anfrage ablehnen (expai.ini [RequestVeto] Rules[], jeweils mit ihrem [RequestVeto_&lt;Regel&gt;]).</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>A step of this conversation is already running. Wait until it has finished, then try again.</source>
+        <translation>Ein Schritt dieser Unterhaltung läuft bereits. Bitte warten Sie, bis er beendet ist, und versuchen Sie es dann erneut.</translation>
+    </message>
+    <message>
+        <source>The model %model has no price, so a cost limit of this site cannot be kept for it. Choose another model, or ask an administrator to set its price.</source>
+        <translation>Für das Modell %model ist kein Preis hinterlegt, daher kann eine Kostengrenze dieser Website dafür nicht eingehalten werden. Wählen Sie ein anderes Modell oder bitten Sie die Administration, den Preis festzulegen.</translation>
+    </message>
+    <message>
+        <source>The limit %limit would be passed together with the requests under way (%used used and %reserved reserved of %max). Try again in a moment.</source>
+        <translation>Die Grenze %limit würde zusammen mit den laufenden Anfragen überschritten (%used verbraucht und %reserved reserviert von %max). Bitte versuchen Sie es gleich noch einmal.</translation>
+    </message>
+    <message>
+        <source>Give the words to search for.</source>
+        <translation>Bitte geben Sie die Suchbegriffe an.</translation>
     </message>
 </context>
 </TS>

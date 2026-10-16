@@ -123,7 +123,7 @@ class expAiProviderHealth
     protected static function recentFailure( $providerID, $seconds )
     {
         $rows = eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), array( 'created', 'error_message' ),
-            array( 'provider' => (string) $providerID ), array( 'id' => 'desc' ), array( 'offset' => 0, 'length' => 1 ), false );
+            expAiUsage::requestsOnly( array( 'provider' => (string) $providerID ) ), array( 'id' => 'desc' ), array( 'offset' => 0, 'length' => 1 ), false );
         if ( !is_array( $rows ) || !$rows )
             return false;
         $row = $rows[0];

@@ -24,6 +24,9 @@ class expAiContentReader
     /** @var int objects the policy left out of lists */
     public $withheld = 0;
 
+    /** @var int[] the objects this reader let through (object id => id): their content may reach the provider */
+    public $read = array();
+
     public function __construct( ?expAiConfig $config = null, ?expAiDataPolicy $policy = null )
     {
         $this->config = $config ?: expAiConfig::instance();
@@ -46,12 +49,32 @@ class expAiContentReader
     {
         if ( $this->policy )
             $this->policy->assertObject( $object );
+        $this->noteRead( $object );
     }
 
     /** @return bool the data policy lets the object go to the provider */
     public function allowed( eZContentObject $object )
     {
-        return !$this->policy || $this->policy->allowsObject( $object );
+        $allowed = !$this->policy || $this->policy->allowsObject( $object );
+        if ( $allowed )
+            $this->noteRead( $object );
+        return $allowed;
+    }
+
+    /** Notes an object whose content may reach the provider (see $read) */
+    public function noteRead( $object )
+    {
+        $id = is_object( $object ) && method_exists( $object, 'attribute' ) ? (int) $object->attribute( 'id' ) : (int) $object;
+        if ( $id > 0 )
+            $this->read[$id] = $id;
+    }
+
+    /** @return int[] the objects noted since the last call, and forgets them */
+    public function takeRead()
+    {
+        $ids = array_values( $this->read );
+        $this->read = array();
+        return $ids;
     }
 
     /** @return int */

@@ -47,18 +47,30 @@ ApiKey=
 # Only for a key that is not scoped to a workspace: the workspace every request names.
 AnthropicWorkspaceId=
 
-# The longest answer (tokens) one call may produce.
-MaxTokens=8000
+# The longest answer (tokens) one call may produce, thinking included. Requests are sent without streaming; with
+# Timeout=115 an answer that long may run out of time first: the limit then still keeps a cut-off answer readable.
+MaxTokens=16000
 
 # How much the model thinks before it answers: low, medium, high (empty: the model's default).
 Effort=medium
 
 # enabled: a request the model declines for a safety reason is retried by the API on the model
-# Anthropic recommends for that case (server-side fallback, Claude API only).
+# Anthropic recommends for that case (server-side fallback, Claude API only). Sent only for the models that accept it
+# (Claude Fable 5.1, Mythos 5.1, Opus 5.5, Opus 5, Sonnet 5.5; not Claude Haiku 5.5), or for a model with the capability
+# refusal_fallback ([Model_<alias>] Capabilities[]); no_refusal_fallback turns it off for one.
 RefusalFallback=enabled
 
 # enabled: the API caches the stable start of each request (tools, instructions, earlier turns).
 PromptCaching=enabled
+
+# enabled: tool definitions go with strict: true (the API keeps every call to the tool's schema), for each tool whose
+# schema allows it; disabled: as they are. The arguments of every call are checked against the schema before it runs.
+StrictTools=enabled
+# The limits of strict tools in one request (tools, optional parameters, parameters with more than one type, all
+# strict tools together): a tool that would pass one is sent as it is.
+StrictToolsMax=20
+StrictOptionalMax=24
+StrictUnionMax=16
 
 # Seconds to wait for one provider call, and for the connection. Keep Timeout below the web
 # server's and PHP's request time limits (see doc/architecture.md, "Long turns").
@@ -593,6 +605,10 @@ CompactContextChars=1800
 # Extra instructions appended to the built-in system prompt (one line per entry), e.g.
 # ExtraInstructions[]=Write in British English.
 
+# Where the write tools of a conversation may write: subtree (the open node and below in the panel, the scope in a
+# Vector thread) or site (anywhere the editor may write).
+WriteScope=subtree
+
 [ToolSettings]
 # The tools the assistant can call, in this order. Each is described in [Tool_<name>].
 Tools[]=get_node
@@ -600,6 +616,7 @@ Tools[]=list_children
 Tools[]=get_tree_context
 Tools[]=list_creatable_classes
 Tools[]=get_class_definition
+Tools[]=search_content
 Tools[]=create_draft
 Tools[]=update_draft
 
@@ -637,6 +654,9 @@ Class=expAiToolListCreatableClasses
 
 [Tool_get_class_definition]
 Class=expAiToolGetClassDefinition
+
+[Tool_search_content]
+Class=expAiToolSearchContent
 
 [Tool_create_draft]
 Class=expAiToolCreateDraft
@@ -885,6 +905,11 @@ MaxRequestsPerTurn=
 # All users together on one provider per month, e.g. ProviderMaxCostPerMonth[openrouter]=20
 ProviderMaxTokensPerMonth[]
 ProviderMaxCostPerMonth[]
+# A request to a model without a price ([Pricing]) while a cost limit applies: block refuses it (the limit could not be
+# kept), ignore lets it through and counts it as free.
+UnpricedCost=block
+# While any limit is set, every request reserves its estimate (input from its length, its MaxTokens as output) before
+# it is sent, and the requests under way count against the limits until they are settled.
 
 [Pricing]
 # Prices per million tokens per model (USD) for the ESTIMATED cost on expai/log and the dashboard. Anthropic's invoice
@@ -913,7 +938,7 @@ ExchangeRatesAsOf=2026-10-12
 # Fallback for models without an entry (the prices of the default model, Claude Sonnet 5.5)
 DefaultInputPerMTok=2
 DefaultCacheWritePerMTok=2.50
-DefaultCacheReadPerMTok=0.10
+DefaultCacheReadPerMTok=0.20
 DefaultOutputPerMTok=10
 
 InputPerMTok[claude-fable-5-1]=10
@@ -933,7 +958,7 @@ OutputPerMTok[claude-opus-5]=25
 
 InputPerMTok[claude-sonnet-5-5]=2
 CacheWritePerMTok[claude-sonnet-5-5]=2.50
-CacheReadPerMTok[claude-sonnet-5-5]=0.10
+CacheReadPerMTok[claude-sonnet-5-5]=0.20
 OutputPerMTok[claude-sonnet-5-5]=10
 
 InputPerMTok[claude-sonnet-5]=2
