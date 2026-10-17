@@ -265,3 +265,5 @@ anchors, literals, internal links and formatting attributes were lost, and ezaut
 - **search_content**: `more_may_exist` counted every object the data policy withheld in the whole step, not only
   in this search, so after other tool calls it could say that nothing more exists when more did. It now counts the
   hits this call withheld.
+- **Local model helper**: a spool file that vanished between the listing and the sort (another run took it) stopped
+  the whole run of `expai-llm-helper`; it is now skipped and the other requests are carried out.

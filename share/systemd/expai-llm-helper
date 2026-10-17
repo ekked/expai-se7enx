@@ -184,13 +184,26 @@ def read_request(path):
     return json.loads(data.decode('utf-8'))
 
 
+def spool_mtime(path):
+    """The time of a spool file for the order of the run, without following a link; a file that vanished since the
+    directory was listed (another run took it) sorts first and is skipped, it never stops the run."""
+    try:
+        return os.lstat(path).st_mtime
+    except OSError:
+        return 0.0
+
+
 def run():
     allowed = allowlist()
     last = ''
-    files = sorted((os.path.join(SPOOL, f) for f in os.listdir(SPOOL) if f.endswith('.json')), key=lambda p: os.lstat(p).st_mtime)  # lstat: a link that points nowhere does not stop the run
+    files = sorted((os.path.join(SPOOL, f) for f in os.listdir(SPOOL) if f.endswith('.json')), key=spool_mtime)
     for path in files:
         try:
-            request = read_request(path)
+            try:
+                request = read_request(path)
+            except FileNotFoundError:
+                # taken by another run meanwhile: nothing to do, nothing to report
+                continue
             if not isinstance(request, dict) or time.time() - float(request.get('ts', 0)) > MAX_AGE:
                 raise ValueError('malformed or older than %d s' % MAX_AGE)
             result = carry_out(request, allowed)
