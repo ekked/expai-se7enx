@@ -95,9 +95,18 @@ class expAiThreadRetention
     const SCAN_PAGES = 20;
 
     /**
+     * @return bool [RetentionSettings] Mode=delete: the retention removes rows. Any other value (report, the default of
+     *              this release, or a value it does not know) only reports what it would remove.
+     */
+    public static function deletes( expAiConfig $config )
+    {
+        return strtolower( trim( (string) $config->get( 'RetentionSettings', 'Mode', 'report' ) ) ) === 'delete';
+    }
+
+    /**
      * Removes old threads and conversations, blanks old request summaries, and removes the threads and conversations
-     * of removed users ([RetentionSettings]; 0 keeps the rows). With [RetentionSettings] Mode=report nothing is changed
-     * (as $dryRun). A thread that cannot be removed is logged and skipped; the next one is tried.
+     * of removed users ([RetentionSettings]; 0 keeps the rows). Unless [RetentionSettings] Mode=delete nothing is
+     * changed (as $dryRun). A thread that cannot be removed is logged and skipped; the next one is tried.
      * @param bool $dryRun count only
      * @return array expai_thread, expai_conversation, expai_draft_log.prompt_summary => rows (that would be) changed,
      *               removed_users => users whose rows were found, failed => threads that could not be removed,
@@ -107,7 +116,7 @@ class expAiThreadRetention
     {
         $config = $config ?: expAiConfig::instance();
         $now = $now === null ? time() : (int) $now;
-        $dryRun = $dryRun || (string) $config->get( 'RetentionSettings', 'Mode', 'delete' ) === 'report';
+        $dryRun = $dryRun || !self::deletes( $config );
         $cutoffs = self::cutoffs( $config, $now );
         $staleBefore = $now - 4 * $config->int( 'ThreadSettings', 'StaleRunSeconds', 900, 60 );
         $out = array( 'expai_thread' => 0, 'expai_conversation' => 0, 'expai_draft_log.prompt_summary' => 0, 'removed_users' => 0, 'failed' => 0,

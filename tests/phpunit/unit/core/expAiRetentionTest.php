@@ -46,6 +46,13 @@ class expAiRetentionTest extends expAiCoreTestCase
         $this->assertSame( array(), expAiThreadRetention::missing( array( 14 ), array( '14' ) ) );
     }
 
+    public function testTheShippedModeOnlyReports(): void
+    {
+        $this->assertFalse( expAiThreadRetention::deletes( $this->useSettings() ), 'this release ships Mode=report' );
+        $this->assertTrue( expAiThreadRetention::deletes( $this->useSettings( array( 'RetentionSettings' => array( 'Mode' => 'delete' ) ) ) ), 'an explicit delete stays' );
+        $this->assertFalse( expAiThreadRetention::deletes( $this->useSettings( array( 'RetentionSettings' => array( 'Mode' => 'remove' ) ) ) ), 'an unknown value only reports' );
+    }
+
     public function testTheLookupOfRemovedUsersFailsClosed(): void
     {
         $exists = function ( array $users ) { return function ( array $chunk ) use ( $users ) { return array_values( array_intersect( $chunk, $users ) ); }; };
@@ -72,7 +79,7 @@ class expAiRetentionTest extends expAiCoreTestCase
     public function testTheRowsOfARemovedUserAndOldRowsGo(): void
     {
         $this->inTransaction();
-        $this->useSettings( array( 'RetentionSettings' => array( 'ThreadKeepDays' => '0', 'ConversationKeepDays' => '30', 'PromptSummaryKeepDays' => '30' ) ) );
+        $this->useSettings( array( 'RetentionSettings' => array( 'Mode' => 'delete', 'ThreadKeepDays' => '0', 'ConversationKeepDays' => '30', 'PromptSummaryKeepDays' => '30' ) ) );
         $old = time() - 40 * 86400;
         $admin = eZUser::fetchByName( 'admin' );
         if ( !$admin instanceof eZUser )

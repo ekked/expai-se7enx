@@ -37,12 +37,14 @@
 
 ### Upgrading (retention)
 
-- **The retention deletes by default.** From the first cron run after the update, the cronjob part `expai` removes
-  threads and conversations not modified for **365 days** and blanks request summaries of the draft log older than
-  365 days; the threads and conversations of removed users go at once. Pinned threads, threads in review or waiting
-  for an answer, and running threads stay.
-- To see first what would go: `php extension/expai/bin/php/expaithreads.php --prune --dry-run -s <siteaccess>`, or
-  set `[RetentionSettings] Mode=report` (the cronjob then only reports). Set a `*KeepDays` to `0` to keep rows.
+- **The retention only reports in this release** (`[RetentionSettings] Mode=report`, the shipped default): the
+  cronjob part `expai` prints what it would remove - threads and conversations not modified for **365 days**, request
+  summaries of the draft log older than 365 days, the threads and conversations of removed users - and removes
+  nothing. Set `Mode=delete` to apply it. **The next release may switch the default to `delete`**: set `Mode`
+  explicitly to keep your choice. Pinned threads, threads in review or waiting for an answer, and running threads
+  always stay.
+- To see what would go at any time: `php extension/expai/bin/php/expaithreads.php --prune --dry-run -s <siteaccess>`.
+  Set a `*KeepDays` to `0` to keep rows.
 - `-s <siteaccess>` is now mandatory for every script in `bin/php`; a siteaccess that does not exist stops the script.
 
 ## Provider-neutral
@@ -250,3 +252,6 @@ anchors, literals, internal links and formatting attributes were lost, and ezaut
   an id, or found none of the users asked for, every user counted as removed and their threads and conversations were
   removed. Now no user counts as removed then; and when more than half of the users of a table look removed, the run
   removes none of them and logs a warning.
+- **Retention reports by default**: `[RetentionSettings] Mode` ships as `report` in this release (the cronjob only
+  says what it would remove); `Mode=delete` applies the retention. The next release may switch the default to
+  `delete`. An explicit setting is unchanged; an unknown value only reports.

@@ -91,8 +91,9 @@ The cronjob part `expai` does it (`cronjobs/expai_thread_prune.php`), and so doe
 
 `cronjobs/expai_prune.php` and `expaithreads.php --prune` do it (`expAiThreadRetention::pruneRecords()`, at most
 1000 threads and 1000 conversations per run, read in pages by id so that rows that stay never hold up the rest; a
-thread that cannot be removed is logged and skipped). 0 keeps the rows. `[RetentionSettings] Mode=report` makes the
-cronjob only say what it would remove; the cronjob prints its counts on every run, also in quiet mode.
+thread that cannot be removed is logged and skipped). 0 keeps the rows. `[RetentionSettings] Mode=report`, the default of this
+release, makes the cronjob only say what it would remove (`Mode=delete` applies it; a later release may switch the
+default to `delete`); the cronjob prints its counts on every run, also in quiet mode.
 
 The removal of the rows of removed users fails closed: when the lookup in `ezuser` fails or finds none of the users
 it asked for, no user counts as removed in that run; when more than half of the users of a table look removed, none

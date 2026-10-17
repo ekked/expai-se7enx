@@ -182,7 +182,7 @@ See [usage-tracking.md](usage-tracking.md).
 
 | Setting | Default | Effect |
 | --- | --- | --- |
-| `Mode` | `delete` | `report`: the cronjob only says what it would remove. |
+| `Mode` | `report` | `report` (the default of this release): the cronjob only says what it would remove; `delete`: the rows go. A later release may switch the default to `delete`; set it explicitly to keep a choice. |
 | `ThreadKeepDays` | `365` | A thread not modified for this many days is removed with its runs, events, proposals, checkpoints, plans and conversations; not when it is pinned, in review, waiting for an answer, or running. |
 | `ConversationKeepDays` | `365` | A conversation not modified for this many days is removed, unless it belongs to a thread that stays. |
 | `PromptSummaryKeepDays` | `365` | The request summary of a draft log row is blanked after this many days; the row stays. |

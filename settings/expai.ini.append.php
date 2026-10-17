@@ -890,8 +890,9 @@ LogRequests=disabled
 [RetentionSettings]
 # How long the editors' words are kept, in days; 0 keeps them. Applied on every run of the cronjob part "expai"
 # (cronjobs/expai_prune.php) and by bin/php/expaithreads.php --prune (--dry-run counts only).
-# delete: the rows go; report: the cronjob only says what it would remove (to check the periods before they apply)
-Mode=delete
+# report (the default of this release): the cronjob only says what it would remove, to check the periods before they
+# apply; delete: the rows go. A later release may switch the default to delete: set Mode explicitly to keep a choice.
+Mode=report
 # A thread (with its runs, events, proposals, checkpoints, plans and conversations) not modified for ThreadKeepDays
 # is removed, unless it is pinned, in review, waiting for an answer, or running (a run that stopped reporting for
 # 4 x [ThreadSettings] StaleRunSeconds does not count as running).

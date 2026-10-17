@@ -111,7 +111,7 @@ the conversation. The rules:
 - `expai_conversation` keeps the conversation (messages, answers, tool results) per user and node until "New
   conversation", until it has not been modified for `[RetentionSettings] ConversationKeepDays` (365), or, when it
   belongs to a thread, until the thread goes after `ThreadKeepDays` (365). The threads and conversations of a user
-  that no longer exists are removed by the next cron run (the kernel sends no event when a user is removed; the rows
+  that no longer exists are removed by the next cron run with `[RetentionSettings] Mode=delete` (the kernel sends no event when a user is removed; the rows
   are found by their user id).
 - Errors go to the debug log as warnings with the provider's error type and message (never the key, request or
   answer).
