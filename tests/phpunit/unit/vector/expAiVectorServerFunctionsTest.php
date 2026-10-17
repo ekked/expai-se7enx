@@ -574,10 +574,6 @@ class expAiVectorServerFunctionsTest extends expAiVectorTestCase
         $this->assertSame( 'accepted', (string) expAiChange::fetchByID( (int) $changes['title']->attribute( 'id' ) )->attribute( 'decision' ) );
         $this->assertSame( 'rejected', expAiChange::fetchByID( (int) $intro->attribute( 'id' ) )->hunks()[0]['decision'] );
 
-        $this->assertRefused( function () use ( $uuid ) {
-            $this->call( 'change_decide', array( 'thread' => $uuid, 'decisions' => json_encode( array( 'list' => array( array( 'change' => 999999999, 'decision' => 'accepted' ) ) ) ) ) ); },
-            'This change does not exist any more' );
-
         // the title is plain text: the editor rewrites the proposed side
         $title = expAiChange::fetchByID( (int) $changes['title']->attribute( 'id' ) );
         $edited = $this->call( 'change_edit', array( 'thread' => $uuid, 'change' => (int) $title->attribute( 'id' ), 'hunk' => $title->hunks()[0]['id'], 'text' => 'Opening hours (edited)' ) );
@@ -590,6 +586,12 @@ class expAiVectorServerFunctionsTest extends expAiVectorTestCase
 
         $restaged = $this->call( 'change_restage', array( 'thread' => $uuid, 'change' => (int) $intro->attribute( 'id' ) ) );
         $this->assertArrayHasKey( 'counts', $restaged );
+
+        // last: a refused list rolls back its transaction as a whole, and with it the test's own (eZDB has no
+        // savepoints), so nothing of the test is read after it
+        $this->assertRefused( function () use ( $uuid ) {
+            $this->call( 'change_decide', array( 'thread' => $uuid, 'decisions' => json_encode( array( 'list' => array( array( 'change' => 999999999, 'decision' => 'accepted' ) ) ) ) ) ); },
+            'This change does not exist any more' );
     }
 
     public function testRebaseSetsChangedProposalsAsideAndAsksTheModelAgain(): void
