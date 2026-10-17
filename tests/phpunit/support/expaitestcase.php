@@ -110,6 +110,30 @@ abstract class expAiTestCase extends PHPUnit\Framework\TestCase
     }
 
     /**
+     * Runs the test method; a test that reaches the database without asking requireDatabase() first is skipped
+     * with the reason instead of erroring, when the installation has no usable database (a DB-less run). With a
+     * usable database the exception is the test's result, as before. PHPUnit 13 calls this hook; older versions
+     * do not have it and run the method themselves.
+     *
+     * @param string $methodName
+     * @param array $testArguments
+     * @return mixed
+     */
+    protected function invokeTestMethod( string $methodName, array $testArguments ): mixed
+    {
+        try
+        {
+            return parent::invokeTestMethod( $methodName, $testArguments );
+        }
+        catch ( eZDBNoConnectionException $e )
+        {
+            if ( expAiTestInstallation::unavailableReason() === null )
+                throw $e;
+            $this->markTestSkipped( expAiTestInstallation::unavailableReason() );
+        }
+    }
+
+    /**
      * Opens a transaction that is rolled back after the test: the rows the test writes through eZDB never stay.
      * The test fails when the code under test left a transaction of its own open inside it.
      * Keep such tests short (the site's writers wait for the transaction), and do not create content inside one

@@ -147,6 +147,12 @@ abstract class expAiVectorCoreTestCase extends expAiTestCase
 
     protected function tearDown(): void
     {
+        // setUp() skipped the test without a usable database (a DB-less run): nothing ran, nothing to guard
+        if ( expAiTestInstallation::unavailableReason() !== null )
+        {
+            parent::tearDown();
+            return;
+        }
         // a guard: the threads of the test logged requests of the stub provider only
         $foreign = array();
         $db = eZDB::instance();

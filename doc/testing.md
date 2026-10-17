@@ -19,7 +19,13 @@ php vendor/bin/phpunit -c extension/expai/phpunit.xml.dist extension/expai/tests
 The bootstrap (`tests/phpunit/bootstrap.php`) starts the installation the same way `bin/php/ezexec.php` does, on
 the siteaccess `EXPAI_TEST_SITEACCESS` (default `admin`). `EXPONENTIAL_ROOT` names another installation. Mail of
 the whole run goes to the file transport, whatever the site's settings say. Without a database or without the expai
-tables, the tests that need them are skipped and give the reason. The rest still runs.
+tables, the tests that need them are skipped and give the reason. The rest still runs. A test that reaches the
+database without asking for it first is skipped the same way in a DB-less run (PHPUnit 13 and later).
+
+The run does not depend on the site it runs on: messages and numbers are compared in English (the run sets
+`RegionalSettings Locale=eng-GB` and `TextTranslation=disabled` in memory), the site's `[DataPolicy] DefaultRegions`
+is emptied (every test of the data policy sets its own rule), and the script runner uses `timeout` or `gtimeout`
+when one is installed. A German siteaccess with `DefaultRegions[]=eu;local` gives the same result as an English one.
 
 The structure detector of the edit form (`design/admin/javascript/expai_structure.js`) has a test of its own that
 runs with node (20 or later), without a browser; `expAiStructureScriptTest` runs it from the unit suite when node is
