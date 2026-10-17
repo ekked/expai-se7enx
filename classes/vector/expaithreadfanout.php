@@ -241,7 +241,10 @@ class expAiThreadFanout
             foreach ( (array) $changes as $change )
             {
                 $value = (string) $change->attribute( 'proposed' );
-                if ( $change->attribute( 'datatype' ) === 'ezxmltext' )
+                // with placeholders numbered from the proposal: the stager takes the open proposals of the thread as sources
+                if ( expAiRichTextTokens::handles( $change->attribute( 'datatype' ) ) )
+                    $value = ( new expAiRichTextTokens() )->forModel( $value );
+                elseif ( $change->attribute( 'datatype' ) === 'ezxmltext' )
                     $value = expAiText::xmlTextToHtml( $value );
                 $value = expAiText::cut( $value, max( 200, $budget ) );
                 $budget -= mb_strlen( $value, 'UTF-8' );

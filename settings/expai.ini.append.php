@@ -639,8 +639,32 @@ WritableDatatypes[]=ezurl
 # The most children / siblings one lookup returns.
 ListLimit=25
 
-# The longest field value the lookup tools return, in characters.
+# The longest field value the lookup tools return, in characters (rich text: [RichTextSettings] MaxLength).
 FieldValueMaxLength=3000
+
+[RichTextSettings]
+# Rich text the model reads and writes (the tools, Vector, a plan's batch requests; doc/configuration.md
+# "[RichTextSettings]"). enabled: what the HTML subset cannot express is a placeholder such as ⟦C1⟧ (a formula, custom tag, embed, table, internal link,
+# formatting, the rest of a long field); an answer is written only when every placeholder comes back exactly once and
+# the value keeps all its custom tags, embeds, tables, ... (otherwise Vector shows it for review). disabled: the old
+# plain HTML view, which loses that structure.
+Placeholders=enabled
+# The datatypes whose stored value is ezxmltext and that get placeholders. A datatype of another extension that
+# stores ezxmltext can be added here.
+Datatypes[]=ezxmltext
+# The characters of a rich text field the model reads. A longer field ends in one placeholder for its rest, which is
+# written back unchanged. Empty: [EditViewSettings] MaxFieldLength.
+MaxLength=
+# The elements that are always kept whole as a placeholder, with the letter of the placeholder (C, E, T, P, A, or any
+# other capital except K, L, Q, R and X; Q stands for a ⟦ or ⟧ of the text). Elements outside the HTML subset that are
+# not listed become X placeholders; links the subset cannot keep become L. Custom tags (math_latex, math_mathml, ...)
+# are kept with all their attributes.
+Protected[custom]=C
+Protected[embed]=E
+Protected[embed-inline]=E
+Protected[table]=T
+Protected[literal]=P
+Protected[anchor]=A
 
 [Tool_get_node]
 Class=expAiToolGetNode
@@ -803,6 +827,17 @@ Languages[]=all
 [EditViewSettings]
 # The controls in the content edit form (content.ini [EditSettings] AdditionalTemplates[]).
 Enabled=true
+
+# true: above a rich text field (ezxmltext) whose editor has an assistant of its own that keeps formulas, embeds and
+# tables (Tiptap, exp_oe_tiptap, with its AI enabled), the field actions (Write, Rewrite, Shorten, Translate ...) and the
+# Improve menu are not shown: they only know the simple HTML subset and would ask for a review of everything else.
+# The presets of the field (e.g. Write summary) stay. The editor is read live, so TinyMCE or no editor shows them again.
+# false: the field actions are shown above every field, whatever the editor.
+HideActionsWithEditorAI=true
+
+# The most characters of a field's current value the model gets (field actions, presets and the Improve menu). A longer
+# field is cut there; the edit form then shows the answer for review instead of writing it over the whole field.
+MaxFieldLength=20000
 
 # The sections of the edit view area, in this order: [EditSection_<name>] Template=
 Sections[]=assistant

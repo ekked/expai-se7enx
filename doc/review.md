@@ -55,7 +55,10 @@ word. Rich text is shown as readable text, never as markup; links, formatting an
 | write | Write accepted changes to drafts | |
 
 The tab label counts the parts that wait; while any wait, the thread is in *Needs you*. A part that inserts or removes
-a table cell alone cannot be accepted alone (accept the parts of the whole table).
+a table cell alone cannot be accepted alone (accept the parts of the whole table). A part of a rich text field whose
+proposal has fewer custom tags (formulas), embeds, anchors or kept links than the published text says what it would
+remove and cannot be accepted at all; Accept field and Accept all reject it, and writing checks the merged field once
+more (configuration.md "[RichTextSettings]").
 
 ## Conflicts
 

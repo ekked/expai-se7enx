@@ -7,7 +7,7 @@ import { createRequire } from 'node:module';
 const require = createRequire( import.meta.url );
 const S = require( '../../design/admin/javascript/expai_structure.js' );
 
-const none = { embed: 0, table: 0, cell: 0, th: 0, merge: 0, custom: 0, anchor: 0, literal: 0, link: 0, attribute: 0 };
+const none = { embed: 0, table: 0, cell: 0, th: 0, merge: 0, custom: 0, anchor: 0, literal: 0, link: 0, otherlink: 0, heading: 0, attribute: 0 };
 const counts = ( over ) => Object.assign( {}, none, over );
 
 test( 'plain answer markup has no structure', () => {
@@ -34,13 +34,14 @@ test( 'tables, custom tags, anchors, literals and internal links', () => {
         + '<pre>code<br>line</pre>'
         + '<p><a href="ezobject://12">obj</a> <a href="eznode://3#x">node</a> <a href="/about">path</a>'
         + ' <a href="#top">jump</a> <a href="mailto:a@b.c">mail</a></p>';
-    assert.deepEqual( S.count( html ), counts( { table: 1, cell: 1, custom: 4, anchor: 2, literal: 1, link: 3, attribute: 1 } ) );
+    assert.deepEqual( S.count( html ), counts( { table: 1, cell: 1, custom: 4, anchor: 2, literal: 1, link: 3, otherlink: 1, attribute: 1 } ) );
 } );
 
 test( 'formatting attributes on blocks, without the editors\' own classes', () => {
     const html = '<p class="lead">a</p><p align="center">b</p><h3 customattributes="x|1">c</h3>'
         + '<p class="mceItemHidden ezoeAlignleft">d</p><ul class="checks"><li>e</li></ul><p style="color:red">f</p>';
-    assert.deepEqual( S.count( html ), counts( { attribute: 4 } ) );
+    // the style attribute is formatting the answer does not keep
+    assert.deepEqual( S.count( html ), counts( { attribute: 5 } ) );
 } );
 
 test( 'the simplified XML of a textarea without an editor', () => {
@@ -114,11 +115,27 @@ test( 'CDATA and the content of script, style, literal and pre are no markup', (
     assert.deepEqual( S.count( '<script>"<table>"' ), none );
 } );
 
-test( 'external links of every kind are no internal links', () => {
+test( 'links with an address of their own are counted apart from internal ones', () => {
     const html = '<p><a href="tel:+491234">t</a> <a href="www.example.de">w</a> <a href="ftp://x.org/f">f</a>'
-        + ' <a href="HTTPS://EXAMPLE.COM/">h</a> <a href="//cdn.example.com/x">c</a> <a href="#top">j</a> <link url_id="5">u</link></p>';
-    assert.deepEqual( S.count( html ), none );
+        + ' <a href="HTTPS://EXAMPLE.COM/">h</a> <a href="//cdn.example.com/x">c</a> <a href="#top">j</a> <link url_id="5">u</link>'
+        + ' <a href="mailto:a@b.c">m</a> <a>no href</a></p>';
+    // http(s) and mailto survive the server's cleaning; tel, www., ftp, //host and #fragment do not
+    assert.deepEqual( S.count( html ), counts( { otherlink: 5 } ) );
     assert.deepEqual( S.count( '<a href="/about">a</a><a href="eznode://2">b</a><link node_id="3">c</link>' ), counts( { link: 3 } ) );
+    assert.deepEqual( S.loss( html, '<p>t w f <a href="https://example.com/">h</a> c j u m</p>' ), [ { kind: 'otherlink', lost: 5 } ] );
+} );
+
+test( 'headings the answer changes (h1, h5, h6) and the style attribute are losses', () => {
+    const html = '<h1>a</h1><h2>b</h2><h5>c</h5><h6>d</h6><p style="text-align:center">e</p>';
+    assert.deepEqual( S.count( html ), counts( { heading: 3, attribute: 1 } ) );
+    assert.deepEqual( S.loss( html, '<h2>a</h2><h2>b</h2><h4>c</h4><h4>d</h4><p>e</p>' ),
+                      [ { kind: 'heading', lost: 3 }, { kind: 'attribute', lost: 1 } ] );
+    assert.deepEqual( S.loss( '<h2>a</h2><h3>b</h3><h4>c</h4>', '<h2>a</h2>' ), [] );
+} );
+
+test( 'the strings of every kind are named lost_<kind>_1 and lost_<kind>_n', () => {
+    assert.equal( S.describe( [ { kind: 'otherlink', lost: 1 }, { kind: 'heading', lost: 2 } ],
+                              { lost_otherlink_1: '%count link', lost_heading_n: '%count headings' } ), '1 link, 2 headings' );
 } );
 
 test( 'an unclosed embed or literal ends at the next block or at the end around it', () => {

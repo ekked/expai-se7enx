@@ -44,6 +44,8 @@
         'attributes', $exp_ai_attributes,
         'actions', $exp_ai_actions,
         'writable', ezini( 'ToolSettings', 'WritableDatatypes', 'expai.ini' ),
+        'hide_editor_ai', array( 'true', 'enabled' )|contains( ezini( 'EditViewSettings', 'HideActionsWithEditorAI', 'expai.ini' )|downcase ),
+        'max_field_length', ezini( 'EditViewSettings', 'MaxFieldLength', 'expai.ini' ),
         'languages', $exp_ai_languages,
         'strings', hash(
             'show', 'Show'|i18n( 'extension/expai/edit' ),
@@ -74,6 +76,7 @@
             'copied', 'Copied.'|i18n( 'extension/expai/edit' ),
             'copy_failed', 'The text could not be copied.'|i18n( 'extension/expai/edit' ),
             'kept', 'Kept the original value.'|i18n( 'extension/expai/edit' ),
+            'review_truncated', 'The field is longer than the %count characters the assistant reads: only the beginning was edited.'|i18n( 'extension/expai/edit' ),
             'review_unchecked', 'The structure of the field could not be checked.'|i18n( 'extension/expai/edit' ),
             'lost_cell_1', '%count table cell'|i18n( 'extension/expai/edit' ),
             'lost_cell_n', '%count table cells'|i18n( 'extension/expai/edit' ),
@@ -93,6 +96,10 @@
             'lost_literal_n', '%count literal blocks'|i18n( 'extension/expai/edit' ),
             'lost_link_1', '%count internal link'|i18n( 'extension/expai/edit' ),
             'lost_link_n', '%count internal links'|i18n( 'extension/expai/edit' ),
+            'lost_otherlink_1', '%count link that is not http(s) or mail'|i18n( 'extension/expai/edit' ),
+            'lost_otherlink_n', '%count links that are not http(s) or mail'|i18n( 'extension/expai/edit' ),
+            'lost_heading_1', '%count heading of level 1, 5 or 6'|i18n( 'extension/expai/edit' ),
+            'lost_heading_n', '%count headings of level 1, 5 or 6'|i18n( 'extension/expai/edit' ),
             'lost_attribute_1', '%count formatting attribute'|i18n( 'extension/expai/edit' ),
             'lost_attribute_n', '%count formatting attributes'|i18n( 'extension/expai/edit' )
         )

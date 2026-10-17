@@ -149,8 +149,20 @@ class expAiChangeStager
      * @param eZContentObject $parserObject the object the rich text belongs to (the parent's object for a new one)
      * @return array( string|null value, string error )
      */
-    public function storageValue( $datatype, $value, $classAttribute, eZContentObject $parserObject )
+    public function storageValue( $datatype, $value, $classAttribute, eZContentObject $parserObject, ?array $sources = null, &$guard = null )
     {
+        $guard = null;
+        // rich text with placeholders: restored from $sources; an answer that loses structure is staged as far as it
+        // can be restored, and its hunks that would drop an element cannot be accepted (expAiDiff "loses")
+        if ( !is_array( $value ) && $value !== null && expAiRichTextTokens::handles( $datatype, $this->context->config ) )
+        {
+            $messages = array();
+            $urlIDs = array();
+            $xml = $this->context->writer->richTextToXml( $parserObject, (string) $value, $urlIDs, $messages, (array) $sources, $guard, true );
+            if ( $xml === false )
+                return array( null, 'the rich text could not be read: ' . implode( ' ', array_map( 'strval', (array) $messages ) ) );
+            return array( (string) $xml, '' );
+        }
         if ( is_array( $value ) )
             $value = $datatype === 'ezkeyword' ? implode( ', ', array_map( 'strval', $value ) ) : null;
         if ( $value === null )
@@ -219,10 +231,23 @@ class expAiChangeStager
                             'base_text' => expAiText::cut( (string) $hunk['base_text'], 8000 ), 'prop_text' => expAiText::cut( (string) $hunk['prop_text'], 8000 ),
                             'context_before' => expAiText::cut( (string) $hunk['context_before'], 300 ), 'context_after' => expAiText::cut( (string) $hunk['context_after'], 300 ),
                             'mergeable' => (bool) $hunk['mergeable'], 'chars' => (int) $hunk['chars'],
-                            'decision' => $old && isset( $old['decision'] ) ? (string) $old['decision'] : $newDecision,
+                            'loses' => isset( $hunk['loses'] ) ? (array) $hunk['loses'] : array(),
+                            'decision' => self::carriedDecision( $hunk, $old, $newDecision ),
                             'edited' => $old && !empty( $old['edited'] ) );
         }
         return $out;
+    }
+
+    /**
+     * The decision a hunk gets when a proposal is compared again: the earlier one of the same hunk, else $newDecision;
+     * a hunk that would drop elements ("loses") is never accepted, so an earlier "accepted" becomes "pending" (an
+     * editor's "rejected" stays).
+     * @return string
+     */
+    public static function carriedDecision( array $hunk, $old, $newDecision )
+    {
+        $decision = $old && isset( $old['decision'] ) ? (string) $old['decision'] : (string) $newDecision;
+        return !empty( $hunk['loses'] ) && $decision === 'accepted' ? 'pending' : $decision;
     }
 
     /* -------------------------------------------------------------- staging */
@@ -307,7 +332,7 @@ class expAiChangeStager
             throw new expAiException( 'This thread has %max staged changes waiting. Ask the editor to review them first.', '', 0, array( '%max' => $max ) );
         $writable = $this->context->config->writableDatatypes();
         $runID = $this->context->conversation ? (int) $this->context->conversation->attribute( 'run_id' ) : 0;
-        $result = array( 'change_ids' => array(), 'staged' => array(), 'unchanged' => array(), 'skipped' => array(), 'errors' => array(), 'held' => array() );
+        $result = array( 'change_ids' => array(), 'staged' => array(), 'unchanged' => array(), 'skipped' => array(), 'errors' => array(), 'held' => array(), 'guarded' => array() );
         $now = time();
         $db = eZDB::instance();
         $db->begin();
@@ -328,13 +353,16 @@ class expAiChangeStager
                     $result['skipped'][$identifier] = 'not translatable: it keeps the value of the main language';
                     continue;
                 }
-                list( $proposed, $error ) = $this->storageValue( $datatype, $value, $classAttribute, $parserObject );
+                $baseValue = isset( $values[$identifier] ) ? (string) $values[$identifier]['value'] : '';
+                $sources = $objectID ? $this->sources( $parserObject, $identifier, $baseValue, $language ) : array( $baseValue );
+                list( $proposed, $error ) = $this->storageValue( $datatype, $value, $classAttribute, $parserObject, $sources, $guard );
                 if ( $proposed === null )
                 {
                     $result['errors'][$identifier] = $error;
                     continue;
                 }
-                $baseValue = isset( $values[$identifier] ) ? (string) $values[$identifier]['value'] : '';
+                if ( $guard && !$guard['ok'] )
+                    $result['guarded'][$identifier] = $guard['reason_model'];
                 $existing = expAiChange::fetchTarget( $threadID, $objectID, $newKey, $language, $identifier );
                 // one field is staged by one run at a time (doc/parallel-runs.md): another run that still works holds it
                 $holder = $objectID ? self::holder( $existing, $runID, $objectID, $language, $identifier ) : null;
@@ -397,8 +425,31 @@ class expAiChangeStager
         $result['status'] = $result['change_ids']
             ? 'staged for the editor\'s review (nothing is written until the editor accepts and applies it)'
               . ( $result['held'] ? '; the fields under "held" are being changed by another run and were not staged' : '' )
+              . ( $result['guarded'] ? '; the rich text fields under "guarded" lost placeholders: the parts that would drop an element cannot be accepted. '
+                                       . 'Call the tool again for this object with every placeholder kept exactly once' : '' )
             : 'nothing to stage: the values equal the published version';
+        if ( !$result['guarded'] )
+            unset( $result['guarded'] );
         return $result;
+    }
+
+    /**
+     * The values a rich text answer for an existing object may take its placeholders from: the published value in the
+     * language, the published values in the other languages, then the open proposals of this thread for the field in
+     * other languages (a translation that works from a staged source text).
+     * @return string[]
+     */
+    protected function sources( eZContentObject $object, $identifier, $baseValue, $language )
+    {
+        $sources = expAiContentWriter::richTextSources( $object, $identifier, $baseValue );
+        $changes = eZPersistentObject::fetchObjectList( expAiChange::definition(), null,
+            array( 'thread_id' => (int) $this->thread->attribute( 'id' ), 'contentobject_id' => (int) $object->attribute( 'id' ),
+                   'attribute_identifier' => (string) $identifier, 'decision' => array( array( 'pending', 'accepted', 'partial', 'applied' ) ) ),
+            array( 'id' => 'desc' ), array( 'offset' => 0, 'length' => 20 ) );
+        foreach ( (array) $changes as $change )
+            if ( (string) $change->attribute( 'language_code' ) !== (string) $language )
+                $sources[] = (string) $change->attribute( 'proposed' );
+        return array_values( array_unique( $sources ) );
     }
 
     /**

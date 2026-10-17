@@ -126,11 +126,37 @@ The alias is what users choose and what the usage log records (letters, digits, 
 | `Tools[]` | the seven tools of tools.md | The tools offered to the model, each defined in `[Tool_<name>] Class=`. |
 | `WritableDatatypes[]` | ezstring, eztext, ezxmltext, ezkeyword, ezboolean, ezinteger, ezfloat, ezdate, ezdatetime, ezemail, ezurl | The datatypes the tools and field actions may write. Others (images, files, relations, ...) are skipped and reported. |
 | `ListLimit` | `25` | The most children / siblings one lookup returns. |
-| `FieldValueMaxLength` | `3000` | The longest field value a lookup returns, in characters. |
+| `FieldValueMaxLength` | `3000` | The longest field value a lookup returns, in characters (rich text: `[RichTextSettings] MaxLength`). |
 
 `[Tool_<name>] Class=` names the class of each tool (`expAiToolGetNode`, `expAiToolListChildren`,
 `expAiToolGetTreeContext`, `expAiToolListCreatableClasses`, `expAiToolGetClassDefinition`, `expAiToolCreateDraft`,
 `expAiToolUpdateDraft`).
+
+## [RichTextSettings]: rich text with placeholders
+
+The model reads and writes rich text (ezxmltext) in the HTML subset `p`, `h1`-`h6`, `strong`, `em`, `ul`, `ol`, `li`,
+`a href` (http(s), mailto), `br` (expAiRichTextTokens). Everything the subset cannot express becomes a placeholder in
+the format of exp_oe_tiptap's assistant: `⟦C1⟧` custom tag (math_latex, math_mathml with all its attributes), `⟦E1⟧`
+embed, `⟦T1⟧` table, `⟦P1⟧` literal, `⟦A1⟧` anchor, `⟦L1⟧` a link to a node or object (or any address but http(s) and
+mailto), `⟦B1⟧` a list with attributes, `⟦X1⟧` any other element, `⟦K1⟧` at the start of a block or inline element:
+its attributes (class, align, custom attributes), `⟦R1⟧` the rest of a field longer than `MaxLength`. Placeholders are
+numbered in document order, so no map is stored: an answer is restored against the value it is written into, else
+the field in the object's other languages (a translation), else, in Vector, the thread's open proposals of the field.
+
+An answer is written only when every placeholder comes back exactly once and the value has no fewer custom tags (per
+name), embeds, tables, literals, anchors, kept links and attributed elements than the value it replaces. Otherwise:
+in the panel the field is not written and the model is told why; in a Vector thread writing directly the field is
+staged for review instead (expai_change); in staged review it is staged as far as it can be restored, the rest of a
+long field always kept. A review part (hunk) whose proposal has fewer of these elements than its base shows what it
+would remove and cannot be accepted; "accept field" rejects it. Applying checks the merged value once more and writes
+nothing that loses structure.
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `Placeholders` | `enabled` | `disabled`: the old plain HTML view, which loses that structure when written back. |
+| `Datatypes[]` | ezxmltext | The datatypes whose stored value is ezxmltext and that get placeholders. |
+| `MaxLength` | empty (`[EditViewSettings] MaxFieldLength`, 20000) | The characters of a rich text field the model reads; the rest is one `⟦R…⟧` placeholder per section level, written back unchanged. |
+| `Protected[<element>]=<letter>` | custom=C, embed=E, embed-inline=E, table=T, literal=P, anchor=A | Elements always kept whole. An element the subset knows (e.g. `strong`) can be added to keep it whole as well. The letters K, L, Q (a ⟦ or ⟧ of the text itself), R and X are reserved. |
 
 ## [PanelSettings]: the Intelligence tab
 
@@ -145,6 +171,8 @@ The alias is what users choose and what the usage log records (letters, digits, 
 | `Enabled` | `true` | The Exponential Intelligence area and the field actions in content/edit. |
 | `Sections[]` | `assistant` | The sections of the edit form area; each `[EditSection_<name>] Template=`. |
 | `FieldActions[]` | write, rewrite, shorten, translate, suggest | The buttons next to the fields, in this order. |
+| `HideActionsWithEditorAI` | `true` | Hides the field actions and the Improve menu above a rich text field whose editor has an assistant of its own that keeps formulas, embeds and tables (Tiptap with its AI enabled); the field's presets stay. See [edit-view-integration.md](edit-view-integration.md). |
+| `MaxFieldLength` | `20000` | The most characters of a field's current value the model gets (field actions, presets, Improve menu), 1000 to 200000. The answer to a longer field is shown for review instead of being written. |
 
 Each `[FieldAction_<name>]`:
 

@@ -85,8 +85,10 @@ into a field, expai.js (`ExpAi.guardedApply()`) checks two things:
   | custom tags | `class="ezoeItemCustomTag ..."`, `type="custom"`, `data-ezelement="eztemplate*"`, `<custom>`, `<sub>`, `<sup>` |
   | anchors | `<a name>`/`<a id>` without `href`, `<anchor>`, `<header anchor_name>` |
   | literals | `<pre>`, `<literal>` |
-  | internal links | links to `ezobject://`, `eznode://`, a path on the site (`/about`), or with `object_id`/`node_id`; links with a scheme of their own (`http`, `mailto`, `tel`, `ftp` ...), without one (`www.example.com`), protocol-relative ones and `#fragment` links are external and do not count |
-  | formatting attributes | each `align`, `valign`, `width`, `border`, `cellpadding`, `cellspacing`, `customattributes`, `target`, `title`, `view` and `custom:*` attribute, a class of its own (the editors' `ezoe*`/`mce*` classes do not count) and the `id` of a link, on any element but an embed: blocks, tables and cells, links (external ones too) and anchors |
+  | internal links | links to `ezobject://`, `eznode://`, a path on the site (`/about`), or with `object_id`/`node_id` |
+  | other links | external links the answer cannot keep either: anything but `http(s)://` and `mailto:` (`tel:`, `ftp:`, `www.example.com`, protocol-relative ones, `#fragment` links); `expAiText::sanitizeHtml()` removes exactly these |
+  | headings | `<h1>`, `<h5>`, `<h6>` (the answer has `<h2>` to `<h4>` only) |
+  | formatting attributes | each `align`, `valign`, `width`, `border`, `cellpadding`, `cellspacing`, `customattributes`, `target`, `title`, `view`, `style` and `custom:*` attribute, a class of its own (the editors' `ezoe*`/`mce*` classes do not count) and the `id` of a link, on any element but an embed: blocks, tables and cells, links (external ones too) and anchors |
 
   It reads the HTML of the Online Editor (TinyMCE) and of Tiptap (exp_oe_tiptap) and the simplified XML of a textarea
   without an editor alike, with a small tag scanner (no DOM). Comments, CDATA sections and the content of `script`,
@@ -97,6 +99,10 @@ into a field, expai.js (`ExpAi.guardedApply()`) checks two things:
   ("The structure of the field could not be checked.") and the console says so once.
 - **A change meanwhile** (every datatype, also the parts of an xrowmetadata field): the value the request sent is kept;
   when the field differs once the answer is there (white space between tags aside), the answer is not written.
+- **A cut value** (every datatype): the model gets the first `[EditViewSettings] MaxFieldLength` characters of the
+  field (default 20000, 1000 to 200000; "Fill the fields" sends 6000 per field). When the field was longer, the answer
+  was made from its beginning only and would replace the whole field, so it is not written ("The field is longer than
+  the %count characters the assistant reads: only the beginning was edited.", `review_truncated`).
 
 Instead of writing, the field's bar shows a review: the answer (as plain text, rendered safely), the reason ("2
 embedded objects, 1 table would be lost.", "The field changed while the answer was written.") and the buttons **Apply
@@ -108,10 +114,28 @@ The same check runs for the field actions, the presets and the Improve menu (`ex
 fields": a field of a fill that needs a review gets it in its bar (or in a box of its own after the label when the
 field has no bar), and the note of the fill counts the answers not written. The strings come from the edit form's
 configuration (`content/edit/expai.tpl`, context `extension/expai/edit`): `review_*`, `apply_anyway`,
-`keep_original`, `copy_text`, `copied`, `copy_failed`, `kept`, `review_unchecked` and `lost_<kind>_1`/`lost_<kind>_n` per kind.
+`keep_original`, `copy_text`, `copied`, `copy_failed`, `kept`, `review_unchecked`, `review_truncated` and `lost_<kind>_1`/`lost_<kind>_n` per kind.
 
 An extension that writes answers into fields itself calls
-`ExpAi.guardedApply( { ctx, adapter, value, sent, host, strings, apply, kept } )`; it returns `{written, review}`.
+`ExpAi.guardedApply( { ctx, adapter, value, sent, host, strings, apply, kept, limit } )`; it returns
+`{written, review}`. `limit` is the number of characters the request sent of the field (default
+`ExpAi.limits.fieldLength`).
+
+### Editors with an assistant of their own
+
+An editor whose own assistant keeps formulas, embeds and tables does that job better than the field actions, which
+only know the subset above and would ask for a review of everything else. Above an ezxmltext field whose editor has
+one, the field actions and the Improve menu are hidden; the presets of the field stay, and the bar goes only when no
+preset is left in it. Tiptap (exp_oe_tiptap) counts when its AI panel is switched on (`options.ai.enabled`). The editor
+is read live (a `MutationObserver` on the field's block): an editor that starts later is picked up, and switching to
+TinyMCE or removing the editor brings the buttons back. Other editors register a detector that gets the field's
+textarea:
+
+```js
+ExpAi.ownAIEditors.register( 'myeditor', function ( textarea ) { return !!MyEditor.aiFor( textarea ); } );
+```
+
+`[EditViewSettings] HideActionsWithEditorAI=false` shows the field actions above every field, whatever the editor.
 
 ## Presets and the Improve menu
 

@@ -172,9 +172,18 @@ class expAiChange extends eZPersistentObject
         {
             if ( $hunkID !== '' && (string) $hunk['id'] !== (string) $hunkID )
                 continue;
-            if ( !isset( $hunk['decision'] ) || $hunk['decision'] !== $decision )
+            $want = $decision;
+            // a part that would drop custom tags, embeds, ... is never written: accepting the whole field rejects it
+            if ( $decision === 'accepted' && !empty( $hunk['loses'] ) )
             {
-                $hunks[$i]['decision'] = $decision;
+                if ( $hunkID !== '' )
+                    throw new expAiException( 'This part would remove %items from the text and cannot be accepted. Reject it, or ask for a new proposal that keeps them.',
+                                              'hunk loses structure', 0, array( '%items' => expAiRichTextTokens::describe( (array) $hunk['loses'] ) ) );
+                $want = 'rejected';
+            }
+            if ( !isset( $hunk['decision'] ) || $hunk['decision'] !== $want )
+            {
+                $hunks[$i]['decision'] = $want;
                 $n++;
             }
         }
@@ -268,6 +277,7 @@ class expAiChange extends eZPersistentObject
                               'context_before' => isset( $hunk['context_before'] ) ? (string) $hunk['context_before'] : '',
                               'context_after' => isset( $hunk['context_after'] ) ? (string) $hunk['context_after'] : '',
                               'mergeable' => !isset( $hunk['mergeable'] ) || $hunk['mergeable'], 'edited' => !empty( $hunk['edited'] ),
+                              'loses' => !empty( $hunk['loses'] ) ? expAiRichTextTokens::describe( (array) $hunk['loses'] ) : '',
                               'editable' => in_array( $this->attribute( 'datatype' ), expAiChangeStager::$editable, true ) && (string) $hunk['prop_text'] !== '' );
         return array( 'id' => (int) $this->attribute( 'id' ), 'attribute' => (string) $this->attribute( 'attribute_identifier' ),
                       'datatype' => (string) $this->attribute( 'datatype' ), 'decision' => (string) $this->attribute( 'decision' ),

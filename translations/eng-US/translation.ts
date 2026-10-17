@@ -1197,6 +1197,26 @@
         <source>%count formatting attributes</source>
         <translation>%count formatting attributes</translation>
     </message>
+    <message>
+        <source>The field is longer than the %count characters the assistant reads: only the beginning was edited.</source>
+        <translation>The field is longer than the %count characters the assistant reads: only the beginning was edited.</translation>
+    </message>
+    <message>
+        <source>%count link that is not http(s) or mail</source>
+        <translation>%count link that is not http(s) or mail</translation>
+    </message>
+    <message>
+        <source>%count links that are not http(s) or mail</source>
+        <translation>%count links that are not http(s) or mail</translation>
+    </message>
+    <message>
+        <source>%count heading of level 1, 5 or 6</source>
+        <translation>%count heading of level 1, 5 or 6</translation>
+    </message>
+    <message>
+        <source>%count headings of level 1, 5 or 6</source>
+        <translation>%count headings of level 1, 5 or 6</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/error</name>
@@ -6643,4 +6663,126 @@
         <translation>Give the words to search for.</translation>
     </message>
 </context>
+<!-- expai rich text placeholders: begin -->
+<context>
+    <name>extension/expai/richtext</name>
+    <message>
+        <source>%count custom tag %name</source>
+        <translation>%count custom tag %name</translation>
+    </message>
+    <message>
+        <source>%count custom tags %name</source>
+        <translation>%count custom tags %name</translation>
+    </message>
+    <message>
+        <source>%count embedded object</source>
+        <translation>%count embedded object</translation>
+    </message>
+    <message>
+        <source>%count embedded objects</source>
+        <translation>%count embedded objects</translation>
+    </message>
+    <message>
+        <source>%count table</source>
+        <translation>%count table</translation>
+    </message>
+    <message>
+        <source>%count tables</source>
+        <translation>%count tables</translation>
+    </message>
+    <message>
+        <source>%count literal block</source>
+        <translation>%count literal block</translation>
+    </message>
+    <message>
+        <source>%count literal blocks</source>
+        <translation>%count literal blocks</translation>
+    </message>
+    <message>
+        <source>%count anchor</source>
+        <translation>%count anchor</translation>
+    </message>
+    <message>
+        <source>%count anchors</source>
+        <translation>%count anchors</translation>
+    </message>
+    <message>
+        <source>%count link the answer cannot keep</source>
+        <translation>%count link the answer cannot keep</translation>
+    </message>
+    <message>
+        <source>%count links the answer cannot keep</source>
+        <translation>%count links the answer cannot keep</translation>
+    </message>
+    <message>
+        <source>%count formatting attribute</source>
+        <translation>%count formatting attribute</translation>
+    </message>
+    <message>
+        <source>%count formatting attributes</source>
+        <translation>%count formatting attributes</translation>
+    </message>
+    <message>
+        <source>the rest of the field</source>
+        <translation>the rest of the field</translation>
+    </message>
+    <message>
+        <source>%count element %name</source>
+        <translation>%count element %name</translation>
+    </message>
+    <message>
+        <source>%count elements %name</source>
+        <translation>%count elements %name</translation>
+    </message>
+    <message>
+        <source>Placeholders missing: %list.</source>
+        <translation>Placeholders missing: %list.</translation>
+    </message>
+    <message>
+        <source>Placeholders repeated: %list.</source>
+        <translation>Placeholders repeated: %list.</translation>
+    </message>
+    <message>
+        <source>Placeholders that are not in the text: %list.</source>
+        <translation>Placeholders that are not in the text: %list.</translation>
+    </message>
+    <message>
+        <source>Placeholders in a place where their element cannot stand: %list.</source>
+        <translation>Placeholders in a place where their element cannot stand: %list.</translation>
+    </message>
+    <message>
+        <source>The text would lose: %items.</source>
+        <translation>The text would lose: %items.</translation>
+    </message>
+    <message>
+        <source>The rich text keeps its structure only when every placeholder comes back exactly once and unchanged.</source>
+        <translation>The rich text keeps its structure only when every placeholder comes back exactly once and unchanged.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>This part would remove %items from the text and cannot be accepted. Reject it, or ask for a new proposal that keeps them.</source>
+        <translation>This part would remove %items from the text and cannot be accepted. Reject it, or ask for a new proposal that keeps them.</translation>
+    </message>
+    <message>
+        <source>The accepted parts would remove %items from the field %field. Nothing was written.</source>
+        <translation>The accepted parts would remove %items from the field %field. Nothing was written.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/step</name>
+    <message>
+        <source>Changed "%name"; rich text that would lose its structure was not written</source>
+        <translation>Changed "%name"; rich text that would lose its structure was not written</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/vector</name>
+    <message>
+        <source>This part would remove %items from the text, so it cannot be accepted. Reject it, or ask for a new proposal that keeps them.</source>
+        <translation>This part would remove %items from the text, so it cannot be accepted. Reject it, or ask for a new proposal that keeps them.</translation>
+    </message>
+</context>
+<!-- expai rich text placeholders: end -->
 </TS>

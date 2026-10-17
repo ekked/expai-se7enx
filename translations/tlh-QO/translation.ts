@@ -1777,6 +1777,26 @@
         <source>%count formatting attributes</source>
         <translation>%count Segh DuH</translation>
     </message>
+    <message>
+        <source>The field is longer than the %count characters the assistant reads: only the beginning was edited.</source>
+        <translation>%count ngutlh law&apos; laD QaH&apos;a&apos;; tlhegh nach neH choHlu&apos;pu&apos;.</translation>
+    </message>
+    <message>
+        <source>%count link that is not http(s) or mail</source>
+        <translation>%count rarwI&apos; http(s) ghap QIn rarwI&apos; ghaj&apos;be&apos;</translation>
+    </message>
+    <message>
+        <source>%count links that are not http(s) or mail</source>
+        <translation>%count rarwI&apos; http(s) ghap QIn rarwI&apos; ghaj&apos;be&apos;</translation>
+    </message>
+    <message>
+        <source>%count heading of level 1, 5 or 6</source>
+        <translation>%count nach patlh 1, 5 ghap 6</translation>
+    </message>
+    <message>
+        <source>%count headings of level 1, 5 or 6</source>
+        <translation>%count nach patlh 1, 5 ghap 6</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/fieldaction</name>

@@ -1774,6 +1774,26 @@
         <source>%count formatting attributes</source>
         <translation>%count atributos de formato</translation>
     </message>
+    <message>
+        <source>The field is longer than the %count characters the assistant reads: only the beginning was edited.</source>
+        <translation>El campo tiene más de los %count caracteres que lee el asistente: solo se editó el principio.</translation>
+    </message>
+    <message>
+        <source>%count link that is not http(s) or mail</source>
+        <translation>%count enlace que no es http(s) ni de correo</translation>
+    </message>
+    <message>
+        <source>%count links that are not http(s) or mail</source>
+        <translation>%count enlaces que no son http(s) ni de correo</translation>
+    </message>
+    <message>
+        <source>%count heading of level 1, 5 or 6</source>
+        <translation>%count encabezado de nivel 1, 5 o 6</translation>
+    </message>
+    <message>
+        <source>%count headings of level 1, 5 or 6</source>
+        <translation>%count encabezados de nivel 1, 5 o 6</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/fieldaction</name>

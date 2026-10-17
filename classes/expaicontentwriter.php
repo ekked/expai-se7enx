@@ -18,6 +18,9 @@ class expAiContentWriter
     /** @var expAiConfig */
     protected $config;
 
+    /** @var array identifier => the guard of the last rich text written into the field (richTextToXml()) */
+    public $guarded = array();
+
     public function __construct( ?expAiConfig $config = null )
     {
         $this->config = $config ?: expAiConfig::instance();
@@ -286,7 +289,14 @@ class expAiContentWriter
      */
     public function writeRichText( eZContentObject $object, eZContentObjectAttribute $attribute, $html )
     {
-        $xml = $this->richTextToXml( $object, $html, $urlIDs, $messages );
+        $classAttribute = $attribute->contentClassAttribute();
+        $identifier = $classAttribute ? (string) $classAttribute->attribute( 'identifier' ) : '';
+        // the placeholders of the answer come from the value it replaces (or, for a translation, another language)
+        $sources = self::richTextSources( $object, $identifier, (string) $attribute->attribute( 'data_text' ) );
+        $xml = $this->richTextToXml( $object, $html, $urlIDs, $messages, $sources, $guard );
+        $this->guarded[$identifier] = $guard;
+        if ( $xml === false && $guard && !$guard['ok'] )
+            return 'not written: ' . $guard['reason_model'];
         if ( $xml === false )
             return 'the rich text could not be read: ' . implode( ' ', $messages );
         $attribute->setAttribute( 'data_text', $xml );
@@ -297,18 +307,107 @@ class expAiContentWriter
     }
 
     /**
-     * @return string|false the ezxmltext XML of an HTML text
+     * The ezxmltext XML of an HTML text. With placeholders ([RichTextSettings] Placeholders, expAiRichTextTokens) the
+     * placeholders of the answer are put back as the elements they stand for, taken from the first of $sources whose
+     * placeholders the answer uses. Nothing is returned (false, $guard['ok'] false) when a placeholder is missing,
+     * repeated, invented or misplaced, or when the value would have less structure than the first of $sources that is
+     * not empty (the value it replaces; for a new language the field in another language); with $bestEffort the value is returned anyway (the
+     * known placeholders restored, the others removed, the rest of a long field kept) for a review that shows it.
+     * @param string[]|null $sources stored values: the value written into first, then the other languages
+     * @param array|null $guard ok, problems, loss, reason (translated, for the editor), reason_model (English)
+     * @return string|false
      */
-    public function richTextToXml( eZContentObject $object, $html, &$urlIDs = array(), &$messages = array() )
+    public function richTextToXml( eZContentObject $object, $html, &$urlIDs = array(), &$messages = array(), ?array $sources = null, &$guard = null, $bestEffort = false )
     {
-        $clean = expAiText::sanitizeHtml( $html );
+        $guard = array( 'ok' => true, 'problems' => array(), 'loss' => array(), 'reason' => '', 'reason_model' => '' );
+        $tokens = expAiRichTextTokens::enabled( $this->config ) ? new expAiRichTextTokens( $this->config ) : null;
+        $read = null;
+        if ( $tokens )
+        {
+            $read = $tokens->resolve( (string) $html, (array) $sources );
+            if ( !expAiRichTextTokens::clean( $read['problems'] ) && !$bestEffort )
+                return $this->refuse( $guard, $messages, $read['problems'], array() );
+        }
+        $clean = expAiText::sanitizeHtml( $html, (bool) $tokens );
         $parser = new eZSimplifiedXMLInputParser( (int) $object->attribute( 'id' ), true, eZXMLInputParser::ERROR_ALL, true );
         $document = $parser->process( $clean );
         $messages = (array) $parser->getMessages();
         if ( !is_object( $document ) )
             return false;
         $urlIDs = (array) $parser->getUrlIDArray();
-        return eZXMLTextType::domString( $document );
+        if ( !$tokens )
+            return eZXMLTextType::domString( $document );
+        $problems = $read['problems'];
+        if ( $read['tokens'] || expAiRichTextTokens::keys( $html ) )
+            foreach ( $tokens->restore( $document, $read, true ) as $name => $list )
+                $problems[$name] = array_values( array_unique( array_merge( $problems[$name], $list ) ) );
+        $xml = eZXMLTextType::domString( $document );
+        // the structure the value replaces is all there; a language that does not exist yet keeps the structure of the
+        // first language that has the field (a translation never drops a formula either)
+        $base = '';
+        // (an empty <section/>, as the kernel stores a field never filled, does not count)
+        foreach ( (array) $sources as $source )
+            if ( !expAiRichTextTokens::isEmpty( $source ) )
+            {
+                $base = (string) $source;
+                break;
+            }
+        $loss = $base !== '' ? $tokens->loss( $base, $xml ) : array();
+        if ( !expAiRichTextTokens::clean( $problems ) || $loss )
+        {
+            $this->refuse( $guard, $messages, $problems, $loss );
+            if ( !$bestEffort )
+                return false;
+        }
+        return $xml;
+    }
+
+    /** @return false, with the reasons of a refused rich text in $guard and $messages */
+    protected function refuse( array &$guard, &$messages, array $problems, array $loss )
+    {
+        $guard['ok'] = false;
+        $guard['problems'] = $problems;
+        $guard['loss'] = $loss;
+        $guard['reason'] = expAiRichTextTokens::reason( $problems, $loss, true );
+        $guard['reason_model'] = expAiRichTextTokens::reason( $problems, $loss, false );
+        $messages = array( $guard['reason_model'] );
+        return false;
+    }
+
+    /**
+     * The values an answer for a rich text field may take its placeholders from: $first (the value it is written
+     * into), then the field in the published version in every language of the object, the main language first.
+     * @return string[]
+     */
+    public static function richTextSources( eZContentObject $object, $identifier, $first = '' )
+    {
+        $out = array( (string) $first );
+        if ( (string) $identifier === '' || !(int) $object->attribute( 'id' ) || (int) $object->attribute( 'status' ) !== eZContentObject::STATUS_PUBLISHED )
+            return $out;
+        $main = (string) $object->attribute( 'initial_language_code' );
+        $languages = array_keys( (array) $object->allLanguages() );
+        usort( $languages, function ( $a, $b ) use ( $main ) { return ( $b === $main ) - ( $a === $main ); } );
+        foreach ( $languages as $language )
+        {
+            $values = expAiDiff::values( $object, (int) $object->attribute( 'current_version' ), $language );
+            if ( isset( $values[$identifier] ) && !expAiRichTextTokens::isEmpty( $values[$identifier]['value'] ) )
+                $out[] = (string) $values[$identifier]['value'];
+        }
+        return array_values( array_unique( $out ) );
+    }
+
+    /**
+     * Checks a rich text answer for an existing object before anything is written (no draft is made for an answer
+     * that would lose structure): against the published value in the language and the other languages.
+     * @return array the guard of richTextToXml() (ok, problems, loss, reason, reason_model)
+     */
+    public function checkRichText( eZContentObject $object, $identifier, $language, $html )
+    {
+        $values = in_array( (string) $language, array_keys( (array) $object->allLanguages() ), true )
+            ? expAiDiff::values( $object, (int) $object->attribute( 'current_version' ), (string) $language ) : array();
+        $base = isset( $values[$identifier] ) ? (string) $values[$identifier]['value'] : '';
+        $this->richTextToXml( $object, (string) $html, $urlIDs, $messages, self::richTextSources( $object, $identifier, $base ), $guard );
+        return $guard;
     }
 
     public function updateName( eZContentObject $object, eZContentObjectVersion $version, $language )

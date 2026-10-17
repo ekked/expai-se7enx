@@ -290,6 +290,35 @@
         return adapters[datatype] || adapters._default;
     }
 
+    /* ------------------------------------------- editors with an assistant of their own */
+
+    // An editor "has its own structure-safe AI" when it has an assistant that keeps what the field actions cannot
+    // (formulas, embeds, tables ...). Each detector gets the field's textarea and answers true or false; the field
+    // actions are hidden above such a field ([EditViewSettings] HideActionsWithEditorAI). The editor is asked live,
+    // so an editor started later, switched or removed is picked up by the observer in edit().
+    var ownAIDetectors = {
+        // Tiptap (exp_oe_tiptap) with its AI panel switched on in the editor's options
+        tiptap: function ( el ) {
+            var tiptap = window.ExpOETiptap && window.ExpOETiptap.get ? window.ExpOETiptap.get( el ) : null;
+            return !!( tiptap && tiptap.options && tiptap.options.ai && tiptap.options.ai.enabled === true );
+        }
+    };
+
+    function editorHasOwnAI( el ) {
+        return !!el && Object.keys( ownAIDetectors ).some( function ( name ) {
+            try { return !!ownAIDetectors[name]( el ); } catch ( e ) { return false; }
+        } );
+    }
+
+    // the longest value the server reads ([EditViewSettings] MaxFieldLength); set by edit()
+    var limits = { fieldLength: 0 };
+
+    // the raw INI value clamped as the server does (expAiPromptFieldAction::maxValueLength): default 20000, 1000 to 200000
+    function fieldLengthLimit( raw ) {
+        var n = /^\s*-?\d+(\.\d+)?\s*$/.test( String( raw === undefined || raw === null ? '' : raw ) ) ? parseInt( raw, 10 ) : 20000;
+        return Math.min( 200000, Math.max( 1000, n ) );
+    }
+
     /* --------------------------------------------- structure and stale guard */
 
     var structureWarned = false;
@@ -307,6 +336,9 @@
      * shows the answer, what would be lost or that the field changed, and "Apply anyway", "Keep the original" and,
      * with the clipboard API, "Copy text". Only "Apply anyway" writes.
      *
+     * A field longer than the limit (o.limit, else ExpAi.limits.fieldLength) was cut when it was sent: the answer was
+     * made from its beginning only, so it is shown for review too (review_truncated).
+     *
      * o: { ctx, adapter, value (the answer), sent (the field's value when the request was sent; undefined: no check),
      *      host (element the review goes into), strings, apply() (writes, returns false when it could not),
      *      kept() (optional, after "Keep the original") }
@@ -318,6 +350,8 @@
         var current = o.adapter.get( o.ctx );
         var rich = !!( o.ctx.attribute && o.ctx.attribute.datatype === 'ezxmltext' && !o.ctx.part );
         var stale = o.sent !== undefined && o.sent !== null && !( Structure ? Structure.same( current, o.sent ) : current === o.sent );
+        var limit = o.limit || limits.fieldLength;
+        var truncated = !!limit && typeof o.sent === 'string' && o.sent.length > limit;
         var lost = rich && Structure ? Structure.loss( current, o.value ) : [];
         // without the detector rich text is never overwritten unseen
         var unchecked = rich && !Structure;
@@ -326,13 +360,16 @@
             window.console.warn( 'expai: expai_structure.js is not loaded; answers to rich text fields are shown for review' );
         }
         clearReview( o.host );
-        if ( !stale && !lost.length && !unchecked ) {
+        if ( !stale && !lost.length && !unchecked && !truncated ) {
             return { written: o.apply() !== false, review: false };
         }
         var text = Structure ? Structure.toText( o.value ) : String( o.value || '' );
         var reasons = [];
         if ( stale ) {
             reasons.push( S.review_changed );
+        }
+        if ( truncated ) {
+            reasons.push( fmt( S.review_truncated, { '%count': limit } ) );
         }
         if ( lost.length ) {
             reasons.push( fmt( S.review_lost, { '%list': Structure.describe( lost, S ) } ) );
@@ -393,6 +430,11 @@
             get: adapterFor
         },
         guardedApply: guardedApply,
+        limits: limits,
+        ownAIEditors: {
+            register: function ( name, detect ) { ownAIDetectors[name] = detect; },
+            has: editorHasOwnAI
+        },
         clearReview: clearReview,
         fieldActions: {
             register: function ( name, hooks ) { fieldActionHooks[name] = hooks || {}; }
@@ -1163,6 +1205,7 @@
         var toggle = root.querySelector( '.exp-ai-toggle' );
         var writable = C.writable || [];
         var fields = [];
+        limits.fieldLength = fieldLengthLimit( C.max_field_length );
 
         if ( toggle && body ) {
             var stored = null;
@@ -1353,9 +1396,36 @@
 
         fields.forEach( fieldBar );
 
-        /** Where the review of an answer to this field goes: its bar of field actions, or a box of its own after the label */
+        /**
+         * Above a rich text field whose editor has its own assistant (editorHasOwnAI) the field actions and the Improve
+         * menu are hidden (class exp-ai-editor-ai on the block); the bar goes with them when no preset is left in it
+         * (exp-ai-bar-off). Runs after every change in the block: the editor starts after this script, and a destroyed
+         * editor gives the buttons back.
+         */
+        function syncOwnAI( ctx ) {
+            var own = C.hide_editor_ai === true && ctx.attribute.datatype === 'ezxmltext' && editorHasOwnAI( fieldInput( ctx ) );
+            ctx.block.classList.toggle( 'exp-ai-editor-ai', own );
+            var bar = ctx.block.querySelector( '.exp-ai-field-bar' );
+            if ( bar ) {
+                bar.classList.toggle( 'exp-ai-bar-off', own && !bar.querySelector( '.exp-ai-preset-chip[data-preset]' ) );
+            }
+        }
+        if ( C.hide_editor_ai === true ) {
+            fields.filter( function ( ctx ) { return ctx.attribute.datatype === 'ezxmltext'; } ).forEach( function ( ctx ) {
+                var later = null;
+                var schedule = function () { window.clearTimeout( later ); later = window.setTimeout( function () { syncOwnAI( ctx ); }, 50 ); };
+                syncOwnAI( ctx );
+                if ( window.MutationObserver ) {
+                    // only added or removed nodes: the class changes above are attribute changes and do not loop
+                    new MutationObserver( schedule ).observe( ctx.block, { childList: true, subtree: true } );
+                }
+                window.addEventListener( 'load', schedule );
+            } );
+        }
+
+        /** Where the review of an answer to this field goes: its bar of field actions (when shown), or a box of its own after the label */
         function reviewHost( ctx ) {
-            var host = ctx.block.querySelector( '.exp-ai-field-bar' ) || ctx.block.querySelector( '.exp-ai-review-host' );
+            var host = ctx.block.querySelector( '.exp-ai-field-bar:not(.exp-ai-bar-off)' ) || ctx.block.querySelector( '.exp-ai-review-host' );
             if ( host ) {
                 return host;
             }
@@ -1392,6 +1462,7 @@
                 fields.forEach( function ( ctx ) {
                     sent[ctx.attribute.id] = ctxValue( ctx );
                     clearReview( ctx.block.querySelector( '.exp-ai-field-bar, .exp-ai-review-host' ) );
+                    clearReview( ctx.block.querySelector( '.exp-ai-review-host' ) );
                 } );
                 api( 'fill', $.extend( base(), { instruction: text, context: formContext() } ) ).then( function ( data ) {
                     fillUndo = [];
@@ -1403,6 +1474,8 @@
                         }
                         var outcome = guardedApply( {
                             ctx: ctx, adapter: adapterFor( ctx.attribute.datatype ), value: f.value, sent: sent[ctx.attribute.id], host: reviewHost( ctx ), strings: S,
+                            // formContext() sends the first 6000 characters of a field
+                            limit: 6000,
                             apply: function () {
                                 var done = fill( ctx, f.value );
                                 if ( done.ok ) {
