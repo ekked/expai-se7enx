@@ -47,6 +47,7 @@ html[data-a4-theme="dark"] .exp-ai, html[data-a4-theme="dark"] .exp-ai-badge,
 /* admin4l keeps its content boxes light in dark mode: expai.js marks them exp-ai-on-light, the light values return */
 html[data-a4-theme="dark"] .exp-ai.exp-ai-on-light, html[data-a4-theme="dark"] .exp-ai-badge.exp-ai-on-light {
     --exp-ai-line: #d9dde3;
+    --exp-ai-muted: #5d6573;
     --exp-ai-surface: rgba(127, 127, 127, 0.06);
     --exp-ai-user: rgba(127, 127, 127, 0.10);
     --exp-ai-accent-text: #b4470c;

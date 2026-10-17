@@ -1503,6 +1503,8 @@
 
         document.addEventListener( 'keydown', function ( e ) {
             if ( e.defaultPrevented || ( window.ExpAiPalette && window.ExpAiPalette.isOpen() ) || ( el.dialog && el.dialog.open ) || ( restoreDialog && restoreDialog.open ) ) { return; }
+            // a keystroke of an input method composing a character is never a shortcut
+            if ( e.isComposing || e.keyCode === 229 ) { return; }
             var ids = Object.keys( app.bindings );
             for ( var i = 0; i < ids.length; i++ ) {
                 var id = ids[i], b = app.bindings[id];
@@ -1510,7 +1512,6 @@
                 // a keystroke with Cmd/Ctrl held (the palette's, when it was not handled, as in a field) never runs
                 // a single-key shortcut such as j or k
                 if ( ( e.ctrlKey || e.metaKey ) && !/(^|\s)(Mod|Ctrl|Meta)\+/.test( b.keys ) ) { continue; }
-                if ( e.isComposing ) { return; }
                 if ( Keys.matches( e, b.keys ) ) {
                     e.preventDefault();
                     if ( id === 'stop' ) { escAt = 0; }
