@@ -129,7 +129,7 @@ class expAiDashboard
         return array(
             'enabled' => $config->isEnabled(),
             'configured' => $config->isConfigured(),
-            'provider' => (string) ( ( $m = $config->registry()->getModel( $config->model() ) ) ? $m['provider'] : 'anthropic' ),
+            'provider' => (string) ( ( $m = $config->registry()->getModel( $config->model() ) ) ? $m['provider'] : '' ),
             'model' => $config->model(),
             'model_label' => $m ? (string) $m['label'] : $config->model(),
             'can_manage' => expAiServerFunctions::hasPolicy( 'model_manage' ),

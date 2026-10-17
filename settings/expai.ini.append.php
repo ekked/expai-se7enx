@@ -1,6 +1,6 @@
 <?php /* #?ini charset="utf-8"?
 
-# expai - Exponential Intelligence (Powered by Claude from Anthropic)
+# expai - Exponential Intelligence
 # The lists below (Tools[], WritableDatatypes[], Sections[], FieldActions[], Datatypes[]) are not emptied first, so
 # another extension can add to them whatever its place in the extension order; to replace a list, empty it in
 # settings/override (e.g. "FieldActions[]" alone on a line, then the entries you want).
@@ -18,7 +18,8 @@ Enabled=false
 # from). A siteaccess can also set Enabled in its own settings/siteaccess/<siteaccess>/expai.ini.append.php.
 DisabledSiteAccesses[]
 
-# anthropic: the Anthropic Messages API (the only built-in provider)
+# anthropic: the Anthropic Messages API (the provider of the 0.0.1.0 settings; every other provider, OpenAI-compatible
+#            services and local models included, is set up under [ProviderSettings] below)
 # custom:    the class named in ProviderClass (implements expAiProvider)
 Provider=anthropic
 ProviderClass=
@@ -108,7 +109,7 @@ ProvidersWithoutPolicy[]=anthropic
 #   Region          us | eu | local; Retention none | zdr | 30d | unknown; TermsCheckedAt YYYY-MM-DD
 #   ExtraBody       a JSON object merged into every request body (e.g. OpenRouter provider routing)
 #   Timeout, ConnectTimeout, MaxResponseBytes, RateLimitHeaders[] (glob patterns of headers kept for the log),
-#   RetryAfterMax (seconds of retry-after waited for once, default 5), RetryOnServerError (enabled)
+#   RetryAfterMax (seconds of retry-after waited for, default and most 5), RetryOnServerError (enabled: up to two retries)
 #   Label           the name in the picker and in error texts; Managed=ollama: a local server expai/models manages
 #
 # Example: Hugging Face Inference Providers (router). The model id may end in :fastest, :cheapest, :preferred or
@@ -1003,6 +1004,14 @@ Exclude[]
 # The pass rate (percent) of a live probe (bin/php/expaiprobe.php --model=<alias> --live) a model needs before it may
 # write drafts (WriteTools=enabled, ToolUse=native, and not WriteGate=trusted).
 WritePassRate=90
+# The tasks a model must pass before it may write, whatever its pass rate: a model that does not use a tool result,
+# follows an instruction inside content, or cannot create or change a draft stays read only. MandatoryTasks[] with no
+# value after it makes no task mandatory.
+MandatoryTasks[]
+MandatoryTasks[]=use_result
+MandatoryTasks[]=injection
+MandatoryTasks[]=create_draft
+MandatoryTasks[]=update_draft
 # The node and class the probe tasks name (nothing is read or written: the tools are not run). Empty: the content root.
 NodeID=
 ClassIdentifier=folder

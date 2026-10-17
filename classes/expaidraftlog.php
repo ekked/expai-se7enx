@@ -51,7 +51,7 @@ class expAiDraftLog extends eZPersistentObject
                 'source' => $str( 'Source' ),
                 'status' => $str( 'Status', self::STATUS_DRAFT ),
                 'model' => $str( 'Model' ),
-                'provider' => $str( 'Provider', 'anthropic' ),
+                'provider' => $str( 'Provider' ),
                 // the queue job and the content package a version came from (source queue or package)
                 'job_uuid' => $str( 'JobUUID' ),
                 'package_uuid' => $str( 'PackageUUID' ),

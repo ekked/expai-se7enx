@@ -72,10 +72,10 @@ class expAiTranslationSync
         if ( !$aligned && $config->flag( 'TranslationSync', 'FullIfStructureMismatch', true ) )
             return array( 'decision' => 'full', 'needs_editor' => true, 'auto' => false, 'reason' => 'the translation does not have the structure of its base' );
         if ( $ratio >= $fullMin )
-            return array( 'decision' => 'full', 'needs_editor' => true, 'auto' => false, 'reason' => sprintf( 'changed ratio %.2f reaches FullMinChangedRatio %.2f', $ratio, $fullMin ) );
+            return array( 'decision' => 'full', 'needs_editor' => true, 'auto' => false, 'reason' => sprintf( 'changed ratio %.2F reaches FullMinChangedRatio %.2F', $ratio, $fullMin ) );
         $reasons = array();
         if ( $ratio > $patchMax )
-            $reasons[] = sprintf( 'changed ratio %.2f above PatchMaxChangedRatio %.2f', $ratio, $patchMax );
+            $reasons[] = sprintf( 'changed ratio %.2F above PatchMaxChangedRatio %.2F', $ratio, $patchMax );
         if ( (int) $units > $maxUnits )
             $reasons[] = sprintf( '%d blocks above PatchMaxSegments %d', $units, $maxUnits );
         if ( (int) $estimateMicros > $threshold )

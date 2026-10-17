@@ -99,8 +99,7 @@ class expAiThreadRunner
         if ( mb_strlen( $message, 'UTF-8' ) > $max )
             throw new expAiException( 'The message is too long (at most %max characters).', '', 0, array( '%max' => $max ) );
         // the node must be readable under the data policy of the model, as in the request
-        $model = $config->registry()->getModel( $alias );
-        $reader = new expAiContentReader( $config, expAiDataPolicy::forProvider( $config, $model ? $model['provider'] : 'anthropic' ) );
+        $reader = new expAiContentReader( $config, expAiDataPolicy::forProvider( $config, $config->registry()->providerOf( $alias ) ) );
         $reader->readableNode( $nodeID );
         if ( !$conversation )
         {

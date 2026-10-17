@@ -48,8 +48,7 @@ before `content/publish` and evaluates each approve event (`event_ezapprove`) as
    and defers the workflow to the cronjob; the version is **pending**. The panel and the dashboard show "Waiting for
    approval".
 2. The approver sees the item in the collaboration inbox, in "Waiting for my approval" on
-   expai's dashboard page, and opens it: the item page shows the note "Exponential Intelligence (Powered by Claude
-   from Anthropic) - This version was written with Exponential Intelligence ... Model: ..." above the decision.
+   expai's dashboard page, and opens it: the item page shows the note "Exponential Intelligence - This version was written with Exponential Intelligence ... Model: ..." above the decision.
 3. **Approve**: the workflow cronjob (the `frequent` part runs `workflow.php`) continues the workflow and publishes
    the version. **Deny**: the cronjob ends the workflow; the version is a draft of the editor again and the panel
    shows it as Draft; it can be edited and sent again (a new approval).

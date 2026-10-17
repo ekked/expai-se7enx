@@ -28,7 +28,6 @@
         <span class="exp-ai-mark" aria-hidden="true"></span>
         <div>
             <h2 id="exp-ai-edit-title">{'Exponential Intelligence'|i18n( 'extension/expai/edit' )}</h2>
-            <p class="exp-ai-sub">{'Powered by Claude from Anthropic'|i18n( 'extension/expai/edit' )}</p>
         </div>
         <input type="button" class="button exp-ai-btn exp-ai-toggle" aria-expanded="false" aria-controls="exp-ai-edit-body" value="{'Show'|i18n( 'extension/expai/edit' )}" />
     </header>
@@ -50,7 +49,7 @@
             'show', 'Show'|i18n( 'extension/expai/edit' ),
             'hide', 'Hide'|i18n( 'extension/expai/edit' ),
             'actions', 'Exponential Intelligence'|i18n( 'extension/expai/edit' ),
-            'actions_title', 'Exponential Intelligence (Powered by Claude from Anthropic)'|i18n( 'extension/expai/edit' ),
+            'actions_title', 'Exponential Intelligence'|i18n( 'extension/expai/edit' ),
             'instruction', 'What should be written?'|i18n( 'extension/expai/edit' ),
             'optional_instruction', 'Optional: how should it change?'|i18n( 'extension/expai/edit' ),
             'language', 'Into which language?'|i18n( 'extension/expai/edit' ),

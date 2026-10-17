@@ -217,7 +217,8 @@ class expAiChainEngine
         $values = $this->promptValues( $run, $chain, $step );
         return array( 'system' => expAiChainPrompt::system( $step, $this->config ),
                       'messages' => array( array( 'role' => 'user', 'content' => expAiChainPrompt::render( $step['prompt_text'], $values ) ) ),
-                      'max_tokens' => (int) $step['max_tokens'],
+                      // the step's MaxTokens, at least expAiModelTest::REASONING_MIN_TOKENS for a reasoning model
+                      'max_tokens' => expAiModelTest::outputBudget( $this->config->registry()->resolveAlias( (string) $step['model'] ), (int) $step['max_tokens'], $this->config ),
                       'output_schema' => self::outputSchema( $step, $chain ) );
     }
 
@@ -386,7 +387,16 @@ class expAiChainEngine
         $run->setAttribute( 'input_tokens', (int) $run->attribute( 'input_tokens' ) + (int) $row->attribute( 'input_tokens' ) );
         $run->setAttribute( 'output_tokens', (int) $run->attribute( 'output_tokens' ) + (int) $row->attribute( 'output_tokens' ) );
 
-        $value = isset( $answer['value'] ) && is_array( $answer['value'] ) ? $answer['value'] : expAiPromptedToolProvider::extractJson( isset( $answer['text'] ) ? (string) $answer['text'] : '' );
+        $cutOff = '';
+        try
+        {
+            $value = self::answerValue( $answer );
+        }
+        catch ( expAiException $e )
+        {
+            $value = null;
+            $cutOff = $e->getMessage();
+        }
         if ( $run->isFinal() )
         {
             $row->setAttribute( 'state', 'done' );
@@ -400,9 +410,10 @@ class expAiChainEngine
         {
             $row->setAttribute( 'state', 'failed' );
             $row->setOutput( array( 'text' => isset( $answer['text'] ) ? expAiText::cut( (string) $answer['text'], 4000 ) : '' ) );
-            $row->setAttribute( 'note', 'the answer was not the JSON the step asks for' . ( !empty( $answer['stop_reason'] ) ? ' (stop reason ' . $answer['stop_reason'] . ')' : '' ) );
+            $row->setAttribute( 'note', $cutOff !== '' ? 'the answer was cut off at the token limit (stop reason max_tokens)'
+                                        : 'the answer was not the JSON the step asks for' . ( !empty( $answer['stop_reason'] ) ? ' (stop reason ' . $answer['stop_reason'] . ')' : '' ) );
             $row->store();
-            $this->fail( $run, 'the step ' . $name . ' did not answer in the expected format' );
+            $this->fail( $run, $cutOff !== '' ? 'the step ' . $name . ': ' . $cutOff : 'the step ' . $name . ' did not answer in the expected format' );
             return array( 'chain' => 'failed', 'run' => (int) $run->attribute( 'id' ), 'step' => $name );
         }
         try
@@ -416,6 +427,23 @@ class expAiChainEngine
         }
         return array( 'chain' => $outcome, 'run' => (int) $run->attribute( 'id' ), 'step' => $name, 'iteration' => $iteration,
                       'verdict' => (string) $row->attribute( 'verdict' ), 'score' => (int) $row->attribute( 'score' ) );
+    }
+
+    /**
+     * The structured value of a stored answer: its value, or the JSON object in its text. An answer cut off at the
+     * token limit is not read at all (a cut JSON object is never complete, and a shorter one inside it is not the
+     * answer).
+     * @param array $answer the stored answer (expAiRequestHandler::storedAnswer()): value, text, stop_reason
+     * @return array|null null when the answer has no JSON object
+     * @throws expAiException when the answer was cut off at the token limit
+     */
+    public static function answerValue( array $answer )
+    {
+        if ( isset( $answer['stop_reason'] ) && $answer['stop_reason'] === 'max_tokens' )
+            throw new expAiException( 'The answer was cut off at the token limit. Raise MaxTokens or lower Effort for this model.', 'stop_reason max_tokens' );
+        if ( isset( $answer['value'] ) && is_array( $answer['value'] ) )
+            return $answer['value'];
+        return expAiText::extractJson( expAiText::stripReasoning( isset( $answer['text'] ) ? (string) $answer['text'] : '' ) );
     }
 
     /**
@@ -700,7 +728,7 @@ class expAiChainEngine
             expAiDraftLog::record( array( 'contentobject_id' => (int) $object->attribute( 'id' ), 'version' => (int) $version->attribute( 'version' ),
                                           'user_id' => (int) $run->attribute( 'user_id' ), 'parent_node_id' => (int) $run->attribute( 'node_id' ),
                                           'language_code' => $language, 'action' => $action, 'source' => 'chain',
-                                          'model' => $this->writerModel( $run ), 'provider' => 'anthropic',
+                                          'model' => $this->writerModel( $run ), 'provider' => $this->config->registry()->providerOf( $this->writerModel( $run ) ),
                                           'job_uuid' => $this->lastJob( $run ), 'prompt_summary' => 'Chain ' . $chain->label() . ': ' . (string) $run->attribute( 'brief' ) ) );
         if ( !empty( $result['errors'] ) )
             $this->flag( $run, 'Fields not written: ' . implode( '; ', array_map( function ( $k, $v ) { return $k . ' (' . $v . ')'; }, array_keys( $result['errors'] ), $result['errors'] ) ) );

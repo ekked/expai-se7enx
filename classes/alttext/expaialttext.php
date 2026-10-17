@@ -198,17 +198,30 @@ class expAiAltText
         return implode( "\n", $parts );
     }
 
-    /** @return array the request for a model */
-    public static function request( expAiConfig $config, expAiImageInput $image, $text )
+    /**
+     * @param string $alias the model alias: a reasoning model gets at least expAiModelTest::REASONING_MIN_TOKENS
+     * @return array the request for a model
+     */
+    public static function request( expAiConfig $config, expAiImageInput $image, $text, $alias = '' )
     {
         return array(
             'system' => self::systemPrompt( $config ),
             'messages' => array( array( 'role' => 'user', 'content' => array( $image->block(), array( 'type' => 'text', 'text' => (string) $text ) ) ) ),
-            'max_tokens' => $config->int( 'AltTextSettings', 'MaxTokens', 600, 100, 4000 ),
+            'max_tokens' => self::maxTokens( $config, $alias ),
             'output_schema' => array( 'type' => 'object', 'properties' => array(
                 'alt_text' => array( 'type' => 'string' ), 'decorative' => array( 'type' => 'boolean' ), 'note' => array( 'type' => 'string' ) ),
                 'required' => array( 'alt_text', 'decorative', 'note' ), 'additionalProperties' => false ),
         );
+    }
+
+    /**
+     * The output budget: [AltTextSettings] MaxTokens, at least expAiModelTest::REASONING_MIN_TOKENS for a reasoning model
+     * (it thinks before it writes; with the small budget of a short text it answers without words).
+     * @return int
+     */
+    public static function maxTokens( expAiConfig $config, $alias = '' )
+    {
+        return expAiModelTest::outputBudget( $alias, $config->int( 'AltTextSettings', 'MaxTokens', 600, 100, 4000 ), $config );
     }
 
     /**
@@ -238,7 +251,7 @@ class expAiAltText
      */
     public static function ask( expAiConfig $config, expAiUsageRecorder $recorder, expAiImageInput $image, $text )
     {
-        $answer = $recorder->send( self::request( $config, $image, $text ) );
+        $answer = $recorder->send( self::request( $config, $image, $text, $recorder->modelAlias() ) );
         $facts = $image->facts();
         if ( $recorder->last )
         {
@@ -246,15 +259,7 @@ class expAiAltText
             $recorder->last->setAttribute( 'tool_calls', json_encode( array( $facts ), JSON_UNESCAPED_SLASHES ) );
             $recorder->last->store();
         }
-        if ( $answer['stop_reason'] === 'refusal' )
-            throw new expAiException( 'Exponential Intelligence declined this request.', 'stop_reason refusal' );
-        $raw = '';
-        foreach ( $answer['content'] as $block )
-            if ( isset( $block['type'] ) && $block['type'] === 'text' )
-                $raw .= $block['text'];
-        $data = expAiPromptedToolProvider::extractJson( $raw );
-        if ( !is_array( $data ) || !isset( $data['alt_text'] ) )
-            throw new expAiException( 'The answer of Exponential Intelligence could not be read.', 'no alt_text' );
+        $data = self::parse( $answer );
         $cost = $recorder->last ? $recorder->last->cost() : null;
         return array(
             'value' => self::clean( $data['alt_text'], self::maxLength( $config ) ),
@@ -269,6 +274,28 @@ class expAiAltText
                                'image' => $facts['image_tokens'] ),
             'usage_log_id' => $recorder->last ? (int) $recorder->last->attribute( 'id' ) : 0,
         );
+    }
+
+    /**
+     * The JSON object of an answer. A refusal and an answer cut off at the token limit are not read.
+     * @return array with alt_text
+     * @throws expAiException
+     */
+    public static function parse( array $answer )
+    {
+        $stop = isset( $answer['stop_reason'] ) ? (string) $answer['stop_reason'] : '';
+        if ( $stop === 'refusal' )
+            throw new expAiException( 'Exponential Intelligence declined this request.', 'stop_reason refusal' );
+        if ( $stop === 'max_tokens' )
+            throw new expAiException( 'The answer was cut off at the token limit. Raise MaxTokens or lower Effort for this model.', 'stop_reason max_tokens' );
+        $raw = '';
+        foreach ( isset( $answer['content'] ) ? (array) $answer['content'] : array() as $block )
+            if ( isset( $block['type'], $block['text'] ) && $block['type'] === 'text' )
+                $raw .= $block['text'];
+        $data = expAiText::extractJson( expAiText::stripReasoning( $raw ) );
+        if ( !is_array( $data ) || !isset( $data['alt_text'] ) )
+            throw new expAiException( 'The answer of Exponential Intelligence could not be read.', 'no alt_text' );
+        return $data;
     }
 
     /**

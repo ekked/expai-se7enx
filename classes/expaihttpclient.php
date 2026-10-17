@@ -27,6 +27,9 @@ class expAiHttpClient
     /** @var string[] lower-case glob patterns of the response headers to keep */
     protected $keepHeaders;
 
+    /** @var array errno, connect_time (seconds, null when unknown) and status of the last request */
+    protected $lastTransfer = array( 'errno' => 0, 'connect_time' => null, 'status' => 0 );
+
     /**
      * @param string[]|null $keepHeaders glob patterns of the response headers to keep (default: the Anthropic rate
      *                                   limit headers and retry-after)
@@ -45,6 +48,29 @@ class expAiHttpClient
     public function timeout()
     {
         return $this->timeout;
+    }
+
+    /**
+     * How the last request ended, for the retry decision of a provider: a transport error is only safe to retry when
+     * the connection was never established (connect_time 0), as the server cannot have started on the request.
+     * @return array errno (0 without a transport error), connect_time (seconds, null when unknown), status
+     */
+    public function lastTransfer()
+    {
+        return $this->lastTransfer;
+    }
+
+    /** @return float the current time in seconds (the clock of the retry deadline; tests replace it) */
+    public function now()
+    {
+        return microtime( true );
+    }
+
+    /** Waits $seconds before a retry (tests replace it so that they do not sleep). */
+    public function pause( $seconds )
+    {
+        if ( $seconds > 0 )
+            usleep( (int) round( $seconds * 1000000 ) );
     }
 
     /** @return bool the header is on the allowlist */
@@ -73,7 +99,8 @@ class expAiHttpClient
      * @param array $options accept (Accept header, default application/json), resolve (curl CURLOPT_RESOLVE list,
      *                       used to pin a checked address), method (GET, POST, DELETE; default POST),
      *                       content_type (of the body, default application/json), on_chunk (a callable that gets
-     *                       every piece of the body as it arrives, e.g. to time the first event of a stream)
+     *                       every piece of the body as it arrives, e.g. to time the first event of a stream),
+     *                       timeout (seconds, at most the client's timeout: the time left of a retry deadline)
      * @return array( int status, string body, array kept headers )
      * @throws expAiException
      */
@@ -84,6 +111,7 @@ class expAiHttpClient
         if ( !function_exists( 'curl_init' ) )
             throw new expAiException( 'Exponential Intelligence is not available on this server.', 'the PHP curl extension is missing' );
 
+        $this->lastTransfer = array( 'errno' => 0, 'connect_time' => null, 'status' => 0 );
         $received = '';
         $tooLarge = false;
         $responseHeaders = array();
@@ -97,14 +125,15 @@ class expAiHttpClient
         $get = $method === 'GET';
         // DELETE without a body sends no content type (batch APIs); content_type: e.g. multipart/form-data; boundary=...
         $noBody = $get || ( $method === 'DELETE' && (string) $body === '' );
+        $timeout = isset( $options['timeout'] ) && is_numeric( $options['timeout'] ) ? max( 1, min( $this->timeout, (int) $options['timeout'] ) ) : $this->timeout;
         $contentType = isset( $options['content_type'] ) && !preg_match( '/[\r\n]/', (string) $options['content_type'] ) ? (string) $options['content_type'] : 'application/json';
         curl_setopt_array( $ch, array(
             CURLOPT_POST => $method === 'POST',
             CURLOPT_HTTPGET => $get,
             CURLOPT_HTTPHEADER => array_merge( $noBody ? array( 'Accept: ' . $accept ) : array( 'Content-Type: ' . $contentType, 'Accept: ' . $accept ), $headers ),
             CURLOPT_FOLLOWLOCATION => false,
-            CURLOPT_TIMEOUT => $this->timeout,
-            CURLOPT_CONNECTTIMEOUT => $this->connectTimeout,
+            CURLOPT_TIMEOUT => $timeout,
+            CURLOPT_CONNECTTIMEOUT => min( $timeout, $this->connectTimeout ),
             CURLOPT_NOSIGNAL => true,
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
@@ -144,6 +173,8 @@ class expAiHttpClient
         $ok = curl_exec( $ch );
         $errno = curl_errno( $ch );
         $status = (int) curl_getinfo( $ch, CURLINFO_RESPONSE_CODE );
+        $connectTime = curl_getinfo( $ch, CURLINFO_CONNECT_TIME );
+        $this->lastTransfer = array( 'errno' => (int) $errno, 'connect_time' => is_numeric( $connectTime ) ? (float) $connectTime : null, 'status' => $status );
         if ( PHP_VERSION_ID < 80000 )
             curl_close( $ch );
         unset( $ch );
@@ -155,7 +186,7 @@ class expAiHttpClient
             // "no answer": not a single byte came back (expAiModelFallback may hand the request to the default model)
             if ( $errno === 28 )
                 throw new expAiException( 'Exponential Intelligence did not answer in time. Please try again with a smaller request.',
-                                          'timeout after ' . $this->timeout . ' s' . ( $received === '' && $status === 0 ? ', no answer' : '' ) );
+                                          'timeout after ' . $timeout . ' s' . ( $received === '' && $status === 0 ? ', no answer' : '' ) );
             throw new expAiException( 'Exponential Intelligence could not be reached.', 'curl error ' . $errno );
         }
         return array( $status, $received, $responseHeaders );

@@ -32,7 +32,7 @@
         'model', $exp_ai_alt_model,
         'strings', hash(
             'actions', 'Exponential Intelligence'|i18n( 'extension/expai/edit' ),
-            'actions_title', 'Exponential Intelligence (Powered by Claude from Anthropic)'|i18n( 'extension/expai/edit' ),
+            'actions_title', 'Exponential Intelligence'|i18n( 'extension/expai/edit' ),
             'write', ezini( 'FieldAction_alt_text', 'Label', 'expai.ini' )|i18n( 'extension/expai/fieldaction' ),
             'write_title', 'A model that can look at images suggests the alt text: %model'|i18n( 'extension/expai/alttext',, hash( '%model', $exp_ai_alt_model.label ) ),
             'decorative', 'Decorative (empty alt text)'|i18n( 'extension/expai/alttext' ),

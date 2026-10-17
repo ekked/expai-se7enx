@@ -241,7 +241,7 @@ class expAiModelTestTest extends expAiProviderTestCase
         $this->assertNull( $result['ttft_ms'] );
         $this->assertGreaterThan( 0, $result['usage_log_id'] );
         $this->assertSame( expAiModelTest::SYSTEM, $stub->requests[0]['system'] );
-        $this->assertSame( 120, $stub->requests[0]['max_tokens'] );
+        $this->assertSame( expAiModelTest::REASONING_MIN_TOKENS, $stub->requests[0]['max_tokens'] );
         $row = eZPersistentObject::fetchObject( expAiUsageLog::definition(), null, array( 'id' => $result['usage_log_id'] ) );
         $this->assertSame( array( 'test', 14, 'xtem' ), array( (string) $row->attribute( 'action' ), (int) $row->attribute( 'user_id' ), (string) $row->attribute( 'provider' ) ) );
 

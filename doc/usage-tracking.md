@@ -97,7 +97,7 @@ checked before a request is sent; when one is reached the editor sees which limi
 is not sent. The dashboard shows a bar for every limit that is set.
 
 Anthropic's own limits apply in addition: the rate limits of the key (the dashboard shows what the last response
-reported; a rate-limited request is retried once when its `retry-after` is short (at most `RetryAfterMax` seconds, [providers.md](providers.md)), otherwise it fails with "busy or over its limit, try again later" and is recorded with its `retry-after`) and the organization's
+reported; a rate-limited request is retried (up to twice) when its `retry-after` is short (at most `RetryAfterMax` seconds, [providers.md](providers.md)), otherwise it fails with "busy or over its limit, try again later" and is recorded with its `retry-after`) and the organization's
 monthly spend limit, which an API key cannot read: see it in the Claude Console.
 
 ## Retention

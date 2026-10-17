@@ -1,6 +1,6 @@
 # Using Exponential Intelligence
 
-Exponential Intelligence (Powered by Claude from Anthropic) writes drafts for you. It works with your own account
+Exponential Intelligence writes drafts for you, with the AI model your site has configured. It works with your own account
 and permissions: it can only read what you may read and only create or change what you may create or change, and it
 never publishes. You decide what happens with every draft.
 
@@ -74,8 +74,8 @@ In the command palette (Ctrl/Cmd+K) you find them as "Suggest title: Title" or "
 
 ## 3. The label
 
-Every version written with Exponential Intelligence carries the label **Exponential Intelligence** (the tooltip says
-"Exponential Intelligence (Powered by Claude from Anthropic)" and names the model):
+Every version written with Exponential Intelligence carries the label **Exponential Intelligence** (the tooltip names the
+model that wrote it):
 
 - in **My drafts** on the dashboard and on the drafts page,
 - in the version view and in the edit form of that version (as a note at the top),

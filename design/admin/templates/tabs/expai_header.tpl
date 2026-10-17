@@ -6,7 +6,7 @@
     {if $tabs_disabled}
         <span class="disabled" title="{'Tab is disabled, enable with toggler to the left of these tabs.'|i18n( 'design/admin/node/view/full' )}">{'Intelligence'|i18n( 'extension/expai/tab' )}</span>
     {else}
-        <a href={concat( $node_url_alias, '/(tab)/', $tab )|ezurl} title="{'Exponential Intelligence (Powered by Claude from Anthropic)'|i18n( 'extension/expai/panel' )}">{'Intelligence'|i18n( 'extension/expai/tab' )}</a>
+        <a href={concat( $node_url_alias, '/(tab)/', $tab )|ezurl} title="{'Exponential Intelligence'|i18n( 'extension/expai/panel' )}">{'Intelligence'|i18n( 'extension/expai/tab' )}</a>
     {/if}
 </li>
 {/if}

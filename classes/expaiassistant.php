@@ -319,9 +319,17 @@ class expAiAssistant
         // the fallback: the usage log names the model the request asked for and why another one answers
         if ( $this->fallback && $this->provider instanceof expAiUsageRecorder )
             $this->provider->setContext( array( 'requested_alias' => $this->fallback['requested'], 'fallback_reason' => $this->fallback['reason'] ) );
+        // tools ran in this turn already (lookups, drafts): an empty final answer then ends the turn
+        $current = $turnHistory ? $turnHistory[count( $turnHistory ) - 1] : array();
+        $toolsRan = !empty( $current['steps'] ) || !empty( $current['drafts'] );
         try
         {
             $answer = $this->provider->send( $call );
+            if ( !$this->given )
+                expAiModelFallback::rememberUp( $this->config, $alias );
+            // an answer with neither words nor a tool call is not a finished answer (a reasoning model that only
+            // thought); the request asked once more fails the same way as the first one
+            $answer = $this->answerOrRetry( $call, $answer, $toolsRan );
         }
         catch ( expAiException $e )
         {
@@ -338,8 +346,6 @@ class expAiAssistant
                 $this->fallbackTo = '';
             }
         }
-        if ( !$this->given )
-            expAiModelFallback::rememberUp( $this->config, $alias );
 
         if ( $answer['stop_reason'] === 'refusal' )
         {
@@ -466,6 +472,76 @@ class expAiAssistant
         $conversation->store();
         $this->lastWritten = isset( $context ) ? $context->written : array();
         return $this->result( $status, $text, $steps, $user, $nodeID, $conversation );
+    }
+
+    /** the words that ask a model for an answer again, after an answer without words or tool calls */
+    const EMPTY_ANSWER_NUDGE = 'Answer the editor in words now, or call a tool.';
+
+    /**
+     * Is the answer empty: no text (besides reasoning) and no tool call? A refusal is an answer.
+     * @return bool
+     */
+    public static function isEmptyAnswer( array $answer )
+    {
+        if ( isset( $answer['stop_reason'] ) && $answer['stop_reason'] === 'refusal' )
+            return false;
+        foreach ( isset( $answer['content'] ) ? (array) $answer['content'] : array() as $block )
+        {
+            if ( !isset( $block['type'] ) )
+                continue;
+            if ( $block['type'] === 'tool_use' )
+                return false;
+            if ( $block['type'] === 'text' && isset( $block['text'] ) && expAiText::stripReasoning( (string) $block['text'] ) !== '' )
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * The answer of a step, asked once more when it was empty (isEmptyAnswer()): the same request with a short note
+     * to the model after the last user message. The note is not stored in the conversation. Each request goes
+     * through the usage recorder, so both are logged and counted. An empty answer after tools ran in this turn
+     * (lookups, drafts written) ends the turn without words: what the tools did stays. An empty answer cut off at
+     * the token limit is not asked again with the same limit.
+     * @param array $call the request of the step
+     * @param array $answer the provider's answer to it
+     * @param bool $toolsRan tools ran in this turn before this answer
+     * @return array the answer to use
+     * @throws expAiException when the answer is empty at the token limit, or the second answer is empty too; a
+     *                        failure of the second request as it is (the caller handles it like the first one's)
+     */
+    protected function answerOrRetry( array $call, array $answer, $toolsRan = false )
+    {
+        if ( !self::isEmptyAnswer( $answer ) )
+            return $answer;
+        if ( $toolsRan )
+        {
+            // reasoning in a text block is not shown as the reply
+            $answer['content'] = array_values( array_filter( isset( $answer['content'] ) ? (array) $answer['content'] : array(),
+                function ( $block ) { return !isset( $block['type'] ) || $block['type'] !== 'text'; } ) );
+            return $answer;
+        }
+        if ( isset( $answer['stop_reason'] ) && $answer['stop_reason'] === 'max_tokens' )
+            throw new expAiException( 'The answer was cut off at the token limit. Raise MaxTokens or lower Effort for this model.', 'empty answer, stop_reason max_tokens' );
+        $retry = $call;
+        $last = count( $retry['messages'] ) - 1;
+        $nudge = array( 'type' => 'text', 'text' => self::EMPTY_ANSWER_NUDGE );
+        if ( $last >= 0 && $retry['messages'][$last]['role'] === 'user' && !isset( $retry['messages'][$last]['content_json'] ) )
+        {
+            $content = $retry['messages'][$last]['content'];
+            $retry['messages'][$last]['content'] = is_array( $content )
+                ? array_merge( $content, array( $nudge ) )
+                : array( array( 'type' => 'text', 'text' => (string) $content ), $nudge );
+        }
+        else
+            $retry['messages'][] = array( 'role' => 'user', 'content' => array( $nudge ) );
+        eZDebug::writeNotice( 'expai: the model answered without words or tool calls (stop reason ' . ( isset( $answer['stop_reason'] ) ? $answer['stop_reason'] : '' ) . '); asked once more', __METHOD__ );
+        $second = $this->provider->send( $retry );
+        if ( !self::isEmptyAnswer( $second ) )
+            return $second;
+        if ( isset( $second['stop_reason'] ) && $second['stop_reason'] === 'max_tokens' )
+            throw new expAiException( 'The answer was cut off at the token limit. Raise MaxTokens or lower Effort for this model.', 'empty answer twice, stop_reason max_tokens' );
+        throw new expAiException( 'The model gave no answer. Try again, or choose another model.', 'empty answer twice' );
     }
 
     /** @return array( string content, bool isError, array step ) */

@@ -39,12 +39,13 @@ still loads after it.
 `Enabled=true` but `Model` or `ApiKey` is empty in the siteaccess's settings (the key belongs in
 settings/override/expai.ini.append.php). The dashboard's Status says "Switched on, but not configured".
 
-## "Exponential Intelligence refused the request (access)."
+## "%provider refused the request (access)."
 
-HTTP 401/403 from the API: the key is wrong or revoked, or a user key needs `AnthropicWorkspaceId`. The debug log has
-the API's error type.
+`%provider` is the provider's `Label` (for the Anthropic provider without a Label: "Anthropic"). HTTP 401/403 from
+the API: the key is wrong or revoked, or a user key needs `AnthropicWorkspaceId`. The debug log has the API's error
+type.
 
-## "Exponential Intelligence reported an error." (HTTP 400, thinking block bound to a different conversation)
+## "%provider reported an error." (HTTP 400, thinking block bound to a different conversation)
 
 The API binds the model's reasoning to the exact start of a conversation. expai keeps each conversation's instructions
 and tools for that reason, and for conversations stored before that it retries once letting the API drop the old
@@ -64,9 +65,10 @@ other allowed model may take the content ("... and no other model you may use ca
 For a stopped local model: start it under expai/models (or choose another model; the pickers show it as "stopped").
 A conversation that was bound to it goes on with the default and returns to the local model once it runs again.
 
-## "Exponential Intelligence did not answer in time" / "The server did not answer in time"
+## "Exponential Intelligence did not answer in time" / "%provider did not answer in time" / "The server did not answer in time"
 
-One model call took longer than `[AISettings] Timeout`, or the web server cut the request. Keep Timeout below the
+One model call took longer than `[AISettings] Timeout`, a gateway in front of the provider gave up (HTTP 408/504), or
+the web server cut the request. Keep Timeout below the
 web server's and proxy's timeouts (architecture.md, "Long turns"); ask for less per message (two articles rather than
 ten). **Continue** resumes from what was stored.
 

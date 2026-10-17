@@ -25,8 +25,8 @@ as the start for a new language). site.ini `[RegionalSettings] TranslationExtens
 | `design/admin/parts/my/menu` | the Dashboard menu entries (Exponential Intelligence, EI: Vector, EI: Chains, EI: Log, EI: Help) |
 | `design/admin/parts/design/menu` | the Design menu entry (Missing alt text) |
 
-Not translated, in every language: "Exponential Intelligence", "Claude", "Anthropic". German: "Powered by Claude from
-Anthropic" is "Bereitgestellt von Claude von Anthropic"; the tab is "Intelligenz".
+Not translated, in every language: "Exponential Intelligence" and the names of providers and models. German: the tab is
+"Intelligenz".
 
 Texts the browser shows are rendered into the page by the templates (JSON blocks) or come translated from the server
 (error messages, step lines, the label texts of `expai::labels`), so expai.js has no texts of its own.

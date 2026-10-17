@@ -94,7 +94,8 @@ class expAiProviderRequestTest extends expAiProviderTestCase
                         413 => 'too long', 500 => 'reported an error' );
         foreach ( $cases as $status => $text )
         {
-            $http = new expAiProviderTestHttp( array( array( $status, json_encode( array( 'error' => array( 'type' => 'some_error', 'message' => "line\nbreak" ) ) ), array( 'retry-after' => '3' ) ) ) );
+            // a Retry-After longer than RetryAfterMax: not retried
+            $http = new expAiProviderTestHttp( array( array( $status, json_encode( array( 'error' => array( 'type' => 'some_error', 'message' => "line\nbreak" ) ) ), array( 'retry-after' => '60' ) ) ) );
             try
             {
                 self::anthropic( array(), $http )->send( array( 'system' => '', 'messages' => array() ) );
@@ -103,9 +104,11 @@ class expAiProviderRequestTest extends expAiProviderTestCase
             catch ( expAiException $e )
             {
                 $this->assertStringContainsString( $text, $e->getMessage(), "status $status" );
-                $this->assertSame( "HTTP $status some_error: line break", $e->detail() );
+                $this->assertSame( "provider anthropic: HTTP $status some_error: line break", $e->detail() );
                 $this->assertSame( $status, $e->getCode() );
-                $this->assertSame( array( 'retry-after' => '3' ), $e->rateLimits );
+                $this->assertSame( array( 'retry-after' => '60' ), $e->rateLimits );
+                $this->assertSame( array( '%provider' => 'Anthropic' ), $e->arguments() );
+                $this->assertCount( 1, $http->requests );
             }
         }
     }
@@ -190,13 +193,13 @@ class expAiProviderRequestTest extends expAiProviderTestCase
         }
     }
 
-    public function testACurlErrorIsRetriedOnceAndATimeoutIsNot(): void
+    public function testAConnectionFailureIsRetriedAndATimeoutIsNot(): void
     {
         $ok = array( 200, '{"choices":[{"message":{"content":"done"}}]}' );
         $http = new expAiProviderTestHttp( array( new expAiException( 'Exponential Intelligence could not be reached.', 'curl error 7' ), $ok ) );
         $this->assertSame( 1, self::openai( array(), $http )->send( array( 'messages' => array() ) )['retries'] );
 
-        $http = new expAiProviderTestHttp( array( new expAiException( 'x', 'curl error 7' ), new expAiException( 'x', 'curl error 6' ) ) );
+        $http = new expAiProviderTestHttp( array( new expAiException( 'x', 'curl error 7' ), new expAiException( 'x', 'curl error 6' ), new expAiException( 'x', 'curl error 6' ) ) );
         $this->expectExceptionDetail( function () use ( $http ) { self::openai( array(), $http )->send( array( 'messages' => array() ) ); }, 'provider xteoai: curl error 6' );
 
         $http = new expAiProviderTestHttp( array( new expAiException( 'x', 'timeout after 5 s' ) ) );
@@ -206,9 +209,9 @@ class expAiProviderRequestTest extends expAiProviderTestCase
         // a server error is retried once; the retry's failure is the answer
         $http = new expAiProviderTestHttp( array( array( 502, 'bad gateway' ), new expAiException( 'x', 'curl error 52' ) ) );
         $this->expectExceptionDetail( function () use ( $http ) { self::openai( array(), $http )->send( array( 'messages' => array() ) ); }, 'provider xteoai: curl error 52' );
-        $http = new expAiProviderTestHttp( array( array( 500, '{"message":"oops sk-abcdefghijklmnop"}' ), array( 500, '{"message":"oops sk-abcdefghijklmnop"}' ) ) );
+        $http = new expAiProviderTestHttp( array_fill( 0, 3, array( 500, '{"message":"oops sk-abcdefghijklmnop"}' ) ) );
         $this->expectExceptionDetail( function () use ( $http ) { self::openai( array(), $http )->send( array( 'messages' => array() ) ); },
-                                      'provider xteoai: HTTP 500: oops [redacted] (after 1 retry)' );
+                                      'provider xteoai: HTTP 500: oops [redacted] (after 2 retries)' );
     }
 
     public function testHttpErrorsUseOneTextPerStatus(): void

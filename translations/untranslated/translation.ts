@@ -395,6 +395,18 @@
         <source>The draft could not be written.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>The model gave no answer. Try again, or choose another model.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The answer was cut off at the token limit. Raise MaxTokens or lower Effort for this model.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The answer stream ended early.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <!-- expai chains: end -->
 <!-- expai lanes/budgets/packages: begin -->
@@ -787,10 +799,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Powered by Claude from Anthropic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Ready</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1006,19 +1014,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Powered by Claude from Anthropic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Show</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Hide</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Exponential Intelligence (Powered by Claude from Anthropic)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1399,11 +1399,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Exponential Intelligence (Powered by Claude from Anthropic)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This version was written with Exponential Intelligence (Powered by Claude from Anthropic).</source>
+        <source>This version was written with Exponential Intelligence.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1625,10 +1621,6 @@
     </message>
     <message>
         <source>Day</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Powered by Claude from Anthropic</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2341,10 +2333,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Powered by Claude from Anthropic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Ask for new content under "%name" or for changes to it. Everything is written as drafts that you own; nothing is published until you decide.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2470,10 +2458,6 @@
     </message>
     <message>
         <source>"%name" was not published: the publishing workflow stopped it. It is still a draft.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Exponential Intelligence (Powered by Claude from Anthropic)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2643,6 +2627,10 @@
     </message>
     <message>
         <source>Estimated at prices as of %date; Anthropic's invoice is authoritative.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Estimated at prices as of %date; the provider's invoice is authoritative.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

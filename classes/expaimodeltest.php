@@ -31,6 +31,42 @@ class expAiModelTest
     const SYSTEM = 'You are a test of the connection. Answer briefly.';
     const PROMPT = 'Write one short sentence about the sea.';
 
+    /**
+     * The fewest output tokens a request to a reasoning model gets: such a model spends output tokens on thinking
+     * before it writes, and with a small budget it returns an answer without words (or a cut-off one).
+     */
+    const REASONING_MIN_TOKENS = 1000;
+
+    /**
+     * Is the model a reasoning model? Its capabilities name reasoning_effort, it has an Effort, or its settings say
+     * Reasoning=true.
+     * @param array|null $model a model of the registry (expAiProviderRegistry::getModel())
+     * @return bool
+     */
+    public static function isReasoningModel( $model )
+    {
+        if ( !is_array( $model ) )
+            return false;
+        if ( isset( $model['capabilities'] ) && in_array( 'reasoning_effort', (array) $model['capabilities'], true ) )
+            return true;
+        if ( isset( $model['effort'] ) && !in_array( strtolower( trim( (string) $model['effort'] ) ), array( '', 'none' ), true ) )
+            return true;
+        $reasoning = isset( $model['settings']['Reasoning'] ) ? strtolower( trim( (string) $model['settings']['Reasoning'] ) ) : '';
+        return in_array( $reasoning, array( 'true', 'enabled', '1', 'yes', 'on' ), true );
+    }
+
+    /**
+     * The output budget of a request: the given number of tokens, at least REASONING_MIN_TOKENS for a reasoning model.
+     * @param string $alias the model alias ('' or an unknown alias: the given number)
+     * @return int
+     */
+    public static function outputBudget( $alias, $tokens, ?expAiConfig $config = null )
+    {
+        $config = $config ?: expAiConfig::instance();
+        $model = (string) $alias !== '' ? $config->registry()->getModel( (string) $alias ) : null;
+        return self::isReasoningModel( $model ) ? max( self::REASONING_MIN_TOKENS, (int) $tokens ) : (int) $tokens;
+    }
+
     /** @return bool the job queue can take the tests */
     public static function queueAvailable()
     {
@@ -289,8 +325,9 @@ class expAiModelTest
             + ( !empty( $context['user_id'] ) ? array( 'user_id' => (int) $context['user_id'] ) : array() )
             + ( !empty( $context['siteaccess'] ) ? array( 'siteaccess' => (string) $context['siteaccess'] ) : array() ) );
         $start = microtime( true );
-        // #392 stream_timing: a provider that streams (Streaming=enabled) is timed to its first token
-        $answer = $recorder->send( array( 'system' => self::SYSTEM, 'messages' => array( array( 'role' => 'user', 'content' => self::PROMPT ) ), 'max_tokens' => 120,
+        // #392 stream_timing: a provider that streams (Streaming=enabled) is timed to its first token. The budget is
+        // that of a reasoning model for every model: the answer is one sentence, and a reasoning model thinks first
+        $answer = $recorder->send( array( 'system' => self::SYSTEM, 'messages' => array( array( 'role' => 'user', 'content' => self::PROMPT ) ), 'max_tokens' => self::REASONING_MIN_TOKENS,
                                           'stream_timing' => true ) );
         $totalMs = (int) round( ( microtime( true ) - $start ) * 1000 );
         $text = '';

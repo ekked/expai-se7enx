@@ -58,14 +58,18 @@ class expAiFieldActionRegistry
      */
     public static function parseStructured( array $answer, expAiFieldRequest $request )
     {
-        if ( $answer['stop_reason'] === 'refusal' )
+        $stop = isset( $answer['stop_reason'] ) ? (string) $answer['stop_reason'] : '';
+        if ( $stop === 'refusal' )
             throw new expAiException( 'Exponential Intelligence declined this request.', 'stop_reason refusal' );
+        // a cut-off answer is not read: a shorter object inside the cut JSON is not the answer
+        if ( $stop === 'max_tokens' )
+            throw new expAiException( 'The answer was cut off at the token limit. Raise MaxTokens or lower Effort for this model.', 'stop_reason max_tokens' );
         $text = '';
         foreach ( $answer['content'] as $block )
             if ( isset( $block['type'] ) && $block['type'] === 'text' )
                 $text .= $block['text'];
-        // a model without structured output may wrap the JSON in words or a code fence
-        $data = expAiPromptedToolProvider::extractJson( $text );
+        // a model without structured output may wrap the JSON in words or a code fence (a reasoning model: after its thinking)
+        $data = expAiText::extractJson( expAiText::stripReasoning( $text ) );
         if ( !is_array( $data ) || !isset( $data['value'] ) )
             throw new expAiException( 'The answer of Exponential Intelligence could not be read.', 'no structured value' );
         return array( 'value' => $request->clean( $data['value'] ), 'note' => isset( $data['note'] ) ? (string) $data['note'] : '',

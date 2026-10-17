@@ -13,6 +13,9 @@
  */
 class expAiText
 {
+    /** the characters extractJson() reads at most while it looks for balanced objects (2 MB of answer once over) */
+    const EXTRACT_JSON_MAX_STEPS = 2000000;
+
     /** Tags the assistant may use in rich text (ezxmltext), with the attributes kept */
     public static $allowedTags = array( 'p' => array(), 'h2' => array(), 'h3' => array(), 'h4' => array(), 'strong' => array(),
                                         'b' => array(), 'em' => array(), 'i' => array(), 'ul' => array(), 'ol' => array(),
@@ -31,6 +34,228 @@ class expAiText
     public static function oneLine( $text )
     {
         return trim( preg_replace( '/\s+/u', ' ', (string) $text ) );
+    }
+
+    /** Harmony and chat template tokens that end the message they follow */
+    public static $endTokens = array( '<|end|>', '<|return|>', '<|call|>', '<|start|>', '<|im_end|>', '<|im_start|>', '<|endoftext|>', '<|eot_id|>' );
+
+    /** Special tokens of chat templates that are never part of an answer (only these, never any other <|x|> text) */
+    public static $specialTokens = array( '<|im_start|>', '<|im_end|>', '<|endoftext|>', '<|eot_id|>', '<|end|>', '<|return|>', '<|call|>',
+                                          '<|start|>', '<|message|>', '<|channel|>', '<|constrain|>' );
+
+    /**
+     * The answer of a model without its reasoning. Only real reasoning markup is handled; a text that merely mentions
+     * a tag or a token keeps it. Invalid UTF-8 is replaced first. The rules:
+     * - Harmony: only when the text has its structure (<|channel|> and <|message|>). Then only the last final channel
+     *   counts: the text after <|channel|>final ... <|message|> up to the first end token (expAiText::$endTokens) or
+     *   the end of the text; the known special tokens (expAiText::$specialTokens) left in it are removed. A Harmony
+     *   text without a final channel has no answer ('').
+     * - Think tags: complete <think>...</think> blocks at the start of the text (after whitespace) are removed. An
+     *   opening <think> at the start that is never closed means the model did not answer (''). A <think> later in the
+     *   text is plain text.
+     * - A closing </think> without an opening tag (some chat templates write the opening tag themselves) ends the
+     *   reasoning when no <think> comes before it and a line break follows it: the answer is the text after it. Alone
+     *   on its last line with nothing after it, it means reasoning without an answer (''). Anywhere else (e.g. in a
+     *   sentence) it is plain text.
+     * - Known special tokens at the end of a text without Harmony structure are removed (a leaked <|im_end|>).
+     * When the regular expression engine fails (e.g. its backtrack limit on a very long text), the text is returned
+     * as it is, trimmed: a limit of the engine never turns an answer into ''.
+     * @return string the answer, trimmed; '' when there is none
+     */
+    public static function stripReasoning( $text )
+    {
+        $text = mb_scrub( (string) $text, 'UTF-8' );
+        $original = trim( $text );
+        if ( strpos( $text, '<|channel|>' ) !== false && strpos( $text, '<|message|>' ) !== false )
+        {
+            $final = self::harmonyFinal( $text );
+            if ( $final === false )
+                return $original;
+            if ( $final === null )
+                return '';
+            $text = str_replace( self::$specialTokens, '', $final );
+        }
+        // complete think blocks at the start
+        while ( ( $found = preg_match( '~^\s*<think\b[^>]*>~i', $text, $m ) ) === 1 )
+        {
+            $close = self::closingThink( $text, strlen( $m[0] ) );
+            if ( $close === false )
+                return $original;
+            // still thinking when the answer ended: no answer
+            if ( $close === null )
+                return '';
+            $text = substr( $text, $close[0] + $close[1] );
+        }
+        if ( $found === false )
+            return $original;
+        // a closing tag whose opening tag was part of the prompt
+        $close = self::closingThink( $text, 0 );
+        if ( $close === false )
+            return $original;
+        if ( $close !== null && stripos( substr( $text, 0, $close[0] ), '<think' ) === false )
+        {
+            $before = substr( $text, 0, $close[0] );
+            $after = substr( $text, $close[0] + $close[1] );
+            if ( trim( $after ) !== '' && preg_match( '~^[ \t]*\r?\n~', $after ) )
+                $text = $after;
+            elseif ( trim( $after ) === '' && ( trim( $before ) === '' || preg_match( '~\n[ \t]*$~', $before ) ) )
+                return '';
+        }
+        // a special token leaked at the end
+        $text = rtrim( $text );
+        do
+        {
+            $length = strlen( $text );
+            foreach ( self::$specialTokens as $token )
+                if ( substr( $text, -strlen( $token ) ) === $token )
+                    $text = rtrim( substr( $text, 0, -strlen( $token ) ) );
+        }
+        while ( strlen( $text ) !== $length );
+        return trim( $text );
+    }
+
+    /**
+     * @return string|null|false the message of the last final channel of a Harmony text; null when there is none;
+     *                           false when the regular expression engine failed
+     */
+    protected static function harmonyFinal( $text )
+    {
+        $final = null;
+        $offset = 0;
+        while ( ( $position = strpos( $text, '<|channel|>', $offset ) ) !== false )
+        {
+            $offset = $position + strlen( '<|channel|>' );
+            $isFinal = preg_match( '~\G\s*final\b~', $text, $m, 0, $offset );
+            if ( $isFinal === false )
+                return false;
+            if ( !$isFinal )
+                continue;
+            $message = strpos( $text, '<|message|>', $offset );
+            if ( $message === false )
+                break;
+            // the header of this channel ends before the next channel
+            $next = strpos( $text, '<|channel|>', $offset );
+            if ( $next !== false && $next < $message )
+                continue;
+            $start = $message + strlen( '<|message|>' );
+            $end = strlen( $text );
+            foreach ( self::$endTokens as $token )
+            {
+                $at = strpos( $text, $token, $start );
+                if ( $at !== false && $at < $end )
+                    $end = $at;
+            }
+            $final = substr( $text, $start, $end - $start );
+            $offset = $end;
+        }
+        return $final;
+    }
+
+    /**
+     * @return array|null|false the offset and length of the first </think> at or after $offset; null when there is
+     *                          none; false when the regular expression engine failed
+     */
+    protected static function closingThink( $text, $offset )
+    {
+        $at = stripos( $text, '</think', $offset );
+        if ( $at === false )
+            return null;
+        $found = preg_match( '~</think\s*>~i', $text, $m, PREG_OFFSET_CAPTURE, $at );
+        if ( $found === false )
+            return false;
+        return $found ? array( $m[0][1], strlen( $m[0][0] ) ) : null;
+    }
+
+    /**
+     * The JSON in the text of a model: the whole text, a ```json fenced block (then any other fenced block) that
+     * decodes, otherwise the longest balanced {...} that decodes (braces inside JSON strings and escaped quotes are
+     * skipped while counting). The whole text and a fenced block may also be a list ([...]); of several objects in
+     * prose the longest wins, so a complete object inside a cut one (e.g. the first element of a cut list) can be
+     * returned: callers do not read an answer cut off at the token limit. Prose around the object is ignored. The
+     * search for balanced objects reads at most EXTRACT_JSON_MAX_STEPS characters in all, so a long answer full of
+     * unbalanced braces cannot hold the request (each start scans to its closing brace: quadratic without a limit);
+     * it then returns the best object found so far.
+     * @return array|null the decoded object or list; null when there is none
+     */
+    public static function extractJson( $text )
+    {
+        $text = trim( (string) $text );
+        if ( $text === '' )
+            return null;
+        $whole = json_decode( $text, true );
+        if ( is_array( $whole ) )
+            return $whole;
+        if ( preg_match_all( '~```[ \t]*([A-Za-z]*)[^\n`]*\n?(.*?)```~s', $text, $fences, PREG_SET_ORDER ) )
+        {
+            // a block marked json first, then any other block
+            foreach ( array( true, false ) as $marked )
+                foreach ( $fences as $fence )
+                    if ( ( strtolower( $fence[1] ) === 'json' ) === $marked )
+                    {
+                        $data = json_decode( trim( $fence[2] ), true );
+                        if ( is_array( $data ) )
+                            return $data;
+                    }
+        }
+        $best = null;
+        $bestLength = 0;
+        $length = strlen( $text );
+        $steps = self::EXTRACT_JSON_MAX_STEPS;
+        $start = strpos( $text, '{' );
+        while ( $start !== false && $steps > 0 )
+        {
+            $end = self::closingBrace( $text, $start, $length, $steps );
+            if ( $end === false )
+            {
+                $start = strpos( $text, '{', $start + 1 );
+                continue;
+            }
+            $data = json_decode( substr( $text, $start, $end - $start + 1 ), true );
+            if ( is_array( $data ) )
+            {
+                if ( $end - $start + 1 > $bestLength )
+                {
+                    $best = $data;
+                    $bestLength = $end - $start + 1;
+                }
+                // the objects inside this one are shorter
+                $start = strpos( $text, '{', $end + 1 );
+            }
+            else
+                $start = strpos( $text, '{', $start + 1 );
+        }
+        return $best;
+    }
+
+    /**
+     * @param int $steps the characters the search may still read, reduced by what this call reads
+     * @return int|false the position of the brace that closes the one at $start (braces in strings do not count)
+     */
+    protected static function closingBrace( $text, $start, $length, &$steps )
+    {
+        $depth = 0;
+        $inString = false;
+        for ( $i = $start; $i < $length; $i++ )
+        {
+            if ( --$steps < 0 )
+                return false;
+            $char = $text[$i];
+            if ( $inString )
+            {
+                if ( $char === '\\' )
+                    $i++;
+                elseif ( $char === '"' )
+                    $inString = false;
+                continue;
+            }
+            if ( $char === '"' )
+                $inString = true;
+            elseif ( $char === '{' )
+                $depth++;
+            elseif ( $char === '}' && --$depth === 0 )
+                return $i;
+        }
+        return false;
     }
 
     /**

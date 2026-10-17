@@ -221,6 +221,13 @@ class expAiProviderRegistry
         return isset( $models[$alias] ) ? $models[$alias] : null;
     }
 
+    /** @return string the provider id of a model alias, '' when the alias is not a known model (never a guessed provider) */
+    public function providerOf( $alias )
+    {
+        $model = $this->getModel( (string) $alias );
+        return $model ? (string) $model['provider'] : '';
+    }
+
     /** @return array|null the settings of a provider (with the key) */
     public function getProvider( $id )
     {

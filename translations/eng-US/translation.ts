@@ -395,6 +395,18 @@
         <source>The draft could not be written.</source>
         <translation>The draft could not be written.</translation>
     </message>
+    <message>
+        <source>The model gave no answer. Try again, or choose another model.</source>
+        <translation>The model gave no answer. Try again, or choose another model.</translation>
+    </message>
+    <message>
+        <source>The answer was cut off at the token limit. Raise MaxTokens or lower Effort for this model.</source>
+        <translation>The answer was cut off at the token limit. Raise MaxTokens or lower Effort for this model.</translation>
+    </message>
+    <message>
+        <source>The answer stream ended early.</source>
+        <translation>The answer stream ended early.</translation>
+    </message>
 </context>
 <!-- expai chains: end -->
 <!-- expai lanes/budgets/packages: begin -->
@@ -787,10 +799,6 @@
         <translation>Choose the folder (or the content) to work on. Its full view opens with the Exponential Intelligence panel and your request.</translation>
     </message>
     <message>
-        <source>Powered by Claude from Anthropic</source>
-        <translation>Powered by Claude from Anthropic</translation>
-    </message>
-    <message>
         <source>Ready</source>
         <translation>Ready</translation>
     </message>
@@ -1006,20 +1014,12 @@
         <translation>Exponential Intelligence</translation>
     </message>
     <message>
-        <source>Powered by Claude from Anthropic</source>
-        <translation>Powered by Claude from Anthropic</translation>
-    </message>
-    <message>
         <source>Show</source>
         <translation>Show</translation>
     </message>
     <message>
         <source>Hide</source>
         <translation>Hide</translation>
-    </message>
-    <message>
-        <source>Exponential Intelligence (Powered by Claude from Anthropic)</source>
-        <translation>Exponential Intelligence (Powered by Claude from Anthropic)</translation>
     </message>
     <message>
         <source>What should be written?</source>
@@ -1399,12 +1399,8 @@
         <translation>Exponential Intelligence</translation>
     </message>
     <message>
-        <source>Exponential Intelligence (Powered by Claude from Anthropic)</source>
-        <translation>Exponential Intelligence (Powered by Claude from Anthropic)</translation>
-    </message>
-    <message>
-        <source>This version was written with Exponential Intelligence (Powered by Claude from Anthropic).</source>
-        <translation>This version was written with Exponential Intelligence (Powered by Claude from Anthropic).</translation>
+        <source>This version was written with Exponential Intelligence.</source>
+        <translation>This version was written with Exponential Intelligence.</translation>
     </message>
     <message>
         <source>Model</source>
@@ -1626,10 +1622,6 @@
     <message>
         <source>Day</source>
         <translation>Day</translation>
-    </message>
-    <message>
-        <source>Powered by Claude from Anthropic</source>
-        <translation>Powered by Claude from Anthropic</translation>
     </message>
     <message>
         <source>Requests and usage</source>
@@ -2341,10 +2333,6 @@
         <translation>Exponential Intelligence</translation>
     </message>
     <message>
-        <source>Powered by Claude from Anthropic</source>
-        <translation>Powered by Claude from Anthropic</translation>
-    </message>
-    <message>
         <source>Ask for new content under "%name" or for changes to it. Everything is written as drafts that you own; nothing is published until you decide.</source>
         <translation>Ask for new content under "%name" or for changes to it. Everything is written as drafts that you own; nothing is published until you decide.</translation>
     </message>
@@ -2471,10 +2459,6 @@
     <message>
         <source>"%name" was not published: the publishing workflow stopped it. It is still a draft.</source>
         <translation>"%name" was not published: the publishing workflow stopped it. It is still a draft.</translation>
-    </message>
-    <message>
-        <source>Exponential Intelligence (Powered by Claude from Anthropic)</source>
-        <translation>Exponential Intelligence (Powered by Claude from Anthropic)</translation>
     </message>
     <message>
         <source>Show older</source>
@@ -2644,6 +2628,10 @@
     <message>
         <source>Estimated at prices as of %date; Anthropic's invoice is authoritative.</source>
         <translation>Estimated at prices as of %date; Anthropic's invoice is authoritative.</translation>
+    </message>
+    <message>
+        <source>Estimated at prices as of %date; the provider's invoice is authoritative.</source>
+        <translation>Estimated at prices as of %date; the provider's invoice is authoritative.</translation>
     </message>
     <message>
         <source>Period</source>

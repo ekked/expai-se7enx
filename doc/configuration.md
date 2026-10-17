@@ -72,8 +72,8 @@ settings keep working unchanged). More providers: the next three sections and [p
 | `TimeoutBackground` | Seconds one call may take outside a web request (the queue worker of Vector and the Intelligence tab, the command line); empty: `Timeout`. The shipped `[Provider_local]` has 900 (the job lease of a turn is 900 + 60 s). A timeout there is shown to the editor and never hands the turn to another model ([local-models.md](local-models.md), "Making a local model usable"). |
 | `KeepAlive` | `Flavor=ollama` only: how long Ollama keeps the model (and the prompt it has cached) in memory after a request, an Ollama duration (`30m`) or seconds; sent as `keep_alive`. |
 | `RateLimitHeaders[]` | Glob patterns of the response headers kept in the usage log (default: `anthropic-ratelimit-*` and `retry-after` for anthropic; `x-ratelimit-*`, `retry-after`, `x-request-id` for openai_chat). |
-| `RetryAfterMax` | Seconds of a `retry-after` on 429/503/529 that expai waits once before retrying (default 5); a longer wait is reported to the editor at once. |
-| `RetryOnServerError` | `enabled` (default): one retry after a second on 500/502/504 or a failed connection (never after a timeout). |
+| `RetryAfterMax` | Seconds of a `retry-after` that expai waits before retrying (default and most 5); a longer wait is reported to the editor at once. |
+| `RetryOnServerError` | `enabled` (default): up to two retries (1 s, 2 s) on 408/425/429, 500/502/503/504/529 or a connection that was never made, within one deadline; never after a timeout or an answer that broke off, nor after a 408/502/504 of an attempt longer than 30 s ([providers.md](providers.md), "Errors, retries, rate limits"). `disabled`: only a 429/503/529 with a short `retry-after`. |
 | `AnthropicExtras` | `anthropic` only: `disabled` leaves out prompt caching, the refusal fallback, the workspace header and the beta headers (for an Anthropic-compatible server such as Ollama's `/v1/messages`). |
 | `Managed` | `ollama`: a local Ollama that expai/models can start, stop and pull models for ([local-models.md](local-models.md)). |
 | `PriceCurrency` | The currency of the prices of its models and of the cost it reports (Melious: `EUR`); empty: `[Pricing] Currency`. Converted with the ECB reference rate (or `[Pricing] ExchangeRates[]`); without a rate the cost is unknown. A `[Model_<alias>] PriceCurrency` wins. |
@@ -383,8 +383,8 @@ steps write), `Steps[]` (the steps in order), `MaxCostPerRun` (the run and job g
 `[ChainStep_article.translate]`): `Type` (generate, review, transform, human, translate), `Label`, `Model` (a model
 alias), `Lane` (`auto`), `PromptTemplate` or `PromptText`, `Tools[]` (read tools run before the call), `Checklist[]`,
 `PassCriteria[]`, `MaxIterations`, `OnFail` (revise, stop, escalate), `ReviseStep`, `OnExhausted` (escalate, stop),
-`Checkpoint` (human, none), `Next`, `MaxTokens`, `OutputFields[]`, `Languages[]`. Every one is explained with an
-example in [chains.md](chains.md#defining-a-chain).
+`Checkpoint` (human, none), `Next`, `MaxTokens` (at least 1000 for a reasoning model), `OutputFields[]`, `Languages[]`.
+Every one is explained with an example in [chains.md](chains.md#defining-a-chain).
 
 ## [McpBridge], [McpSettings], [McpServer_<id>]: MCP tools
 
@@ -608,7 +608,7 @@ See [alt-text.md](alt-text.md). The button is the field action `[FieldAction_alt
 | `ImageRegions[]` | (empty) | Regions (us, eu, local) images may go to, on top of the object's `[DataPolicy]` rules. |
 | `ImageZeroRetention` | disabled | enabled: images only go to providers with zero retention (none, zdr). |
 | `MaxLength` | 150 | The longest alt text; the answer is cut at a word. |
-| `MaxTokens` | 600 | The most output tokens of one suggestion. |
+| `MaxTokens` | 600 | The most output tokens of one suggestion. A reasoning model (capability `reasoning_effort`, an `Effort`, or `Reasoning=true`) gets at least 1000, since it spends output tokens thinking. |
 | `MaxContextLength` | 4000 | The longest page text sent as context, in characters. |
 | `CompanionAttributes[]` | alternative_text, alt_text | ezstring fields of the same object that repeat the alt text; filled when empty or equal to it. |
 | `ExtraInstructions` | (empty) | House rules added to the prompt. |

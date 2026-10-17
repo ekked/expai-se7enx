@@ -601,12 +601,14 @@ class expAiDiff
         else
             $writer->updateName( $object, $version, $language );
         $node = $object->attribute( 'main_node' );
+        $config = isset( $options['config'] ) && $options['config'] instanceof expAiConfig ? $options['config'] : expAiConfig::instance();
+        $model = isset( $options['model'] ) ? (string) $options['model'] : '';
         expAiDraftLog::record( array(
             'contentobject_id' => (int) $object->attribute( 'id' ), 'version' => $versionNo,
             'user_id' => (int) eZUser::currentUserID(), 'node_id' => $node ? (int) $node->attribute( 'node_id' ) : 0,
             'parent_node_id' => $node ? (int) $node->attribute( 'parent_node_id' ) : 0, 'language_code' => $language,
             'action' => isset( $options['action'] ) && $options['action'] === 'create' ? 'create' : 'update', 'source' => isset( $options['source'] ) ? (string) $options['source'] : 'diff',
-            'model' => isset( $options['model'] ) ? (string) $options['model'] : '', 'provider' => isset( $options['provider'] ) ? (string) $options['provider'] : 'anthropic',
+            'model' => $model, 'provider' => isset( $options['provider'] ) ? (string) $options['provider'] : $config->registry()->providerOf( $model ),
             'job_uuid' => isset( $options['job_uuid'] ) ? (string) $options['job_uuid'] : '',
             'thread_id' => isset( $options['thread_id'] ) ? (int) $options['thread_id'] : 0, 'change_id' => isset( $options['change_id'] ) ? (int) $options['change_id'] : 0,
             'prompt_summary' => isset( $options['prompt_summary'] ) ? (string) $options['prompt_summary'] : '' ) );

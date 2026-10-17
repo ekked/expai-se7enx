@@ -8,7 +8,6 @@
         <span class="exp-ai-mark" aria-hidden="true"></span>
         <div>
             <h2 id="exp-ai-panel-title">{'Exponential Intelligence'|i18n( 'extension/expai/panel' )}</h2>
-            <p class="exp-ai-sub">{'Powered by Claude from Anthropic'|i18n( 'extension/expai/panel' )}</p>
         </div>
         {include uri='design:expai/parts/help_link.tpl' page='full-view-panel' label='the Intelligence tab'|i18n( 'extension/expai/help' ) text='?'}
     </header>
@@ -52,7 +51,7 @@
         'sent_pending', '"%name" is waiting for approval.'|i18n( 'extension/expai/panel' ),
         'sent_draft', '"%name" was not published: the publishing workflow stopped it. It is still a draft.'|i18n( 'extension/expai/panel' ),
         'label', 'Exponential Intelligence'|i18n( 'extension/expai/label' ),
-        'label_full', 'Exponential Intelligence (Powered by Claude from Anthropic)'|i18n( 'extension/expai/label' )
+        'label_full', 'Exponential Intelligence'|i18n( 'extension/expai/label' )
     ) )}</script>
 </section>
 {/if}

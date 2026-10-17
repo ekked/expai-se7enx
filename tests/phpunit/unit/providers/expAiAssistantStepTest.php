@@ -185,6 +185,26 @@ class expAiAssistantStepTest extends expAiProviderTestCase
         $this->assertSame( 4, $second['exchange']['lookups'], 'every step that writes nothing is a lookup, failed ones too' );
     }
 
+    public function testAnEmptyAnswerAfterToolCallsEndsTheTurn(): void
+    {
+        $stub = new expAiProviderTestScript( array(
+            expAiProviderTestScript::answer( array( expAiProviderTestScript::call( 'c1', 'get_node', array( 'node_id' => $this->nodeID ) ) ), 'tool_use' ),
+            expAiProviderTestScript::answer( array( array( 'type' => 'thinking', 'thinking' => 'Nothing to add.' ) ) ) ) );
+        $assistant = $this->assistant( $stub );
+        $this->assertSame( 'continue', $assistant->step( $this->nodeID, 'Read the folder' )['status'] );
+        $second = $assistant->step( $this->nodeID, null );
+        $this->assertSame( array( 'done', '' ), array( $second['status'], $second['text'] ) );
+        $this->assertCount( 2, $stub->requests, 'not asked once more after the tools ran' );
+    }
+
+    public function testAnEmptyFirstAnswerIsAskedOnceMoreAndItsFailureIsTheStepsFailure(): void
+    {
+        $stub = new expAiProviderTestScript( array( expAiProviderTestScript::answer( array() ),
+                                                    new expAiException( 'Exponential Intelligence could not be reached.', 'curl error 7' ) ) );
+        $this->expectAssistantError( function () use ( $stub ) { $this->assistant( $stub )->step( $this->nodeID, 'Hello' ); }, 'Exponential Intelligence could not be reached.' );
+        $this->assertCount( 2, $stub->requests );
+    }
+
     public function testAnAnswerCutOffInsideACallAndLongResults(): void
     {
         $config = $this->sitewide( array( 'AssistantSettings' => array( 'MaxMessageLength' => 200, 'ContextWindowTurns' => 8, 'MaxToolResultBytes' => 1000, 'MaxToolIterations' => 10 ) ) );

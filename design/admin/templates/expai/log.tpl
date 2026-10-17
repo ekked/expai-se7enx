@@ -4,7 +4,6 @@
         <span class="exp-ai-mark" aria-hidden="true"></span>
         <div>
             <h1 class="context-title">{'Exponential Intelligence'|i18n( 'extension/expai/log' )}</h1>
-            <p class="exp-ai-sub">{'Powered by Claude from Anthropic'|i18n( 'extension/expai/log' )}</p>
         </div>
     </header>
     <ul class="exp-ai-tabs">
