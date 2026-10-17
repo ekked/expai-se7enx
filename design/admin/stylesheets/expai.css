@@ -245,6 +245,10 @@ html[data-a4-theme="dark"] .exp-ai.exp-ai-on-light, html[data-a4-theme="dark"] .
     margin: 0.15em 0 0.4em;
     font-size: 0.85em;
 }
+/* a rich text field whose editor has its own assistant (Tiptap): no field actions, no Improve menu; the bar only stays
+   for the presets (expai.js syncOwnAI) */
+.exp-ai-editor-ai .exp-ai .exp-ai-chip, .exp-ai-editor-ai .exp-ai .exp-ai-improve { display: none !important; }
+.exp-ai-field-bar.exp-ai-bar-off { display: none !important; }
 .exp-ai-field-title { display: inline-flex; align-items: center; gap: 0.3em; color: var(--exp-ai-muted); font-weight: 600; margin-right: 0.2em; }
 .exp-ai .exp-ai-chip {
     padding: 0.15em 0.65em;

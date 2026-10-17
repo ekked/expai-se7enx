@@ -1777,6 +1777,26 @@
         <source>%count formatting attributes</source>
         <translation>%count attributa formationis</translation>
     </message>
+    <message>
+        <source>The field is longer than the %count characters the assistant reads: only the beginning was edited.</source>
+        <translation>Campus longior est quam %count characteres quos adiutor legit: initium tantum mutatum est.</translation>
+    </message>
+    <message>
+        <source>%count link that is not http(s) or mail</source>
+        <translation>%count nexus neque http(s) neque epistulae</translation>
+    </message>
+    <message>
+        <source>%count links that are not http(s) or mail</source>
+        <translation>%count nexus neque http(s) neque epistularum</translation>
+    </message>
+    <message>
+        <source>%count heading of level 1, 5 or 6</source>
+        <translation>%count titulus gradus 1, 5 vel 6</translation>
+    </message>
+    <message>
+        <source>%count headings of level 1, 5 or 6</source>
+        <translation>%count tituli gradus 1, 5 vel 6</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/fieldaction</name>

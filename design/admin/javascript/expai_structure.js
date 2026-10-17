@@ -9,7 +9,7 @@
  * it works on the HTML of the Online Editor (TinyMCE), of Tiptap (exp_oe_tiptap) and on the simplified XML of a
  * textarea without an editor alike.
  *
- *   ExpAiStructure.count( value )              { embed, table, cell, th, merge, custom, anchor, literal, link, attribute }
+ *   ExpAiStructure.count( value )              { embed, table, cell, th, merge, custom, anchor, literal, link, otherlink, heading, attribute }
  *   ExpAiStructure.loss( current, proposed )   [ { kind, lost } ]: the kinds the proposed value has fewer of
  *   ExpAiStructure.describe( loss, strings )   "2 embedded objects, 1 table" (strings lost_<kind>_1 / lost_<kind>_n)
  *   ExpAiStructure.toText( html )              the value as plain text with paragraphs, for a preview
@@ -27,8 +27,10 @@
     'use strict';
 
     // cell: td and th; th: header cells; merge: what colspan/rowspan above 1 span beyond their own cell;
+    // link: internal links; otherlink: links the answer cannot keep either (#fragment, tel:, ftp:, www., //host: only
+    // http(s) and mailto survive the server's cleaning); heading: h1, h5 and h6 (the answer has h2-h4 only);
     // attribute: each formatting or link attribute (SIGNIFICANT, custom:*, an own class, the id of a link)
-    var KINDS = [ 'embed', 'table', 'cell', 'th', 'merge', 'custom', 'anchor', 'literal', 'link', 'attribute' ];
+    var KINDS = [ 'embed', 'table', 'cell', 'th', 'merge', 'custom', 'anchor', 'literal', 'link', 'otherlink', 'heading', 'attribute' ];
 
     var VOID = { area: 1, base: 1, br: 1, col: 1, embed: 1, hr: 1, img: 1, input: 1, link: 1, meta: 1, param: 1, source: 1, track: 1, wbr: 1 };
 
@@ -36,7 +38,7 @@
 
     // attributes that carry formatting or the behaviour of a link, counted one by one
     var SIGNIFICANT = { align: 1, valign: 1, width: 1, border: 1, cellpadding: 1, cellspacing: 1, customattributes: 1,
-                        target: 1, title: 1, view: 1 };
+                        target: 1, title: 1, view: 1, style: 1 };
 
     // elements whose content is not markup: skipped up to their end tag
     var RAW = { script: 1, style: 1 };
@@ -80,7 +82,7 @@
     /**
      * A link to an object or node of the site, or to a path on it (/about): the answer cannot keep it. Links with a
      * scheme of their own (http, https, mailto, tel, ftp ...), without one (www.example.com) and to a #fragment are
-     * external; the answer keeps http(s) and mailto, the others are left to the editor.
+     * external; the answer keeps http(s) and mailto, the others are counted as otherlink (lostLink).
      */
     function internalLink( attrs ) {
         if ( has( attrs, 'object_id' ) || has( attrs, 'node_id' ) ) {
@@ -88,6 +90,12 @@
         }
         var href = String( attrs.href || '' ).trim();
         return /^(ezobject|eznode|ezcontent|ezlocation|ezurl):/i.test( href ) || ( href.charAt( 0 ) === '/' && href.charAt( 1 ) !== '/' );
+    }
+
+    /** A link with an address the server's cleaning removes: anything but http(s) and mailto (internal ones are counted as link) */
+    function lostLink( attrs ) {
+        var href = String( attrs.href || '' ).trim();
+        return href !== '' && !/^(https?:\/\/[^\s"<>]+|mailto:[^\s"<>]+)$/i.test( href );
     }
 
     /**
@@ -119,6 +127,12 @@
         }
         if ( ( name === 'a' || name === 'link' ) && internalLink( attrs ) ) {
             return { kind: 'link' };
+        }
+        if ( ( name === 'a' || name === 'link' ) && lostLink( attrs ) ) {
+            return { kind: 'otherlink' };
+        }
+        if ( name === 'h1' || name === 'h5' || name === 'h6' ) {
+            return { kind: 'heading' };
         }
         return null;
     }

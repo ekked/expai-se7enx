@@ -804,6 +804,17 @@ Languages[]=all
 # The controls in the content edit form (content.ini [EditSettings] AdditionalTemplates[]).
 Enabled=true
 
+# true: above a rich text field (ezxmltext) whose editor has an assistant of its own that keeps formulas, embeds and
+# tables (Tiptap, exp_oe_tiptap, with its AI enabled), the field actions (Write, Rewrite, Shorten, Translate ...) and the
+# Improve menu are not shown: they only know the simple HTML subset and would ask for a review of everything else.
+# The presets of the field (e.g. Write summary) stay. The editor is read live, so TinyMCE or no editor shows them again.
+# false: the field actions are shown above every field, whatever the editor.
+HideActionsWithEditorAI=true
+
+# The most characters of a field's current value the model gets (field actions, presets and the Improve menu). A longer
+# field is cut there; the edit form then shows the answer for review instead of writing it over the whole field.
+MaxFieldLength=20000
+
 # The sections of the edit view area, in this order: [EditSection_<name>] Template=
 Sections[]=assistant
 

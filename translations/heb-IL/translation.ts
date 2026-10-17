@@ -1776,6 +1776,26 @@
         <source>%count formatting attributes</source>
         <translation>%count מאפייני עיצוב</translation>
     </message>
+    <message>
+        <source>The field is longer than the %count characters the assistant reads: only the beginning was edited.</source>
+        <translation>השדה ארוך מ־%count התווים שהעוזר קורא: רק ההתחלה נערכה.</translation>
+    </message>
+    <message>
+        <source>%count link that is not http(s) or mail</source>
+        <translation>%count קישור שאינו http(s) או דואר</translation>
+    </message>
+    <message>
+        <source>%count links that are not http(s) or mail</source>
+        <translation>%count קישורים שאינם http(s) או דואר</translation>
+    </message>
+    <message>
+        <source>%count heading of level 1, 5 or 6</source>
+        <translation>%count כותרת ברמה 1, 5 או 6</translation>
+    </message>
+    <message>
+        <source>%count headings of level 1, 5 or 6</source>
+        <translation>%count כותרות ברמה 1, 5 או 6</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/fieldaction</name>

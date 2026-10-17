@@ -1197,6 +1197,26 @@
         <source>%count formatting attributes</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>The field is longer than the %count characters the assistant reads: only the beginning was edited.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count link that is not http(s) or mail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count links that are not http(s) or mail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count heading of level 1, 5 or 6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count headings of level 1, 5 or 6</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/error</name>

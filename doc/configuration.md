@@ -145,6 +145,8 @@ The alias is what users choose and what the usage log records (letters, digits, 
 | `Enabled` | `true` | The Exponential Intelligence area and the field actions in content/edit. |
 | `Sections[]` | `assistant` | The sections of the edit form area; each `[EditSection_<name>] Template=`. |
 | `FieldActions[]` | write, rewrite, shorten, translate, suggest | The buttons next to the fields, in this order. |
+| `HideActionsWithEditorAI` | `true` | Hides the field actions and the Improve menu above a rich text field whose editor has an assistant of its own that keeps formulas, embeds and tables (Tiptap with its AI enabled); the field's presets stay. See [edit-view-integration.md](edit-view-integration.md). |
+| `MaxFieldLength` | `20000` | The most characters of a field's current value the model gets (field actions, presets, Improve menu), 1000 to 200000. The answer to a longer field is shown for review instead of being written. |
 
 Each `[FieldAction_<name>]`:
 
