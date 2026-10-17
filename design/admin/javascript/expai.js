@@ -1268,18 +1268,25 @@
             if ( !actions.length ) {
                 return;
             }
-            var bar = document.createElement( 'div' );
-            bar.className = 'exp-ai exp-ai-field-bar';
-            bar.innerHTML = '<span class="exp-ai-field-title" title="' + esc( S.actions_title ) + '"><span class="exp-ai-mark" aria-hidden="true"></span>' + esc( S.actions ) + '</span>'
-                + actions.map( function ( a ) {
-                    return '<button type="button" class="exp-ai-chip" data-action="' + esc( a.name ) + '">' + esc( a.label ) + '</button>';
-                } ).join( '' )
-                + '<div class="exp-ai-field-form" hidden="hidden"></div><p class="exp-ai-field-note" aria-live="polite"></p>';
-            var label = ctx.block.querySelector( ':scope > label, :scope > fieldset > legend, :scope > .translation > label' );
-            if ( label && label.parentNode === ctx.block ) {
-                label.insertAdjacentElement( 'afterend', bar );
+            // drawn with the page (content/edit/expai_attribute.tpl, through content.ini [EditSettings]
+            // AttributeTemplates[]), so the form does not move: taken on, its buttons enabled; otherwise drawn here
+            var bar = ctx.block.querySelector( '.exp-ai-field-bar[data-exp-ai-attribute="' + String( ctx.attribute.id ).replace( /\D/g, '' ) + '"]' );
+            if ( bar && bar.querySelector( '.exp-ai-field-form' ) && bar.querySelector( '.exp-ai-field-note' ) ) {
+                Array.prototype.forEach.call( bar.querySelectorAll( '.exp-ai-chip' ), function ( chip ) { chip.disabled = false; } );
             } else {
-                ctx.block.insertBefore( bar, ctx.block.firstChild );
+                bar = document.createElement( 'div' );
+                bar.className = 'exp-ai exp-ai-field-bar';
+                bar.innerHTML = '<span class="exp-ai-field-title" title="' + esc( S.actions_title ) + '"><span class="exp-ai-mark" aria-hidden="true"></span>' + esc( S.actions ) + '</span>'
+                    + actions.map( function ( a ) {
+                        return '<button type="button" class="exp-ai-chip" data-action="' + esc( a.name ) + '">' + esc( a.label ) + '</button>';
+                    } ).join( '' )
+                    + '<div class="exp-ai-field-form" hidden="hidden"></div><p class="exp-ai-field-note" aria-live="polite"></p>';
+                var label = ctx.block.querySelector( ':scope > label, :scope > fieldset > legend, :scope > .translation > label' );
+                if ( label && label.parentNode === ctx.block ) {
+                    label.insertAdjacentElement( 'afterend', bar );
+                } else {
+                    ctx.block.insertBefore( bar, ctx.block.firstChild );
+                }
             }
             var formBox = bar.querySelector( '.exp-ai-field-form' );
             var note = bar.querySelector( '.exp-ai-field-note' );

@@ -20,7 +20,17 @@ and draws, for users with `expai/write` while `[AISettings] Enabled` and `[EditV
 - a JSON block (`.exp-ai-edit-config`) with the object id, version, language, the attributes (id, identifier,
   datatype, name), the field actions, the writable datatypes, the site's languages and the translated texts.
 
-No edit form template is overridden; the per-field buttons are added by expai.js.
+No edit form template is overridden. The bar of field actions is drawn with the page through the kernel's second hook,
+content.ini `[EditSettings] AttributeTemplates[]` (Exponential 6.0.15 and later), which includes
+`content/edit/expai_attribute.tpl` in every field's block, after its label (first in the block when the field has its
+own fieldset or is being translated): the bar is there at the first paint, so the form does not move down when
+expai.js starts (no layout shift). Its buttons are disabled until expai.js takes the bar on. On an older kernel, or a
+design whose `edit_attribute.tpl` has no such hook, expai.js draws the bars itself as before.
+
+```ini
+[EditSettings]
+AttributeTemplates[]=content/edit/expai_attribute.tpl
+```
 
 This differs from the older approach of ezgoogletranslate (archived), which overrode `content/edit.tpl`,
 `content/edit_attribute.tpl` and datatype edit templates per design to place "translate" links: expai needs no copy

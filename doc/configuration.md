@@ -471,6 +471,7 @@ See [mcp.md](mcp.md).
 | `design.ini` | `DesignExtensions[]=expai`, `BackendJavaScriptList[]=expai.js`, `BackendCSSFileList[]=expai.css` |
 | `admininterface.ini` | the tabs `expai` (content navigation part) and `expai_media` (media), header template `expai_header.tpl`, body `expai.tpl` |
 | `content.ini` | `[EditSettings] AdditionalTemplates[]=content/edit/expai.tpl` |
+| `content.ini` | `[EditSettings] AttributeTemplates[]=content/edit/expai_attribute.tpl` (the field bars drawn with the page) |
 | `menu.ini` | the entries of the Dashboard menu (`[Leftmenu_my]`: Exponential Intelligence, EI: Vector, EI: Chains, EI: Log, EI: Help), of Setup (`[Leftmenu_setup]`: EI: Summary, EI: Models, EI: Budgets, Job queue) and of Design (`[Leftmenu_design]`: Missing alt text), each with its policies ([dashboard.md](dashboard.md)) |
 | `cronjob.ini` | the cronjob part `expai`: `expai_queue.php` (resumes held jobs, releases lost batch submits), `expai_prune.php` (usage rows older than `RetentionDays`; draft log rows of removed objects marked `deleted`; threads, conversations and request summaries after `[RetentionSettings]`, and those of removed users), `expai_thread_prune.php` (thread events, proposals, checkpoints); run it with `-s <admin siteaccess>` |
 | `dashboard.ini` | the dashboard block `expai_drafts` (Priority 35, 5 items, `expai/write`) |

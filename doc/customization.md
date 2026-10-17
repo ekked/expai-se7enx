@@ -12,6 +12,7 @@ expai:
 | `tabs/expai.tpl` | the panel frame, its sections, the panel's texts (JSON) |
 | `expai/panel/conversation.tpl`, `expai/panel/drafts.tpl` | the panel sections |
 | `content/edit/expai.tpl` | the edit form area and its configuration (JSON) |
+| `content/edit/expai_attribute.tpl` | the bar of field actions of one field, drawn with the page (content.ini `AttributeTemplates[]`) |
 | `expai/edit/assistant.tpl` | "Fill the fields" |
 | `expai/dashboard.tpl`, `expai/browse_start_writing.tpl` | the dashboard page, the browser's description |
 | `dashboard/expai_drafts.tpl` | the dashboard block |
