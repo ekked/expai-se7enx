@@ -14,6 +14,9 @@
  *   --timeout=<s>    seconds per request instead of the provider's Timeout (a slow local model on a CPU)
  *   --list           the models of the registry with their latest probe
  *
+ * -s <siteaccess> is mandatory: the script prints the siteaccess and its database (stderr) and does not run
+ * where expai is not active (expAiScript).
+ *
  * @copyright Copyright (C) 1998 - 2026 7x & Exponential Foundation. All rights reserved.
  * @license GNU General Public License v2.0 (or any later version)
  * @package expai
@@ -32,7 +35,9 @@ $options = $script->getOptions( '[model:][live][base-url:][login:][list][timeout
     'login' => 'The user the requests are logged for',
     'timeout' => 'Seconds per request instead of the provider\'s Timeout',
     'list' => 'List the models and their latest probe' ) );
+expAiScript::requireSiteAccess( $script, $options );
 $script->initialize();
+expAiScript::announce( $script );
 
 $config = expAiConfig::instance();
 $registry = $config->registry();

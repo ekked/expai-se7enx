@@ -286,7 +286,8 @@ class expAiCheckpoint extends eZPersistentObject
             $seen[$key] = true;
             $objectID = (int) $log->attribute( 'contentobject_id' );
             $object = expAiObjects::fetch( $objectID );
-            $name = $object ? (string) $object->attribute( 'name' ) : '#' . $objectID;
+            // the name only for a viewer who may read the object
+            $name = $object && $object->canRead() ? (string) $object->attribute( 'name' ) : '#' . $objectID;
             $row = array( 'object_id' => $objectID, 'version' => (int) $log->attribute( 'version' ), 'language' => (string) $log->attribute( 'language_code' ),
                           'name' => $name, 'log_id' => (int) $log->attribute( 'id' ) );
             $version = self::draftVersion( $objectID, (int) $log->attribute( 'version' ) );

@@ -137,7 +137,7 @@ $tpl->setVariable( 'key_problems', $registry->keyPlacementProblems() );
 $tpl->setVariable( 'local', $local );
 $tpl->setVariable( 'threshold', expAiProbe::threshold( $config ) );
 $tpl->setVariable( 'bridge', array( 'enabled' => $config->flag( 'McpBridge', 'Enabled', false ), 'tools' => $config->arr( 'McpBridge', 'Tools' ),
-                                    'available' => class_exists( 'expMcpContentTool' ) ) );
+                                    'available' => class_exists( 'expMcpContentTool' ) && expAiConfig::extensionActive( 'expmcp' ) ) );
 $tpl->setVariable( 'mcp_servers', $mcpServers );
 $tpl->setVariable( 'policy_active', ( new expAiDataPolicy( $config, array() ) )->active() );
 $tpl->setVariable( 'notice', $notice );

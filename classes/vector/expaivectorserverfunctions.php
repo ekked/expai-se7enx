@@ -176,7 +176,8 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
             $conversation = $thread->conversation();
             $history = array( 'exchanges' => array(), 'has_older' => false );
             if ( $conversation )
-                $history = ( new expAiAssistant( $config ) )->useConversation( $conversation )->history( eZUser::currentUser(), (int) $thread->attribute( 'node_id' ) );
+                $history = expAiVector::visibleHistory( ( new expAiAssistant( $config ) )->useConversation( $conversation )
+                    ->history( eZUser::currentUser(), (int) $thread->attribute( 'node_id' ) ), $thread->isOwner( $userID ) );
             if ( $thread->isOwner( $userID ) && (int) $thread->attribute( 'seen_event_id' ) < (int) $thread->attribute( 'last_event_id' ) )
             {
                 eZPersistentObject::updateObjectList( array( 'definition' => expAiThread::definition(),
@@ -184,11 +185,9 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
                                                              'conditions' => array( 'id' => (int) $thread->attribute( 'id' ) ) ) );
                 $thread->setAttribute( 'seen_event_id', (int) $thread->attribute( 'last_event_id' ) );
             }
-            $followups = array();
-            foreach ( expAiFollowup::waiting( (int) $thread->attribute( 'id' ) ) as $followup )
-                $followups[] = $followup->present();
+            $followups = expAiVector::visibleFollowups( expAiFollowup::waiting( (int) $thread->attribute( 'id' ) ), $thread->isOwner( $userID ) );
             return array( 'thread' => expAiVector::detail( $thread, $userID, $config ), 'history' => $history,
-                          'drafts' => expAiVector::drafts( $thread ), 'followups' => $followups,
+                          'drafts' => expAiVector::drafts( $thread ), 'followups' => $followups['list'], 'followups_waiting' => $followups['count'],
                           'pending' => $conversation ? $conversation->awaitsAnswer() : false,
                           'lanes' => expAiVector::lanes( (string) $thread->attribute( 'model_alias' ) ?: $config->effectiveModel(), $config ) );
         } );
@@ -206,8 +205,8 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
             if ( !$conversation )
                 return array( 'exchanges' => array(), 'has_older' => false );
             $before = (int) self::post( 'before', '0' );
-            return ( new expAiAssistant( $config ) )->useConversation( $conversation )
-                ->history( eZUser::currentUser(), (int) $thread->attribute( 'node_id' ), $before > 0 ? $before : null );
+            return expAiVector::visibleHistory( ( new expAiAssistant( $config ) )->useConversation( $conversation )
+                ->history( eZUser::currentUser(), (int) $thread->attribute( 'node_id' ), $before > 0 ? $before : null ), $thread->isOwner( self::userID() ) );
         } );
     }
 
@@ -258,7 +257,7 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
                 }
                 if ( $cursor < (int) $thread->attribute( 'last_event_id' ) )
                     foreach ( expAiThreadEvent::fetchAfter( (int) $thread->attribute( 'id' ), $cursor, 200 ) as $event )
-                        $out['events'][] = array( 'thread' => $uuid ) + $event->present();
+                        $out['events'][] = array( 'thread' => $uuid ) + expAiVector::visibleEvent( $event->present(), $thread->isOwner( self::userID() ) );
             }
             $out['next_ms'] = self::nextPoll( $config, $openRunning, $running );
             return $out;
@@ -640,7 +639,8 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
     protected static function changesAnswer( expAiThread $thread, array $extra = array() )
     {
         $fresh = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ) ?: $thread;
-        return $extra + array( 'groups' => expAiVector::changeGroups( $fresh ), 'counts' => expAiChange::counts( (int) $fresh->attribute( 'id' ) ),
+        $groups = expAiVector::changeGroups( $fresh, $withheld, self::userID() );
+        return $extra + array( 'groups' => $groups, 'withheld' => $withheld, 'counts' => expAiChange::counts( (int) $fresh->attribute( 'id' ) ),
                                'can_decide' => expAiThreadAccess::canWrite( $fresh ) && expAiVector::allowed(),
                                'thread' => expAiVector::detail( $fresh, self::userID() ), 'drafts' => expAiVector::drafts( $fresh ) );
     }
@@ -681,37 +681,46 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
             $n = 0;
             $db = eZDB::instance();
             $db->begin();
-            $all = self::post( 'all' );
-            if ( in_array( $all, array( 'accepted', 'rejected' ), true ) )
+            try
             {
-                foreach ( expAiChange::fetchForThread( (int) $thread->attribute( 'id' ), array( 'pending', 'accepted', 'rejected', 'partial' ) ) as $change )
+                $all = self::post( 'all' );
+                if ( in_array( $all, array( 'accepted', 'rejected' ), true ) )
                 {
-                    $n += $change->decide( '', $all, $userID );
-                    $change->store();
+                    foreach ( expAiChange::fetchForThread( (int) $thread->attribute( 'id' ), array( 'pending', 'accepted', 'rejected', 'partial' ) ) as $change )
+                    {
+                        $n += $change->decide( '', $all, $userID );
+                        $change->store();
+                    }
                 }
-            }
-            else
-            {
-                $list = self::postJson( 'decisions' );
-                foreach ( array_slice( isset( $list['list'] ) && is_array( $list['list'] ) ? $list['list'] : array(), 0, 500 ) as $d )
+                else
                 {
-                    if ( !is_array( $d ) || !isset( $d['change'], $d['decision'] ) )
-                        continue;
-                    $change = self::loadChange( $thread, (int) $d['change'] );
-                    if ( in_array( $change->attribute( 'decision' ), array( 'applied', 'stale' ), true ) )
-                        continue;
-                    $n += $change->decide( isset( $d['hunk'] ) ? (string) $d['hunk'] : '', (string) $d['decision'], $userID );
-                    $change->store();
+                    $list = self::postJson( 'decisions' );
+                    foreach ( array_slice( isset( $list['list'] ) && is_array( $list['list'] ) ? $list['list'] : array(), 0, 500 ) as $d )
+                    {
+                        if ( !is_array( $d ) || !isset( $d['change'], $d['decision'] ) )
+                            continue;
+                        $change = self::loadChange( $thread, (int) $d['change'] );
+                        if ( in_array( $change->attribute( 'decision' ), array( 'applied', 'stale' ), true ) )
+                            continue;
+                        $n += $change->decide( isset( $d['hunk'] ) ? (string) $d['hunk'] : '', (string) $d['decision'], $userID );
+                        $change->store();
+                    }
                 }
+                // the editor's own decisions are no event: the answer carries them, and an event would make every open
+                // browser of the thread reload it
+                if ( $n )
+                {
+                    $thread->touch();
+                    $thread->store();
+                }
+                $db->commit();
             }
-            // the editor's own decisions are no event: the answer carries them, and an event would make every open
-            // browser of the thread reload it
-            if ( $n )
+            catch ( Throwable $e )
             {
-                $thread->touch();
-                $thread->store();
+                if ( $db->transactionCounter() > 0 )
+                    $db->rollback();
+                throw $e;
             }
-            $db->commit();
             return self::changesAnswer( $thread, array( 'decided' => $n ) );
         } );
     }
@@ -761,19 +770,28 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
             $lines = array();
             $db = eZDB::instance();
             $db->begin();
-            foreach ( expAiChange::fetchForThread( (int) $thread->attribute( 'id' ), array( 'pending', 'accepted', 'partial', 'conflict' ) ) as $change )
+            try
             {
-                if ( $ids ? !in_array( (int) $change->attribute( 'id' ), $ids, true ) : $change->attribute( 'decision' ) !== 'conflict' && !$change->baseChanged() )
-                    continue;
-                if ( $change->isNew() )
-                    continue;
-                $key = (int) $change->attribute( 'contentobject_id' ) . ' (' . $change->attribute( 'language_code' ) . ')';
-                $lines[$key][] = (string) $change->attribute( 'attribute_identifier' );
-                $change->setAttribute( 'decision', 'stale' );
-                $change->setAttribute( 'modified', time() );
-                $change->store();
+                foreach ( expAiChange::fetchForThread( (int) $thread->attribute( 'id' ), array( 'pending', 'accepted', 'partial', 'conflict' ) ) as $change )
+                {
+                    if ( $ids ? !in_array( (int) $change->attribute( 'id' ), $ids, true ) : $change->attribute( 'decision' ) !== 'conflict' && !$change->baseChanged() )
+                        continue;
+                    if ( $change->isNew() )
+                        continue;
+                    $key = (int) $change->attribute( 'contentobject_id' ) . ' (' . $change->attribute( 'language_code' ) . ')';
+                    $lines[$key][] = (string) $change->attribute( 'attribute_identifier' );
+                    $change->setAttribute( 'decision', 'stale' );
+                    $change->setAttribute( 'modified', time() );
+                    $change->store();
+                }
+                $db->commit();
             }
-            $db->commit();
+            catch ( Throwable $e )
+            {
+                if ( $db->transactionCounter() > 0 )
+                    $db->rollback();
+                throw $e;
+            }
             if ( !$lines )
                 throw new expAiException( 'There is nothing to rebase.' );
             $parts = array();
@@ -821,6 +839,8 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
         if ( !$plan )
             return $extra + array( 'plan' => null, 'can_decide' => false );
         $out = $plan->present();
+        // the approver sees no name, instruction or field of a target it may not read
+        $out = expAiVector::visiblePlan( $out, $thread->isOwner( self::userID() ) );
         $e = $out['estimate'];
         $money = function ( $micros ) { return expAiCost::enabled() ? expAiBudget::money( (int) $micros ) : ''; };
         $out['money'] = array( 'low' => $money( isset( $e['low_micros'] ) ? $e['low_micros'] : 0 ), 'expected' => $money( isset( $e['expected_micros'] ) ? $e['expected_micros'] : 0 ),
@@ -930,7 +950,8 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
         return self::run( function ()
         {
             $thread = self::loadThread();
-            return array( 'checkpoints' => expAiCheckpoint::listFor( $thread, max( 1, min( 50, (int) self::post( 'limit', '50' ) ) ) ),
+            return array( 'checkpoints' => expAiVector::visibleCheckpoints( expAiCheckpoint::listFor( $thread, max( 1, min( 50, (int) self::post( 'limit', '50' ) ) ) ),
+                                                                            $thread->isOwner( self::userID() ) ),
                           'can_restore' => expAiThreadAccess::canWrite( $thread ) && expAiVector::allowed() );
         } );
     }

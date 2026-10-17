@@ -61,6 +61,31 @@ class expAiAltTextTest extends expAiContentTestCase
         $this->assertRefused( function () use ( $config, $image, $attribute ) { expAiAltText::suggest( $config, $image, $attribute, self::SOURCE, array() ); }, 'switched off' );
     }
 
+    public function testTheReportReadsTheImageAttributesInOneQueryForManyObjects(): void
+    {
+        $this->siteSettings( array( 'AltTextSettings' => array( 'Enabled' => 'enabled' ) ) );
+        $folder = $this->folder();
+        $this->asUser( 'admin' );
+        $ids = array();
+        for ( $i = 0; $i < 4; $i++ )
+            $ids[] = (int) $this->image( (int) $folder->attribute( 'node_id' ), 'XT batch ' . $i )->attribute( 'id' );
+
+        // the same attributes as the data maps give: same ids, same identifiers, per language
+        $batched = expAiAltText::imageAttributes( $ids );
+        foreach ( $ids as $id )
+        {
+            $object = eZContentObject::fetch( $id );
+            $map = $object->fetchDataMap( (int) $object->attribute( 'current_version' ), self::SOURCE );
+            $this->assertSame( (int) $map['image']->attribute( 'id' ), (int) $batched[$id][self::SOURCE]['image']->attribute( 'id' ) );
+            $this->assertSame( array( 'image' ), array_keys( $batched[$id][self::SOURCE] ) );
+        }
+
+        // the report of the whole folder lists the objects in the order of the tree
+        $report = expAiAltText::missing( $folder );
+        $this->assertCount( 4, $report['rows'] );
+        $this->assertSame( $ids, array_column( $report['rows'], 'object_id' ) );
+    }
+
     public function testTheReportTheQueueAndTheJob(): void
     {
         $config = $this->siteSettings( array( 'AltTextSettings' => array( 'Enabled' => 'enabled', 'Model' => '', 'ImageRegions' => array(), 'ImageZeroRetention' => 'disabled',

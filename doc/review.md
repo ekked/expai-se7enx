@@ -132,6 +132,22 @@ useful for drafts written directly.
   who may open a thread see its changes read-only.
 - Writing checks the editor's own **edit** (or create) permission per object and language at apply time; without it
   the object is listed with the reason and nothing is written.
+- An approver who opens a thread of someone else sees only what they may **read** themselves: the Changes tab leaves
+  out the changes of an object the viewer may not read (for a proposed new object: its parent node; a new object
+  without a parent is left out too) and says how many (`withheld` in the answer); a plan item on such a target, or
+  one whose target cannot be told, keeps its action and state but shows `#<id>` (or nothing) instead of the name,
+  and no instruction or fields; the drafts of an exchange on such objects, or with a key that cannot be read (and
+  the notes of what became of them), are left out of the conversation. The owner sees the thread unfiltered. The
+  Drafts list and the restore preview of a checkpoint name only readable objects, for everyone
+  (`expAiVector::changeGroups()`, `changeHidden()`, `visiblePlanItems()`, `visibleHistory()`, `drafts()`).
+- The words of a thread cannot be told apart by object, so an approver does not get them at all (fail closed): not
+  the thread's title (the owner's first request), not the requests, answers, steps and turn records of the
+  conversation, not the queued follow-ups (only how many wait), not the labels and last steps of the plan's runs, not the labels of the checkpoints, not the plan's
+  assumptions, questions and risks. Of the events (poll `events` and the stream `expai/stream`) an approver gets
+  states, ids, counts and costs (`status`, `cost`, `plan`, `run`, `checkpoint`, `followup`, only their known keys),
+  `draft`, `change` and `held` only for objects they may read, and nothing of `text`, `step_end`, `error` or any
+  other kind (`expAiVector::visibleEvent()`, `visibleRuns()`, `visibleCheckpoints()`, `visiblePlan()`). Every entry
+  point checks first that the user may open the thread at all (owner, or approver of a version it wrote).
 
 ## Tests
 

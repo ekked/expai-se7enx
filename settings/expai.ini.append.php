@@ -41,23 +41,36 @@ ModelLabels[claude-sonnet-5-5]=Claude Sonnet 5.5
 ModelLabels[claude-opus-5-5]=Claude Opus 5.5
 ModelLabels[claude-haiku-5-5]=Claude Haiku 5.5
 
-# The API key. Put it ONLY in settings/override/expai.ini.append.php.
+# The API key. Put it in settings/override/expai.ini.append.php (or in an untracked location of
+# [ProviderSettings] KeyLocations[]), never in a file git tracks.
 ApiKey=
 # Only for a key that is not scoped to a workspace: the workspace every request names.
 AnthropicWorkspaceId=
 
-# The longest answer (tokens) one call may produce.
-MaxTokens=8000
+# The longest answer (tokens) one call may produce, thinking included. Requests are sent without streaming; with
+# Timeout=115 an answer that long may run out of time first: the limit then still keeps a cut-off answer readable.
+MaxTokens=16000
 
 # How much the model thinks before it answers: low, medium, high (empty: the model's default).
 Effort=medium
 
 # enabled: a request the model declines for a safety reason is retried by the API on the model
-# Anthropic recommends for that case (server-side fallback, Claude API only).
+# Anthropic recommends for that case (server-side fallback, Claude API only). Sent only for the models that accept it
+# (Claude Fable 5.1, Mythos 5.1, Opus 5.5, Opus 5, Sonnet 5.5; not Claude Haiku 5.5), or for a model with the capability
+# refusal_fallback ([Model_<alias>] Capabilities[]); no_refusal_fallback turns it off for one.
 RefusalFallback=enabled
 
 # enabled: the API caches the stable start of each request (tools, instructions, earlier turns).
 PromptCaching=enabled
+
+# enabled: tool definitions go with strict: true (the API keeps every call to the tool's schema), for each tool whose
+# schema allows it; disabled: as they are. The arguments of every call are checked against the schema before it runs.
+StrictTools=enabled
+# The limits of strict tools in one request (tools, optional parameters, parameters with more than one type, all
+# strict tools together): a tool that would pass one is sent as it is.
+StrictToolsMax=20
+StrictOptionalMax=24
+StrictUnionMax=16
 
 # Seconds to wait for one provider call, and for the connection. Keep Timeout below the web
 # server's and PHP's request time limits (see doc/architecture.md, "Long turns").
@@ -100,9 +113,18 @@ DefaultModel=
 # to require the policy for every choice but the site default.
 ProvidersWithoutPolicy[]=anthropic
 
+# Where an ApiKey or Token may be set besides settings/override: fnmatch patterns relative to the installation. A file
+# there is accepted only when it is not shipped with the code (git does not track it; in a release without git: it
+# lies outside the release, e.g. a symlinked shared directory). The default is the settings directory of any
+# extension, for a git-ignored extension of secrets. A tracked file is always reported.
+KeyLocations[]=settings/override
+# (a star directly followed by a slash would end the PHP comment around this file; fnmatch() lets the star match
+# slashes, so extension/*settings covers extension/<name>/settings/...)
+KeyLocations[]=extension/*settings
+
 # A provider: Type=anthropic | openai_chat | custom (Class=<class implementing expAiProvider>)
 #   BaseURL         the API (openai_chat: the base, /chat/completions is added; anthropic: the messages URL)
-#   ApiKey          ONLY in settings/override; ApiKeyHeader authorization (Bearer, default of openai_chat) |
+#   ApiKey          in settings/override or a [ProviderSettings] KeyLocations[] location git does not track; ApiKeyHeader authorization (Bearer, default of openai_chat) |
 #                   x-api-key (default of anthropic) | api-key (Azure) | x-goog-api-key | none (a local server)
 #   Headers[]       extra request headers ("Name: value"; key headers are refused)
 #   Flavor          openai | huggingface | openrouter | mistral | xai | ollama | llamacpp | generic (small differences)
@@ -585,6 +607,10 @@ CompactContextChars=1800
 # Extra instructions appended to the built-in system prompt (one line per entry), e.g.
 # ExtraInstructions[]=Write in British English.
 
+# Where the write tools of a conversation may write: subtree (the open node and below in the panel, the scope in a
+# Vector thread) or site (anywhere the editor may write).
+WriteScope=subtree
+
 [ToolSettings]
 # The tools the assistant can call, in this order. Each is described in [Tool_<name>].
 Tools[]=get_node
@@ -592,6 +618,7 @@ Tools[]=list_children
 Tools[]=get_tree_context
 Tools[]=list_creatable_classes
 Tools[]=get_class_definition
+Tools[]=search_content
 Tools[]=create_draft
 Tools[]=update_draft
 
@@ -629,6 +656,9 @@ Class=expAiToolListCreatableClasses
 
 [Tool_get_class_definition]
 Class=expAiToolGetClassDefinition
+
+[Tool_search_content]
+Class=expAiToolSearchContent
 
 [Tool_create_draft]
 Class=expAiToolCreateDraft
@@ -857,6 +887,22 @@ RetentionDays=365
 # It contains content and the editors' words: leave it disabled in production.
 LogRequests=disabled
 
+[RetentionSettings]
+# How long the editors' words are kept, in days; 0 keeps them. Applied on every run of the cronjob part "expai"
+# (cronjobs/expai_prune.php) and by bin/php/expaithreads.php --prune (--dry-run counts only).
+# delete: the rows go; report: the cronjob only says what it would remove (to check the periods before they apply)
+Mode=delete
+# A thread (with its runs, events, proposals, checkpoints, plans and conversations) not modified for ThreadKeepDays
+# is removed, unless it is pinned, in review, waiting for an answer, or running (a run that stopped reporting for
+# 4 x [ThreadSettings] StaleRunSeconds does not count as running).
+ThreadKeepDays=365
+# A conversation not modified for ConversationKeepDays is removed, unless it belongs to a thread that stays.
+ConversationKeepDays=365
+# The summary of the editor's request in the draft log (expai_draft_log.prompt_summary) is blanked after
+# PromptSummaryKeepDays; the row itself stays as the record of the draft.
+PromptSummaryKeepDays=365
+# Independent of these periods: the threads and conversations of a user that no longer exists are removed.
+
 [Limits]
 # Every limit is optional: empty or 0 means no limit. Tokens are input + output + cache write + cache read; costs are
 # the [Pricing] estimate. Checked before every request to the model; the editor sees which limit and when it resets.
@@ -877,6 +923,11 @@ MaxRequestsPerTurn=
 # All users together on one provider per month, e.g. ProviderMaxCostPerMonth[openrouter]=20
 ProviderMaxTokensPerMonth[]
 ProviderMaxCostPerMonth[]
+# A request to a model without a price ([Pricing]) while a cost limit applies: block refuses it (the limit could not be
+# kept), ignore lets it through and counts it as free.
+UnpricedCost=block
+# While any limit is set, every request reserves its estimate (input from its length, its MaxTokens as output) before
+# it is sent, and the requests under way count against the limits until they are settled.
 
 [Pricing]
 # Prices per million tokens per model (USD) for the ESTIMATED cost on expai/log and the dashboard. Anthropic's invoice
@@ -905,7 +956,7 @@ ExchangeRatesAsOf=2026-10-12
 # Fallback for models without an entry (the prices of the default model, Claude Sonnet 5.5)
 DefaultInputPerMTok=2
 DefaultCacheWritePerMTok=2.50
-DefaultCacheReadPerMTok=0.10
+DefaultCacheReadPerMTok=0.20
 DefaultOutputPerMTok=10
 
 InputPerMTok[claude-fable-5-1]=10
@@ -925,7 +976,7 @@ OutputPerMTok[claude-opus-5]=25
 
 InputPerMTok[claude-sonnet-5-5]=2
 CacheWritePerMTok[claude-sonnet-5-5]=2.50
-CacheReadPerMTok[claude-sonnet-5-5]=0.10
+CacheReadPerMTok[claude-sonnet-5-5]=0.20
 OutputPerMTok[claude-sonnet-5-5]=10
 
 InputPerMTok[claude-sonnet-5]=2
@@ -1054,7 +1105,7 @@ Servers[]
 Label=Documentation search
 # https only; http only for a loopback address with AllowLoopback=enabled
 URL=https://mcp.example.org/mcp
-# ONLY in settings/override
+# in settings/override or a [ProviderSettings] KeyLocations[] location that git does not track
 Token=
 # The tools the panel may call; everything else the server offers is ignored.
 AllowedTools[]=search_docs
@@ -1120,6 +1171,9 @@ Background=auto
 # expqueue stays the safety net). PhpCli: the PHP command line binary for it (empty: the one of this PHP).
 KickWorker=enabled
 PhpCli=
+# Pass --allow-root-user to the started worker. Off: a worker refuses to run as root. Enable it only for a site whose
+# PHP itself runs as root (then the files the worker writes belong to root).
+WorkerAllowRoot=disabled
 # Streams open at once (one PHP process each: at most 25 % of PHP-FPM pm.max_children); over it the browser polls
 MaxStreams=4
 # Seconds one stream is held before the browser reconnects (Last-Event-ID)
@@ -1309,7 +1363,7 @@ SearchResultsFetchable=disabled
 Label=Brave Search
 Class=expAiWebSearchBrave
 Endpoint=https://api.search.brave.com/res/v1/web/search
-# ONLY in settings/override (X-Subscription-Token)
+# in settings/override or a [ProviderSettings] KeyLocations[] location that git does not track (X-Subscription-Token)
 ApiKey=
 # The query leaves the site: the data policy checks the panel's node against these
 Region=us

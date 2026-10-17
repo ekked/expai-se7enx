@@ -15,7 +15,7 @@
 {foreach ezini( 'PanelSettings', 'Sections', 'expai.ini' ) as $exp_ai_section}
     {include uri=concat( 'design:', ezini( concat( 'PanelSection_', $exp_ai_section ), 'Template', 'expai.ini' ) ) node=$node section=$exp_ai_section}
 {/foreach}
-    <script type="application/json" class="exp-ai-strings">{json_encode( hash(
+    <script type="application/json" class="exp-ai-strings">{hash(
         'you', 'You'|i18n( 'extension/expai/panel' ),
         'assistant', 'Exponential Intelligence'|i18n( 'extension/expai/panel' ),
         'assistant_short', 'Exponential Intelligence'|i18n( 'extension/expai/panel' ),
@@ -23,6 +23,10 @@
         'working', 'Exponential Intelligence is working...'|i18n( 'extension/expai/panel' ),
         'error', 'Something went wrong:'|i18n( 'extension/expai/panel' ),
         'timeout', 'The server did not answer in time. Please try again.'|i18n( 'extension/expai/panel' ),
+        'session_expired', 'Your session has expired. Reload the page and sign in again.'|i18n( 'extension/expai/panel' ),
+        'poll_lost', 'The connection to the run was lost. Reload the page to follow it.'|i18n( 'extension/expai/panel' ),
+        'answer_ready', 'The answer is ready.'|i18n( 'extension/expai/panel' ),
+        'draft_gone', 'This draft no longer exists.'|i18n( 'extension/expai/panel' ),
         'continue', 'Continue'|i18n( 'extension/expai/panel' ),
         'interrupted', 'The last answer was interrupted.'|i18n( 'extension/expai/panel' ),
         'reset_confirm', 'Start a new conversation? The drafts stay.'|i18n( 'extension/expai/panel' ),
@@ -52,6 +56,6 @@
         'sent_draft', '"%name" was not published: the publishing workflow stopped it. It is still a draft.'|i18n( 'extension/expai/panel' ),
         'label', 'Exponential Intelligence'|i18n( 'extension/expai/label' ),
         'label_full', 'Exponential Intelligence'|i18n( 'extension/expai/label' )
-    ) )}</script>
+    )|expai_json}</script>
 </section>
 {/if}

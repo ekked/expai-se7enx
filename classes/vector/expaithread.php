@@ -278,7 +278,7 @@ class expAiThread extends eZPersistentObject
         $micros = 0;
         $tokens = 0;
         $requests = 0;
-        $rows = eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), null, array( 'thread_id' => (int) $this->attribute( 'id' ) ),
+        $rows = eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), null, expAiUsage::requestsOnly( array( 'thread_id' => (int) $this->attribute( 'id' ) ) ),
                                                       array( 'id' => 'asc' ), array( 'offset' => 0, 'length' => 5000 ), false );
         foreach ( (array) $rows as $row )
         {
@@ -289,7 +289,8 @@ class expAiThread extends eZPersistentObject
             if ( $cost !== null )
                 $micros += (int) round( $cost * 1000000 );
         }
-        $this->setAttribute( 'cost_micros', min( 2147483647, $micros ) );
+        // cost_micros is 64 bits wide (expAiSchema::BIGINT)
+        $this->setAttribute( 'cost_micros', $micros );
         $this->setAttribute( 'tokens', min( 2147483647, $tokens ) );
         $this->setAttribute( 'requests', $requests );
     }
@@ -351,16 +352,25 @@ class expAiThread extends eZPersistentObject
         $id = (int) $this->attribute( 'id' );
         $db = eZDB::instance();
         $db->begin();
-        foreach ( expAiThreadRun::fetchForThread( $id ) as $run )
+        try
         {
-            if ( $withConversations && (int) $run->attribute( 'conversation_id' ) )
-                eZPersistentObject::removeObject( expAiConversation::definition(), array( 'id' => (int) $run->attribute( 'conversation_id' ) ) );
-            $run->remove();
+            foreach ( expAiThreadRun::fetchForThread( $id ) as $run )
+            {
+                if ( $withConversations && (int) $run->attribute( 'conversation_id' ) )
+                    eZPersistentObject::removeObject( expAiConversation::definition(), array( 'id' => (int) $run->attribute( 'conversation_id' ) ) );
+                $run->remove();
+            }
+            foreach ( array( 'expai_thread_event', 'expai_followup', 'expai_checkpoint', 'expai_plan', 'expai_change' ) as $table )
+                eZPersistentObject::removeObject( expAiThreadRetention::tableDefinition( $table ), array( 'thread_id' => $id ) );
+            $this->remove();
+            $db->commit();
         }
-        foreach ( array( 'expai_thread_event', 'expai_followup', 'expai_checkpoint', 'expai_plan', 'expai_change' ) as $table )
-            eZPersistentObject::removeObject( expAiThreadRetention::tableDefinition( $table ), array( 'thread_id' => $id ) );
-        $this->remove();
-        $db->commit();
+        catch ( Throwable $e )
+        {
+            if ( $db->transactionCounter() > 0 )
+                $db->rollback();
+            throw $e;
+        }
     }
 
     /**
@@ -466,62 +476,71 @@ class expAiThread extends eZPersistentObject
             return;
         $db = eZDB::instance();
         $db->begin();
-        if ( (string) $thread->attribute( 'title' ) === '' && !empty( $result['exchange']['user'] ) )
-            $thread->setAttribute( 'title', expAiText::cut( expAiText::oneLine( (string) $result['exchange']['user'] ), expAiConfig::instance()->int( 'ThreadSettings', 'TitleLength', 80, 20, 255 ) ) );
-        if ( (string) $conversation->attribute( 'model_alias' ) !== '' )
+        try
         {
-            $thread->setAttribute( 'model_alias', (string) $conversation->attribute( 'model_alias' ) );
-            $thread->setAttribute( 'provider', (string) $conversation->attribute( 'provider' ) );
+            if ( (string) $thread->attribute( 'title' ) === '' && !empty( $result['exchange']['user'] ) )
+                $thread->setAttribute( 'title', expAiText::cut( expAiText::oneLine( (string) $result['exchange']['user'] ), expAiConfig::instance()->int( 'ThreadSettings', 'TitleLength', 80, 20, 255 ) ) );
+            if ( (string) $conversation->attribute( 'model_alias' ) !== '' )
+            {
+                $thread->setAttribute( 'model_alias', (string) $conversation->attribute( 'model_alias' ) );
+                $thread->setAttribute( 'provider', (string) $conversation->attribute( 'provider' ) );
+            }
+            foreach ( isset( $result['steps'] ) ? (array) $result['steps'] : array() as $step )
+                $thread->addEvent( 'step_end', array( 'text' => isset( $step['text'] ) ? (string) $step['text'] : '', 'ok' => !empty( $step['ok'] ),
+                                                      'writes' => !empty( $step['writes'] ) ), $runID );
+            if ( isset( $result['text'] ) && trim( (string) $result['text'] ) !== '' )
+                $thread->addEvent( 'text', array( 'text' => (string) $result['text'] ), $runID );
+            foreach ( $written as $log )
+                $thread->addEvent( 'draft', array( 'object_id' => (int) $log->attribute( 'contentobject_id' ), 'version' => (int) $log->attribute( 'version' ),
+                                                   'language' => (string) $log->attribute( 'language_code' ), 'action' => (string) $log->attribute( 'action' ) ), $runID );
+            $before = (int) $thread->attribute( 'cost_micros' );
+            $thread->refreshCost();
+            if ( (int) $thread->attribute( 'cost_micros' ) !== $before || !empty( $result['steps'] ) || isset( $result['text'] ) )
+                $thread->addEvent( 'cost', array( 'micros' => (int) $thread->attribute( 'cost_micros' ), 'tokens' => (int) $thread->attribute( 'tokens' ),
+                                                  'requests' => (int) $thread->attribute( 'requests' ) ), $runID );
+            $status = isset( $result['status'] ) ? (string) $result['status'] : 'done';
+            if ( $status === 'continue' )
+                $state = 'running';
+            elseif ( $status === 'failed' )
+            {
+                $state = 'failed';
+                $thread->addEvent( 'error', array( 'message' => isset( $result['error'] ) ? expAiText::cut( (string) $result['error'], 500 ) : '' ), $runID );
+            }
+            elseif ( $status === 'stopped' )
+                $state = 'stopped';
+            elseif ( self::$holdRunning )
+                // a job with more turns to go (the items of an approved plan)
+                $state = 'running';
+            else
+                // the exchange of the turn wrote drafts, staged changes or a plan: they wait for the editor
+                $state = $written || !empty( $result['exchange']['drafts'] ) ? 'review' : $thread->restingState();
+            $thread->setState( $state );
+            // a turn that ended in words: notes sent to steer it that it could not take any more wait as queued
+            // follow-ups (doc/parallel-runs.md "Steering")
+            if ( $state !== 'running' && class_exists( 'expAiFollowup' ) )
+                expAiFollowup::steersToQueue( (int) $thread->attribute( 'id' ) );
+            $run = expAiThreadRun::fetchByID( $runID );
+            if ( $run )
+            {
+                $run->setAttribute( 'state', $state );
+                $run->setAttribute( 'model_alias', (string) $conversation->attribute( 'model_alias' ) );
+                if ( !(int) $run->attribute( 'started' ) )
+                    $run->setAttribute( 'started', time() );
+                if ( $state !== 'running' )
+                    $run->setAttribute( 'finished', time() );
+                $run->setAttribute( 'modified', time() );
+                $run->store();
+            }
+            $thread->touch();
+            $thread->store();
+            $db->commit();
         }
-        foreach ( isset( $result['steps'] ) ? (array) $result['steps'] : array() as $step )
-            $thread->addEvent( 'step_end', array( 'text' => isset( $step['text'] ) ? (string) $step['text'] : '', 'ok' => !empty( $step['ok'] ),
-                                                  'writes' => !empty( $step['writes'] ) ), $runID );
-        if ( isset( $result['text'] ) && trim( (string) $result['text'] ) !== '' )
-            $thread->addEvent( 'text', array( 'text' => (string) $result['text'] ), $runID );
-        foreach ( $written as $log )
-            $thread->addEvent( 'draft', array( 'object_id' => (int) $log->attribute( 'contentobject_id' ), 'version' => (int) $log->attribute( 'version' ),
-                                               'language' => (string) $log->attribute( 'language_code' ), 'action' => (string) $log->attribute( 'action' ) ), $runID );
-        $before = (int) $thread->attribute( 'cost_micros' );
-        $thread->refreshCost();
-        if ( (int) $thread->attribute( 'cost_micros' ) !== $before || !empty( $result['steps'] ) || isset( $result['text'] ) )
-            $thread->addEvent( 'cost', array( 'micros' => (int) $thread->attribute( 'cost_micros' ), 'tokens' => (int) $thread->attribute( 'tokens' ),
-                                              'requests' => (int) $thread->attribute( 'requests' ) ), $runID );
-        $status = isset( $result['status'] ) ? (string) $result['status'] : 'done';
-        if ( $status === 'continue' )
-            $state = 'running';
-        elseif ( $status === 'failed' )
+        catch ( Throwable $e )
         {
-            $state = 'failed';
-            $thread->addEvent( 'error', array( 'message' => isset( $result['error'] ) ? expAiText::cut( (string) $result['error'], 500 ) : '' ), $runID );
+            if ( $db->transactionCounter() > 0 )
+                $db->rollback();
+            throw $e;
         }
-        elseif ( $status === 'stopped' )
-            $state = 'stopped';
-        elseif ( self::$holdRunning )
-            // a job with more turns to go (the items of an approved plan)
-            $state = 'running';
-        else
-            // the exchange of the turn wrote drafts, staged changes or a plan: they wait for the editor
-            $state = $written || !empty( $result['exchange']['drafts'] ) ? 'review' : $thread->restingState();
-        $thread->setState( $state );
-        // a turn that ended in words: notes sent to steer it that it could not take any more wait as queued
-        // follow-ups (doc/parallel-runs.md "Steering")
-        if ( $state !== 'running' && class_exists( 'expAiFollowup' ) )
-            expAiFollowup::steersToQueue( (int) $thread->attribute( 'id' ) );
-        $run = expAiThreadRun::fetchByID( $runID );
-        if ( $run )
-        {
-            $run->setAttribute( 'state', $state );
-            $run->setAttribute( 'model_alias', (string) $conversation->attribute( 'model_alias' ) );
-            if ( !(int) $run->attribute( 'started' ) )
-                $run->setAttribute( 'started', time() );
-            if ( $state !== 'running' )
-                $run->setAttribute( 'finished', time() );
-            $run->setAttribute( 'modified', time() );
-            $run->store();
-        }
-        $thread->touch();
-        $thread->store();
-        $db->commit();
     }
 
     /** After a step of a child run: its events, the thread's cost, the run's model and times (not the thread's state) */
@@ -530,27 +549,36 @@ class expAiThread extends eZPersistentObject
         $runID = (int) $run->attribute( 'id' );
         $db = eZDB::instance();
         $db->begin();
-        foreach ( isset( $result['steps'] ) ? (array) $result['steps'] : array() as $step )
-            $thread->addEvent( 'step_end', array( 'text' => isset( $step['text'] ) ? (string) $step['text'] : '', 'ok' => !empty( $step['ok'] ),
-                                                  'writes' => !empty( $step['writes'] ), 'run_id' => $runID ), $runID );
-        if ( isset( $result['text'] ) && trim( (string) $result['text'] ) !== '' )
-            $thread->addEvent( 'text', array( 'text' => (string) $result['text'], 'run_id' => $runID ), $runID );
-        if ( isset( $result['status'] ) && $result['status'] === 'failed' )
-            $thread->addEvent( 'error', array( 'message' => isset( $result['error'] ) ? expAiText::cut( (string) $result['error'], 500 ) : '', 'run_id' => $runID ), $runID );
-        foreach ( $written as $log )
-            $thread->addEvent( 'draft', array( 'object_id' => (int) $log->attribute( 'contentobject_id' ), 'version' => (int) $log->attribute( 'version' ),
-                                               'language' => (string) $log->attribute( 'language_code' ), 'action' => (string) $log->attribute( 'action' ) ), $runID );
-        $thread->refreshCost();
-        $thread->addEvent( 'cost', array( 'micros' => (int) $thread->attribute( 'cost_micros' ), 'tokens' => (int) $thread->attribute( 'tokens' ),
-                                          'requests' => (int) $thread->attribute( 'requests' ) ), $runID );
-        $run->setAttribute( 'model_alias', (string) $conversation->attribute( 'model_alias' ) );
-        if ( !(int) $run->attribute( 'started' ) )
-            $run->setAttribute( 'started', time() );
-        $run->refreshCost();
-        $run->setAttribute( 'modified', time() );
-        $run->store();
-        $thread->storeActivity();
-        $db->commit();
+        try
+        {
+            foreach ( isset( $result['steps'] ) ? (array) $result['steps'] : array() as $step )
+                $thread->addEvent( 'step_end', array( 'text' => isset( $step['text'] ) ? (string) $step['text'] : '', 'ok' => !empty( $step['ok'] ),
+                                                      'writes' => !empty( $step['writes'] ), 'run_id' => $runID ), $runID );
+            if ( isset( $result['text'] ) && trim( (string) $result['text'] ) !== '' )
+                $thread->addEvent( 'text', array( 'text' => (string) $result['text'], 'run_id' => $runID ), $runID );
+            if ( isset( $result['status'] ) && $result['status'] === 'failed' )
+                $thread->addEvent( 'error', array( 'message' => isset( $result['error'] ) ? expAiText::cut( (string) $result['error'], 500 ) : '', 'run_id' => $runID ), $runID );
+            foreach ( $written as $log )
+                $thread->addEvent( 'draft', array( 'object_id' => (int) $log->attribute( 'contentobject_id' ), 'version' => (int) $log->attribute( 'version' ),
+                                                   'language' => (string) $log->attribute( 'language_code' ), 'action' => (string) $log->attribute( 'action' ) ), $runID );
+            $thread->refreshCost();
+            $thread->addEvent( 'cost', array( 'micros' => (int) $thread->attribute( 'cost_micros' ), 'tokens' => (int) $thread->attribute( 'tokens' ),
+                                              'requests' => (int) $thread->attribute( 'requests' ) ), $runID );
+            $run->setAttribute( 'model_alias', (string) $conversation->attribute( 'model_alias' ) );
+            if ( !(int) $run->attribute( 'started' ) )
+                $run->setAttribute( 'started', time() );
+            $run->refreshCost();
+            $run->setAttribute( 'modified', time() );
+            $run->store();
+            $thread->storeActivity();
+            $db->commit();
+        }
+        catch ( Throwable $e )
+        {
+            if ( $db->transactionCounter() > 0 )
+                $db->rollback();
+            throw $e;
+        }
     }
 
     /** The panel's "New conversation": the panel threads of those conversations go with them */

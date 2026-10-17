@@ -35,7 +35,7 @@ class expAiProviderRequestTest extends expAiProviderTestCase
         $http = new expAiProviderTestHttp( array( self::answer( array( array( 'type' => 'text', 'text' => 'hi' ) ),
                                                          array( 'input_tokens' => 10, 'output_tokens' => 3, 'cache_creation_input_tokens' => 2, 'cache_read_input_tokens' => 4 ) ) ) );
         $provider = self::anthropic( array( 'Effort' => 'High', 'AnthropicExtras' => 'enabled', 'PromptCaching' => 'enabled', 'RefusalFallback' => 'enabled',
-                                            'AnthropicWorkspaceId' => 'ws_1', 'LaneParams' => array( 'speed' => 'fast', 'model' => 'never' ), 'Label' => 'My Claude' ), $http );
+                                            'Capabilities' => array( 'refusal_fallback' ), 'AnthropicWorkspaceId' => 'ws_1', 'LaneParams' => array( 'speed' => 'fast', 'model' => 'never' ), 'Label' => 'My Claude' ), $http );
         $this->assertSame( 'My Claude', $provider->providerLabel() );
         $answer = $provider->send( array( 'system' => 'sys', 'max_tokens' => 50, 'tools' => array( array( 'name' => 'get_node' ) ), 'tool_choice' => array( 'type' => 'auto' ),
                                           'output_schema' => array( 'type' => 'object' ),
@@ -69,7 +69,7 @@ class expAiProviderRequestTest extends expAiProviderTestCase
         $payload = $http->json();
         $this->assertArrayNotHasKey( 'cache_control', $payload );
         $this->assertArrayNotHasKey( 'output_config', $payload, 'an unknown effort is not sent' );
-        $this->assertSame( 8000, $payload['max_tokens'] );
+        $this->assertSame( expAiAnthropicProvider::DEFAULT_MAX_TOKENS, $payload['max_tokens'] );
         foreach ( $http->requests[0][1] as $header )
             $this->assertStringStartsNotWith( 'anthropic-workspace-id', $header );
     }
@@ -79,7 +79,7 @@ class expAiProviderRequestTest extends expAiProviderTestCase
         $http = new expAiProviderTestHttp( array(
             array( 400, json_encode( array( 'error' => array( 'type' => 'invalid_request_error', 'message' => 'thinking block_binding mismatch' ) ) ) ),
             self::answer( array( array( 'type' => 'text', 'text' => 'ok' ) ) ) ) );
-        $answer = self::anthropic( array( 'AnthropicExtras' => 'enabled', 'RefusalFallback' => 'enabled' ), $http )->send( array( 'system' => 's', 'messages' => array() ) );
+        $answer = self::anthropic( array( 'AnthropicExtras' => 'enabled', 'RefusalFallback' => 'enabled', 'Model' => 'claude-opus-5-5' ), $http )->send( array( 'system' => 's', 'messages' => array() ) );
         $this->assertSame( 1, $answer['retries'] );
         $this->assertCount( 2, $http->requests );
         $retry = $http->json( 1 );

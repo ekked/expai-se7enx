@@ -65,7 +65,7 @@ Servers[]=docs
 [McpServer_docs]
 Label=Documentation search
 URL=https://mcp.example.org/mcp
-Token=...                          # settings/override only
+Token=...                          # settings/override or an untracked KeyLocations[] location
 AllowedTools[]=search_docs
 Region=us
 Retention=unknown

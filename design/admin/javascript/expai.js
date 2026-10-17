@@ -72,10 +72,53 @@
                     resolve( json.content );
                 }
             } ).fail( function ( xhr, status ) {
-                reject( { message: status === 'timeout' ? '' : ( xhr && xhr.status ? 'HTTP ' + xhr.status : '' ),
-                          kind: status === 'timeout' || ( xhr && ( xhr.status === 504 || xhr.status === 502 ) ) ? 'timeout' : 'http' } );
+                var code = xhr && xhr.status ? xhr.status : 0;
+                // an HTML page where JSON was asked for (status 200, parsererror): the login page of a lost session
+                var loginPage = status === 'parsererror' && xhr && /^\s*</.test( String( xhr.responseText || '' ) );
+                reject( { message: status === 'timeout' ? '' : ( code ? 'HTTP ' + code : '' ),
+                          kind: status === 'timeout' || code === 504 || code === 502 ? 'timeout' : 'http',
+                          status: code,
+                          // 401/403, or the login page instead of JSON: the session is gone (or the permission); polling again cannot help
+                          expired: code === 401 || code === 403 || loginPage } );
             } );
         } );
+    }
+
+    /**
+     * The bookkeeping of a polling loop. fail( err ) says whether to go on: after five failures in a row, or at once
+     * when the session has expired, it answers { stop: true, error: <the error to show> }; otherwise { delay } grows
+     * from the base interval (doubling, at most 60 s, like expai_watch.js). ok() resets it. whenVisible( fn ) runs fn
+     * now, or when the tab is shown again: a hidden tab does not poll.
+     */
+    function pollGuard( baseMs, strings ) {
+        var failures = 0;
+        var texts = strings || {};
+        return {
+            ok: function () { failures = 0; },
+            fail: function ( err ) {
+                failures++;
+                if ( err && err.expired ) {
+                    return { stop: true, error: { message: texts.session_expired || 'Your session has expired. Reload the page and sign in again.', kind: 'http', expired: true } };
+                }
+                if ( failures >= 5 ) {
+                    return { stop: true, error: { message: texts.poll_lost || 'The connection to the run was lost. Reload the page to follow it.', kind: 'http', lost: true } };
+                }
+                return { stop: false, delay: Math.min( baseMs * Math.pow( 2, failures ), 60000 ) };
+            },
+            whenVisible: function ( fn ) {
+                if ( !document.hidden ) {
+                    fn();
+                    return;
+                }
+                var onShow = function () {
+                    if ( !document.hidden ) {
+                        document.removeEventListener( 'visibilitychange', onShow );
+                        fn();
+                    }
+                };
+                document.addEventListener( 'visibilitychange', onShow );
+            }
+        };
     }
 
     function on( event, fn ) {
@@ -100,6 +143,30 @@
             text = text.split( key ).join( String( args[key] ) );
         } );
         return text;
+    }
+
+    /**
+     * The key under which this browser remembers the palette's state for the signed-in user: a shared browser must not
+     * carry one user's "off" or key bindings over to the next. admin4's user menu names the login of the user
+     * (.a4-user-menu-login, also while the menu is inactive); a design without it gets the plain key.
+     */
+    function paletteStoreKey() {
+        var login = document.querySelector( '#a4-user-menu .a4-user-menu-login' );
+        var who = login ? login.textContent.trim() : '';
+        return 'exp-ai-palette-keys' + ( who ? ':' + who : '' );
+    }
+
+    /** The same text without its Markdown marks, on one line: the collapsed header of an exchange shows this, not "## **Title**" */
+    function plainText( text ) {
+        return String( text || '' ).replace( /\r/g, '' )
+            .replace( /```[a-z]*\n?/gi, '' )
+            .replace( /!?\[([^\]]*)\]\([^)]*\)/g, '$1' )
+            .replace( /^\s{0,3}(#{1,6}\s+|>\s?|[-*+]\s+|\d+[.)]\s+|[-*_]{3,}\s*$)/gm, '' )
+            .replace( /(\*\*|__)(.+?)\1/g, '$2' )
+            .replace( /(^|[\s(])[*_]([^*_\n]+)[*_](?=[\s).,;:!?]|$)/g, '$1$2' )
+            .replace( /`([^`]*)`/g, '$1' )
+            .replace( /\|/g, ' ' )
+            .replace( /\s+/g, ' ' ).trim();
     }
 
     /** Assistant text (plain with a little Markdown) as safe HTML */
@@ -131,7 +198,14 @@
         if ( !node ) {
             return {};
         }
-        try { return JSON.parse( node.textContent ) || {}; } catch ( e ) { return {}; }
+        try {
+            return JSON.parse( node.textContent ) || {};
+        } catch ( e ) {
+            if ( window.console && console.warn ) {
+                console.warn( 'expai: the configuration block ' + selector + ' is not valid JSON', e );
+            }
+            return {};
+        }
     }
 
     function url( path ) {
@@ -334,7 +408,11 @@
         slowStatus: slowStatus,
         turnRecord: turnRecord,
         watchChip: watchChip,
-        requestLinks: requestLinks
+        requestLinks: requestLinks,
+        pollGuard: pollGuard,
+        readJSON: readJSON,
+        plainText: plainText,
+        paletteStoreKey: paletteStoreKey
     };
 
     /**
@@ -504,6 +582,17 @@
         var S = readJSON( root, '.exp-ai-strings' );
         var log = root.querySelector( '.exp-ai-log' );
         var working = root.querySelector( '.exp-ai-working' );
+        // the step messages and the end of a turn, spoken through a live region of their own (the log itself is not
+        // live: a long answer or a reloaded history would be read out whole); at most one message every 2 seconds
+        var live = root.querySelector( '.exp-ai-steps-live' );
+        var liveAt = 0;
+        function announce( message, force ) {
+            if ( !live || !message || ( !force && Date.now() - liveAt < 2000 ) ) {
+                return;
+            }
+            liveAt = Date.now();
+            live.textContent = message;
+        }
         var errorBox = root.querySelector( '.exp-ai-error' );
         var input = root.querySelector( '.exp-ai-input' );
         var sendButton = root.querySelector( '.exp-ai-send' );
@@ -570,8 +659,8 @@
             return '<div class="exp-ai-x-head">'
                 + '<button type="button" class="exp-ai-x-toggle" aria-expanded="false" aria-controls="' + bodyId + '">'
                 + '<span class="exp-ai-x-time">' + esc( timeText( x.time ) ) + '</span>'
-                + '<span class="exp-ai-x-line"><strong>' + esc( S.you ) + ':</strong> ' + esc( x.user_snippet || '' ) + '</span>'
-                + ( x.snippet && x.reply ? '<span class="exp-ai-x-line exp-ai-x-reply"><strong>' + esc( S.assistant_short ) + ':</strong> ' + esc( x.snippet ) + '</span>' : '' )
+                + '<span class="exp-ai-x-line"><strong>' + esc( S.you ) + ':</strong> ' + esc( plainText( x.user_snippet ) ) + '</span>'
+                + ( x.snippet && x.reply ? '<span class="exp-ai-x-line exp-ai-x-reply"><strong>' + esc( S.assistant_short ) + ':</strong> ' + esc( plainText( x.snippet ) ) + '</span>' : '' )
                 + lookups + '</button>'
                 + '<span class="exp-ai-x-chips">' + chips( x ) + '</span></div>'
                 + '<div class="exp-ai-x-body" id="' + bodyId + '" hidden="hidden">'
@@ -659,6 +748,30 @@
                 }
             } );
         }
+        // a draft chip in the header of an exchange links to a version that may have been discarded since (a 404): the
+        // link is checked when it is followed, and a gone version shows a note instead of an error page
+        if ( log ) {
+            log.addEventListener( 'click', function ( e ) {
+                var link = e.target.closest ? e.target.closest( 'a.exp-ai-chip-link' ) : null;
+                if ( !link || e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || !window.fetch ) {
+                    return;
+                }
+                e.preventDefault();
+                var target = link.href;
+                window.fetch( target, { method: 'HEAD', credentials: 'same-origin' } ).then( function ( r ) {
+                    if ( r.status === 404 || r.status === 410 ) {
+                        var gone = document.createElement( 'span' );
+                        gone.className = 'exp-ai-chip-gone';
+                        gone.title = S.draft_gone || 'This draft no longer exists.';
+                        gone.innerHTML = link.innerHTML;
+                        link.parentNode.replaceChild( gone, link );
+                        announce( S.draft_gone, true );
+                    } else {
+                        window.location.href = target;
+                    }
+                } ).catch( function () { window.location.href = target; } );
+            } );
+        }
         if ( olderButton ) {
             olderButton.addEventListener( 'click', function () {
                 olderButton.disabled = true;
@@ -686,7 +799,8 @@
                 return;
             }
             errorBox.hidden = false;
-            errorBox.textContent = err.kind === 'timeout' ? S.timeout : ( S.error + ' ' + ( err.message || '' ) ).trim();
+            errorBox.textContent = err.kind === 'timeout' ? S.timeout
+                : err.expired ? ( S.session_expired || err.message || '' ) : err.lost ? ( err.message || '' ) : ( S.error + ' ' + ( err.message || '' ) ).trim();
         }
 
         function note( text ) {
@@ -776,17 +890,23 @@
             if ( text && data.notice ) {
                 text.textContent = data.notice;
             }
+            var guard = pollGuard( 3000, S );
             return new Promise( function ( resolve, reject ) {
                 function tick() {
+                    guard.whenVisible( poll );
+                }
+                function poll() {
                     var after = {};
                     after[uuid] = cursor;
                     api( 'expaivector::events', { threads: uuid, after: JSON.stringify( after ), open: uuid } ).then( function ( ev ) {
+                        guard.ok();
                         var news = ( ev.events || [] ).filter( function ( e ) { return e.thread === uuid; } );
                         var failed = '';
                         news.forEach( function ( e ) {
                             cursor = Math.max( cursor, e.id );
                             if ( e.kind === 'step_end' && e.payload && e.payload.text && text ) {
                                 text.textContent = e.payload.text;
+                                announce( e.payload.text );
                             }
                             if ( e.kind === 'error' && e.payload ) {
                                 failed = e.payload.message || '';
@@ -829,7 +949,14 @@
                                 resolve( { status: switched ? 'switched' : 'done', 'switch': switched } );
                             }
                         } );
-                    } ).catch( function () { window.setTimeout( tick, 3000 ); } );
+                    } ).catch( function ( err ) {
+                        var verdict = guard.fail( err );
+                        if ( verdict.stop ) {
+                            reject( verdict.error );
+                        } else {
+                            window.setTimeout( tick, verdict.delay );
+                        }
+                    } );
                 }
                 window.setTimeout( tick, 1000 );
             } );
@@ -849,6 +976,7 @@
                         if ( r.status === 'switched' && r['switch'] && r['switch'].pending ) {
                             return r['switch'].background ? followQueued( { thread: data.thread } ) : step( { 'continue': '1' } );
                         }
+                        announce( S.answer_ready, true );
                         emit( 'panel:done', { panel: root, data: r } );
                         return r;
                     } );
@@ -868,6 +996,7 @@
                     return step( { 'continue': '1' } );
                 }
                 if ( continueButton ) { continueButton.hidden = true; }
+                announce( S.answer_ready, true );
                 emit( 'panel:done', { panel: root, data: data } );
                 return data;
             } );
@@ -1468,8 +1597,10 @@
 
     /* ------------------------------------------------------------------ start */
 
-    // the dark colour tokens follow the surface an element sits on, not the page's theme switch: admin4l keeps its
-    // content boxes light in dark mode, other designs make them dark
+    // admin4's switch and the system setting are handled by the stylesheet alone (expai.css, html[data-a4-theme]);
+    // this marks the exceptions by the surface an element sits on: admin4l keeps its content boxes light in dark mode
+    // (exp-ai-on-light), other designs make them dark without a switch (exp-ai-on-dark). Elements added later
+    // (field bars, preset and alternative text bars) are picked up by the observer below.
     function surfaces() {
         function isDark( el ) {
             for ( var node = el; node && node.nodeType === 1; node = node.parentElement ) {
@@ -1482,11 +1613,30 @@
         }
         function update() {
             var els = document.querySelectorAll( '.exp-ai, .exp-ai-badge' );
+            var themeDark = document.documentElement.getAttribute( 'data-a4-theme' ) === 'dark';
             for ( var i = 0; i < els.length; i++ ) {
-                els[i].classList.toggle( 'exp-ai-on-dark', isDark( els[i].parentElement ) );
+                var dark = isDark( els[i].parentElement );
+                els[i].classList.toggle( 'exp-ai-on-dark', dark );
+                els[i].classList.toggle( 'exp-ai-on-light', themeDark && !dark );
             }
         }
         update();
+        if ( window.MutationObserver && document.body ) {
+            var later = null;
+            // only what was added and is, or holds, an Intelligence element: not a rescan on every change of the page
+            var holdsExpAi = function ( node ) {
+                return node.nodeType === 1 && ( ( node.matches && node.matches( '.exp-ai, .exp-ai-badge' ) ) || ( node.querySelector && node.querySelector( '.exp-ai, .exp-ai-badge' ) ) );
+            };
+            new MutationObserver( function ( mutations ) {
+                var relevant = mutations.some( function ( m ) {
+                    return Array.prototype.some.call( m.addedNodes, holdsExpAi );
+                } );
+                if ( relevant ) {
+                    window.clearTimeout( later );
+                    later = window.setTimeout( update, 100 );
+                }
+            } ).observe( document.body, { childList: true, subtree: true } );
+        }
         if ( window.MutationObserver ) {
             new MutationObserver( function () { window.setTimeout( update, 50 ); } )
                 .observe( document.documentElement, { attributes: true, attributeFilter: [ 'data-a4-theme', 'class' ] } );
@@ -1534,7 +1684,8 @@
     // Ctrl/Cmd+K on any admin page (outside fields and rich text editors): the palette, loaded on first use
     function paletteHook() {
         var stored = '';
-        try { stored = window.localStorage.getItem( 'exp-ai-palette-keys' ) || ''; } catch ( e ) { stored = ''; }
+        var storeKey = paletteStoreKey();
+        try { stored = window.localStorage.getItem( storeKey ) || ''; } catch ( e ) { stored = ''; }
         // "off:<time>": no palette for this user (no access, or switched off); asked again after a day
         if ( stored.indexOf( 'off' ) === 0 ) {
             if ( Date.now() - ( parseInt( stored.slice( 4 ), 10 ) || 0 ) < 86400000 ) {
@@ -1544,7 +1695,7 @@
         }
         var loading = null;
         function defaultMatch( e ) {
-            var mac = /Mac|iPhone|iPad|iPod/.test( navigator.platform || navigator.userAgent || '' );
+            var mac = /mac|iphone|ipad|ipod/i.test( ( navigator.userAgentData && navigator.userAgentData.platform ) || navigator.platform || navigator.userAgent || '' );
             return e.code === 'KeyK' && ( mac ? e.metaKey && !e.ctrlKey : e.ctrlKey && !e.metaKey ) && !e.altKey && !e.shiftKey;
         }
         function load() {
@@ -1555,7 +1706,7 @@
                 loading = api( 'expaivector::palette', {} ).then( function ( cfg ) {
                     if ( cfg.global === false ) {
                         // [KeyBindings] GlobalPalette=disabled: the palette only in Vector
-                        try { window.localStorage.setItem( 'exp-ai-palette-keys', 'off:' + Date.now() ); } catch ( e ) { /* storage may be off */ }
+                        try { window.localStorage.setItem( storeKey, 'off:' + Date.now() ); } catch ( e ) { /* storage may be off */ }
                         throw { message: '', kind: 'off' };
                     }
                     var gotScripts = window.ExpAiPalette ? Promise.resolve() : Promise.all( ( cfg.scripts || [] ).map( function ( src ) {
@@ -1569,13 +1720,13 @@
                     } ) );
                     return gotScripts.then( function () {
                         window.ExpAiPalette.configure( cfg );
-                        try { window.localStorage.setItem( 'exp-ai-palette-keys', cfg.bindings && cfg.bindings.palette ? cfg.bindings.palette.keys : 'off:' + Date.now() ); } catch ( e ) { /* storage may be off */ }
+                        try { window.localStorage.setItem( storeKey, cfg.bindings && cfg.bindings.palette ? cfg.bindings.palette.keys : 'off:' + Date.now() ); } catch ( e ) { /* storage may be off */ }
                     } );
                 } ).catch( function ( err ) {
                     loading = null;
                     // no access to Exponential Intelligence: leave Ctrl+K to the browser from now on
                     if ( err && err.kind === 'server' ) {
-                        try { window.localStorage.setItem( 'exp-ai-palette-keys', 'off:' + Date.now() ); } catch ( e ) { /* storage may be off */ }
+                        try { window.localStorage.setItem( storeKey, 'off:' + Date.now() ); } catch ( e ) { /* storage may be off */ }
                     }
                     throw err;
                 } );
@@ -1584,7 +1735,7 @@
         }
         document.addEventListener( 'keydown', function ( e ) {
             // Vector handles its own keys
-            if ( window.ExpAiVectorApp || e.defaultPrevented ) {
+            if ( window.ExpAiVectorApp || e.defaultPrevented || e.isComposing || e.repeat ) {
                 return;
             }
             var keys = window.ExpAiKeys && window.ExpAiPalette && window.ExpAiPalette.config().bindings.palette ? window.ExpAiPalette.config().bindings.palette.keys : stored;

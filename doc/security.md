@@ -43,7 +43,7 @@ page sums it up for a data protection officer ([summary.md](summary.md)).
 
 ## Several providers
 
-- Keys of every provider live in settings/override only; expai/models shows "key present" and warns about a key in
+- Keys of every provider live in settings/override or in an untracked `KeyLocations[]` location; expai/models shows "key present" and warns about a key in
   any other file or in a file every user of the server can read. A key-like string in a provider's error message is
   redacted before it is logged.
 - The data policy keeps sections and classes away from providers outside the regions they allow or without zero
@@ -52,8 +52,12 @@ page sums it up for a data protection officer ([summary.md](summary.md)).
   when the tools are offered and again when one is run.
 - A local model listens on the loopback address only; the web process starts and stops it only through a spool
   request that a root-owned helper checks against its own allowlist ([local-models.md](local-models.md)).
-- MCP: allowlisted tools only, read-only, an SSRF guard on the URL, results wrapped as data, and no write tool after
-  an external result in the same turn ([mcp.md](mcp.md)).
+- MCP: allowlisted tools only, read-only, an SSRF guard on the URL, results wrapped as data, and no write tool while
+  an external result is part of the conversation's window ([mcp.md](mcp.md)).
+- The write tools write only inside the panel's subtree or a thread's scope (`[AssistantSettings] WriteScope`), and
+  the arguments of every tool call are checked against the tool's schema before it runs.
+- One step at a time per conversation: a second request for the same conversation while a step runs (another tab, a
+  double click) is refused instead of running the tools twice.
 
 ## Prompt injection
 
@@ -88,8 +92,8 @@ the conversation. The rules:
   `Region` and `Retention`, and the tool tells the model never to put site content into a query.
 - **Prompt injection from web content**: a page can contain text written to steer the model. Page text is wrapped in
   "Begin/End of outside data" markers and every result says it is data, not instructions. After a web_fetch or
-  web_search result, the rest of the turn may not write drafts (as after an external MCP tool); the editor reads
-  what was found and asks again. Even then the model can only write drafts the editor may write, which wait for
+  web_search result, no draft is written while that result is part of the conversation's window (as after an
+  external MCP tool): until a new conversation starts (a compaction keeps the earlier answers, which may repeat it; only a window with the editor's words only ends it). Even then the model can only write drafts the editor may write, which wait for
   review. Check links in drafts written from web results before publishing.
 - **Project history**: git runs without a shell (an argument list, fixed format, literal pathspecs,
   `--end-of-options`, the search text as a fixed string), in a clean environment, only `log`, `ls-files` and
@@ -102,10 +106,13 @@ the conversation. The rules:
 
 - `expai_draft_log` keeps, per version written: object, version, user id, node, language, action, source, state,
   model, time and a summary of the request (the first `[LogSettings] MaxPromptSummaryLength` characters). The request
-  text may contain whatever the editor wrote; keep that in mind for data protection requests (delete the rows of a
-  user with the user).
+  text may contain whatever the editor wrote; the cronjob part `expai` blanks it after
+  `[RetentionSettings] PromptSummaryKeepDays` (365); the row stays as the record of the draft.
 - `expai_conversation` keeps the conversation (messages, answers, tool results) per user and node until "New
-  conversation" or until removed. Delete old rows by your own retention policy.
+  conversation", until it has not been modified for `[RetentionSettings] ConversationKeepDays` (365), or, when it
+  belongs to a thread, until the thread goes after `ThreadKeepDays` (365). The threads and conversations of a user
+  that no longer exists are removed by the next cron run (the kernel sends no event when a user is removed; the rows
+  are found by their user id).
 - Errors go to the debug log as warnings with the provider's error type and message (never the key, request or
   answer).
 - The browser stores only which history rows were opened and whether the edit form area is open (localStorage).

@@ -103,7 +103,7 @@ if ( isset( $user['export'] ) && $user['export'] === 'csv' )
     foreach ( $rows as $row )
     {
         $cost = $row->cost();
-        fputcsv( $out, array( $row->attribute( 'id' ), date( 'c', (int) $row->attribute( 'created' ) ), $row->attribute( 'user_id' ),
+        fputcsv( $out, expAiUsage::csvRow( array( $row->attribute( 'id' ), date( 'c', (int) $row->attribute( 'created' ) ), $row->attribute( 'user_id' ),
                               $row->attribute( 'node_id' ), $row->attribute( 'conversation_id' ), $row->attribute( 'turn' ), $row->attribute( 'action' ),
                               $row->attribute( 'model' ), $row->attribute( 'input_tokens' ), $row->attribute( 'output_tokens' ),
                               $row->attribute( 'cache_write_tokens' ), $row->attribute( 'cache_read_tokens' ), $row->attribute( 'stop_reason' ),
@@ -113,7 +113,7 @@ if ( isset( $user['export'] ) && $user['export'] === 'csv' )
                               $row->attribute( 'error_class' ), $row->attribute( 'error_message' ), $row->attribute( 'drafts_written' ),
                               $cost === null ? '' : number_format( $cost, 6, '.', '' ),
                               $row->attribute( 'provider' ), $row->attribute( 'model_alias' ), $row->attribute( 'region' ), $row->attribute( 'retention' ),
-                              $row->attribute( 'reasoning_tokens' ), $row->costSource(), $row->attribute( 'tool_mode' ), $row->attribute( 'mcp_calls' ) ), ',', '"', '' );
+                              $row->attribute( 'reasoning_tokens' ), $row->costSource(), $row->attribute( 'tool_mode' ), $row->attribute( 'mcp_calls' ) ) ), ',', '"', '' );
     }
     rewind( $out );
     $csv = stream_get_contents( $out );

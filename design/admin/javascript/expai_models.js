@@ -32,7 +32,7 @@
 
     function init( ExpAi, page ) {
         var strings = {};
-        try { strings = JSON.parse( page.querySelector( '.exp-ai-models-strings' ).textContent || '{}' ); } catch ( e ) { strings = {}; }
+        try { strings = JSON.parse( page.querySelector( '.exp-ai-models-strings' ).textContent || '{}' ); } catch ( e ) { strings = {}; ( window.console && console.warn && console.warn( 'expai: a configuration block is not valid JSON', e ) ); }
         var interval = parseInt( page.getAttribute( 'data-poll' ), 10 ) || 3000;
         var timer = null;
         var busy = false;

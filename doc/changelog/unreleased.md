@@ -1,5 +1,50 @@
 # Unreleased
 
+## Transactions, scripts, access and retention
+
+- **Transactions**: every `begin()` of expai is followed by a `try` whose `catch` rolls back before the exception
+  leaves the method (content writer, publisher, diff, alt text, planner, slow model switch, thread migration, change
+  stager, thread removal and step bookkeeping, Vector decisions and rebase). A failure no longer leaves the rest of
+  the request inside an open transaction that the end of the request rolls back (drafts, usage rows and the
+  conversation were lost with it). `expAiContentWriter::createDraft()` refuses unknown fields before it opens one.
+  The test base class fails a test that leaves a transaction open.
+- **Command line scripts** (`bin/php/*.php`): `-s <siteaccess>` is mandatory, the siteaccess and its database are
+  printed (stderr) at the start, and a script does not run where expai is not active (`expAiScript`).
+  `expaischema.php --print` and `--write-files` need no siteaccess.
+- **Veto per object**: the `[RequestVeto]` rules with a content condition (`Sections[]`, `Classes[]`, `Subtrees[]`)
+  apply to every object the tools read (`expAiGate::objectVeto()`, `expAiContentReader`): an object read on its own
+  is refused, in lists it is withheld with the rule's reason. Every location of an object counts; a missing fact
+  (no location, section or class) or an unknown part of the request meets the condition (fail closed). A rule with an
+  invalid name or without its group is reported in the debug log.
+- **Retention**: `[RetentionSettings] ThreadKeepDays`, `ConversationKeepDays`, `PromptSummaryKeepDays` (365 each; 0
+  keeps). The cronjob part `expai` and `expaithreads.php --prune` remove old threads (with their runs, events and
+  conversations) and conversations, blank old request summaries of the draft log, and remove the threads and
+  conversations of users that no longer exist (`expAiThreadRetention::pruneRecords()`).
+- **Vector for approvers**: an approver who opens another editor's thread sees nothing of objects they may not read
+  (staged changes, plan items, drafts, checkpoint names) and none of the thread's words (title, requests, answers,
+  steps, turn records, run labels, checkpoint labels, the plan's assumptions); the events of the poll and the stream
+  are reduced to states, ids, counts and costs, and to drafts and changes of readable objects. What cannot be told
+  apart is withheld.
+- **Optional extensions**: expqueue, expservices and expmcp are used only when they are active in the siteaccess,
+  not merely because their classes can be loaded (`expAiConfig::extensionActive()`).
+- **AI label**: a draft log entry older than the version that now has its number (the kernel reuses the number of a
+  discarded draft) no longer labels that version (`expAiDraftLog::fetchByVersion()`, `fetchForVersions()`).
+- **CSV export** of expai/log: a value starting with `=`, `+`, `-`, `@`, a tab or a carriage return gets a leading
+  `'`. **Chain runs**: the run page is shown to its starter, holders of `expai/log`, and users who may use the chain
+  and edit its object (checked for that user); a run without its object yet only to the first two.
+  **Local model helper**: spool files are opened with `O_NOFOLLOW` and checked on the open handle (regular file, at
+  most 4 KB).
+
+### Upgrading (retention)
+
+- **The retention deletes by default.** From the first cron run after the update, the cronjob part `expai` removes
+  threads and conversations not modified for **365 days** and blanks request summaries of the draft log older than
+  365 days; the threads and conversations of removed users go at once. Pinned threads, threads in review or waiting
+  for an answer, and running threads stay.
+- To see first what would go: `php extension/expai/bin/php/expaithreads.php --prune --dry-run -s <siteaccess>`, or
+  set `[RetentionSettings] Mode=report` (the cronjob then only reports). Set a `*KeepDays` to `0` to keep rows.
+- `-s <siteaccess>` is now mandatory for every script in `bin/php`; a siteaccess that does not exist stops the script.
+
 ## Provider-neutral
 
 expai works with any provider (Anthropic, every OpenAI-compatible service, local models); it no longer presents itself
@@ -80,6 +125,39 @@ anchors, literals, internal links and formatting attributes were lost, and ezaut
 - New strings in the context `extension/expai/edit`; a node test of the detector in `tests/js/`
   ([edit-view-integration.md](../edit-view-integration.md#structure-is-never-lost-silently)).
 
+## Conversations, limits and the Anthropic request
+
+- **Data policy on a change of model**: a conversation notes every object whose content a tool returned. When it goes
+  on with another model (the editor's choice, the fallback), the objects are checked against the new provider's data
+  policy; when one may not go there, the new model gets the editor's words only, and the exchange says so. The
+  fallback prefers a model whose provider may take everything the conversation read.
+- **Fallback in the middle of a tool loop**: the next model gets the drafts the open exchange wrote so far and is told
+  not to create them again.
+- **One step at a time per conversation**: a second step while one runs is refused ("A step of this conversation is
+  already running.") instead of running the tools twice; the lock (`expai_conversation.busy_owner`, `busy_until`) ends
+  with the step or expires on its own.
+- **Limits under parallel requests**: with a limit set, every request reserves its estimate before it is sent
+  (`expai_usage_log.reserved_tokens`, `reserved_micros`) and is settled after it; the check counts the reservations,
+  so parallel requests cannot pass a limit together. `[Limits] UnpricedCost=block` (default) refuses a model without
+  a price while a cost limit applies; `ignore` counts it as free. Every failure leaves a usage row, also one that is
+  not a provider error.
+- **Prices**: Claude Sonnet 5.5 cache reads cost 0.20 per million tokens (was 0.10), and so does the fallback price
+  `DefaultCacheReadPerMTok`.
+- **Refusal fallback** (`fallbacks: "default"`) only for the models that accept it (Claude Fable 5.1, Mythos 5.1,
+  Opus 5.5, Opus 5, Sonnet 5.5), never for Claude Haiku 5.5; capabilities `refusal_fallback` and
+  `no_refusal_fallback` decide for other models. The usage log records the category of a refusal.
+- **Tool calls**: `[AISettings] MaxTokens` is 16000 (was 8000); Anthropic tool definitions go with `strict: true` where
+  the schema allows it (`StrictTools`); the arguments of every call are checked against the tool's schema before it
+  runs. The probe asks with the panel's instructions (with `ExtraInstructions[]`); `read_node` and `two_nodes` require
+  the node ids they name.
+- **Writes**: after an external tool's result (web, MCP), drafts stay locked while the result is part of the
+  conversation's window (until a new conversation, or a window with the editor's words only), not only for one turn. The write tools write only
+  inside the panel's subtree or the thread's scope (`[AssistantSettings] WriteScope=subtree`; `site` lifts it).
+- **search_content**: a new read tool, full-text search over the content (eZ Find when active, else the kernel's
+  search), as the current user and through the data policy ([tools.md](../tools.md#search_content)).
+- **Storage**: the `*_micros` columns of expai are `bigint`; a long queue payload is bound as a value on Oracle instead
+  of a string literal (which ends at 4000 bytes).
+
 ## Upgrading
 
 - Live probe results stored before this update in which a mandatory task (`use_result`, `injection`, `create_draft`,
@@ -88,3 +166,63 @@ anchors, literals, internal links and formatting attributes were lost, and ezaut
   results; [probe.md](../probe.md)).
 - Reasoning models get at least 1000 output tokens per request in the model test, alt text, plan batches and chains;
   a lower `MaxTokens` is raised for them, which can make those requests cost more.
+- Mandatory: run `php extension/expai/bin/php/expaischema.php --install -s <siteaccess>` with the update (on MySQL /
+  MariaDB the widening rebuilds `expai_usage_log` and blocks writes to it meanwhile; see database.md): it adds
+  `expai_conversation.busy_owner`, `busy_until`, `expai_usage_log.reserved_tokens`, `reserved_micros` (the code reads
+  them) and widens the `*_micros` columns to `bigint` on MySQL / MariaDB and PostgreSQL.
+- The write tools of the panel no longer write outside the open node's subtree; set `[AssistantSettings]
+  WriteScope=site` for the earlier behaviour.
+
+## Admin interface: polling, dark mode, accessibility, small fixes
+
+- **Polling** (the panel and Vector follow a queued turn): after five failed polls in a row the loop stops with a visible
+  message ("The connection to the run was lost. Reload the page to follow it.") instead of retrying silently; the
+  interval grows 6, 12, 24, 48 s up to 60 s, as on the dashboard. A 401 or 403 stops at once ("Your session has
+  expired ..."). A hidden tab does not poll and continues when it is shown. `ExpAi.api()` rejects with `kind: 'http'`,
+  `status` and `expired: true` for 401/403.
+- **Dark mode in CSS**: the dark tokens apply under `html[data-a4-theme="dark"]`, so bars
+  and previews created after the page loaded are right at once; `exp-ai-on-dark` stays for other dark designs, `exp-ai-on-light` is new (admin4l). Accent text uses `--a4-accent-text`; `--exp-ai-warn`, `--exp-ai-danger`
+  and `--exp-ai-ok` follow the admin4 tokens; z-indexes follow `--a4-z-*`; forced colours and reduced motion are handled
+  ([customization.md](../customization.md#colors-and-look)).
+- **JSON in script blocks**: the template operator `expai_json` replaces `json_encode` for every
+  `<script type="application/json">` block (`<`, `>`, `&`, `'` and `"` are escaped, invalid UTF-8 is substituted, not
+  dropped). A block that does not parse is reported in the browser console.
+- **Accessibility**: the conversation log is no longer a live region (a long answer or a reloaded history was read out
+  whole); step messages and the end of a turn go through a polite status line of their own. The palette: `aria-expanded`
+  follows the results, groups are labelled, the number of results is announced, the page behind does not scroll, a key
+  held down or an IME composition does not act. The palette's local-storage key is per user.
+- **Cmd+K on macOS** is detected case-insensitively (`macOS`, `MacIntel`) and shows as ⌘K; Cmd/Ctrl never also fires a
+  single-key shortcut.
+- **Fixes**: the collapsed conversation header shows the text without Markdown marks; a preset whose model returned no
+  text (a "Write summary" on an empty field) shows the model's note and marks nothing as filled (`refused` in the answer
+  of `expaipreset::preset`); a draft chip in the history is checked (HEAD) before it is followed and shows a note for a
+  discarded draft; the chain page does not suggest starting a chain without `expqueue`; "unknown" retentions are
+  translated (`expai_retention`); "Job" and "Request in the log" of the model test are translated (they sat in the wrong
+  context); the key placement warning accepts a key in any settings directory that git does not track, configurable
+  with `[ProviderSettings] KeyLocations[]` (default `settings/override`, `extension/*settings`).
+- **Alternative text report**: the images without alt text under a node are read with one query per 200 objects instead
+  of one data map per object and language.
+- **Script cache busting**: the scripts the templates load directly carry `?v=<change time>`; for
+  `BackendJavaScriptList` the packer's `AppendLastModifiedTime` does the same in production
+  ([architecture.md](../architecture.md)).
+- **Workers**: `expAiQueueKick` detaches with `setsid` only where the system has it (else `nohup` alone) and reports a
+  start where the shell gives no process id as failed (this detects only that the shell could not be started, not a worker
+  that exits at once); `--allow-root-user` is passed only with `[VectorSettings] WorkerAllowRoot=enabled`
+  (default `disabled`); `worker-kick.json` is created with mode 0660.
+- **web_fetch** uses `expAiHttpClient` (with its `resolve` option for the checked address) instead of a second curl
+  client; the SSRF guard is unchanged. The client gained the options `user_agent`, `accept_language`, `encoding`,
+  `header_max` and `truncate`.
+- **list_children**: `total` counts the children of the given class, `has_more` says whether another page follows and
+  `withheld` counts the children of the page that the data policy keeps away. `get_tree_context` counts through the same
+  function.
+- Requires PHP 8.1 or later (`composer.json` `^8.1`); `imagedestroy()` is no longer called (no effect since PHP 8.0,
+  deprecated in 8.5).
+
+## Upgrading (admin interface)
+
+- New setting `[VectorSettings] WorkerAllowRoot` (default `disabled`): a site whose PHP runs as root and relies on kicked
+  workers enables it.
+- New setting `[ProviderSettings] KeyLocations[]`; a site that put a key into a git-ignored extension of secrets needs
+  no change (the default accepts it).
+- New strings in the contexts `panel`, `vector`, `preset`, `keyboard` and `chain` (ger-DE and eng-US included).
+

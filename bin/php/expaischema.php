@@ -3,17 +3,20 @@
 /**
  * The tables of expai (expai_draft_log, expai_conversation, expai_usage_log, expai_probe_result).
  *
- *   php extension/expai/bin/php/expaischema.php --install [-s <siteaccess>]   creates the missing tables, columns and
+ *   php extension/expai/bin/php/expaischema.php --install -s <siteaccess>     creates the missing tables, columns and
  *                                                                             indexes in the siteaccess's database
  *                                                                             (idempotent; also the upgrade, which
  *                                                                             renames role policies of pre-release
  *                                                                             builds to the current function names)
- *   php extension/expai/bin/php/expaischema.php --check  [-s <siteaccess>]    says which tables, columns and indexes
+ *   php extension/expai/bin/php/expaischema.php --check  -s <siteaccess>      says which tables, columns and indexes
  *                                                                             are missing
  *   php extension/expai/bin/php/expaischema.php --print=<engine>              prints the SQL of mysql, postgresql,
  *                                                                             sqlite or oracle
  *   php extension/expai/bin/php/expaischema.php --write-files                 rewrites share/db_schema.dba and
  *                                                                             sql/<engine>/schema.sql
+ *
+ * -s <siteaccess> is mandatory (not with --print and --write-files): the script prints the siteaccess and its database (stderr) and does not run
+ * where expai is not active (expAiScript).
  *
  * @copyright Copyright (C) 1998 - 2026 7x & Exponential Foundation. All rights reserved.
  * @license GNU General Public License v2.0 (or any later version)
@@ -31,7 +34,11 @@ $options = $script->getOptions( '[install][check][print:][write-files]', '', arr
     'check' => 'List the expai tables, columns and indexes that are missing in the database of the siteaccess',
     'print' => 'Print the SQL for an engine: mysql, postgresql, sqlite or oracle',
     'write-files' => 'Rewrite share/db_schema.dba and sql/<engine>/schema.sql from expAiSchema::definition()' ) );
+// the SQL and the files are made from the definition alone: no database, no siteaccess needed
+$noDatabase = $options['print'] || $options['write-files'];
+expAiScript::requireSiteAccess( $script, $options, $noDatabase );
 $script->initialize();
+expAiScript::announce( $script, $noDatabase );
 
 $failed = false;
 if ( $options['print'] )

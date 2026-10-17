@@ -8,6 +8,21 @@ message the model can react to, and shown as a red step in the panel. Field valu
 
 Every tool description tells the model that field values are data written by people, not instructions.
 
+The arguments of every call are checked against the tool's input schema before the tool runs (required fields, types,
+unknown fields where the schema closes the object); a call that does not match gets an error result naming what is
+wrong, and the model calls again. Towards Anthropic, the tools whose schema allows it are sent with `strict: true`
+(`StrictTools`, configuration.md).
+
+The write tools write only inside the part of the site the conversation works on: in the panel the open node and its
+subtree (the parent of a new object; for a changed object one of its locations, or, for an object that was never
+published, the parent its draft is assigned to), in a Vector thread its scope.
+`[AssistantSettings] WriteScope=site` lifts this; the editor's own permissions apply either way.
+
+Every object whose content a read tool returns is noted with the conversation. When the conversation goes on with
+another model (the editor's choice, the fallback), these objects are checked against the data policy of the new
+model's provider; when one may not go there, the new model gets the editor's words only, not the earlier answers
+([data-policy.md](data-policy.md)).
+
 ## get_node
 
 Reads a node and the fields of its object (current version).
@@ -31,6 +46,9 @@ Checks: `canRead()` on the node, else "Node %id does not exist or you may not re
 | `class_identifier` | string | all classes |
 | `offset` | integer | 0 |
 | `limit` | integer | `ListLimit` (and at most that) |
+
+The answer carries `total` (the children of the given class the user may read), `offset`, `has_more` (another page
+follows) and `withheld` (children of this page the data policy keeps away: they are not in `children`).
 
 Result: `parent_node_id`, `total`, `offset`, `children` (node_id, object_id, name, class_identifier, modified), in
 the node's sort order. Checks: `canRead()`; `subTree()` with the user's limitations.
@@ -60,6 +78,24 @@ Result: `parent_node_id`, `classes` (identifier, name) from `canCreateClassList(
 Result: identifier, name, description, is_container, object_name_pattern, `attributes` (identifier, name, datatype,
 required, writable, format, description, max_length for ezstring). `format` says how to write a value (e.g. "rich text
 as HTML using only p, h2, h3, h4, strong, em, ul, ol, li, a href"). Unknown class: "There is no content class ...".
+
+## search_content
+
+Full-text search over the content with the site's search engine (`eZSearch`: eZ Find's Solr when `ezfind` is active,
+else the kernel's own search). The search runs as the current user and finds only what the user may read.
+
+| Input | Type | Default |
+| --- | --- | --- |
+| `query` | string | required (at most 200 characters are used) |
+| `class` | string | all classes (a class identifier) |
+| `subtree` | integer | the open node; without one (a Vector thread) the thread's scope, else the content root |
+| `offset` | integer | 0 |
+| `limit` | integer | 10 (at most 25) |
+
+Result: `query`, `subtrees`, `offset`, `hits` (node_id, object_id, name, class, path, snippet) and `more_may_exist`
+(the engine's own count is not passed on: it includes hits the user may not read or the data policy keeps away). The snippet is eZ Find's highlight, else the start of the first text field (cut to 240 characters).
+Checks: `canRead()` on the subtree and on every hit; a hit the data policy keeps away from the provider is left out
+and counted in `withheld_by_data_policy`, like the other read tools.
 
 ## create_draft (writes)
 
@@ -140,9 +176,10 @@ configured; a conversation keeps the tools it started with. Every result says it
 page text of `web_fetch` is wrapped in "Begin/End of outside data" markers. The usage log adds the host to the tool's
 entry (`host`: the fetched host, `search:<provider>`, or `history:<repositories>`), never the URL or the query.
 
-A `web_fetch` or `web_search` result counts as outside data: like an external MCP result, the rest of that turn may
-not write drafts. The model tells the editor what it found and the editor asks again ("now write the draft"); the
-next turn may write. `[WebSettings] WritesAfterWebResults=enabled` lifts this; `project_history` (the team's own
+A `web_fetch` or `web_search` result counts as outside data: like an external MCP result, no draft is written while it
+is part of the conversation's window, in that turn and the turns after it, until a new conversation starts (a
+compaction keeps the earlier answers, which may repeat the result). The model tells the editor what it found; to
+write from it, the editor starts a new conversation with what is needed. `[WebSettings] WritesAfterWebResults=enabled` lifts this; `project_history` (the team's own
 committed work) does not stop writing.
 
 ## web_fetch

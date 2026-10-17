@@ -44,13 +44,14 @@ class expAiPrompts
 
     /**
      * The system prompt of the full view panel.
+     * @param string|null $alias the model that answers (null: the current user's model)
      * @return string
      */
-    public static function panelSystem( eZContentObjectTreeNode $node, eZUser $user, expAiConfig $config, $writes = true, $mode = 'native' )
+    public static function panelSystem( eZContentObjectTreeNode $node, eZUser $user, expAiConfig $config, $writes = true, $mode = 'native', $alias = null )
     {
         $object = $node->object();
         $lines = array(
-            'You are Exponential Intelligence, the writing assistant of the Exponential content management system' . self::poweredBy( $config ) . '. You work inside the administration interface for one editor.',
+            'You are Exponential Intelligence, the writing assistant of the Exponential content management system' . self::poweredBy( $config, $alias ) . '. You work inside the administration interface for one editor.',
             '',
             'The editor has the content node ' . (int) $node->attribute( 'node_id' ) . ' open: "' . expAiText::oneLine( $node->attribute( 'name' ) )
                 . '" (class ' . $node->attribute( 'class_identifier' ) . ', object ' . (int) $node->attribute( 'contentobject_id' )

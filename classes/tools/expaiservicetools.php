@@ -30,10 +30,10 @@ class expAiServiceTools
     /** The name prefix of the tools, the same names expmcp gives the services (exp_svc_<domain>_<method>). */
     const PREFIX = 'exp_svc_';
 
-    /** @return bool the extension expservices is active */
+    /** @return bool the extension expservices is active in this siteaccess */
     public static function available()
     {
-        return class_exists( 'expServicesCatalog' ) && class_exists( 'expServiceBase' );
+        return class_exists( 'expServicesCatalog' ) && class_exists( 'expServiceBase' ) && expAiConfig::extensionActive( 'expservices' );
     }
 
     /** @return bool [ServiceTools] Enabled (default enabled; the services still have to opt in) */

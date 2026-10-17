@@ -102,17 +102,54 @@ class expAiDraftLog extends eZPersistentObject
         return $log;
     }
 
-    /** @return expAiDraftLog|null the newest entry of a version */
+    /**
+     * The newest entry of a version. The kernel reuses the number of a version that was discarded (an edit draft
+     * removed by the editor or by the draft cleanup): an entry older than the version's "created" belongs to the
+     * removed version, not to this one, and is ignored.
+     * @return expAiDraftLog|null
+     */
     public static function fetchByVersion( $objectID, $version )
     {
         $list = eZPersistentObject::fetchObjectList( self::definition(), null,
             array( 'contentobject_id' => (int) $objectID, 'version' => (int) $version ), array( 'id' => 'desc' ), array( 'offset' => 0, 'length' => 1 ) );
-        return $list ? $list[0] : null;
+        if ( !$list )
+            return null;
+        $created = self::versionCreated( array( (int) $objectID ) );
+        $key = (int) $objectID . ':' . (int) $version;
+        return self::belongsToVersion( (int) $list[0]->attribute( 'created' ), isset( $created[$key] ) ? $created[$key] : 0 ) ? $list[0] : null;
+    }
+
+    /**
+     * @param int $logCreated the "created" of a log entry
+     * @param int $versionCreated the "created" of the version with that number now (0: no such version, or not known)
+     * @return bool the entry was written for this version, not for an earlier one with the same number
+     */
+    public static function belongsToVersion( $logCreated, $versionCreated )
+    {
+        return (int) $versionCreated <= 0 || (int) $logCreated >= (int) $versionCreated;
+    }
+
+    /**
+     * @param int[] $objectIDs
+     * @return array "objectID:version" => created of every version of the objects
+     */
+    protected static function versionCreated( array $objectIDs )
+    {
+        $objectIDs = array_values( array_unique( array_filter( array_map( 'intval', $objectIDs ) ) ) );
+        if ( !$objectIDs )
+            return array();
+        $rows = eZPersistentObject::fetchObjectList( eZContentObjectVersion::definition(), array( 'contentobject_id', 'version', 'created' ),
+            array( 'contentobject_id' => array( $objectIDs ) ), null, null, false );
+        $out = array();
+        foreach ( (array) $rows as $row )
+            $out[(int) $row['contentobject_id'] . ':' . (int) $row['version']] = (int) $row['created'];
+        return $out;
     }
 
     /**
      * @param array $pairs list of array( objectID, version )
-     * @return array "objectID:version" => expAiDraftLog (newest entry of each)
+     * @return array "objectID:version" => expAiDraftLog (newest entry of each that belongs to the version as it is now,
+     *               see fetchByVersion())
      */
     public static function fetchForVersions( array $pairs )
     {
@@ -127,10 +164,11 @@ class expAiDraftLog extends eZPersistentObject
             $wanted[(int) $pair[0] . ':' . (int) $pair[1]] = true;
         $list = eZPersistentObject::fetchObjectList( self::definition(), null,
             array( 'contentobject_id' => array( array_keys( $objectIDs ) ) ), array( 'id' => 'asc' ) );
+        $created = $list ? self::versionCreated( array_keys( $objectIDs ) ) : array();
         foreach ( $list as $log )
         {
             $key = $log->attribute( 'contentobject_id' ) . ':' . $log->attribute( 'version' );
-            if ( isset( $wanted[$key] ) )
+            if ( isset( $wanted[$key] ) && self::belongsToVersion( (int) $log->attribute( 'created' ), isset( $created[$key] ) ? $created[$key] : 0 ) )
                 $result[$key] = $log;
         }
         return $result;

@@ -77,10 +77,22 @@ Owner decision: events, staged proposals and checkpoints are kept **30 days**:
 
 The cronjob part `expai` does it (`cronjobs/expai_thread_prune.php`), and so does
 
-    php extension/expai/bin/php/expaithreads.php --prune [--dry-run]
+    php extension/expai/bin/php/expaithreads.php --prune [--dry-run] -s <siteaccess>
 
 0 keeps the rows. The threads, their runs and conversations stay until the editor removes them (the panel's
-"New conversation" removes its thread with its events).
+"New conversation" removes its thread with its events), or until the retention of `[RetentionSettings]` removes them:
+
+| What | Removed after |
+| --- | --- |
+| a thread with its runs, events, follow-ups, checkpoints, plans, staged changes and conversations; not a pinned one, not one in review or waiting for an answer, not one that runs (a run silent for 4 x `[ThreadSettings] StaleRunSeconds` does not count) | not modified for `ThreadKeepDays` (365) |
+| a conversation that is not part of a thread that stays | not modified for `ConversationKeepDays` (365) |
+| the request summary of a draft log row (blanked, the row stays) | `PromptSummaryKeepDays` (365) |
+| the threads and conversations of a user that no longer exists, whatever their shelf | the next run (a thread that runs the run after it ends) |
+
+`cronjobs/expai_prune.php` and `expaithreads.php --prune` do it (`expAiThreadRetention::pruneRecords()`, at most
+1000 threads and 1000 conversations per run, read in pages by id so that rows that stay never hold up the rest; a
+thread that cannot be removed is logged and skipped). 0 keeps the rows. `[RetentionSettings] Mode=report` makes the
+cronjob only say what it would remove; the cronjob prints its counts on every run, also in quiet mode.
 
 ## From conversations to threads
 
@@ -89,9 +101,9 @@ tables and turns every panel conversation into a thread (origin `panel`, scope: 
 the conversation, its usage rows and its draft log rows, and caches the cost. It is idempotent: a conversation that
 has a thread is left alone. Separately:
 
-    php extension/expai/bin/php/expaithreads.php --migrate --dry-run   # what would be created
-    php extension/expai/bin/php/expaithreads.php --migrate
-    php extension/expai/bin/php/expaithreads.php --report             # counts per origin, state, shelf (no content)
+    php extension/expai/bin/php/expaithreads.php --migrate --dry-run -s <siteaccess>   # what would be created
+    php extension/expai/bin/php/expaithreads.php --migrate -s <siteaccess>
+    php extension/expai/bin/php/expaithreads.php --report -s <siteaccess>             # counts per origin, state, shelf (no content)
 
 The conversations are unchanged apart from `thread_id`/`run_id`; dropping the thread tables gives the earlier state
 back.

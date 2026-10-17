@@ -17,6 +17,9 @@
  * Without --approve, --skip or --status it does what the workflow event does after a publish: decide for every
  * translation, store the decisions, and queue the patches that are below the thresholds of expai.ini [TranslationSync].
  *
+ * -s <siteaccess> is mandatory: the script prints the siteaccess and its database (stderr) and does not run
+ * where expai is not active (expAiScript).
+ *
  * @copyright Copyright (C) 1998 - 2026 7x & Exponential Foundation. All rights reserved.
  * @license GNU General Public License v2.0 (or any later version)
  * @package expai
@@ -34,7 +37,9 @@ $options = $script->getOptions( '[object:][languages:][dry-run][approve][mode:][
     'dry-run' => 'decide and print only', 'approve' => 'queue the update of --languages', 'mode' => 'with --approve: patch or full',
     'skip' => 'mark --languages as up to date', 'status' => 'print the stored decisions', 'diff' => 'print the hunks of the source change',
     'login' => 'the user', 'json' => 'print the report as JSON' ) );
+expAiScript::requireSiteAccess( $script, $options );
 $script->initialize();
+expAiScript::announce( $script );
 
 $fail = function ( $text ) use ( $cli, $script )
 {

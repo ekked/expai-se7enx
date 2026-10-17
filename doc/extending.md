@@ -159,7 +159,7 @@ Provider=tavily
 Label=Tavily
 Class=myTavilySearchProvider
 Endpoint=https://api.tavily.com/search
-ApiKey=            # settings/override only
+ApiKey=            # settings/override or an untracked KeyLocations[] location
 Region=us
 Retention=unknown
 ```

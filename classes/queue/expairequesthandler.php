@@ -155,6 +155,21 @@ class expAiRequestHandler extends expQueueHandlerBase
         return expQueueResult::fail( $lane->key() . ': ' . $detail, $status ? 'http_' . $status : 'refused' );
     }
 
+    /**
+     * A long text for an SQL statement: a bound variable where the database binds them (Oracle: a string literal
+     * ends at 4000 bytes, a bound value is a CLOB), the quoted literal elsewhere.
+     * @param eZDBInterface|object $db
+     * @return string the SQL of the value
+     */
+    public static function textValue( $db, $text, $name )
+    {
+        $text = (string) $text;
+        if ( method_exists( $db, 'bindingType' ) && $db->bindingType() != eZDBInterface::BINDING_NO
+             && ( method_exists( $db, 'countStringSize' ) ? $db->countStringSize( $text ) : strlen( $text ) ) > 2000 )
+            return $db->bindVariable( $text, array( 'name' => (string) $name ) );
+        return "'" . $db->escapeString( $text ) . "'";
+    }
+
     /** Moves a job to another lane (payload, lane and resource), e.g. after its batch expired. */
     public static function moveToLane( expQueueJob $job, array $p, expAiLane $lane, $why )
     {
@@ -162,7 +177,7 @@ class expAiRequestHandler extends expQueueHandlerBase
         $p['moved'][] = array( 'to' => $lane->name(), 'why' => expAiText::cut( (string) $why, 120 ), 'at' => time() );
         $json = json_encode( $p, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
         $db = eZDB::instance();
-        $db->query( "UPDATE expqueue_job SET payload = '" . $db->escapeString( $json ) . "', lane = '" . $db->escapeString( $lane->name() )
+        $db->query( "UPDATE expqueue_job SET payload = " . self::textValue( $db, $json, 'payload' ) . ", lane = '" . $db->escapeString( $lane->name() )
                     . "', resource_key = '" . $db->escapeString( $lane->key() ) . "', external_ref = '' WHERE id = " . (int) $job->attribute( 'id' ) );
         $job->setAttribute( 'payload', $json );
         $job->setAttribute( 'lane', $lane->name() );

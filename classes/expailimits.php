@@ -20,9 +20,78 @@
  *   MaxRequestsPerTurn         model calls per editor message (expAiAssistant)
  *   ProviderMaxTokensPerMonth[<provider>], ProviderMaxCostPerMonth[<provider>]
  *                              all users together on one provider (reset on the 1st)
+ *   UnpricedCost               block (default) | ignore: a request to a model without a price while a cost limit
+ *                              applies is refused (block), or counted as free (ignore)
+ *
+ * Requests under way: while any limit is set, every request reserves its estimate (a row of expai_usage_log with
+ * reserved_tokens and reserved_micros, written before the request is sent and settled with the real numbers after
+ * it, expAiUsageRecorder). The check counts what was used plus what the requests under way reserved, so parallel
+ * requests cannot pass a limit together; the request's own reservation is left out of its check (it may pass a limit
+ * by its own size, as before). A reservation older than RESERVATION_SECONDS (a process that ended without settling it)
+ * is not counted, and is removed (expAiUsage::removeStaleReservations()).
  */
 class expAiLimits
 {
+    /** seconds a reservation counts: longer than any request may run */
+    const RESERVATION_SECONDS = 900;
+
+    /** @return bool at least one limit is set (only then requests reserve their estimate) */
+    public static function anySet( ?expAiConfig $config = null )
+    {
+        $config = $config ?: expAiConfig::instance();
+        foreach ( self::definitions() as $def )
+        {
+            $raw = $config->get( 'Limits', $def[0], '' );
+            if ( is_numeric( $raw ) && (float) $raw > 0 )
+                return true;
+        }
+        return (bool) self::providerDefinitions( $config );
+    }
+
+    /** @return string block | ignore ([Limits] UnpricedCost, default block) */
+    public static function unpricedCost( ?expAiConfig $config = null )
+    {
+        $config = $config ?: expAiConfig::instance();
+        return strtolower( trim( (string) $config->get( 'Limits', 'UnpricedCost', 'block' ) ) ) === 'ignore' ? 'ignore' : 'block';
+    }
+
+    /**
+     * The cost limits that apply to a request to a provider.
+     * @return string[] limit keys
+     */
+    public static function costLimitsFor( $providerID, ?expAiConfig $config = null )
+    {
+        $config = $config ?: expAiConfig::instance();
+        $out = array();
+        foreach ( self::definitions() as $key => $def )
+        {
+            $raw = $config->get( 'Limits', $def[0], '' );
+            if ( $def[1] === 'cost' && is_numeric( $raw ) && (float) $raw > 0 )
+                $out[] = $key;
+        }
+        foreach ( self::providerDefinitions( $config ) as $key => $def )
+            if ( $def[1] === 'cost' && $def[4] === (string) $providerID )
+                $out[] = $key;
+        return $out;
+    }
+
+    /**
+     * How a limit stands for a new request.
+     * @param array $limit a row of status(): used, reserved, max
+     * @return string '' (it may go), over (used up) or reserved (the requests under way would pass it)
+     */
+    public static function verdict( array $limit )
+    {
+        $max = isset( $limit['max'] ) ? (float) $limit['max'] : 0.0;
+        if ( $max <= 0 )
+            return '';
+        $used = isset( $limit['used'] ) ? (float) $limit['used'] : 0.0;
+        if ( $used >= $max )
+            return 'over';
+        $reserved = isset( $limit['reserved'] ) ? (float) $limit['reserved'] : 0.0;
+        return $used + $reserved > $max ? 'reserved' : '';
+    }
+
     /** @return string a key of the current session (a hash: the session id itself is never stored) */
     public static function sessionKey()
     {
@@ -116,6 +185,7 @@ class expAiLimits
                 $filters['session_key'] = self::sessionKey() ?: '-';
             else
                 $filters['from'] = self::periodStart( $period );
+            $filters += self::reservationFilters( $context );
             $cacheKey = md5( serialize( $filters ) );
             if ( !isset( $cache[$cacheKey] ) )
             {
@@ -124,10 +194,11 @@ class expAiLimits
             }
             $t = $cache[$cacheKey];
             $used = $unit === 'cost' ? (float) $t['cost'] : (float) ( $t['input'] + $t['output'] + $t['cache_write'] + $t['cache_read'] );
+            $reserved = self::reservedOf( $t, $unit );
             $percent = $max > 0 ? min( 100, round( 100 * $used / $max, 1 ) ) : 0;
             $level = $max <= 0 ? 'ok' : ( $used >= $max ? 'over' : ( $percent >= 90 ? 'high' : ( $percent >= 75 ? 'warn' : 'ok' ) ) );
             $out[$key] = array( 'key' => $key, 'setting' => $setting, 'unit' => $unit, 'scope' => $scope, 'period' => $period,
-                                'used' => $unit === 'cost' ? round( $used, 4 ) : (int) $used, 'max' => $max, 'percent' => $percent,
+                                'used' => $unit === 'cost' ? round( $used, 4 ) : (int) $used, 'reserved' => $reserved, 'max' => $max, 'percent' => $percent,
                                 'level' => $level, 'reset' => self::periodEnd( $period ), 'cost_known' => $t['cost_known'],
                                 'unpriced' => $unit === 'cost' && isset( $t['unpriced'] ) ? (int) $t['unpriced'] : 0 );
         }
@@ -137,6 +208,7 @@ class expAiLimits
             if ( isset( $context['provider'] ) && $context['provider'] !== $provider && !empty( $context['only_provider'] ) )
                 continue;
             $filters = array( 'provider' => $provider, 'from' => self::periodStart( $period ) );
+            $filters += self::reservationFilters( $context );
             $cacheKey = md5( serialize( $filters ) );
             if ( !isset( $cache[$cacheKey] ) )
             {
@@ -145,10 +217,11 @@ class expAiLimits
             }
             $t = $cache[$cacheKey];
             $used = $unit === 'cost' ? (float) $t['cost'] : (float) ( $t['input'] + $t['output'] + $t['cache_write'] + $t['cache_read'] );
+            $reserved = self::reservedOf( $t, $unit );
             $percent = min( 100, round( 100 * $used / $max, 1 ) );
             $level = $used >= $max ? 'over' : ( $percent >= 90 ? 'high' : ( $percent >= 75 ? 'warn' : 'ok' ) );
             $out[$key] = array( 'key' => $key, 'setting' => $setting, 'unit' => $unit, 'scope' => $scope, 'period' => $period, 'provider' => $provider,
-                                'used' => $unit === 'cost' ? round( $used, 4 ) : (int) $used, 'max' => $max, 'percent' => $percent,
+                                'used' => $unit === 'cost' ? round( $used, 4 ) : (int) $used, 'reserved' => $reserved, 'max' => $max, 'percent' => $percent,
                                 'level' => $level, 'reset' => self::periodEnd( $period ), 'cost_known' => $t['cost_known'],
                                 'unpriced' => $unit === 'cost' && isset( $t['unpriced'] ) ? (int) $t['unpriced'] : 0 );
         }
@@ -156,31 +229,62 @@ class expAiLimits
     }
 
     /**
-     * Refuses a request when a limit is reached, naming the limit and when it resets.
-     * @param array $context user_id, conversation_id
+     * The filters of a limit's usage: with the reservations of the requests under way, without the request's own
+     * (context reservation_id): a request is never refused for its own estimate, only for what the others reserved.
+     * @return array
+     */
+    public static function reservationFilters( array $context )
+    {
+        $filters = array( 'with_reservations' => true );
+        if ( !empty( $context['reservation_id'] ) )
+            $filters['exclude_id'] = (int) $context['reservation_id'];
+        return $filters;
+    }
+
+    /** @return int|float what the requests under way reserved of a total (aggregate()), in the unit of a limit */
+    protected static function reservedOf( array $totals, $unit )
+    {
+        if ( $unit === 'cost' )
+            return isset( $totals['reserved_cost'] ) ? round( (float) $totals['reserved_cost'], 4 ) : 0.0;
+        return isset( $totals['reserved_tokens'] ) ? (int) $totals['reserved_tokens'] : 0;
+    }
+
+    /**
+     * Refuses a request when a limit is reached, or would be passed together with the requests under way, naming
+     * the limit and when it resets; and a request to a model without a price while a cost limit applies
+     * ([Limits] UnpricedCost=block).
+     * @param array $context user_id, conversation_id, provider, model (the model id), model_alias
      * @throws expAiException
      */
     public static function check( array $context )
     {
         $config = expAiConfig::instance();
-        $any = false;
-        foreach ( self::definitions() as $def )
-        {
-            $raw = $config->get( 'Limits', $def[0], '' );
-            if ( is_numeric( $raw ) && (float) $raw > 0 )
-                $any = true;
-        }
-        if ( self::providerDefinitions( $config ) )
-            $any = true;
-        if ( !$any )
+        if ( !self::anySet( $config ) )
             return;
+        // a model without a price: a cost limit cannot be kept for it
+        if ( isset( $context['model'] ) && self::unpricedCost( $config ) === 'block' && expAiCost::enabled( $config )
+             && self::costLimitsFor( isset( $context['provider'] ) ? (string) $context['provider'] : '', $config )
+             && expAiUsage::cost( (string) $context['model'], 1000, 1000, 0, 0, isset( $context['model_alias'] ) ? (string) $context['model_alias'] : '' ) === null )
+        {
+            throw new expAiException( 'The model %model has no price, so a cost limit of this site cannot be kept for it. Choose another model, or ask an administrator to set its price.',
+                                      'limit: unpriced model with a cost limit (UnpricedCost=block)', 0,
+                                      array( '%model' => isset( $context['model_alias'] ) && $context['model_alias'] !== '' ? (string) $context['model_alias'] : (string) $context['model'] ) );
+        }
         foreach ( self::status( $context ) as $limit )
         {
-            if ( $limit['level'] !== 'over' )
+            $verdict = self::verdict( $limit );
+            if ( $verdict === '' )
                 continue;
             // a provider's limit stops only requests to that provider
             if ( isset( $limit['provider'] ) && ( !isset( $context['provider'] ) || $context['provider'] !== $limit['provider'] ) )
                 continue;
+            if ( $verdict === 'reserved' )
+                throw new expAiException( 'The limit %limit would be passed together with the requests under way (%used used and %reserved reserved of %max). Try again in a moment.',
+                                          'limit ' . $limit['setting'] . ' (reserved)', 0, array(
+                    '%limit' => self::label( $limit['key'] ),
+                    '%used' => $limit['unit'] === 'cost' ? $limit['used'] . ' ' . expAiUsage::currency() : number_format( $limit['used'] ),
+                    '%reserved' => $limit['unit'] === 'cost' ? $limit['reserved'] . ' ' . expAiUsage::currency() : number_format( $limit['reserved'] ),
+                    '%max' => $limit['unit'] === 'cost' ? $limit['max'] . ' ' . expAiUsage::currency() : number_format( $limit['max'] ) ) );
             $resets = array(
                 'conversation' => ezpI18n::tr( 'extension/expai/limits', 'when you start a new conversation' ),
                 'session' => ezpI18n::tr( 'extension/expai/limits', 'when you log in again' ),

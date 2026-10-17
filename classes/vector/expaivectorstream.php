@@ -86,6 +86,8 @@ class expAiVectorStream
         self::send( ": ok\nretry: 3000\n\n" );
         $threadID = (int) $thread->attribute( 'id' );
         $uuid = (string) $thread->attribute( 'uuid' );
+        // an approver gets the events as expAiVector::visibleEvent() leaves them
+        $owner = $thread->isOwner( (int) eZUser::currentUserID() );
         $cursor = (int) $after;
         $end = time() + $seconds;
         while ( time() < $end )
@@ -93,7 +95,7 @@ class expAiVectorStream
             foreach ( expAiThreadEvent::fetchAfter( $threadID, $cursor, 200 ) as $event )
             {
                 $cursor = (int) $event->attribute( 'id' );
-                echo 'id: ' . $cursor . "\nevent: thread\ndata: " . json_encode( array( 'thread' => $uuid ) + $event->present(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . "\n\n";
+                echo 'id: ' . $cursor . "\nevent: thread\ndata: " . json_encode( array( 'thread' => $uuid ) + expAiVector::visibleEvent( $event->present(), $owner ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . "\n\n";
             }
             self::send( ": ping\n\n" );
             if ( connection_aborted() )

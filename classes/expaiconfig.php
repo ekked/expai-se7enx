@@ -27,6 +27,21 @@ class expAiConfig
         return new self();
     }
 
+    /**
+     * An extension expai works with (expqueue, expservices, expmcp) is used only when it is active in the current
+     * siteaccess: the class autoload of an installation lists the classes of every extension in the tree, active or
+     * not, so class_exists() alone would use an extension the site has switched off.
+     * @param string $extension the directory name of the extension
+     * @param string[]|null $active the active extensions (default eZExtension::activeExtensions())
+     * @return bool
+     */
+    public static function extensionActive( $extension, ?array $active = null )
+    {
+        if ( $active === null )
+            $active = class_exists( 'eZExtension' ) ? (array) eZExtension::activeExtensions() : array();
+        return in_array( (string) $extension, $active, true );
+    }
+
     /** @return eZINI */
     public function ini()
     {

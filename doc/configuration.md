@@ -28,11 +28,12 @@ a list, empty it where you set it: a line with only `FieldActions[]`, then the e
 | `AllowUserModelChoice` | `enabled` | Users may pick another model from `AllowedModels[]` (dashboard, panel, edit form); the choice is the preference `expai_model`. A choice that is no longer allowed falls back to `Model`. |
 | `AllowedModels[]` | `claude-sonnet-5-5`, `claude-opus-5-5`, `claude-haiku-5-5` | The models offered. `Model` is always offered. |
 | `ModelLabels[<id>]` | Claude Sonnet 5.5, ... | The name shown for a model id (the id when not set). |
-| `ApiKey` | (empty) | The API key. Only in settings/override, never committed. Without it expai is "not configured". |
+| `ApiKey` | (empty) | The API key. In settings/override or an untracked `KeyLocations[]` location, never committed. Without it expai is "not configured". |
 | `AnthropicWorkspaceId` | (empty) | For a key that is not scoped to a workspace: sent as `anthropic-workspace-id`. |
-| `MaxTokens` | `8000` | The longest answer of one call, in tokens. |
+| `MaxTokens` | `16000` | The longest answer of one call, in tokens, thinking included. Requests are sent without streaming; with `Timeout=115` an answer this long may run out of time first. |
 | `Effort` | `medium` | How much the model thinks: `low`, `medium`, `high` (`xhigh`, `max` where the model has them); empty: the model's default. |
-| `RefusalFallback` | `enabled` | Sends `fallbacks: "default"`: a request the model declines for a safety reason is retried on the model Anthropic recommends (Claude API only; set `disabled` for other endpoints). |
+| `RefusalFallback` | `enabled` | Sends `fallbacks: "default"`: a request the model declines for a safety reason is retried on the model Anthropic recommends (Claude API only; set `disabled` for other endpoints). Only for the models that accept it: Claude Fable 5.1, Mythos 5.1, Opus 5.5, Opus 5 and Sonnet 5.5 (and their dated snapshots), never Claude Haiku 5.5; another model gets it with the capability `refusal_fallback` (`[Model_<alias>] Capabilities[]`), `no_refusal_fallback` turns it off for a listed one. |
+| `StrictTools` | `enabled` | Tool definitions go with `strict: true` where the tool's schema allows it (every object closed with `additionalProperties: false`, only `type`, `properties`, `required`, `items`, `enum`, `description`); other tools, MCP tools among them, as they are. `disabled`: none strict. `StrictToolsMax` (20), `StrictOptionalMax` (24) and `StrictUnionMax` (16) cap the strict tools of one request, their optional parameters and their parameters with more than one type; a tool that would pass a cap goes as it is. The arguments of every call are checked against the tool's schema before the tool runs, with any provider. |
 | `PromptCaching` | `enabled` | Asks the API to cache the stable start of each request (instructions, tools, earlier turns). |
 | `Timeout` | `115` | Seconds for one call. Keep it below the web server's and PHP's request limits (architecture.md, "Long turns"). |
 | `ConnectTimeout` | `10` | Seconds to connect. |
@@ -53,6 +54,7 @@ settings keep working unchanged). More providers: the next three sections and [p
 | `Providers[]` | `anthropic` | The active providers, in the order the model picker shows them. Each needs a `[Provider_<id>]` group, except `anthropic`, which falls back to `[AISettings]`. |
 | `DefaultModel` | (empty) | The alias of the site default model; empty: `anthropic.<[AISettings] Model>`. |
 | `ProvidersWithoutPolicy[]` | `anthropic` | The models of these providers can be chosen by everyone with `expai/write` (as in 0.0.1.0); every other provider's models need `expai/model_use` (limitation Provider). Empty it to require the policy for everything but the default. |
+| `KeyLocations[]` | `settings/override`, `extension/*settings` | Where an `ApiKey` or `Token` may be set besides `settings/override` (fnmatch patterns relative to the installation). A file there is accepted only when it is not shipped with the code: git does not track it, or, in a release without git, it lies outside the release (a symlink to shared files). A tracked file is always reported on `expai/models`. |
 
 ## [Provider_<id>]: one provider
 
@@ -62,7 +64,7 @@ settings keep working unchanged). More providers: the next three sections and [p
 | `Flavor` | `openai_chat` only: `openai`, `huggingface`, `openrouter`, `mistral`, `xai`, `ollama`, `llamacpp`, `melious`, `generic`: the small differences (tool_choice support, Mistral's tool names, `max_completion_tokens`, OpenRouter's `reasoning` object, the cost Melious reports in `billing_cost.credits`). |
 | `Label` | The name in the picker, in error texts and on expai/models. |
 | `BaseURL` | The API: for `openai_chat` the base (`https://router.huggingface.co/v1`; `/chat/completions` is added, a query such as Azure's `api-version` is kept); for `anthropic` the messages URL. |
-| `ApiKey` | The key, ONLY in settings/override. expai/models warns about a key in any other file. |
+| `ApiKey` | The key, in settings/override or an untracked `[ProviderSettings] KeyLocations[]` location. expai/models warns about a key in any other file (and about one in a tracked file). |
 | `ApiKeyHeader` | `authorization` (Bearer, default of `openai_chat`), `x-api-key` (default of `anthropic`), `api-key` (Azure), `x-goog-api-key`, or `none` (a local server). |
 | `KeyOptional` | `true`: send no key header when `ApiKey` is empty (a server that accepts both). |
 | `Headers[]` | Extra request headers, `Name: value` (e.g. OpenRouter's `X-OpenRouter-Title`). Key headers, `Host` and line breaks are refused. |
@@ -115,6 +117,7 @@ The alias is what users choose and what the usage log records (letters, digits, 
 | `ContextWindowTurns` | `8` | Exchanges in the window sent to the model. When it is full, the older exchanges become a short summary (cut from their own text, no extra call) and the last half are kept word for word. The panel still shows the whole history. |
 | `CompactContextChars` | `1800` | The longest snapshot of the open page in a compact prompt (`[Model_<alias>] PromptProfile=compact`), in characters: its writable text fields as plain text, each cut to 600. |
 | `ExtraInstructions[]` | (none) | Lines added to the instructions of the panel and the edit form, e.g. `ExtraInstructions[]=Write in British English.` New conversations get them; running ones keep the instructions they started with. |
+| `WriteScope` | `subtree` | Where the write tools may write: `subtree` (the open node and below in the panel, the thread's scope in Vector; a target outside is refused with an error the model can react to) or `site` (anywhere the editor may write). |
 
 ## [ToolSettings]: what the assistant may use
 
@@ -175,6 +178,19 @@ Each `[FieldAction_<name>]`:
 
 See [usage-tracking.md](usage-tracking.md).
 
+## [RetentionSettings]: how long the editors' words are kept
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `Mode` | `delete` | `report`: the cronjob only says what it would remove. |
+| `ThreadKeepDays` | `365` | A thread not modified for this many days is removed with its runs, events, proposals, checkpoints, plans and conversations; not when it is pinned, in review, waiting for an answer, or running. |
+| `ConversationKeepDays` | `365` | A conversation not modified for this many days is removed, unless it belongs to a thread that stays. |
+| `PromptSummaryKeepDays` | `365` | The request summary of a draft log row is blanked after this many days; the row stays. |
+
+`0` keeps the rows. Independent of the periods, the threads and conversations of a user that no longer exists are
+removed. The cronjob part `expai` (`expai_prune.php`) and `bin/php/expaithreads.php --prune` do it
+([threads.md](threads.md#retention)).
+
 ## [Limits]: optional limits
 
 Every limit is optional: empty or `0` is no limit. Tokens are input + output + cache write + cache read; costs are the
@@ -190,6 +206,13 @@ and when it resets. Days and months follow the site's time zone. The dashboard s
 | `MaxTokensPerSitePerMonth`, `MaxCostPerSitePerMonth` | on the 1st (all users together) |
 | `MaxRequestsPerTurn` | the most model calls one message may lead to; empty: `[AssistantSettings] MaxToolIterations` (a retry of the prompted tool protocol counts) |
 | `ProviderMaxTokensPerMonth[<provider>]`, `ProviderMaxCostPerMonth[<provider>]` | on the 1st: all users together on one provider; only requests to that provider are stopped |
+| `UnpricedCost` | `block` (default): a request to a model without a price is refused while a cost limit applies to it, as the limit could not be kept; `ignore`: it goes and counts as free |
+
+While any limit is set, every request reserves its estimate before it is sent (input from the length of the request,
+its `MaxTokens` as output) and counts with it until its row is settled with the real numbers. Parallel requests
+therefore cannot pass a limit together: a request that would pass it with the requests under way is refused ("would
+be passed together with the requests under way"). A reservation older than 15 minutes (a process that ended without
+settling it) no longer counts.
 
 Anthropic's own limits apply as well: the rate limits of the key (the dashboard shows the last values the API
 reported) and the spend limit of the organization, set in the Claude Console.
@@ -400,7 +423,7 @@ See [mcp.md](mcp.md).
 | --- | --- |
 | `Label` | The name shown with its tools. |
 | `URL` | The endpoint: https, or http to a loopback address with `AllowLoopback=enabled`. |
-| `Token` | Sent as a Bearer token; ONLY in settings/override. |
+| `Token` | Sent as a Bearer token; in settings/override or an untracked `KeyLocations[]` location. |
 | `AllowedTools[]` | The tools the panel may call (`mcp__<id>__<tool>`); everything else the server offers is ignored. |
 | `Region`, `Retention` | Checked against the panel node's data policy before every call. |
 | `MaxResultBytes` | The longest result passed to the model (default 16000). |
@@ -419,7 +442,7 @@ See [mcp.md](mcp.md).
 | `admininterface.ini` | the tabs `expai` (content navigation part) and `expai_media` (media), header template `expai_header.tpl`, body `expai.tpl` |
 | `content.ini` | `[EditSettings] AdditionalTemplates[]=content/edit/expai.tpl` |
 | `menu.ini` | the entries of the Dashboard menu (`[Leftmenu_my]`: Exponential Intelligence, EI: Vector, EI: Chains, EI: Log, EI: Help), of Setup (`[Leftmenu_setup]`: EI: Summary, EI: Models, EI: Budgets, Job queue) and of Design (`[Leftmenu_design]`: Missing alt text), each with its policies ([dashboard.md](dashboard.md)) |
-| `cronjob.ini` | the cronjob part `expai`: `expai_queue.php` (resumes held jobs, releases lost batch submits), `expai_prune.php` (usage rows older than `RetentionDays`; draft log rows of removed objects marked `deleted`), `expai_thread_prune.php` (thread events, proposals, checkpoints); run it with `-s <admin siteaccess>` |
+| `cronjob.ini` | the cronjob part `expai`: `expai_queue.php` (resumes held jobs, releases lost batch submits), `expai_prune.php` (usage rows older than `RetentionDays`; draft log rows of removed objects marked `deleted`; threads, conversations and request summaries after `[RetentionSettings]`, and those of removed users), `expai_thread_prune.php` (thread events, proposals, checkpoints); run it with `-s <admin siteaccess>` |
 | `dashboard.ini` | the dashboard block `expai_drafts` (Priority 35, 5 items, `expai/write`) |
 | `browse.ini` | `[ExpAiStartWriting]`: the content browser of "Change location" (single node) |
 | `site.ini` | `TranslationExtensions[]=expai`, `[TemplateSettings] ExtensionAutoloadPath[]=expai` (the template operators `expai_money`, `expai_tokens`, `expai_number`) |
@@ -459,7 +482,8 @@ See [mcp.md](mcp.md).
 | `MaxStreams` | 4 | streams open at once (one PHP process each: at most 25 % of PHP-FPM `pm.max_children`) |
 | `StreamSeconds` | 25 | how long one stream is held before the browser reconnects |
 | `Background` | auto | turns of slow models run as queue jobs (`auto`), every turn (`always`), none (`never`); [vector.md](vector.md#background-runs) |
-| `KickWorker` | enabled | without a running worker, start one detached worker for interactive jobs after queueing |
+| `KickWorker` | enabled | without a running worker, start one detached worker for interactive jobs after queueing (setsid where the system has it, else nohup alone) |
+| `WorkerAllowRoot` | disabled | pass `--allow-root-user` to the started worker; only for a site whose PHP runs as root |
 | `PhpCli` | (empty) | the PHP command line binary of that worker (empty: the one of this PHP) |
 | `MaxStagedChanges` | 500 | staged changes one thread may hold open ([review.md](review.md)); over it the write tools ask for a review first |
 | `MaxEditLength` | 20000 | the longest text of an edited part in the Changes tab (characters) |
@@ -539,7 +563,7 @@ configured.
 | `Label` | The name in results and the data policy. |
 | `Class` | A class extending `expAiWebSearchProvider` (`expAiWebSearchBrave` for `[SearchProvider_brave]`). |
 | `Endpoint` | The API address (https). |
-| `ApiKey` | ONLY in settings/override; without it web_search is not offered. |
+| `ApiKey` | In settings/override or an untracked `KeyLocations[]` location; without it web_search is not offered. |
 | `Region`, `Retention` | Checked against the panel node's data policy before every search (the query leaves the site). |
 | `Timeout` | Seconds per search (default 10). |
 | `SafeSearch`, `Country`, `SearchLang` | Brave's `safesearch`, `country` and `search_lang` parameters (optional). |

@@ -551,46 +551,55 @@ class expAiDiff
         $result = array( 'written' => array(), 'skipped' => array(), 'errors' => array() );
         $db = eZDB::instance();
         $db->begin();
-        foreach ( $values as $identifier => $value )
+        try
         {
-            if ( !isset( $dataMap[$identifier] ) )
+            foreach ( $values as $identifier => $value )
             {
-                $result['errors'][$identifier] = 'no such attribute';
-                continue;
+                if ( !isset( $dataMap[$identifier] ) )
+                {
+                    $result['errors'][$identifier] = 'no such attribute';
+                    continue;
+                }
+                $attribute = $dataMap[$identifier];
+                if ( !$attribute->attribute( 'can_translate' ) && $language !== $object->attribute( 'initial_language_code' ) )
+                {
+                    $result['skipped'][$identifier] = 'not translatable';
+                    continue;
+                }
+                $datatype = isset( $datatypes[$identifier] ) ? $datatypes[$identifier] : (string) $attribute->attribute( 'data_type_string' );
+                if ( $datatype !== 'ezxmltext' )
+                {
+                    $plain[$identifier] = $value;
+                    continue;
+                }
+                $check = new DOMDocument( '1.0', 'UTF-8' );
+                $previous = libxml_use_internal_errors( true );
+                $ok = $check->loadXML( (string) $value, LIBXML_NONET );
+                libxml_clear_errors();
+                libxml_use_internal_errors( $previous );
+                if ( !$ok )
+                {
+                    $result['errors'][$identifier] = 'the rich text is not well-formed';
+                    continue;
+                }
+                $attribute->setAttribute( 'data_text', (string) $value );
+                $attribute->store();
+                $urlIDs = array();
+                foreach ( $check->getElementsByTagName( 'link' ) as $link )
+                    if ( $link->hasAttribute( 'url_id' ) )
+                        $urlIDs[] = (int) $link->getAttribute( 'url_id' );
+                if ( $urlIDs && class_exists( 'eZSimplifiedXMLInput' ) )
+                    eZSimplifiedXMLInput::updateUrlObjectLinks( $attribute, array_values( array_unique( $urlIDs ) ) );
+                $result['written'][] = $identifier;
             }
-            $attribute = $dataMap[$identifier];
-            if ( !$attribute->attribute( 'can_translate' ) && $language !== $object->attribute( 'initial_language_code' ) )
-            {
-                $result['skipped'][$identifier] = 'not translatable';
-                continue;
-            }
-            $datatype = isset( $datatypes[$identifier] ) ? $datatypes[$identifier] : (string) $attribute->attribute( 'data_type_string' );
-            if ( $datatype !== 'ezxmltext' )
-            {
-                $plain[$identifier] = $value;
-                continue;
-            }
-            $check = new DOMDocument( '1.0', 'UTF-8' );
-            $previous = libxml_use_internal_errors( true );
-            $ok = $check->loadXML( (string) $value, LIBXML_NONET );
-            libxml_clear_errors();
-            libxml_use_internal_errors( $previous );
-            if ( !$ok )
-            {
-                $result['errors'][$identifier] = 'the rich text is not well-formed';
-                continue;
-            }
-            $attribute->setAttribute( 'data_text', (string) $value );
-            $attribute->store();
-            $urlIDs = array();
-            foreach ( $check->getElementsByTagName( 'link' ) as $link )
-                if ( $link->hasAttribute( 'url_id' ) )
-                    $urlIDs[] = (int) $link->getAttribute( 'url_id' );
-            if ( $urlIDs && class_exists( 'eZSimplifiedXMLInput' ) )
-                eZSimplifiedXMLInput::updateUrlObjectLinks( $attribute, array_values( array_unique( $urlIDs ) ) );
-            $result['written'][] = $identifier;
+            $db->commit();
         }
-        $db->commit();
+        catch ( Throwable $e )
+        {
+            if ( $db->transactionCounter() > 0 )
+                $db->rollback();
+            throw $e;
+        }
         if ( $plain )
         {
             $written = $writer->writeFields( $object, $version, $language, $plain );

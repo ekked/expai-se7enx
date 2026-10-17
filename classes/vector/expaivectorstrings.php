@@ -22,6 +22,8 @@ class expAiVectorStrings
             'placeholder' => $t( 'Type a command, a thread or a node...' ),
             'empty' => $t( 'Nothing found.' ),
             'searching' => $t( 'Searching...' ),
+            'results_1' => $t( '%count result' ),
+            'results_n' => $t( '%count results' ),
             'group_commands' => $t( 'Commands' ),
             'group_threads' => $t( 'Threads' ),
             'group_nodes' => $t( 'Nodes' ),

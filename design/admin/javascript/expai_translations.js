@@ -29,7 +29,7 @@
         var fmt = ExpAi.format;
         var node = box.getAttribute( 'data-node-id' );
         var strings = {};
-        try { strings = JSON.parse( box.querySelector( '.exp-ai-tr-strings' ).textContent || '{}' ); } catch ( e ) { strings = {}; }
+        try { strings = JSON.parse( box.querySelector( '.exp-ai-tr-strings' ).textContent || '{}' ); } catch ( e ) { strings = {}; ( window.console && console.warn && console.warn( 'expai: a configuration block is not valid JSON', e ) ); }
         var body = box.querySelector( 'tbody' );
         var note = box.querySelector( '.exp-ai-tr-note' );
         var checkButton = box.querySelector( '.exp-ai-tr-check' );

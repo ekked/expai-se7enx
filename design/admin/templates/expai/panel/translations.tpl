@@ -24,7 +24,7 @@
         <input type="button" class="button exp-ai-btn exp-ai-tr-check" value="{'Check translations'|i18n( 'extension/expai/translation' )}" hidden="hidden" />
     </div>
     <p class="exp-ai-hint">{'Small changes of the source are queued as translation patches at once; full translations and larger or more expensive changes wait for your approval. Results are drafts of the translation; nothing is published.'|i18n( 'extension/expai/translation' )}</p>
-    <script type="application/json" class="exp-ai-tr-strings">{json_encode( hash(
+    <script type="application/json" class="exp-ai-tr-strings">{hash(
         'source', 'Source language: %language, version %version'|i18n( 'extension/expai/translation' ),
         'state_unchecked', 'Not checked yet'|i18n( 'extension/expai/translation' ),
         'state_up_to_date', 'Up to date'|i18n( 'extension/expai/translation' ),
@@ -50,7 +50,7 @@
         'queued_note', 'Queued. The draft appears here when the job is done.'|i18n( 'extension/expai/translation' ),
         'skipped_note', 'Marked as up to date.'|i18n( 'extension/expai/translation' ),
         'error', 'Something went wrong:'|i18n( 'extension/expai/panel' )
-    ) )}</script>
-    <script src={'javascript/expai_translations.js'|ezdesign}></script>
+    )|expai_json}</script>
+    <script src="{'javascript/expai_translations.js'|ezdesign( 'no' )}?v={'javascript/expai_translations.js'|expai_version}"></script>
 </div>
 {/if}

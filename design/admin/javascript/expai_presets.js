@@ -28,10 +28,10 @@
         }
         root.setAttribute( 'data-exp-ai-presets', '1' );
         var C;
-        try { C = JSON.parse( node.textContent ) || {}; } catch ( e ) { return; }
+        try { C = JSON.parse( node.textContent ) || {}; } catch ( e ) { ( window.console && console.warn && console.warn( 'expai: a configuration block is not valid JSON', e ) ); return; }
         var S = C.strings || {};
         var esc = ExpAi.esc;
-        var edit = JSON.parse( ( root.querySelector( '.exp-ai-edit-config' ) || { textContent: '{}' } ).textContent || '{}' );
+        var edit = ExpAi.readJSON ? ExpAi.readJSON( root, '.exp-ai-edit-config' ) : {};
         var form = root.closest( 'form' ) || document.getElementById( 'editform' );
         if ( !form ) {
             return;
@@ -182,6 +182,14 @@
                 // a failure after the request was sent: the error and the link to its record
                 if ( result && result.error ) {
                     ctx.note.innerHTML = esc( ( S.error + ' ' + result.error ).trim() ) + recordLinks( result.record );
+                    return;
+                }
+                // the model gave no text, usually with a reason ("there is nothing to summarize"): shown as such, nothing is
+                // written and nothing is marked as filled
+                if ( result && ( result.refused || String( result.value || '' ).replace( /<[^>]*>/g, '' ).trim() === '' ) ) {
+                    ctx.note.innerHTML = '<span class="exp-ai-note-refused">' + esc( result.note || S.no_text ) + '</span>'
+                        + ( result.fallback ? ' <span class="exp-ai-fallback-notice">' + esc( result.fallback.notice ) + '</span>' : '' )
+                        + recordLinks( result.record );
                     return;
                 }
                 var extras = ( result.note ? ' <em>' + esc( result.note ) + '</em>' : '' )

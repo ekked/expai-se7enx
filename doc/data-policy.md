@@ -35,7 +35,13 @@ an unknown region meets no region requirement. Without any rule everything may g
 - **The panel**: before the first request, the node the panel is open on. The editor gets "The data policy keeps
   "<name>" (object <id>) away from <provider>: regions eu or local required; the provider is in region us ..." and
   can choose another model.
-- **Every tool**: `get_node`, `list_children`, `get_tree_context`, `create_draft` (the class and the parent's
+- **A change of model in a conversation**: the conversation notes every object whose content a tool returned (and
+  the open node). When it goes on with another model - the editor chose one, or the fallback to the site default
+  answers - these objects are checked against the new provider's policy. When all may go there, the new model gets
+  the earlier exchanges as a short summary as before; when one may not, it gets the editor's words only (each
+  earlier answer is replaced by a placeholder, drafts by their object:version keys) and the exchange says so. The
+  fallback prefers a model whose provider may take everything the conversation read.
+- **Every tool**: `get_node`, `list_children`, `get_tree_context`, `search_content`, `create_draft` (the class and the parent's
   section), `update_draft`: a refused object is a tool error the model reads; lists leave such objects out and add
   `withheld_by_data_policy: <n>`; a path shows only the node id of a withheld ancestor.
 - **The edit form**: field actions and "Fill the fields" check the object before anything is sent.

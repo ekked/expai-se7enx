@@ -58,6 +58,9 @@ Add your own with `[PanelSettings] Sections[]` (extending.md).
   stay.
 - A conversation is per user and node. After `[AssistantSettings] ConversationLifetime` without a message a new one
   starts.
+- One step at a time: while a step of the conversation runs, a second one (another tab, a double click) is refused
+  with "A step of this conversation is already running." The lock ends with the step, or on its own after twice the
+  model's `Timeout` plus a minute; a long step extends it after every round of tools and before the fallback's request.
 
 ## The history
 
@@ -103,6 +106,15 @@ The new window has no tool calls or thinking blocks of the old one, so it never 
 model's reasoning to the start of a conversation, and the instructions and tool definitions (the conversation's
 frame) stay the same, so prompt caching keeps working for them. The model still knows the drafts' object ids and can
 change them with `update_draft`.
+
+A change of model builds the same kind of window for the new model. An exchange still under way (the fallback in the
+middle of a tool loop) goes on with the editor's message and the drafts it wrote so far ("Already done for this
+request ...: drafts written ... Do not create them again"), so the new model does not write them twice. When the data
+policy keeps content the conversation read away from the new model's provider, the window has the editor's words
+only ([data-policy.md](data-policy.md)). The same happens, fail closed, when the conversation holds content it cannot
+account for: more objects than it keeps (500), or the result of a tool that does not read through the content reader
+(the in-process MCP bridge `exp__*`, MCP servers, web tools). The write lock after an external tool's result ends only
+with such a window or a new conversation; an ordinary compaction keeps it, as its summary may repeat the result.
 
 ## Drafts
 

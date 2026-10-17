@@ -43,9 +43,11 @@ class expAiContentWriter
      */
     public function createDraft( eZContentObjectTreeNode $parentNode, $classIdentifier, array $fields, $language = '' )
     {
-        $class = eZContentClass::fetchByIdentifier( (string) $classIdentifier );
+        $class = $this->fetchClass( $classIdentifier );
         if ( !$class instanceof eZContentClass )
             throw new expAiException( 'There is no content class "%identifier".', '', 0, array( '%identifier' => (string) $classIdentifier ) );
+        // before anything is written: an unknown field must not leave a half-made object (or an open transaction)
+        self::checkFieldIdentifiers( array_keys( $fields ), array_keys( (array) $class->dataMap() ) );
         if ( !$parentNode->canRead() )
             throw new expAiException( 'Node %id does not exist or you may not read it.', '', 0, array( '%id' => (int) $parentNode->attribute( 'node_id' ) ) );
         $language = $this->defaultLanguage( $language );
@@ -56,30 +58,60 @@ class expAiContentWriter
         $user = eZUser::currentUser();
         $db = eZDB::instance();
         $db->begin();
-        $object = $class->instantiate( (int) $user->attribute( 'contentobject_id' ), (int) $parentObject->attribute( 'section_id' ),
-                                       false, $language, eZContentObjectVersion::STATUS_DRAFT );
-        if ( !$object instanceof eZContentObject )
+        try
         {
-            $db->rollback();
-            throw new expAiException( 'The draft could not be created.', 'instantiate failed' );
+            $object = $class->instantiate( (int) $user->attribute( 'contentobject_id' ), (int) $parentObject->attribute( 'section_id' ),
+                                           false, $language, eZContentObjectVersion::STATUS_DRAFT );
+            if ( !$object instanceof eZContentObject )
+                throw new expAiException( 'The draft could not be created.', 'instantiate failed' );
+            $object->store();
+            $assignment = eZNodeAssignment::create( array(
+                'contentobject_id' => $object->attribute( 'id' ),
+                'contentobject_version' => $object->attribute( 'current_version' ),
+                'parent_node' => (int) $parentNode->attribute( 'node_id' ),
+                'is_main' => 1,
+                'sort_field' => $class->attribute( 'sort_field' ),
+                'sort_order' => $class->attribute( 'sort_order' ) ) );
+            $assignment->store();
+            $version = $object->version( 1 );
+            $version->setAttribute( 'modified', time() );
+            $version->setAttribute( 'status', eZContentObjectVersion::STATUS_DRAFT );
+            $version->store();
+            $result = $this->writeFields( $object, $version, $language, $fields );
+            $this->updateName( $object, $version, $language );
+            $db->commit();
         }
-        $object->store();
-        $assignment = eZNodeAssignment::create( array(
-            'contentobject_id' => $object->attribute( 'id' ),
-            'contentobject_version' => $object->attribute( 'current_version' ),
-            'parent_node' => (int) $parentNode->attribute( 'node_id' ),
-            'is_main' => 1,
-            'sort_field' => $class->attribute( 'sort_field' ),
-            'sort_order' => $class->attribute( 'sort_order' ) ) );
-        $assignment->store();
-        $version = $object->version( 1 );
-        $version->setAttribute( 'modified', time() );
-        $version->setAttribute( 'status', eZContentObjectVersion::STATUS_DRAFT );
-        $version->store();
-        $result = $this->writeFields( $object, $version, $language, $fields );
-        $this->updateName( $object, $version, $language );
-        $db->commit();
+        catch ( Throwable $e )
+        {
+            // a nested rollback (writeFields() inside createDraft()) has already ended the whole transaction
+            if ( $db->transactionCounter() > 0 )
+                $db->rollback();
+            throw $e;
+        }
         return array( $object, $version, $result );
+    }
+
+    /**
+     * @param string $identifier
+     * @return eZContentClass|null
+     */
+    protected function fetchClass( $identifier )
+    {
+        return eZContentClass::fetchByIdentifier( (string) $identifier );
+    }
+
+    /**
+     * Refuses field identifiers the class does not have. Called before a transaction is opened.
+     * @param string[] $identifiers the fields to write
+     * @param string[] $valid the identifiers of the class
+     * @throws expAiException for an unknown identifier (the message lists the valid ones)
+     */
+    public static function checkFieldIdentifiers( array $identifiers, array $valid )
+    {
+        $unknown = array_diff( $identifiers, $valid );
+        if ( $unknown )
+            throw new expAiException( 'Unknown field(s) %unknown. The fields of this class are: %valid.', '', 0,
+                                      array( '%unknown' => implode( ', ', $unknown ), '%valid' => implode( ', ', $valid ) ) );
     }
 
     /**
@@ -107,12 +139,22 @@ class expAiContentWriter
             throw new expAiException( 'Object %id is not published; open its draft in the edit form instead.', '', 0, array( '%id' => (int) $object->attribute( 'id' ) ) );
         $db = eZDB::instance();
         $db->begin();
-        $copyFrom = in_array( $language, array_keys( $object->allLanguages() ), true ) ? false : (string) $object->attribute( 'initial_language_code' );
-        $version = $object->createNewVersionIn( $language, $copyFrom, false, true, eZContentObjectVersion::STATUS_DRAFT );
-        $version->setAttribute( 'modified', time() );
-        $version->setAttribute( 'creator_id', (int) $user->attribute( 'contentobject_id' ) );
-        $version->store();
-        $db->commit();
+        try
+        {
+            $copyFrom = in_array( $language, array_keys( $object->allLanguages() ), true ) ? false : (string) $object->attribute( 'initial_language_code' );
+            $version = $object->createNewVersionIn( $language, $copyFrom, false, true, eZContentObjectVersion::STATUS_DRAFT );
+            $version->setAttribute( 'modified', time() );
+            $version->setAttribute( 'creator_id', (int) $user->attribute( 'contentobject_id' ) );
+            $version->store();
+            $db->commit();
+        }
+        catch ( Throwable $e )
+        {
+            // a nested rollback (writeFields() inside createDraft()) has already ended the whole transaction
+            if ( $db->transactionCounter() > 0 )
+                $db->rollback();
+            throw $e;
+        }
         return array( $version, $language, true );
     }
 
@@ -127,37 +169,44 @@ class expAiContentWriter
         if ( (int) $version->attribute( 'status' ) !== eZContentObjectVersion::STATUS_DRAFT )
             throw new expAiException( 'Only drafts can be written.', 'version status ' . $version->attribute( 'status' ) );
         $dataMap = $object->fetchDataMap( (int) $version->attribute( 'version' ), $language );
-        $unknown = array_diff( array_keys( $fields ), array_keys( $dataMap ) );
-        if ( $unknown )
-            throw new expAiException( 'Unknown field(s) %unknown. The fields of this class are: %valid.', '', 0,
-                                      array( '%unknown' => implode( ', ', $unknown ), '%valid' => implode( ', ', array_keys( $dataMap ) ) ) );
+        self::checkFieldIdentifiers( array_keys( $fields ), array_keys( $dataMap ) );
         $writable = $this->config->writableDatatypes();
         $result = array( 'written' => array(), 'skipped' => array(), 'errors' => array() );
         $db = eZDB::instance();
         $db->begin();
-        foreach ( $fields as $identifier => $value )
+        try
         {
-            $attribute = $dataMap[$identifier];
-            $datatype = (string) $attribute->attribute( 'data_type_string' );
-            if ( !in_array( $datatype, $writable, true ) )
+            foreach ( $fields as $identifier => $value )
             {
-                $result['skipped'][$identifier] = "the datatype $datatype is not written by the assistant; the editor sets it in the edit form";
-                continue;
+                $attribute = $dataMap[$identifier];
+                $datatype = (string) $attribute->attribute( 'data_type_string' );
+                if ( !in_array( $datatype, $writable, true ) )
+                {
+                    $result['skipped'][$identifier] = "the datatype $datatype is not written by the assistant; the editor sets it in the edit form";
+                    continue;
+                }
+                if ( !$attribute->attribute( 'can_translate' ) && $language !== $object->attribute( 'initial_language_code' ) )
+                {
+                    $result['skipped'][$identifier] = 'not translatable: it keeps the value of the main language';
+                    continue;
+                }
+                $error = $this->writeValue( $object, $attribute, $datatype, $value );
+                if ( $error !== true )
+                    $result['errors'][$identifier] = $error;
+                else
+                    $result['written'][] = $identifier;
             }
-            if ( !$attribute->attribute( 'can_translate' ) && $language !== $object->attribute( 'initial_language_code' ) )
-            {
-                $result['skipped'][$identifier] = 'not translatable: it keeps the value of the main language';
-                continue;
-            }
-            $error = $this->writeValue( $object, $attribute, $datatype, $value );
-            if ( $error !== true )
-                $result['errors'][$identifier] = $error;
-            else
-                $result['written'][] = $identifier;
+            $version->setAttribute( 'modified', time() );
+            $version->store();
+            $db->commit();
         }
-        $version->setAttribute( 'modified', time() );
-        $version->store();
-        $db->commit();
+        catch ( Throwable $e )
+        {
+            // a nested rollback (writeFields() inside createDraft()) has already ended the whole transaction
+            if ( $db->transactionCounter() > 0 )
+                $db->rollback();
+            throw $e;
+        }
         $this->updateName( $object, $version, $language );
         return $result;
     }

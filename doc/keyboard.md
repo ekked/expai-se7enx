@@ -11,7 +11,15 @@ Ctrl+K (Cmd+K on macOS) opens the palette:
 
 On other pages the palette is loaded on first use (`expaivector::palette` returns its script, texts and the
 editor's key bindings), so it adds nothing to pages where it is not used. A user without access to Exponential
-Intelligence keeps the browser's Ctrl+K (the answer is remembered for a day).
+Intelligence keeps the browser's Ctrl+K (the answer is remembered for a day, in this browser **per user**: the key
+`exp-ai-palette-keys:<login>` of the local storage (the login shown in admin4's user menu; without it the plain key), so a shared browser does not carry one user's answer to the next).
+Cmd is detected from `navigator.userAgentData.platform` ("macOS"), `navigator.platform` ("MacIntel") or the user agent,
+without regard to case; the palette and the sheet then show ⌘K. A keystroke with Cmd or Ctrl held never also runs a
+single-key shortcut (j, k, ...), and a key held down or an input method composing text does not trigger the palette.
+
+For screen readers the search field is a combobox whose `aria-expanded` is true only while there are results, the
+results are in labelled groups (`role="group"`), and a status line announces the number of results (or "Searching...").
+While the palette is open the page behind it does not scroll.
 
 What it lists, as you type:
 

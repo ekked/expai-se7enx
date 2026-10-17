@@ -167,7 +167,7 @@ class expAiBudget
                               'message' => sprintf( 'the monthly site budget of %s is reached (%s spent, %s reserved, %s needed)',
                                                     self::money( $cap ), self::money( $spent ), self::money( $reserved ), self::money( $micros ) ) );
         }
-        if ( $groupID && class_exists( 'expQueueGroup' ) )
+        if ( $groupID && class_exists( 'expQueueGroup' ) && expAiConfig::extensionActive( 'expqueue' ) )
         {
             $group = expQueueGroup::fetchByID( (int) $groupID );
             $gcap = $group ? (int) $group->attribute( 'budget_micros' ) : 0;
@@ -256,7 +256,7 @@ class expAiBudget
     /** @return int jobs held by a budget */
     public static function heldCount()
     {
-        if ( !class_exists( 'expQueue' ) || !expQueue::installed() )
+        if ( !expAiQueue::available() )
             return 0;
         return expQueue::count( array( 'state' => 'held', 'error_class' => self::ERROR_CLASS ) );
     }
@@ -268,7 +268,7 @@ class expAiBudget
      */
     public function status( $groups = 10 )
     {
-        $queue = class_exists( 'expQueue' ) && expQueue::installed();
+        $queue = expAiQueue::available();
         $cap = $this->siteCap();
         $spent = $this->spentThisMonth();
         $reserved = $queue ? $this->reserved() : 0;

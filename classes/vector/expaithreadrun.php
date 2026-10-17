@@ -102,7 +102,7 @@ class expAiThreadRun extends eZPersistentObject
         $micros = 0;
         $tokens = 0;
         // thread_id first: the usage log is indexed by thread
-        $rows = eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), null, array( 'thread_id' => (int) $this->attribute( 'thread_id' ), 'run_id' => (int) $this->attribute( 'id' ) ),
+        $rows = eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), null, expAiUsage::requestsOnly( array( 'thread_id' => (int) $this->attribute( 'thread_id' ), 'run_id' => (int) $this->attribute( 'id' ) ) ),
                                                       array( 'id' => 'asc' ), array( 'offset' => 0, 'length' => 2000 ), false );
         foreach ( (array) $rows as $row )
         {
@@ -112,7 +112,8 @@ class expAiThreadRun extends eZPersistentObject
             if ( $cost !== null )
                 $micros += (int) round( $cost * 1000000 );
         }
-        $this->setAttribute( 'cost_micros', min( 2147483647, $micros ) );
+        // cost_micros is 64 bits wide (expAiSchema::BIGINT)
+        $this->setAttribute( 'cost_micros', $micros );
         $this->setAttribute( 'tokens', min( 2147483647, $tokens ) );
     }
 

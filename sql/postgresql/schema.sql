@@ -9,6 +9,8 @@ CREATE SEQUENCE IF NOT EXISTS expai_conversation_id_seq
   MINVALUE 1
   CACHE 1;
 CREATE TABLE IF NOT EXISTS expai_conversation (
+  busy_owner character varying(60) DEFAULT ''::character varying NOT NULL,
+  busy_until integer DEFAULT 0 NOT NULL,
   created integer DEFAULT 0 NOT NULL,
   draft_count integer DEFAULT 0 NOT NULL,
   id integer DEFAULT nextval('expai_conversation_id_seq'::text) NOT NULL,
@@ -62,9 +64,11 @@ CREATE TABLE IF NOT EXISTS expai_usage_log (
   rate_limits text,
   reasoning_tokens integer DEFAULT 0 NOT NULL,
   region character varying(10) DEFAULT ''::character varying NOT NULL,
-  reported_cost_micros integer DEFAULT 0 NOT NULL,
+  reported_cost_micros bigint DEFAULT '0' NOT NULL,
   request_debug text,
   requested_model_alias character varying(100) DEFAULT ''::character varying NOT NULL,
+  reserved_micros bigint DEFAULT '0' NOT NULL,
+  reserved_tokens integer DEFAULT 0 NOT NULL,
   retention character varying(10) DEFAULT ''::character varying NOT NULL,
   retries integer DEFAULT 0 NOT NULL,
   run_id integer DEFAULT 0 NOT NULL,
@@ -152,7 +156,7 @@ CREATE SEQUENCE IF NOT EXISTS expai_thread_id_seq
   MINVALUE 1
   CACHE 1;
 CREATE TABLE IF NOT EXISTS expai_thread (
-  cost_micros integer DEFAULT 0 NOT NULL,
+  cost_micros bigint DEFAULT '0' NOT NULL,
   created integer DEFAULT 0 NOT NULL,
   id integer DEFAULT nextval('expai_thread_id_seq'::text) NOT NULL,
   lane character varying(16) DEFAULT 'auto'::character varying NOT NULL,
@@ -166,7 +170,7 @@ CREATE TABLE IF NOT EXISTS expai_thread (
   "position" integer DEFAULT 0 NOT NULL,
   provider character varying(40) DEFAULT ''::character varying NOT NULL,
   requests integer DEFAULT 0 NOT NULL,
-  reserved_micros integer DEFAULT 0 NOT NULL,
+  reserved_micros bigint DEFAULT '0' NOT NULL,
   review_policy character varying(12) DEFAULT 'staged'::character varying NOT NULL,
   run_mode character varying(10) DEFAULT 'write'::character varying NOT NULL,
   scope_json text,
@@ -192,7 +196,7 @@ CREATE SEQUENCE IF NOT EXISTS expai_thread_run_id_seq
   CACHE 1;
 CREATE TABLE IF NOT EXISTS expai_thread_run (
   conversation_id integer DEFAULT 0 NOT NULL,
-  cost_micros integer DEFAULT 0 NOT NULL,
+  cost_micros bigint DEFAULT '0' NOT NULL,
   created integer DEFAULT 0 NOT NULL,
   finished integer DEFAULT 0 NOT NULL,
   id integer DEFAULT nextval('expai_thread_run_id_seq'::text) NOT NULL,
@@ -375,7 +379,7 @@ CREATE TABLE IF NOT EXISTS expai_chain_run (
   "chain" character varying(40) DEFAULT ''::character varying NOT NULL,
   chain_hash character varying(40) DEFAULT ''::character varying NOT NULL,
   class_identifier character varying(50) DEFAULT ''::character varying NOT NULL,
-  cost_micros integer DEFAULT 0 NOT NULL,
+  cost_micros bigint DEFAULT '0' NOT NULL,
   created integer DEFAULT 0 NOT NULL,
   current_step character varying(40) DEFAULT ''::character varying NOT NULL,
   data text,
@@ -409,7 +413,7 @@ CREATE SEQUENCE IF NOT EXISTS expai_chain_step_id_seq
   MINVALUE 1
   CACHE 1;
 CREATE TABLE IF NOT EXISTS expai_chain_step (
-  cost_micros integer DEFAULT 0 NOT NULL,
+  cost_micros bigint DEFAULT '0' NOT NULL,
   created integer DEFAULT 0 NOT NULL,
   finished integer DEFAULT 0 NOT NULL,
   id integer DEFAULT nextval('expai_chain_step_id_seq'::text) NOT NULL,

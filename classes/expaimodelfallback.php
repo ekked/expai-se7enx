@@ -27,6 +27,10 @@
  * permissions, the data policy) the first model of the user's allowed models that can; when none can, a message that
  * names why the requested model cannot answer. A request that asked for the site default itself never moves to
  * another provider: its failure is shown as before.
+ *
+ * A conversation carries the content it read (expAiConversation::readObjects()). choose() prefers a model whose
+ * provider may take all of it ($prefer, objectsAllow()); a model that may take only the open node is the second
+ * choice, and the conversation then goes on with the editor's words only (expAiAssistant::step()).
  */
 class expAiModelFallback
 {
@@ -110,19 +114,25 @@ class expAiModelFallback
      * The model that answers instead of $requested.
      * @return string the alias, '' when no model can (or when $requested is the site default)
      */
-    public static function choose( expAiConfig $config, $requested, $allows = null )
+    public static function choose( expAiConfig $config, $requested, $allows = null, $prefer = null )
     {
         $default = $config->model();
         if ( (string) $requested === $default )
             return '';
-        $candidates = array_merge( array( $default ), array_keys( $config->allowedModelRows() ) );
-        foreach ( array_values( array_unique( $candidates ) ) as $alias )
-        {
-            if ( $alias === '' || $alias === (string) $requested )
-                continue;
-            if ( self::preflight( $config, $alias, $allows ) === '' )
-                return $alias;
-        }
+        $candidates = array_values( array_unique( array_merge( array( $default ), array_keys( $config->allowedModelRows() ) ) ) );
+        // first a model that may take everything the conversation read, then one that may take the request itself
+        $checks = array();
+        if ( $prefer )
+            $checks[] = function ( $providerID ) use ( $allows, $prefer ) { return ( !$allows || call_user_func( $allows, $providerID ) ) && call_user_func( $prefer, $providerID ); };
+        $checks[] = $allows;
+        foreach ( $checks as $check )
+            foreach ( $candidates as $alias )
+            {
+                if ( $alias === '' || $alias === (string) $requested )
+                    continue;
+                if ( self::preflight( $config, $alias, $check ) === '' )
+                    return $alias;
+            }
         return '';
     }
 
@@ -210,7 +220,7 @@ class expAiModelFallback
      * @return array( string alias, array|null fallback (describe()) )
      * @throws expAiException when no model can take it
      */
-    public static function resolve( expAiConfig $config, $requested, $allows = null )
+    public static function resolve( expAiConfig $config, $requested, $allows = null, $prefer = null )
     {
         $requested = (string) $requested;
         // switched off: as before (a model the user may not use any more silently becomes the default)
@@ -220,7 +230,7 @@ class expAiModelFallback
         // the site default itself never moves to another provider: its failure is shown as before
         if ( $reason === '' || $requested === $config->model() )
             return array( $requested, null );
-        $used = self::choose( $config, $requested, $allows );
+        $used = self::choose( $config, $requested, $allows, $prefer );
         if ( $used === '' )
             throw self::noneLeft( $config, $requested, $reason );
         return array( $used, self::describe( $config, $requested, $used, $reason ) );
@@ -294,6 +304,47 @@ class expAiModelFallback
                 return false;
             }
         };
+    }
+
+    /**
+     * The data policy check of the objects a conversation read, for choose().
+     * @param int[] $objectIDs
+     * @param bool $untracked the conversation holds content its list does not cover (no provider passes then)
+     * @return callable|null function( string $providerID ): bool; null when there are none
+     */
+    public static function objectsAllow( expAiConfig $config, array $objectIDs, $untracked = false )
+    {
+        // content the conversation cannot account for: no provider is known to be allowed it
+        if ( $untracked )
+            return function ( $providerID ) { return false; };
+        if ( !$objectIDs )
+            return null;
+        return function ( $providerID ) use ( $config, $objectIDs )
+        {
+            return expAiModelFallback::objectsAllowed( $config, $providerID, $objectIDs );
+        };
+    }
+
+    /**
+     * Does the data policy of a provider let every one of these objects go to it? An object that no longer exists
+     * is not content any more and does not count.
+     * @param int[] $objectIDs
+     * @param callable|null $fetch function( int $id ): eZContentObject|null (default eZContentObject::fetch)
+     * @param expAiDataPolicy|null $policy the provider's policy (default expAiDataPolicy::forProvider())
+     * @return bool
+     */
+    public static function objectsAllowed( expAiConfig $config, $providerID, array $objectIDs, $fetch = null, $policy = null )
+    {
+        if ( !$objectIDs )
+            return true;
+        $policy = $policy ?: expAiDataPolicy::forProvider( $config, (string) $providerID );
+        foreach ( array_unique( array_map( 'intval', $objectIDs ) ) as $id )
+        {
+            $object = $fetch ? call_user_func( $fetch, $id ) : eZContentObject::fetch( $id );
+            if ( is_object( $object ) && !$policy->allowsObject( $object ) )
+                return false;
+        }
+        return true;
     }
 
     /** @return callable the data policy check of an object */

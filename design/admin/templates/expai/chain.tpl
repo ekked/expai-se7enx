@@ -47,7 +47,11 @@
         </table>
 {include name=navigator uri='design:navigator/google.tpl' page_uri='/expai/chain' item_count=$total view_parameters=hash( 'offset', $offset ) item_limit=$limit}
 {else}
+{if $ready}
         <p class="exp-ai-hint">{'No runs yet. Start one from the Intelligence tab of a page ("Write with a chain") or from Start writing on the dashboard.'|i18n( 'extension/expai/chain' )}</p>
+{else}
+        <p class="exp-ai-hint">{'No runs yet.'|i18n( 'extension/expai/chain' )}</p>
+{/if}
 {/if}
     </section>
 </div>

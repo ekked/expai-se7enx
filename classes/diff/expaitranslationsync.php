@@ -493,7 +493,7 @@ class expAiTranslationSync
     /** @return bool whether a queue job has not ended */
     public static function jobActive( $uuid )
     {
-        if ( (string) $uuid === '' || !class_exists( 'expQueue' ) )
+        if ( (string) $uuid === '' || !expAiQueue::available() )
             return false;
         $job = expQueue::fetch( (string) $uuid );
         return $job && !in_array( (string) $job->attribute( 'state' ), array( 'done', 'dead', 'cancelled' ), true );
@@ -582,7 +582,7 @@ class expAiTranslationSync
             $row['stale'] = isset( $row['to_version'] ) && (int) $row['to_version'] !== (int) $object->attribute( 'current_version' )
                             && !in_array( $row['state'], array( 'queued', 'held' ), true );
             $row['job_state'] = '';
-            if ( $row['job_uuid'] !== '' && class_exists( 'expQueue' ) )
+            if ( $row['job_uuid'] !== '' && expAiQueue::available() )
             {
                 $job = expQueue::fetch( $row['job_uuid'] );
                 if ( $job )

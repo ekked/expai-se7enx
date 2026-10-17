@@ -21,7 +21,7 @@
 .exp-ai-wc-meta strong { color: var(--a4-ink, inherit); }
 .exp-ai-wc-status { min-height: 1.2em; margin: 0.4em 0; font-size: 0.9em; }
 .exp-ai-wc-status-ok { color: var(--exp-ai-ok); }
-.exp-ai-wc-status-warn { color: var(--exp-ai-accent); font-weight: 600; }
+.exp-ai-wc-status-warn { color: var(--exp-ai-accent-text); font-weight: 600; }
 .exp-ai-wc-status-error { color: var(--exp-ai-error); }
 .exp-ai-wc-none, .exp-ai-wc-hint, .exp-ai-wc-keys { color: var(--exp-ai-muted); font-size: 0.85em; }
 .exp-ai-wc-hint { margin: 0.2em 0; }
@@ -54,4 +54,10 @@
 @media (max-width: 520px) {
     .exp-ai-wc { width: calc(100vw - 1em); padding: 0.8em; }
     .exp-ai-wc-btn { white-space: normal; }
+}
+
+@media (forced-colors: active) {
+    .exp-ai-wc-line del, .exp-ai-wc-line ins { forced-color-adjust: none; }
+    .exp-ai-wc-line del { text-decoration: line-through; }
+    .exp-ai-wc-line ins { text-decoration: underline; }
 }

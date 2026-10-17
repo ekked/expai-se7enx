@@ -83,7 +83,7 @@ class expAiPolicy
     public function serviceDomains()
     {
         $out = array();
-        if ( class_exists( 'expServicesCatalog' ) )
+        if ( expAiServiceTools::available() )
             foreach ( expServicesCatalog::domainClasses() as $domain => $class )
                 $out[] = array( 'id' => (string) $domain, 'name' => (string) $domain );
         return $out;

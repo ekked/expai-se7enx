@@ -150,13 +150,16 @@ abstract class expAiVectorCoreTestCase extends expAiTestCase
         // a guard: the threads of the test logged requests of the stub provider only
         $foreign = array();
         $db = eZDB::instance();
-        while ( $db->transactionCounter() > 0 )
+        // a second guard: the code under test closed every transaction it opened
+        $open = $db->transactionCounter();
+        if ( $open > 0 )
             $db->rollback();
         $rows = $db->arrayQuery( 'SELECT u.id, u.provider FROM expai_usage_log u, expai_thread t WHERE u.thread_id = t.id AND u.id > ' . (int) $this->usageBefore
                                  . " AND t.title LIKE 'XTB %' AND u.provider <> 'xtb'" );
         foreach ( (array) $rows as $row )
             $foreign[] = implode( ':', $row );
         parent::tearDown();
+        $this->assertSame( 0, $open, 'the test left a transaction open' );
         $this->assertSame( array(), $foreign, 'a request reached a provider other than the stub' );
     }
 

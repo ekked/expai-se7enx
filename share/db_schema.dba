@@ -256,8 +256,8 @@ $schema = array (
       ),
       'cost_micros' => 
       array (
-        'length' => 11,
-        'type' => 'int',
+        'length' => 20,
+        'type' => 'bigint',
         'not_null' => '1',
         'default' => 0,
       ),
@@ -439,8 +439,8 @@ $schema = array (
     array (
       'cost_micros' => 
       array (
-        'length' => 11,
-        'type' => 'int',
+        'length' => 20,
+        'type' => 'bigint',
         'not_null' => '1',
         'default' => 0,
       ),
@@ -898,6 +898,20 @@ $schema = array (
     'name' => 'expai_conversation',
     'fields' => 
     array (
+      'busy_owner' => 
+      array (
+        'length' => 60,
+        'type' => 'varchar',
+        'not_null' => '1',
+        'default' => '',
+      ),
+      'busy_until' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
+      ),
       'created' => 
       array (
         'length' => 11,
@@ -1496,8 +1510,8 @@ $schema = array (
     array (
       'cost_micros' => 
       array (
-        'length' => 11,
-        'type' => 'int',
+        'length' => 20,
+        'type' => 'bigint',
         'not_null' => '1',
         'default' => 0,
       ),
@@ -1592,8 +1606,8 @@ $schema = array (
       ),
       'reserved_micros' => 
       array (
-        'length' => 11,
-        'type' => 'int',
+        'length' => 20,
+        'type' => 'bigint',
         'not_null' => '1',
         'default' => 0,
       ),
@@ -1800,8 +1814,8 @@ $schema = array (
       ),
       'cost_micros' => 
       array (
-        'length' => 11,
-        'type' => 'int',
+        'length' => 20,
+        'type' => 'bigint',
         'not_null' => '1',
         'default' => 0,
       ),
@@ -2144,8 +2158,8 @@ $schema = array (
       ),
       'reported_cost_micros' => 
       array (
-        'length' => 11,
-        'type' => 'int',
+        'length' => 20,
+        'type' => 'bigint',
         'not_null' => '1',
         'default' => 0,
       ),
@@ -2160,6 +2174,20 @@ $schema = array (
         'type' => 'varchar',
         'not_null' => '1',
         'default' => '',
+      ),
+      'reserved_micros' => 
+      array (
+        'length' => 20,
+        'type' => 'bigint',
+        'not_null' => '1',
+        'default' => 0,
+      ),
+      'reserved_tokens' => 
+      array (
+        'length' => 11,
+        'type' => 'int',
+        'not_null' => '1',
+        'default' => 0,
       ),
       'retention' => 
       array (

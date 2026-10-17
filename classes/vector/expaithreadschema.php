@@ -61,7 +61,7 @@ class expAiThreadSchema
         $schema['expai_thread'] = array(
             'name' => 'expai_thread',
             'fields' => array(
-                'cost_micros' => $int,
+                'cost_micros' => expAiSchema::BIGINT,
                 'created' => $int,
                 'id' => $id,
                 'lane' => $varchar( 16, 'auto' ),
@@ -75,7 +75,7 @@ class expAiThreadSchema
                 'position' => $int,
                 'provider' => $varchar( 40 ),
                 'requests' => $int,
-                'reserved_micros' => $int,
+                'reserved_micros' => expAiSchema::BIGINT,
                 'review_policy' => $varchar( 12, 'staged' ),
                 'run_mode' => $varchar( 10, 'write' ),
                 'scope_json' => $text,
@@ -99,7 +99,7 @@ class expAiThreadSchema
             'name' => 'expai_thread_run',
             'fields' => array(
                 'conversation_id' => $int,
-                'cost_micros' => $int,
+                'cost_micros' => expAiSchema::BIGINT,
                 'created' => $int,
                 'finished' => $int,
                 'id' => $id,

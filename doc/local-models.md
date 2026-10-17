@@ -78,7 +78,8 @@ The web process never runs a command. A button writes a request `<id>.json` into
 (`{action, model, requested_by_user_id, ts}`) and logs it to `var/log/expai-models.log`; `expai-llm-helper.path` starts
 the root-owned helper, which handles one request at a time: fixed actions only (start, stop, pull, remove,
 refresh_status), the model must be in `/etc/expai-llm/models.allow` (root-owned, not writable by others), requests
-older than 10 minutes, larger than 4 KB or malformed are dropped, a pull needs 20 GB free, and every action goes to the
+older than 10 minutes, larger than 4 KB, not a regular file (a link is not followed: the file is opened with
+`O_NOFOLLOW` and checked on the open handle) or malformed are dropped, a pull needs 20 GB free, and every action goes to the
 journal (`journalctl -u expai-llm-helper`). The helper writes `/var/lib/expai-llm/status.json` for the view.
 
 `expai-llm-idle.timer` runs every 5 minutes and stops Ollama after 30 minutes without a loaded model (Ollama itself

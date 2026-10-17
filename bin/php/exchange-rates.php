@@ -10,6 +10,9 @@
  * [Pricing] ExchangeRatesMaxAgeHours) and by the cronjob part expai_exchange_rates.php. A failed fetch keeps the last
  * rates and says so.
  *
+ * -s <siteaccess> is mandatory: the script prints the siteaccess and its database (stderr) and does not run
+ * where expai is not active (expAiScript).
+ *
  * @copyright Copyright (C) 1998 - 2026 7x & Exponential Foundation. All rights reserved.
  * @license GNU General Public License v2.0 (or any later version)
  * @package expai
@@ -23,7 +26,9 @@ $script = eZScript::instance( array( 'description' => "Exchange rates of Exponen
                                      'use-session' => false, 'use-modules' => true, 'use-extensions' => true ) );
 $script->startup();
 $options = $script->getOptions( '[show]', '', array( 'show' => 'only print the stored rates and the rates in use' ) );
+expAiScript::requireSiteAccess( $script, $options );
 $script->initialize();
+expAiScript::announce( $script );
 
 $config = expAiConfig::instance();
 expAiExchangeRates::disableRefresh();

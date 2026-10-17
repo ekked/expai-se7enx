@@ -41,18 +41,7 @@ class expAiPlanner
         foreach ( array_slice( array_values( $raw ), 0, $max ) as $n => $in )
         {
             $in = is_array( $in ) ? $in : array();
-            $action = isset( $in['action'] ) && in_array( $in['action'], self::$actions, true ) ? (string) $in['action'] : 'update';
-            $languages = array_values( array_unique( array_filter( array_map( 'strval', isset( $in['languages'] ) ? (array) $in['languages'] : array() ),
-                function ( $l ) { return preg_match( '/^[a-z]{3}-[A-Z]{2}$/', $l ) === 1; } ) ) );
-            $fields = array_values( array_unique( array_filter( array_map( 'strval', isset( $in['fields'] ) ? (array) $in['fields'] : array() ),
-                function ( $f ) { return preg_match( '/^[A-Za-z0-9_]{1,100}$/', $f ) === 1; } ) ) );
-            $item = array( 'index' => $n, 'action' => $action,
-                           'target' => array( 'node_id' => isset( $in['node_id'] ) ? (int) $in['node_id'] : 0, 'object_id' => isset( $in['object_id'] ) ? (int) $in['object_id'] : 0,
-                                              'parent_node_id' => isset( $in['parent_node_id'] ) ? (int) $in['parent_node_id'] : 0 ),
-                           'target_name' => '', 'class' => isset( $in['class'] ) ? mb_substr( (string) $in['class'], 0, 100, 'UTF-8' ) : '',
-                           'languages' => $languages, 'fields' => array_slice( $fields, 0, 30 ),
-                           'summary' => expAiText::cut( expAiText::oneLine( isset( $in['summary'] ) ? (string) $in['summary'] : '' ), 500 ),
-                           'refused' => '', 'selected' => true );
+            $item = self::newItem( $in, $n );
             $item['refused'] = self::check( $thread, $item, $siteLanguages, $scope );
             if ( $item['refused'] === '' || $item['target_name'] === '' )
                 $item['target_name'] = self::targetName( $item );
@@ -62,6 +51,29 @@ class expAiPlanner
             $items[] = $item;
         }
         return self::autoDependencies( $items );
+    }
+
+    /**
+     * An item of the tool input in the stored form, not yet checked (no database is read).
+     * @param array $in an item of the tool input
+     * @param int $n its index
+     * @return array index, action, target (node_id, object_id, parent_node_id), target_name, class, languages, fields,
+     *               summary, refused, selected
+     */
+    public static function newItem( array $in, $n )
+    {
+        $action = isset( $in['action'] ) && in_array( $in['action'], self::$actions, true ) ? (string) $in['action'] : 'update';
+        $languages = array_values( array_unique( array_filter( array_map( 'strval', isset( $in['languages'] ) ? (array) $in['languages'] : array() ),
+            function ( $l ) { return preg_match( '/^[a-z]{3}-[A-Z]{2}$/', $l ) === 1; } ) ) );
+        $fields = array_values( array_unique( array_filter( array_map( 'strval', isset( $in['fields'] ) ? (array) $in['fields'] : array() ),
+            function ( $f ) { return preg_match( '/^[A-Za-z0-9_]{1,100}$/', $f ) === 1; } ) ) );
+        return array( 'index' => (int) $n, 'action' => $action,
+                      'target' => array( 'node_id' => isset( $in['node_id'] ) ? (int) $in['node_id'] : 0, 'object_id' => isset( $in['object_id'] ) ? (int) $in['object_id'] : 0,
+                                         'parent_node_id' => isset( $in['parent_node_id'] ) ? (int) $in['parent_node_id'] : 0 ),
+                      'target_name' => '', 'class' => isset( $in['class'] ) ? mb_substr( (string) $in['class'], 0, 100, 'UTF-8' ) : '',
+                      'languages' => $languages, 'fields' => array_slice( $fields, 0, 30 ),
+                      'summary' => expAiText::cut( expAiText::oneLine( isset( $in['summary'] ) ? (string) $in['summary'] : '' ), 500 ),
+                      'refused' => '', 'selected' => true );
     }
 
     /** @return int[] the earlier item indexes an input item names in depends_on (1-based numbers, or indexes as stored) */
@@ -202,25 +214,34 @@ class expAiPlanner
         };
         $db = eZDB::instance();
         $db->begin();
-        foreach ( (array) eZPersistentObject::fetchObjectList( expAiPlan::definition(), null, array( 'thread_id' => (int) $thread->attribute( 'id' ), 'state' => 'proposed' ) ) as $old )
+        try
         {
-            $old->setAttribute( 'state', 'superseded' );
-            $old->setAttribute( 'modified', time() );
-            $old->store();
+            foreach ( (array) eZPersistentObject::fetchObjectList( expAiPlan::definition(), null, array( 'thread_id' => (int) $thread->attribute( 'id' ), 'state' => 'proposed' ) ) as $old )
+            {
+                $old->setAttribute( 'state', 'superseded' );
+                $old->setAttribute( 'modified', time() );
+                $old->store();
+            }
+            $now = time();
+            $plan = new expAiPlan( array( 'thread_id' => (int) $thread->attribute( 'id' ), 'state' => 'proposed', 'created' => $now, 'modified' => $now ) );
+            $plan->setItems( $items );
+            $estimate = ( new expAiPlanEstimate( $config ) )->estimate( $plan->runnableItems(), self::alias( $thread, $config ), (string) $thread->attribute( 'lane' ), $thread );
+            $estimate['meta'] = array( 'assumptions' => $list( 'assumptions' ), 'questions' => $list( 'questions' ), 'risks' => $list( 'risks' ), 'model' => (string) $model );
+            $plan->setEstimate( $estimate );
+            $plan->store();
+            $thread->addEvent( 'plan', array( 'plan_id' => (int) $plan->attribute( 'id' ), 'items' => count( $items ),
+                                              'refused' => count( array_filter( $items, function ( $i ) { return $i['refused'] !== ''; } ) ),
+                                              'expected_micros' => (int) $estimate['expected_micros'] ) );
+            $thread->touch();
+            $thread->store();
+            $db->commit();
         }
-        $now = time();
-        $plan = new expAiPlan( array( 'thread_id' => (int) $thread->attribute( 'id' ), 'state' => 'proposed', 'created' => $now, 'modified' => $now ) );
-        $plan->setItems( $items );
-        $estimate = ( new expAiPlanEstimate( $config ) )->estimate( $plan->runnableItems(), self::alias( $thread, $config ), (string) $thread->attribute( 'lane' ), $thread );
-        $estimate['meta'] = array( 'assumptions' => $list( 'assumptions' ), 'questions' => $list( 'questions' ), 'risks' => $list( 'risks' ), 'model' => (string) $model );
-        $plan->setEstimate( $estimate );
-        $plan->store();
-        $thread->addEvent( 'plan', array( 'plan_id' => (int) $plan->attribute( 'id' ), 'items' => count( $items ),
-                                          'refused' => count( array_filter( $items, function ( $i ) { return $i['refused'] !== ''; } ) ),
-                                          'expected_micros' => (int) $estimate['expected_micros'] ) );
-        $thread->touch();
-        $thread->store();
-        $db->commit();
+        catch ( Throwable $e )
+        {
+            if ( $db->transactionCounter() > 0 )
+                $db->rollback();
+            throw $e;
+        }
         return $plan;
     }
 

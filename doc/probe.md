@@ -19,10 +19,10 @@ text into its answer instead), and a write tool it names anyway is refused when 
 ## Running the probe
 
 ```
-php extension/expai/bin/php/expaiprobe.php --list                         the models and their latest live probe
-php extension/expai/bin/php/expaiprobe.php --model=<alias>                dry run: the tasks and the first request body
+php extension/expai/bin/php/expaiprobe.php --list -s admin                the models and their latest live probe
+php extension/expai/bin/php/expaiprobe.php --model=<alias> -s admin       dry run: the tasks and the first request body
 php extension/expai/bin/php/expaiprobe.php --model=<alias> --live -s admin --login=admin
-php extension/expai/bin/php/expaiprobe.php --model=<alias> --base-url=http://127.0.0.1:18358/hf/v1   a test server (mode mock)
+php extension/expai/bin/php/expaiprobe.php --model=<alias> --base-url=http://127.0.0.1:18358/hf/v1 -s admin   a test server (mode mock)
 ```
 
 Run it with the siteaccess whose settings define the model (`-s admin`). `--login` names the user the requests are

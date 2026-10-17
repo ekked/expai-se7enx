@@ -1,9 +1,9 @@
 {* expai/models: providers, models, probe results, MCP and the local model server (policy expai/model_manage). Never shows a key. *}
 {ezscript_require( array( 'expai_models.js' ) )}
 <div class="exp-ai exp-ai-models-page" data-exp-ai-models="1" data-poll="{$poll_ms|wash}">
-    <script type="application/json" class="exp-ai-models-strings">{json_encode( hash(
+    <script type="application/json" class="exp-ai-models-strings">{hash(
         'starting', 'Queueing…'|i18n( 'extension/expai/modeltest' ),
-        'failed', 'The request failed: %error'|i18n( 'extension/expai/modeltest' ) ) )}</script>
+        'failed', 'The request failed: %error'|i18n( 'extension/expai/modeltest' ) )|expai_json}</script>
     <header class="exp-ai-head">
         <span class="exp-ai-mark" aria-hidden="true"></span>
         <div>
@@ -28,7 +28,7 @@
             <div><dt>{'Type'|i18n( 'extension/expai/models' )}</dt><dd>{$p.type|wash}{if $p.flavor} / {$p.flavor|wash}{/if}</dd></div>
             <div><dt>{'Host'|i18n( 'extension/expai/models' )}</dt><dd>{$p.host|wash}</dd></div>
             <div><dt>{'Region'|i18n( 'extension/expai/models' )}</dt><dd>{if $p.region}{$p.region|upcase|wash}{else}{'unknown'|i18n( 'extension/expai/models' )}{/if}</dd></div>
-            <div><dt>{'Retention'|i18n( 'extension/expai/models' )}</dt><dd>{$p.retention|wash}</dd></div>
+            <div><dt>{'Retention'|i18n( 'extension/expai/models' )}</dt><dd>{$p.retention|expai_retention|wash}</dd></div>
             <div><dt>{'Terms checked'|i18n( 'extension/expai/models' )}</dt><dd>{if $p.terms_checked_at}{$p.terms_checked_at|wash}{else}{'not checked'|i18n( 'extension/expai/models' )}{/if}</dd></div>
 {if $p.exchange}
             <div><dt>{'Prices'|i18n( 'extension/expai/models' )}</dt><dd>{if $p.exchange.rate}{'1 %currency = %rate %site'|i18n( 'extension/expai/models',, hash( '%currency', $p.exchange.currency, '%rate', $p.exchange.rate, '%site', $p.exchange.site ) )|wash}<br /><small>{if eq( $p.exchange.source, 'ecb' )}{'ECB reference rate of %date'|i18n( 'extension/expai/models',, hash( '%date', $p.exchange.date ) )|wash}{else}{'rate from the settings (%date)'|i18n( 'extension/expai/models',, hash( '%date', $p.exchange.date ) )|wash}{/if}</small>{else}<span class="exp-ai-step-failed">{'%currency: no exchange rate, cost unknown'|i18n( 'extension/expai/models',, hash( '%currency', $p.exchange.currency ) )|wash}</span>{/if}</dd></div>

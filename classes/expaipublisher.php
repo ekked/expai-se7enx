@@ -155,19 +155,28 @@ class expAiPublisher
             throw new expAiException( 'You may not remove this draft.' );
         $db = eZDB::instance();
         $db->begin();
-        $auditVersion = array( 'version' => (int) $version->attribute( 'version' ), 'status' => (int) $version->attribute( 'status' ),
-                               'language' => (string) $version->initialLanguageCode() );
-        $name = (string) $object->attribute( 'name' );
-        if ( class_exists( 'expAuditHook' ) )
-            expAuditHook::muted( 'content.object.purge', function () use ( $version ) { $version->removeThis(); } );
-        else
-            $version->removeThis();
-        if ( class_exists( 'expAuditHook' ) )
-            expAuditHook::emit( 'content.version.remove', array(
-                'object' => array( 'type' => 'version', 'id' => (string) $auditVersion['version'], 'object_id' => (int) $objectID,
-                                   'name' => $name !== '' ? $name : null ),
-                'before' => array( 'versions' => array( $auditVersion ), 'discard' => true ) ) );
-        $db->commit();
+        try
+        {
+            $auditVersion = array( 'version' => (int) $version->attribute( 'version' ), 'status' => (int) $version->attribute( 'status' ),
+                                   'language' => (string) $version->initialLanguageCode() );
+            $name = (string) $object->attribute( 'name' );
+            if ( class_exists( 'expAuditHook' ) )
+                expAuditHook::muted( 'content.object.purge', function () use ( $version ) { $version->removeThis(); } );
+            else
+                $version->removeThis();
+            if ( class_exists( 'expAuditHook' ) )
+                expAuditHook::emit( 'content.version.remove', array(
+                    'object' => array( 'type' => 'version', 'id' => (string) $auditVersion['version'], 'object_id' => (int) $objectID,
+                                       'name' => $name !== '' ? $name : null ),
+                    'before' => array( 'versions' => array( $auditVersion ), 'discard' => true ) ) );
+            $db->commit();
+        }
+        catch ( Throwable $e )
+        {
+            if ( $db->transactionCounter() > 0 )
+                $db->rollback();
+            throw $e;
+        }
         $log->setStatus( expAiDraftLog::STATUS_DISCARDED );
         return array( 'status' => expAiDraftLog::STATUS_DISCARDED );
     }

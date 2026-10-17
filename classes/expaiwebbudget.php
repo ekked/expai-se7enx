@@ -47,7 +47,7 @@ class expAiWebBudget
         $config = $config ?: expAiConfig::instance();
         $min = $config->int( 'WebBudget', 'MinSamples', 5, 1, 20 );
         $rows = eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), array( 'latency_ms' ),
-            array( 'model_alias' => (string) $alias, 'error_class' => '' ), array( 'id' => 'desc' ), array( 'offset' => 0, 'length' => 20 ), false );
+            expAiUsage::requestsOnly( array( 'model_alias' => (string) $alias, 'error_class' => '' ) ), array( 'id' => 'desc' ), array( 'offset' => 0, 'length' => 20 ), false );
         $rows = is_array( $rows ) ? $rows : array();
         if ( count( $rows ) < $min )
             return null;

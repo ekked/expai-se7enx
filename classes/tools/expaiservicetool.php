@@ -171,7 +171,7 @@ class expAiServiceTool extends expAiTool
     /** The content the arguments name must be allowed by the data policy. */
     protected function checkArguments( array $input, expAiContentReader $reader )
     {
-        if ( !$reader->policy() )
+        if ( !$reader->filters() )
             return;
         foreach ( self::CONTENT_ARGUMENTS as $name => $kind )
         {
@@ -215,7 +215,7 @@ class expAiServiceTool extends expAiTool
         }
         $data = array_key_exists( 'data', $envelope ) ? $envelope['data'] : null;
         $withheld = 0;
-        if ( $context->reader->policy() && is_array( $data ) )
+        if ( $context->reader->filters() && is_array( $data ) )
         {
             if ( ( $object = self::rowObject( $data ) ) )
                 $context->reader->assertAllowed( $object );

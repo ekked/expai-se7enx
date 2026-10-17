@@ -166,10 +166,8 @@ class expAiImageInput
             else
                 imagejpeg( $target, null, $quality );
             $out = (string) ob_get_clean();
-            imagedestroy( $target );
             if ( strlen( $out ) <= (int) $limits['max_bytes'] )
             {
-                imagedestroy( $source );
                 $image->mediaType = $alpha ? 'image/png' : 'image/jpeg';
                 $image->data = $out;
                 $image->width = $w;
@@ -185,7 +183,6 @@ class expAiImageInput
             if ( $edge < 64 )
                 break;
         }
-        imagedestroy( $source );
         throw new expAiException( 'The image could not be made small enough to be sent.' );
     }
 

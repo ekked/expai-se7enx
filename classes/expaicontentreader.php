@@ -11,7 +11,9 @@
  * Nodes, objects, fields and classes as small arrays for the assistant to read. Every fetch goes through the
  * kernel's permission checks of the current user (canRead, subTree with the user's limitations), and, with a data
  * policy set (setPolicy()), through the policy of the provider the content goes to: a node it keeps away is refused,
- * lists leave such objects out and say how many.
+ * lists leave such objects out and say how many. The rules of [RequestVeto] that name content (Sections[], Classes[],
+ * Subtrees[]) apply to every object read the same way (expAiGate::objectVeto()): a vetoed object is refused, or left
+ * out of a list with the rule's reason.
  */
 class expAiContentReader
 {
@@ -21,8 +23,17 @@ class expAiContentReader
     /** @var expAiDataPolicy|null */
     protected $policy;
 
-    /** @var int objects the policy left out of lists */
+    /** @var int objects the policy or the veto left out of lists */
     public $withheld = 0;
+
+    /** @var array what is known of the request for the veto: siteaccess, provider, region, purpose */
+    protected $request = array();
+
+    /** @var array object id => array( reason, source ) of the veto */
+    protected $vetoes = array();
+
+    /** @var int[] the objects this reader let through (object id => id): their content may reach the provider */
+    public $read = array();
 
     public function __construct( ?expAiConfig $config = null, ?expAiDataPolicy $policy = null )
     {
@@ -33,6 +44,35 @@ class expAiContentReader
     public function setPolicy( ?expAiDataPolicy $policy )
     {
         $this->policy = $policy;
+        $this->vetoes = array();
+    }
+
+    /**
+     * What is known of the request, for the veto of each object read (siteaccess, provider, region, purpose). The
+     * provider and its region default to those of the data policy.
+     */
+    public function setRequest( array $request )
+    {
+        $this->request = $request;
+        $this->vetoes = array();
+    }
+
+    /**
+     * @return string the reason of the [RequestVeto] rule that refuses the object ('' when none does)
+     */
+    public function vetoReason( eZContentObject $object )
+    {
+        $id = (int) $object->attribute( 'id' );
+        if ( !isset( $this->vetoes[$id] ) )
+        {
+            $request = $this->request;
+            if ( $this->policy && !isset( $request['provider'] ) )
+                $request['provider'] = $this->policy->providerID();
+            if ( $this->policy && !isset( $request['region'] ) )
+                $request['region'] = $this->policy->providerRegion();
+            $this->vetoes[$id] = expAiGate::objectVeto( $object, $request, $this->config );
+        }
+        return $this->vetoes[$id][0];
     }
 
     /** @return expAiDataPolicy|null */
@@ -41,17 +81,50 @@ class expAiContentReader
         return $this->policy;
     }
 
-    /** @throws expAiException when the data policy keeps the object away from the provider */
+    /**
+     * @return bool something keeps objects away from the provider: a data policy is set, or a [RequestVeto] rule names
+     *              content (results of services and bridges are then filtered row by row)
+     */
+    public function filters()
+    {
+        return $this->policy !== null || expAiGate::hasContentRules( $this->config );
+    }
+
+    /** @throws expAiException when the data policy keeps the object away from the provider, or the veto refuses it */
     public function assertAllowed( eZContentObject $object )
     {
         if ( $this->policy )
             $this->policy->assertObject( $object );
+        $reason = $this->vetoReason( $object );
+        if ( $reason !== '' )
+            throw new expAiException( 'This request was refused: %reason', 'veto (object ' . (int) $object->attribute( 'id' ) . ', '
+                                      . $this->vetoes[(int) $object->attribute( 'id' )][1] . ')', 403, array( '%reason' => $reason ) );
+        $this->noteRead( $object );
     }
 
-    /** @return bool the data policy lets the object go to the provider */
+    /** @return bool the data policy lets the object go to the provider, and no veto refuses it */
     public function allowed( eZContentObject $object )
     {
-        return !$this->policy || $this->policy->allowsObject( $object );
+        $allowed = ( !$this->policy || $this->policy->allowsObject( $object ) ) && $this->vetoReason( $object ) === '';
+        if ( $allowed )
+            $this->noteRead( $object );
+        return $allowed;
+    }
+
+    /** Notes an object whose content may reach the provider (see $read) */
+    public function noteRead( $object )
+    {
+        $id = is_object( $object ) && method_exists( $object, 'attribute' ) ? (int) $object->attribute( 'id' ) : (int) $object;
+        if ( $id > 0 )
+            $this->read[$id] = $id;
+    }
+
+    /** @return int[] the objects noted since the last call, and forgets them */
+    public function takeRead()
+    {
+        $ids = array_values( $this->read );
+        $this->read = array();
+        return $ids;
     }
 
     /** @return int */
@@ -150,20 +223,38 @@ class expAiContentReader
                 return '[file]';
             case 'ezobjectrelation':
             case 'ezobjectrelationlist':
-                $names = array();
-                foreach ( array_filter( explode( '-', (string) $attribute->toString() ) ) as $id )
-                {
-                    $related = eZContentObject::fetch( (int) $id );
-                    if ( $related && $related->canRead() )
-                        $names[] = $related->attribute( 'name' ) . ' (object ' . (int) $id . ')';
-                }
-                return expAiText::cut( implode( '; ', $names ), $max );
+                return $this->relationValue( (string) $attribute->toString(), $max );
             case 'ezuser':
             case 'ezpassword':
                 return '[account data]';
             default:
                 return expAiText::cut( (string) $attribute->toString(), $max );
         }
+    }
+
+    /**
+     * The value of an object relation field: the names of the related objects the user may read, as far as the data
+     * policy and the veto let them go to the provider; a related object they keep away is named by its id only.
+     * @param string $ids the field's toString(): object ids joined by "-"
+     * @return string
+     */
+    public function relationValue( $ids, $max )
+    {
+        $names = array();
+        foreach ( array_filter( explode( '-', (string) $ids ) ) as $id )
+        {
+            $related = $this->fetchRelated( (int) $id );
+            if ( !$related || !$related->canRead() )
+                continue;
+            $names[] = $this->allowed( $related ) ? $related->attribute( 'name' ) . ' (object ' . (int) $id . ')' : '(object ' . (int) $id . ' withheld)';
+        }
+        return expAiText::cut( implode( '; ', $names ), $max );
+    }
+
+    /** @return eZContentObject|null */
+    protected function fetchRelated( $objectID )
+    {
+        return eZContentObject::fetch( (int) $objectID ) ?: null;
     }
 
     /**
@@ -273,12 +364,14 @@ class expAiContentReader
         return $out;
     }
 
-    /** @return array the node in a few fields; only its id when the data policy keeps it away */
+    /** @return array the node in a few fields; only its id (and why) when the data policy or the veto keeps it away */
     public function shortNode( eZContentObjectTreeNode $node )
     {
         $object = $node->object();
-        if ( $object && !$this->allowed( $object ) )
+        if ( $object && $this->policy && !$this->policy->allowsObject( $object ) )
             return array( 'node_id' => (int) $node->attribute( 'node_id' ), 'withheld' => 'kept away by the data policy' );
+        if ( $object && ( $reason = $this->vetoReason( $object ) ) !== '' )
+            return array( 'node_id' => (int) $node->attribute( 'node_id' ), 'withheld' => 'refused: ' . $reason );
         return array(
             'node_id' => (int) $node->attribute( 'node_id' ),
             'object_id' => (int) $node->attribute( 'contentobject_id' ),

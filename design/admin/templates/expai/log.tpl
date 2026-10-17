@@ -116,7 +116,7 @@
                                 <td>{$r.iteration}</td>
                                 <td>{$r.created|l10n( 'shorttime' )}</td>
                                 <td>{$r.model|wash}{if $r.model_alias}<br /><small>{$r.model_alias|wash}{if and( $r.tool_mode, ne( $r.tool_mode, 'native' ) )} &middot; {$r.tool_mode|wash}{/if}</small>{/if}</td>
-                                <td>{if $r.region}{$r.region|upcase|wash}{if $r.retention} <small>({$r.retention|wash})</small>{/if}{else}-{/if}</td>
+                                <td>{if $r.region}{$r.region|upcase|wash}{if $r.retention} <small>({$r.retention|expai_retention|wash})</small>{/if}{else}-{/if}</td>
                                 <td>{$r.input_tokens} / {$r.output_tokens} / {$r.cache_write_tokens} / {$r.cache_read_tokens}</td>
                                 <td>{$r.stop_reason|wash}{if $r.retries} ({'%count retry'|i18n( 'extension/expai/log',, hash( '%count', $r.retries ) )}){/if}</td>
                                 <td>{$r.http_status}</td>

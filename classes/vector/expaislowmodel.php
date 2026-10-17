@@ -31,7 +31,7 @@ class expAiSlowModel
         $alias = (string) $alias;
         if ( array_key_exists( $alias, self::$latency ) )
             return self::$latency[$alias];
-        $rows = eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), array( 'latency_ms' ), array( 'model_alias' => $alias ),
+        $rows = eZPersistentObject::fetchObjectList( expAiUsageLog::definition(), array( 'latency_ms' ), expAiUsage::requestsOnly( array( 'model_alias' => $alias ) ),
                                                       array( 'id' => 'desc' ), array( 'offset' => 0, 'length' => 20 ), false );
         $values = array();
         foreach ( (array) $rows as $row )
@@ -143,41 +143,50 @@ class expAiSlowModel
         $now = time();
         $db = eZDB::instance();
         $db->begin();
-        $oldRun->setAttribute( 'state', 'stopped' );
-        $oldRun->setAttribute( 'finished', $now );
-        $oldRun->store();
-        $history = $old->history();
-        $keep = max( 1, (int) floor( $config->int( 'AssistantSettings', 'ContextWindowTurns', 8, 2, 100 ) / 2 ) );
-        $done = $history;
-        $pending = $old->awaitsAnswer() && $done ? array_pop( $done ) : null;
-        $messages = $done ? expAiAssistant::compact( $done, $keep ) : array();
-        if ( $pending )
-            $messages[] = array( 'role' => 'user', 'content' => array( array( 'type' => 'text', 'text' => (string) $pending['user'] ) ) );
-        $conversation = new expAiConversation( array( 'user_id' => (int) $old->attribute( 'user_id' ), 'node_id' => (int) $old->attribute( 'node_id' ),
-                                                      'messages' => '[]', 'created' => $now, 'modified' => $now ) );
-        // the exchanges as the editor saw them (the one under way keeps its steps; the new model continues it)
-        $conversation->setHistory( $history );
-        $conversation->setMessages( $messages );
-        $conversation->setWindowTurns( min( count( $done ), $keep ) + ( $pending ? 1 : 0 ) );
-        if ( (string) $old->scopeNote() !== '' )
-            $conversation->setScopeNote( $old->scopeNote() );
-        $conversation->setAttribute( 'thread_id', (int) $thread->attribute( 'id' ) );
-        $conversation->store();
-        $run = new expAiThreadRun( array( 'thread_id' => (int) $thread->attribute( 'id' ), 'conversation_id' => (int) $conversation->attribute( 'id' ),
-                                          'kind' => 'turn', 'state' => 'idle', 'label' => (string) $thread->attribute( 'title' ), 'model_alias' => $alias,
-                                          'lane' => (string) $thread->attribute( 'lane' ), 'created' => $now, 'modified' => $now ) );
-        $run->store();
-        $conversation->setAttribute( 'run_id', (int) $run->attribute( 'id' ) );
-        $conversation->store();
-        $model = $config->registry()->getModel( $alias );
-        $thread = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ) ?: $thread;
-        $thread->setAttribute( 'lead_run_id', (int) $run->attribute( 'id' ) );
-        $thread->setAttribute( 'model_alias', $alias );
-        $thread->setAttribute( 'provider', $model ? (string) $model['provider'] : '' );
-        $thread->setState( 'stopped', array( 'switched' => array( 'from' => $from, 'to' => $alias ) ) );
-        $thread->touch();
-        $thread->store();
-        $db->commit();
+        try
+        {
+            $oldRun->setAttribute( 'state', 'stopped' );
+            $oldRun->setAttribute( 'finished', $now );
+            $oldRun->store();
+            $history = $old->history();
+            $keep = max( 1, (int) floor( $config->int( 'AssistantSettings', 'ContextWindowTurns', 8, 2, 100 ) / 2 ) );
+            $done = $history;
+            $pending = $old->awaitsAnswer() && $done ? array_pop( $done ) : null;
+            $messages = $done ? expAiAssistant::compact( $done, $keep ) : array();
+            if ( $pending )
+                $messages[] = array( 'role' => 'user', 'content' => array( array( 'type' => 'text', 'text' => (string) $pending['user'] ) ) );
+            $conversation = new expAiConversation( array( 'user_id' => (int) $old->attribute( 'user_id' ), 'node_id' => (int) $old->attribute( 'node_id' ),
+                                                          'messages' => '[]', 'created' => $now, 'modified' => $now ) );
+            // the exchanges as the editor saw them (the one under way keeps its steps; the new model continues it)
+            $conversation->setHistory( $history );
+            $conversation->setMessages( $messages );
+            $conversation->setWindowTurns( min( count( $done ), $keep ) + ( $pending ? 1 : 0 ) );
+            if ( (string) $old->scopeNote() !== '' )
+                $conversation->setScopeNote( $old->scopeNote() );
+            $conversation->setAttribute( 'thread_id', (int) $thread->attribute( 'id' ) );
+            $conversation->store();
+            $run = new expAiThreadRun( array( 'thread_id' => (int) $thread->attribute( 'id' ), 'conversation_id' => (int) $conversation->attribute( 'id' ),
+                                              'kind' => 'turn', 'state' => 'idle', 'label' => (string) $thread->attribute( 'title' ), 'model_alias' => $alias,
+                                              'lane' => (string) $thread->attribute( 'lane' ), 'created' => $now, 'modified' => $now ) );
+            $run->store();
+            $conversation->setAttribute( 'run_id', (int) $run->attribute( 'id' ) );
+            $conversation->store();
+            $model = $config->registry()->getModel( $alias );
+            $thread = expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ) ?: $thread;
+            $thread->setAttribute( 'lead_run_id', (int) $run->attribute( 'id' ) );
+            $thread->setAttribute( 'model_alias', $alias );
+            $thread->setAttribute( 'provider', $model ? (string) $model['provider'] : '' );
+            $thread->setState( 'stopped', array( 'switched' => array( 'from' => $from, 'to' => $alias ) ) );
+            $thread->touch();
+            $thread->store();
+            $db->commit();
+        }
+        catch ( Throwable $e )
+        {
+            if ( $db->transactionCounter() > 0 )
+                $db->rollback();
+            throw $e;
+        }
         // the Intelligence tab runs on the user's model
         if ( $thread->attribute( 'origin' ) === expAiThread::ORIGIN_PANEL )
             eZPreferences::setValue( 'expai_model', $alias );
