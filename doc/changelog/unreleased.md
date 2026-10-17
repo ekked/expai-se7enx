@@ -59,6 +59,27 @@ reasoning markup, and gateways reject optional parameters.
 - **Locale**: the translation sync reason and the probe output use `%F` (a decimal comma under a German locale broke
   the stored reason).
 
+## Structure is never lost silently
+
+Field actions, presets, the Improve menu and "Fill the fields" replaced the whole value of a rich text field with the
+answer, which only has `p, h2-h4, strong, em, ul, ol, li, a href`: embedded objects and images, tables, custom tags,
+anchors, literals, internal links and formatting attributes were lost, and ezautosave stored the loss.
+
+- `expai_structure.js` (new, loaded before expai.js) counts the structure-bearing elements of an ezxmltext field and of
+  the answer, in the HTML of the Online Editor and of Tiptap and in the simplified XML alike: embedded objects, tables,
+  table cells, header cells, merged cells, custom tags, anchors, literals, internal links, and each formatting or link
+  attribute (`target`, `title`, a class ... also on external links). CDATA and the content of `script`, `style` and
+  literals are not read as markup; an unclosed embed does not hide the rest of the value.
+- Without the detector, every answer to a rich text field is shown for review; it is never written unseen.
+- When the answer has fewer of any kind, it is not written. The field's bar shows a review instead: the answer, what
+  would be lost ("2 embedded objects, 1 table would be lost."), and **Apply anyway**, **Keep the original** and
+  **Copy text**. Only **Apply anyway** writes, with Undo as before.
+- **Stale guard**: when a field changed while the answer was written, the answer is not written either; the same
+  review says so. This applies to every datatype, also to the parts of an xrowmetadata field.
+- `ExpAi.guardedApply()` is the extension point for scripts that write answers into fields themselves.
+- New strings in the context `extension/expai/edit`; a node test of the detector in `tests/js/`
+  ([edit-view-integration.md](../edit-view-integration.md#structure-is-never-lost-silently)).
+
 ## Upgrading
 
 - Live probe results stored before this update in which a mandatory task (`use_result`, `injection`, `create_draft`,

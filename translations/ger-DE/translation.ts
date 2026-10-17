@@ -1065,6 +1065,134 @@
         <source>Exponential Intelligence suggested no values.</source>
         <translation>Exponential Intelligence hat keine Werte vorgeschlagen.</translation>
     </message>
+    <message>
+        <source>Review the answer</source>
+        <translation>Antwort prüfen</translation>
+    </message>
+    <message>
+        <source>Nothing was written into the field yet: review the answer below.</source>
+        <translation>In das Feld wurde noch nichts geschrieben: Prüfen Sie die Antwort unten.</translation>
+    </message>
+    <message>
+        <source>The field changed while the answer was written.</source>
+        <translation>Das Feld wurde geändert, während die Antwort geschrieben wurde.</translation>
+    </message>
+    <message>
+        <source>%list would be lost.</source>
+        <translation>Verloren ginge: %list.</translation>
+    </message>
+    <message>
+        <source>%count answer(s) not written: review them at their fields.</source>
+        <translation>%count Antwort(en) nicht übernommen: Prüfen Sie sie bei den Feldern.</translation>
+    </message>
+    <message>
+        <source>Apply anyway</source>
+        <translation>Trotzdem übernehmen</translation>
+    </message>
+    <message>
+        <source>Keep the original</source>
+        <translation>Original behalten</translation>
+    </message>
+    <message>
+        <source>Copy text</source>
+        <translation>Text kopieren</translation>
+    </message>
+    <message>
+        <source>Copied.</source>
+        <translation>Kopiert.</translation>
+    </message>
+    <message>
+        <source>The text could not be copied.</source>
+        <translation>Der Text konnte nicht kopiert werden.</translation>
+    </message>
+    <message>
+        <source>Kept the original value.</source>
+        <translation>Der ursprüngliche Wert wurde beibehalten.</translation>
+    </message>
+    <message>
+        <source>The structure of the field could not be checked.</source>
+        <translation>Die Struktur des Felds konnte nicht geprüft werden.</translation>
+    </message>
+    <message>
+        <source>%count table cell</source>
+        <translation>%count Tabellenzelle</translation>
+    </message>
+    <message>
+        <source>%count table cells</source>
+        <translation>%count Tabellenzellen</translation>
+    </message>
+    <message>
+        <source>%count header cell</source>
+        <translation>%count Kopfzelle</translation>
+    </message>
+    <message>
+        <source>%count header cells</source>
+        <translation>%count Kopfzellen</translation>
+    </message>
+    <message>
+        <source>%count merged cell</source>
+        <translation>%count verbundene Zelle</translation>
+    </message>
+    <message>
+        <source>%count merged cells</source>
+        <translation>%count verbundene Zellen</translation>
+    </message>
+    <message>
+        <source>%count embedded object</source>
+        <translation>%count eingebettetes Objekt</translation>
+    </message>
+    <message>
+        <source>%count embedded objects</source>
+        <translation>%count eingebettete Objekte</translation>
+    </message>
+    <message>
+        <source>%count table</source>
+        <translation>%count Tabelle</translation>
+    </message>
+    <message>
+        <source>%count tables</source>
+        <translation>%count Tabellen</translation>
+    </message>
+    <message>
+        <source>%count custom tag</source>
+        <translation>%count benutzerdefiniertes Tag</translation>
+    </message>
+    <message>
+        <source>%count custom tags</source>
+        <translation>%count benutzerdefinierte Tags</translation>
+    </message>
+    <message>
+        <source>%count anchor</source>
+        <translation>%count Anker</translation>
+    </message>
+    <message>
+        <source>%count anchors</source>
+        <translation>%count Anker</translation>
+    </message>
+    <message>
+        <source>%count literal block</source>
+        <translation>%count Literal-Block</translation>
+    </message>
+    <message>
+        <source>%count literal blocks</source>
+        <translation>%count Literal-Blöcke</translation>
+    </message>
+    <message>
+        <source>%count internal link</source>
+        <translation>%count interner Link</translation>
+    </message>
+    <message>
+        <source>%count internal links</source>
+        <translation>%count interne Links</translation>
+    </message>
+    <message>
+        <source>%count formatting attribute</source>
+        <translation>%count Formatierungsattribut</translation>
+    </message>
+    <message>
+        <source>%count formatting attributes</source>
+        <translation>%count Formatierungsattribute</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/error</name>

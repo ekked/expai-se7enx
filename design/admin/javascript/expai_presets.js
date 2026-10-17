@@ -12,7 +12,9 @@
  *   - registers each preset and each Improve menu in the command palette (ExpAi.commands, doc/keyboard.md).
  *
  * A click sends expaipreset::preset and puts the answer into the form, highlighted, with Undo; nothing is stored
- * until the editor stores the draft. Events: ExpAi.emit( 'field:filled', { field, value, previous, preset } ).
+ * until the editor stores the draft. An answer that would lose structure of a rich text field, or a field changed
+ * while the answer was written, is shown for review instead (ExpAi.guardedApply, strings of the edit form).
+ * Events: ExpAi.emit( 'field:filled', { field, value, previous, preset } ).
  */
 (function ( window, document ) {
     'use strict';
@@ -34,6 +36,7 @@
         if ( !form ) {
             return;
         }
+        var R = edit.strings || {};
         var writable = edit.writable || [];
         var attributes = edit.attributes || [];
 
@@ -151,6 +154,9 @@
             ctx.bar.classList.toggle( 'exp-ai-busy', on );
             Array.prototype.forEach.call( ctx.group.querySelectorAll( 'button' ), function ( b ) { b.disabled = on; } );
             if ( on ) {
+                if ( ExpAi.clearReview ) {
+                    ExpAi.clearReview( ctx.bar );
+                }
                 ctx.note.innerHTML = '<span class="exp-ai-spinner" aria-hidden="true"></span> ' + esc( S.working );
             }
         }
@@ -178,18 +184,30 @@
                     ctx.note.innerHTML = esc( ( S.error + ' ' + result.error ).trim() ) + recordLinks( result.record );
                     return;
                 }
-                var previous = adapter( ctx ).get( ctx );
-                if ( !adapter( ctx ).set( ctx, result.value ) ) {
-                    ctx.note.textContent = S.error;
-                    return;
+                var extras = ( result.note ? ' <em>' + esc( result.note ) + '</em>' : '' )
+                    + ( result.fallback ? ' <span class="exp-ai-fallback-notice">' + esc( result.fallback.notice ) + '</span>' : '' );
+                var apply = function () {
+                    var previous = adapter( ctx ).get( ctx );
+                    if ( !adapter( ctx ).set( ctx, result.value ) ) {
+                        ctx.note.textContent = S.error;
+                        return false;
+                    }
+                    ctx.undo = previous;
+                    flash( ctx );
+                    ExpAi.emit( 'field:filled', { field: ctx, value: result.value, previous: previous, preset: kind + ':' + name } );
+                    ctx.note.innerHTML = esc( S.filled ) + extras
+                        + ' <button type="button" class="exp-ai-link exp-ai-preset-undo">' + esc( S.undo ) + '</button>'
+                        + recordLinks( result.record );
+                    return true;
+                };
+                // not written when the answer would lose structure or the field changed meanwhile: a review instead
+                var outcome = ExpAi.guardedApply ? ExpAi.guardedApply( {
+                    ctx: ctx, adapter: adapter( ctx ), value: result.value, sent: value, host: ctx.bar, strings: R, apply: apply,
+                    kept: function () { ctx.note.textContent = R.kept; }
+                } ) : { written: apply(), review: false };
+                if ( outcome.review ) {
+                    ctx.note.innerHTML = esc( R.review_note ) + extras + recordLinks( result.record );
                 }
-                ctx.undo = previous;
-                flash( ctx );
-                ExpAi.emit( 'field:filled', { field: ctx, value: result.value, previous: previous, preset: kind + ':' + name } );
-                ctx.note.innerHTML = esc( S.filled ) + ( result.note ? ' <em>' + esc( result.note ) + '</em>' : '' )
-                    + ( result.fallback ? ' <span class="exp-ai-fallback-notice">' + esc( result.fallback.notice ) + '</span>' : '' )
-                    + ' <button type="button" class="exp-ai-link exp-ai-preset-undo">' + esc( S.undo ) + '</button>'
-                    + recordLinks( result.record );
             } ).catch( function ( err ) {
                 ctx.note.textContent = err && err.kind === 'timeout' ? S.timeout : ( S.error + ' ' + ( err && err.message || '' ) ).trim();
             } ).then( function () {

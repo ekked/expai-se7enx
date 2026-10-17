@@ -17,6 +17,8 @@
  *                                                  fill:done, labels:done
  *   ExpAi.fieldAdapters.register( datatype, { get( ctx ), set( ctx, value ) } )
  *   ExpAi.fieldActions.register( name, { before( ctx, params ), after( ctx, result ) } )
+ *   ExpAi.guardedApply( { ctx, adapter, value, sent, host, strings, apply, kept } )   write unless structure would be
+ *                                                  lost or the field changed meanwhile (expai_structure.js)
  *   ExpAi.panelSections.register( name, function ( panel ) { ... } )
  *   ExpAi.api( 'function', data ) -> Promise of the content of expai::<function>
  */
@@ -214,6 +216,92 @@
         return adapters[datatype] || adapters._default;
     }
 
+    /* --------------------------------------------- structure and stale guard */
+
+    var structureWarned = false;
+
+    function clearReview( host ) {
+        Array.prototype.forEach.call( host ? host.querySelectorAll( ':scope > .exp-ai-review' ) : [], function ( box ) { box.remove(); } );
+    }
+
+    /**
+     * Puts an answer into a field unless that would lose structure or overwrite a change (doc/edit-view-integration.md
+     * "Structure is never lost silently"). A rich text field (ezxmltext, not a part of a field) whose answer has fewer
+     * embedded objects, tables, table cells, header cells, merged cells, custom tags, anchors, literals, internal links
+     * or formatting and link attributes than the field now has (ExpAiStructure), every rich text answer when the
+     * detector is missing, and any field that changed since the request was sent, is not written: a review in `host`
+     * shows the answer, what would be lost or that the field changed, and "Apply anyway", "Keep the original" and,
+     * with the clipboard API, "Copy text". Only "Apply anyway" writes.
+     *
+     * o: { ctx, adapter, value (the answer), sent (the field's value when the request was sent; undefined: no check),
+     *      host (element the review goes into), strings, apply() (writes, returns false when it could not),
+     *      kept() (optional, after "Keep the original") }
+     * @return { written: bool, review: bool }
+     */
+    function guardedApply( o ) {
+        var S = o.strings || {};
+        var Structure = window.ExpAiStructure;
+        var current = o.adapter.get( o.ctx );
+        var rich = !!( o.ctx.attribute && o.ctx.attribute.datatype === 'ezxmltext' && !o.ctx.part );
+        var stale = o.sent !== undefined && o.sent !== null && !( Structure ? Structure.same( current, o.sent ) : current === o.sent );
+        var lost = rich && Structure ? Structure.loss( current, o.value ) : [];
+        // without the detector rich text is never overwritten unseen
+        var unchecked = rich && !Structure;
+        if ( unchecked && !structureWarned && window.console ) {
+            structureWarned = true;
+            window.console.warn( 'expai: expai_structure.js is not loaded; answers to rich text fields are shown for review' );
+        }
+        clearReview( o.host );
+        if ( !stale && !lost.length && !unchecked ) {
+            return { written: o.apply() !== false, review: false };
+        }
+        var text = Structure ? Structure.toText( o.value ) : String( o.value || '' );
+        var reasons = [];
+        if ( stale ) {
+            reasons.push( S.review_changed );
+        }
+        if ( lost.length ) {
+            reasons.push( fmt( S.review_lost, { '%list': Structure.describe( lost, S ) } ) );
+        }
+        if ( unchecked ) {
+            reasons.push( S.review_unchecked );
+        }
+        var clipboard = window.navigator && window.navigator.clipboard && window.navigator.clipboard.writeText;
+        var box = document.createElement( 'div' );
+        box.className = 'exp-ai exp-ai-review';
+        box.setAttribute( 'role', 'group' );
+        box.setAttribute( 'aria-label', S.review_title || '' );
+        box.innerHTML = '<p class="exp-ai-review-reason"><strong>' + esc( S.review_title ) + ':</strong> ' + reasons.map( esc ).join( ' ' ) + '</p>'
+            + '<div class="exp-ai-review-text">' + renderText( text ) + '</div>'
+            + '<p class="exp-ai-review-actions">'
+            + '<input type="button" class="button exp-ai-btn exp-ai-review-apply" value="' + esc( S.apply_anyway ) + '" /> '
+            + '<input type="button" class="defaultbutton exp-ai-btn exp-ai-review-keep" value="' + esc( S.keep_original ) + '" />'
+            + ( clipboard ? ' <button type="button" class="exp-ai-link exp-ai-review-copy">' + esc( S.copy_text ) + '</button>' : '' )
+            + '</p>';
+        o.host.appendChild( box );
+        box.querySelector( '.exp-ai-review-apply' ).addEventListener( 'click', function () {
+            box.remove();
+            o.apply();
+        } );
+        box.querySelector( '.exp-ai-review-keep' ).addEventListener( 'click', function () {
+            box.remove();
+            if ( o.kept ) {
+                o.kept();
+            }
+        } );
+        var copy = box.querySelector( '.exp-ai-review-copy' );
+        if ( copy ) {
+            copy.addEventListener( 'click', function () {
+                window.navigator.clipboard.writeText( text ).then( function () {
+                    copy.textContent = S.copied;
+                }, function () {
+                    copy.textContent = S.copy_failed;
+                } );
+            } );
+        }
+        return { written: false, review: true };
+    }
+
     var fieldActionHooks = {};
     var panelSectionInits = {};
 
@@ -230,6 +318,8 @@
             register: function ( datatype, adapter ) { adapters[datatype] = adapter; },
             get: adapterFor
         },
+        guardedApply: guardedApply,
+        clearReview: clearReview,
         fieldActions: {
             register: function ( name, hooks ) { fieldActionHooks[name] = hooks || {}; }
         },
@@ -1027,13 +1117,16 @@
                 bar.classList.toggle( 'exp-ai-busy', on );
                 Array.prototype.forEach.call( bar.querySelectorAll( 'button, input[type="button"]' ), function ( b ) { b.disabled = on; } );
                 if ( on ) {
+                    clearReview( bar );
                     note.innerHTML = '<span class="exp-ai-spinner" aria-hidden="true"></span> ' + esc( S.working );
                 }
             }
 
             function runAction( action, params ) {
                 var hooks = fieldActionHooks[action.name] || {};
-                var data = $.extend( base(), { attribute_id: ctx.attribute.id, action: action.name, value: ctxValue( ctx ), context: formContext() }, params );
+                // the value as sent: when the field differs once the answer is there, it is not overwritten
+                var sent = ctxValue( ctx );
+                var data = $.extend( base(), { attribute_id: ctx.attribute.id, action: action.name, value: sent, context: formContext() }, params );
                 if ( hooks.before && hooks.before( ctx, data ) === false ) {
                     return;
                 }
@@ -1048,12 +1141,23 @@
                         note.textContent = '';
                         return;
                     }
-                    var done = fill( ctx, result.value );
-                    undo = done.previous;
-                    note.innerHTML = esc( S.filled ) + ( result.note ? ' <em>' + esc( result.note ) + '</em>' : '' )
-                        + ( result.fallback ? ' <span class="exp-ai-fallback-notice">' + esc( result.fallback.notice ) + '</span>' : '' )
-                        + ' <button type="button" class="exp-ai-link exp-ai-undo">' + esc( S.undo ) + '</button>'
-                        + requestLinks( result.record );
+                    var extras = ( result.note ? ' <em>' + esc( result.note ) + '</em>' : '' )
+                        + ( result.fallback ? ' <span class="exp-ai-fallback-notice">' + esc( result.fallback.notice ) + '</span>' : '' );
+                    var outcome = guardedApply( {
+                        ctx: ctx, adapter: adapterFor( ctx.attribute.datatype ), value: result.value, sent: sent, host: bar, strings: S,
+                        apply: function () {
+                            var done = fill( ctx, result.value );
+                            undo = done.previous;
+                            note.innerHTML = esc( S.filled ) + extras
+                                + ' <button type="button" class="exp-ai-link exp-ai-undo">' + esc( S.undo ) + '</button>'
+                                + requestLinks( result.record );
+                            return done.ok;
+                        },
+                        kept: function () { note.textContent = S.kept; }
+                    } );
+                    if ( outcome.review ) {
+                        note.innerHTML = esc( S.review_note ) + extras + requestLinks( result.record );
+                    }
                 } ).catch( function ( err ) {
                     note.textContent = err.kind === 'timeout' ? S.timeout : ( S.error + ' ' + ( err.message || '' ) ).trim();
                 } ).then( function () {
@@ -1120,6 +1224,23 @@
 
         fields.forEach( fieldBar );
 
+        /** Where the review of an answer to this field goes: its bar of field actions, or a box of its own after the label */
+        function reviewHost( ctx ) {
+            var host = ctx.block.querySelector( '.exp-ai-field-bar' ) || ctx.block.querySelector( '.exp-ai-review-host' );
+            if ( host ) {
+                return host;
+            }
+            host = document.createElement( 'div' );
+            host.className = 'exp-ai exp-ai-review-host';
+            var label = ctx.block.querySelector( ':scope > label, :scope > fieldset > legend, :scope > .translation > label' );
+            if ( label && label.parentNode === ctx.block ) {
+                label.insertAdjacentElement( 'afterend', host );
+            } else {
+                ctx.block.insertBefore( host, ctx.block.firstChild );
+            }
+            return host;
+        }
+
         // "Fill the fields" from a brief
         var brief = root.querySelector( '#exp-ai-brief' );
         var goButton = root.querySelector( '.exp-ai-fill-go' );
@@ -1137,22 +1258,38 @@
                 goButton.disabled = true;
                 if ( fillWorking ) { fillWorking.hidden = false; }
                 if ( fillNote ) { fillNote.textContent = ''; }
+                // the values as sent: a field that differs once the answer is there is not overwritten
+                var sent = {};
+                fields.forEach( function ( ctx ) {
+                    sent[ctx.attribute.id] = ctxValue( ctx );
+                    clearReview( ctx.block.querySelector( '.exp-ai-field-bar, .exp-ai-review-host' ) );
+                } );
                 api( 'fill', $.extend( base(), { instruction: text, context: formContext() } ) ).then( function ( data ) {
                     fillUndo = [];
-                    var count = 0;
+                    var count = 0, reviews = 0;
                     ( data.fields || [] ).forEach( function ( f ) {
                         var ctx = fields.filter( function ( x ) { return x.attribute.id === f.attribute_id; } )[0];
                         if ( !ctx ) {
                             return;
                         }
-                        var done = fill( ctx, f.value );
-                        if ( done.ok ) {
-                            count++;
-                            fillUndo.push( { ctx: ctx, value: done.previous } );
-                        }
+                        var outcome = guardedApply( {
+                            ctx: ctx, adapter: adapterFor( ctx.attribute.datatype ), value: f.value, sent: sent[ctx.attribute.id], host: reviewHost( ctx ), strings: S,
+                            apply: function () {
+                                var done = fill( ctx, f.value );
+                                if ( done.ok ) {
+                                    fillUndo.push( { ctx: ctx, value: done.previous } );
+                                    if ( undoButton ) { undoButton.hidden = false; }
+                                }
+                                return done.ok;
+                            }
+                        } );
+                        count += outcome.written ? 1 : 0;
+                        reviews += outcome.review ? 1 : 0;
                     } );
                     if ( fillNote ) {
-                        fillNote.innerHTML = esc( count ? fmt( S.filled_count, { '%count': count } ) : S.nothing ) + ( data.note ? ' <em>' + esc( data.note ) + '</em>' : '' )
+                        fillNote.innerHTML = esc( count ? fmt( S.filled_count, { '%count': count } ) : ( reviews ? '' : S.nothing ) )
+                            + ( reviews ? ' ' + esc( fmt( S.review_count, { '%count': reviews } ) ) : '' )
+                            + ( data.note ? ' <em>' + esc( data.note ) + '</em>' : '' )
                             + ( data.fallback ? ' <span class="exp-ai-fallback-notice">' + esc( data.fallback.notice ) + '</span>' : '' );
                     }
                     if ( undoButton ) { undoButton.hidden = !count; }

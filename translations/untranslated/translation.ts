@@ -1065,6 +1065,134 @@
         <source>Exponential Intelligence suggested no values.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Review the answer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing was written into the field yet: review the answer below.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The field changed while the answer was written.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%list would be lost.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count answer(s) not written: review them at their fields.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply anyway</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep the original</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The text could not be copied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Kept the original value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The structure of the field could not be checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count table cell</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count table cells</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count header cell</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count header cells</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count merged cell</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count merged cells</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count embedded object</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count embedded objects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count table</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count tables</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count custom tag</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count custom tags</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count anchor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count anchors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count literal block</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count literal blocks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count internal link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count internal links</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count formatting attribute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%count formatting attributes</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/error</name>
