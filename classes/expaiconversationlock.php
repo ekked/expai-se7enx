@@ -158,6 +158,17 @@ class expAiConversationBusyException extends expAiException
         $this->started = (bool) $started;
     }
 
+    /**
+     * A busy conversation is the expected answer to a second click while a step runs, not a fault: it is told
+     * to the user (and retried by the queue), and kept out of the warning log.
+     * @return expAiException
+     */
+    public function translated()
+    {
+        eZDebug::writeDebug( $this->getMessage() . ' (' . $this->detail . ')', __METHOD__ );
+        return new expAiException( $this->translatedMessage(), $this->detail, $this->getCode() );
+    }
+
     /** how long a queued turn waits before it tries a busy conversation again */
     const RETRY_SECONDS = 20;
 
