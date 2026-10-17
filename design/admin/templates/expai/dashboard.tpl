@@ -263,7 +263,7 @@
             </div>
             <ol class="exp-ai-vchart-bars">
 {foreach $series.series as $point}
-                <li class="{if $point.today}exp-ai-today{/if}{if eq( $point.value, 0 )} exp-ai-empty-day{/if}" tabindex="0"
+                <li class="{if $point.today}exp-ai-today{/if}{if eq( $point.value, 0 )} exp-ai-empty-day{/if}"
                     title="{$point.label|wash}: {if eq( $series.metric, 'cost' )}{$point.value|expai_money}{else}{$point.value|expai_number} {'tokens'|i18n( 'extension/expai/limits' )}{/if}">
                     <span class="exp-ai-vbar" style="height: {max( $point.percent, 2 )}%"></span>
                 </li>

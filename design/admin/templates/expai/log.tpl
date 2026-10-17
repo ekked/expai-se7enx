@@ -105,9 +105,10 @@
                         <span>{if $turn.cost_known}{$turn.cost|mul( 10000 )|round|div( 10000 )} {$currency|wash}{if $turn.cost_reported} ({'reported'|i18n( 'extension/expai/log' )}){/if}{elseif $cost_enabled}{'no price'|i18n( 'extension/expai/usage' )}{else}{'cost not configured'|i18n( 'extension/expai/log' )}{/if}</span>
                         {if $turn.reasoning}<span>{'%count reasoning tokens'|i18n( 'extension/expai/log',, hash( '%count', $turn.reasoning ) )}</span>{/if}
                         {if $turn.drafts}<span class="exp-ai-status-published">{'%count draft(s)'|i18n( 'extension/expai/log',, hash( '%count', $turn.drafts ) )}</span>{/if}
-                        {include uri='design:expai/parts/links.tpl' links=$turn.links}
                         {if $turn.errors}<span class="exp-ai-step-failed">{'%count error(s)'|i18n( 'extension/expai/log',, hash( '%count', $turn.errors ) )}</span>{/if}
                     </summary>
+                    {* the links of the turn below the summary: a link inside a summary is a control inside a control *}
+                    {include uri='design:expai/parts/links.tpl' links=$turn.links}
                     <table class="list exp-ai-draft-table" cellspacing="0">
                         <thead><tr><th>#</th><th>{'Time'|i18n( 'extension/expai/log' )}</th><th>{'Model'|i18n( 'extension/expai/log' )}</th><th>{'Region'|i18n( 'extension/expai/log' )}</th><th>{'Tokens in / out / cache write / read'|i18n( 'extension/expai/log' )}</th><th>{'Stop'|i18n( 'extension/expai/log' )}</th><th>HTTP</th><th>{'Latency'|i18n( 'extension/expai/log' )}</th><th>{'Tools'|i18n( 'extension/expai/log' )}</th><th>{'Error'|i18n( 'extension/expai/log' )}</th></tr></thead>
                         <tbody>
