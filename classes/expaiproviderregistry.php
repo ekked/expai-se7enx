@@ -431,27 +431,60 @@ class expAiProviderRegistry
                 break;
             }
         }
-        // true: in the repository; false: not; null: git could not say (dubious ownership, a broken checkout): no warning
-        return $matches && self::shippedWithTheCode( $file, $path ) !== true;
+        // true: in a repository; false: not; null: git could not say (a broken checkout, no git): counted as shipped, so
+        // the warning stays (a key that may be in a repository is not accepted on a guess)
+        return $matches && self::shippedWithTheCode( $file, $path ) === false;
     }
 
-    /** @return bool|null the file is part of the code: tracked by git (true), not tracked (false), git cannot say (null); without a git work tree: inside the release's real path (true) or outside it (false) */
+    /**
+     * @return bool|null the file is part of the code: tracked by the nearest git work tree that contains it (true; an
+     *                   extension is often a clone of its own, which the installation's repository does not see), not
+     *                   tracked (false), git cannot say (null); without a git work tree: inside the release's real path
+     *                   (true) or outside it (false)
+     */
     protected static function shippedWithTheCode( $file, $path )
     {
         $root = rtrim( (string) eZSys::rootDir(), '/' );
-        if ( file_exists( $root . '/.git' ) && function_exists( 'exec' ) )
+        $absolute = $path !== '' && $path[0] === '/' ? $path : $root . '/' . $file;
+        $repository = self::nearestWorkTree( dirname( $absolute ), $root );
+        if ( $repository !== null && function_exists( 'exec' ) )
         {
             $output = array();
             $status = 1;
-            @exec( 'git -C ' . escapeshellarg( $root ) . ' ls-files --error-unmatch -- ' . escapeshellarg( $file ) . ' 2>/dev/null', $output, $status );
-            // 0: tracked. 1: not tracked. Anything else (128 dubious ownership, 127 no git): git works here but cannot
-            // say, so nothing is claimed in either direction
+            $relative = ltrim( substr( $absolute, strlen( $repository ) ), '/' );
+            // safe.directory for this one call: the web server's user often differs from the checkout's owner, and git
+            // then refuses to answer (dubious ownership) although only a file list is read
+            @exec( 'git -c safe.directory=' . escapeshellarg( $repository ) . ' -C ' . escapeshellarg( $repository )
+                   . ' ls-files --error-unmatch -- ' . escapeshellarg( $relative ) . ' 2>/dev/null', $output, $status );
+            // 0: tracked. 1: not tracked. Anything else (127 no git): git cannot say
             if ( $status === 0 )
                 return true;
             return $status === 1 ? false : null;
         }
-        $real = realpath( $path !== '' && $path[0] === '/' ? $path : $root . '/' . $file );
+        $real = realpath( $absolute );
         $realRoot = realpath( $root );
         return $real === false || $realRoot === false || strpos( $real, $realRoot . '/' ) === 0;
+    }
+
+    /**
+     * @param string $directory where the search starts
+     * @param string $root the installation; the search does not go above it
+     * @return string|null the nearest directory from $directory up to $root that holds a .git (directory or file), null
+     *                     when there is none
+     */
+    protected static function nearestWorkTree( $directory, $root )
+    {
+        $directory = rtrim( (string) $directory, '/' );
+        $root = rtrim( (string) $root, '/' );
+        if ( $root === '' || ( $directory !== $root && strpos( $directory, $root . '/' ) !== 0 ) )
+            return file_exists( $root . '/.git' ) ? $root : null;
+        while ( true )
+        {
+            if ( file_exists( $directory . '/.git' ) )
+                return $directory;
+            if ( $directory === $root || strlen( $directory ) <= strlen( $root ) )
+                return null;
+            $directory = dirname( $directory );
+        }
     }
 }

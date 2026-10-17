@@ -144,4 +144,51 @@ class expAiProviderRegistryTest extends expAiProviderTestCase
         $ini->setVariable( 'ProviderSettings', 'KeyLocations', array( 'extension/*/settings' ) );
         $this->assertCount( 1, ( new expAiProviderRegistry( new expAiConfig( $ini ) ) )->keyPlacementProblems() );
     }
+    public function testTheNearestWorkTreeOfAKeyFileAnswersWhetherItIsTracked(): void
+    {
+        $root = expAiTestMockServer::tmp( 'xte-git' );
+        $this->cleanup( static function () use ( $root ) { expAiTestMockServer::removeTree( $root ); } );
+        mkdir( $root . '/extension/x/settings', 0700, true );
+        mkdir( $root . '/extension/x/.git' );
+        $this->assertSame( $root . '/extension/x', expAiProviderRegistryTestRegistry::nearest( $root . '/extension/x/settings', $root ),
+                           'an extension that is a clone of its own answers for its files' );
+        $this->assertNull( expAiProviderRegistryTestRegistry::nearest( $root . '/settings/override', $root ), 'no work tree up to the root' );
+        mkdir( $root . '/.git' );
+        $this->assertSame( $root, expAiProviderRegistryTestRegistry::nearest( $root . '/settings/override', $root ) );
+        $this->assertSame( $root, expAiProviderRegistryTestRegistry::nearest( '/elsewhere/settings', $root ), 'a path outside the root asks the root' );
+        $this->assertSame( $root . '/extension/x', expAiProviderRegistryTestRegistry::nearest( $root . '/extension/x/settings', $root ) );
+    }
+
+    public function testAKeyFileCommittedInAnExtensionsOwnRepositoryCountsAsShipped(): void
+    {
+        if ( !function_exists( 'exec' ) )
+            $this->markTestSkipped( 'exec() is not available' );
+        exec( 'git --version 2>/dev/null', $out, $status );
+        if ( $status !== 0 )
+            $this->markTestSkipped( 'no git' );
+        $repo = expAiTestMockServer::tmp( 'xte-repo' );
+        $this->cleanup( static function () use ( $repo ) { expAiTestMockServer::removeTree( $repo ); } );
+        mkdir( $repo . '/settings' );
+        file_put_contents( $repo . '/settings/expai.ini.append.php', "[Provider_x]\nApiKey=test-not-a-key\n" );
+        file_put_contents( $repo . '/settings/untracked.ini.append.php', "[Provider_x]\nApiKey=test-not-a-key\n" );
+        $git = 'git -c user.name=t -c user.email=t@example.invalid -C ' . escapeshellarg( $repo );
+        exec( $git . ' init -q 2>&1 && ' . $git . ' add settings/expai.ini.append.php 2>&1 && ' . $git . ' commit -q -m t 2>&1', $out, $status );
+        $this->assertSame( 0, $status, implode( "\n", $out ) );
+        $this->assertTrue( expAiProviderRegistryTestRegistry::shipped( 'x', $repo . '/settings/expai.ini.append.php' ), 'tracked in its own repository' );
+        $this->assertFalse( expAiProviderRegistryTestRegistry::shipped( 'x', $repo . '/settings/untracked.ini.append.php' ) );
+    }
+}
+
+/** nearestWorkTree() and shippedWithTheCode() made callable */
+class expAiProviderRegistryTestRegistry extends expAiProviderRegistry
+{
+    public static function nearest( $directory, $root )
+    {
+        return self::nearestWorkTree( $directory, $root );
+    }
+
+    public static function shipped( $file, $path )
+    {
+        return self::shippedWithTheCode( $file, $path );
+    }
 }
