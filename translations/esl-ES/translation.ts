@@ -1111,6 +1111,14 @@
         <translation>Indica las palabras que quieres buscar.</translation>
     </message>
     <message>
+        <source>This part would remove %items from the text and cannot be accepted. Reject it, or ask for a new proposal that keeps them.</source>
+        <translation>Esta parte eliminaría %items del texto y no se puede aceptar. Recházala o pide una nueva propuesta que los conserve.</translation>
+    </message>
+    <message>
+        <source>The accepted parts would remove %items from the field %field. Nothing was written.</source>
+        <translation>Las partes aceptadas eliminarían %items del campo %field. No se escribió nada.</translation>
+    </message>
+    <message>
         <source>Request in the log</source>
         <translation>Solicitud en el registro</translation>
     </message>
@@ -3085,6 +3093,10 @@
         <source>Proposed a plan with %count item(s)</source>
         <translation>Ha propuesto un plan con %count elemento(s)</translation>
     </message>
+    <message>
+        <source>Changed "%name"; rich text that would lose its structure was not written</source>
+        <translation>Se cambió «%name»; no se escribió el texto enriquecido que habría perdido su estructura</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/tab</name>
@@ -4799,6 +4811,10 @@
     <message>
         <source>Your note reached Vector: %note</source>
         <translation>Tu nota ha llegado a Vector: %note</translation>
+    </message>
+    <message>
+        <source>This part would remove %items from the text, so it cannot be accepted. Reject it, or ask for a new proposal that keeps them.</source>
+        <translation>Esta parte eliminaría %items del texto, así que no se puede aceptar. Recházala o pide una nueva propuesta que los conserve.</translation>
     </message>
 </context>
 <context>
@@ -6629,6 +6645,101 @@
     <message>
         <source>The rules that refuse a request (expai.ini [RequestVeto] Rules[], each with its [RequestVeto_&lt;rule&gt;]).</source>
         <translation>Las reglas que rechazan una solicitud (expai.ini [RequestVeto] Rules[], cada una con su [RequestVeto_&lt;rule&gt;]).</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/richtext</name>
+    <message>
+        <source>%count custom tag %name</source>
+        <translation>%count etiqueta personalizada %name</translation>
+    </message>
+    <message>
+        <source>%count custom tags %name</source>
+        <translation>%count etiquetas personalizadas %name</translation>
+    </message>
+    <message>
+        <source>%count embedded object</source>
+        <translation>%count objeto incrustado</translation>
+    </message>
+    <message>
+        <source>%count embedded objects</source>
+        <translation>%count objetos incrustados</translation>
+    </message>
+    <message>
+        <source>%count table</source>
+        <translation>%count tabla</translation>
+    </message>
+    <message>
+        <source>%count tables</source>
+        <translation>%count tablas</translation>
+    </message>
+    <message>
+        <source>%count literal block</source>
+        <translation>%count bloque literal</translation>
+    </message>
+    <message>
+        <source>%count literal blocks</source>
+        <translation>%count bloques literales</translation>
+    </message>
+    <message>
+        <source>%count anchor</source>
+        <translation>%count ancla</translation>
+    </message>
+    <message>
+        <source>%count anchors</source>
+        <translation>%count anclas</translation>
+    </message>
+    <message>
+        <source>%count link the answer cannot keep</source>
+        <translation>%count enlace que la respuesta no puede conservar</translation>
+    </message>
+    <message>
+        <source>%count links the answer cannot keep</source>
+        <translation>%count enlaces que la respuesta no puede conservar</translation>
+    </message>
+    <message>
+        <source>%count formatting attribute</source>
+        <translation>%count atributo de formato</translation>
+    </message>
+    <message>
+        <source>%count formatting attributes</source>
+        <translation>%count atributos de formato</translation>
+    </message>
+    <message>
+        <source>the rest of the field</source>
+        <translation>el resto del campo</translation>
+    </message>
+    <message>
+        <source>%count element %name</source>
+        <translation>%count elemento %name</translation>
+    </message>
+    <message>
+        <source>%count elements %name</source>
+        <translation>%count elementos %name</translation>
+    </message>
+    <message>
+        <source>Placeholders missing: %list.</source>
+        <translation>Faltan marcadores de posición: %list.</translation>
+    </message>
+    <message>
+        <source>Placeholders repeated: %list.</source>
+        <translation>Marcadores de posición repetidos: %list.</translation>
+    </message>
+    <message>
+        <source>Placeholders that are not in the text: %list.</source>
+        <translation>Marcadores de posición que no están en el texto: %list.</translation>
+    </message>
+    <message>
+        <source>Placeholders in a place where their element cannot stand: %list.</source>
+        <translation>Marcadores de posición en un lugar donde su elemento no puede ir: %list.</translation>
+    </message>
+    <message>
+        <source>The text would lose: %items.</source>
+        <translation>El texto perdería: %items.</translation>
+    </message>
+    <message>
+        <source>The rich text keeps its structure only when every placeholder comes back exactly once and unchanged.</source>
+        <translation>El texto enriquecido solo conserva su estructura cuando cada marcador de posición vuelve exactamente una vez y sin cambios.</translation>
     </message>
 </context>
 </TS>

@@ -1114,6 +1114,14 @@
         <translation>nejmeH mu&apos;mey yIngu&apos;.</translation>
     </message>
     <message>
+        <source>This part would remove %items from the text and cannot be accepted. Reject it, or ask for a new proposal that keeps them.</source>
+        <translation>ghItlhvo&apos; %items teqbej &apos;ay&apos;vam, vaj laj&apos;laHlu&apos;be&apos;. yIQo&apos;, pagh ghaHmey polbogh ghot chu&apos; yItlhob.</translation>
+    </message>
+    <message>
+        <source>The accepted parts would remove %items from the field %field. Nothing was written.</source>
+        <translation>%field tlheghvo&apos; %items teqbej laj&apos;lu&apos;pu&apos;bogh &apos;ay&apos;mey. Doch ghItlhlu&apos;pu&apos;be&apos;.</translation>
+    </message>
+    <message>
         <source>Request in the log</source>
         <translation>wanI&apos; tetlhDaq tlhobghach</translation>
     </message>
@@ -3088,6 +3096,10 @@
         <source>Proposed a plan with %count item(s)</source>
         <translation>nab ghotlu&apos;ta&apos; (Dochmey: %count)</translation>
     </message>
+    <message>
+        <source>Changed "%name"; rich text that would lose its structure was not written</source>
+        <translation>&quot;%name&quot; choHlu&apos;pu&apos;; mIwDaj chIlbogh ghItlh naQ ghItlhlu&apos;pu&apos;be&apos;</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/tab</name>
@@ -4802,6 +4814,10 @@
     <message>
         <source>Your note reached Vector: %note</source>
         <translation>Vector ghoSta&apos; QInlIj: %note</translation>
+    </message>
+    <message>
+        <source>This part would remove %items from the text, so it cannot be accepted. Reject it, or ask for a new proposal that keeps them.</source>
+        <translation>ghItlhvo&apos; %items teqbej &apos;ay&apos;vam, vaj laj&apos;laHlu&apos;be&apos;. yIQo&apos;, pagh ghaHmey polbogh ghot chu&apos; yItlhob.</translation>
     </message>
 </context>
 <context>
@@ -6632,6 +6648,101 @@
     <message>
         <source>The rules that refuse a request (expai.ini [RequestVeto] Rules[], each with its [RequestVeto_&lt;rule&gt;]).</source>
         <translation>tlhobghach Qo&apos;bogh chutmey (expai.ini [RequestVeto] Rules[], Hoch [RequestVeto_&lt;rule&gt;] Daj ghaj).</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/richtext</name>
+    <message>
+        <source>%count custom tag %name</source>
+        <translation>%count lo&apos;wI&apos; per %name</translation>
+    </message>
+    <message>
+        <source>%count custom tags %name</source>
+        <translation>%count lo&apos;wI&apos; per %name</translation>
+    </message>
+    <message>
+        <source>%count embedded object</source>
+        <translation>%count lanlu&apos;ta&apos;bogh Doch</translation>
+    </message>
+    <message>
+        <source>%count embedded objects</source>
+        <translation>%count lanlu&apos;ta&apos;bogh Doch</translation>
+    </message>
+    <message>
+        <source>%count table</source>
+        <translation>%count SomHom</translation>
+    </message>
+    <message>
+        <source>%count tables</source>
+        <translation>%count SomHom</translation>
+    </message>
+    <message>
+        <source>%count literal block</source>
+        <translation>%count ghItlh choHbe&apos;bogh</translation>
+    </message>
+    <message>
+        <source>%count literal blocks</source>
+        <translation>%count ghItlh choHbe&apos;bogh</translation>
+    </message>
+    <message>
+        <source>%count anchor</source>
+        <translation>%count Daq per</translation>
+    </message>
+    <message>
+        <source>%count anchors</source>
+        <translation>%count Daq per</translation>
+    </message>
+    <message>
+        <source>%count link the answer cannot keep</source>
+        <translation>%count rarwI&apos; pollaHbe&apos;bogh jang</translation>
+    </message>
+    <message>
+        <source>%count links the answer cannot keep</source>
+        <translation>%count rarwI&apos; pollaHbe&apos;bogh jang</translation>
+    </message>
+    <message>
+        <source>%count formatting attribute</source>
+        <translation>%count Segh DuH</translation>
+    </message>
+    <message>
+        <source>%count formatting attributes</source>
+        <translation>%count Segh DuH</translation>
+    </message>
+    <message>
+        <source>the rest of the field</source>
+        <translation>tlhegh latlh &apos;ay&apos;</translation>
+    </message>
+    <message>
+        <source>%count element %name</source>
+        <translation>%count &apos;ay&apos; %name</translation>
+    </message>
+    <message>
+        <source>%count elements %name</source>
+        <translation>%count &apos;ay&apos;mey %name</translation>
+    </message>
+    <message>
+        <source>Placeholders missing: %list.</source>
+        <translation>Daq per tu&apos;lu&apos;be&apos;: %list.</translation>
+    </message>
+    <message>
+        <source>Placeholders repeated: %list.</source>
+        <translation>Daq per ghoSqa&apos;lu&apos;: %list.</translation>
+    </message>
+    <message>
+        <source>Placeholders that are not in the text: %list.</source>
+        <translation>ghItlhDaq tu&apos;lu&apos;be&apos;bogh Daq per: %list.</translation>
+    </message>
+    <message>
+        <source>Placeholders in a place where their element cannot stand: %list.</source>
+        <translation>&apos;ay&apos;chaj QamlaHbe&apos;bogh DaqDaq Daq per: %list.</translation>
+    </message>
+    <message>
+        <source>The text would lose: %items.</source>
+        <translation>chIlbej ghItlh: %items.</translation>
+    </message>
+    <message>
+        <source>The rich text keeps its structure only when every placeholder comes back exactly once and unchanged.</source>
+        <translation>Daq per Hoch wa&apos;logh choHbe&apos;taHvIS cheghchugh neH, mIwDaj pol ghItlh naQ.</translation>
     </message>
 </context>
 </TS>

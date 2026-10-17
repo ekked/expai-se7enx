@@ -1113,6 +1113,14 @@
         <translation>יש לציין את המילים לחיפוש.</translation>
     </message>
     <message>
+        <source>This part would remove %items from the text and cannot be accepted. Reject it, or ask for a new proposal that keeps them.</source>
+        <translation>חלק זה היה מסיר %items מהטקסט ולא ניתן לקבל אותו. יש לדחות אותו, או לבקש הצעה חדשה ששומרת עליהם.</translation>
+    </message>
+    <message>
+        <source>The accepted parts would remove %items from the field %field. Nothing was written.</source>
+        <translation>החלקים שהתקבלו היו מסירים %items מהשדה %field. דבר לא נכתב.</translation>
+    </message>
+    <message>
         <source>Request in the log</source>
         <translation>הבקשה ביומן</translation>
     </message>
@@ -3087,6 +3095,10 @@
         <source>Proposed a plan with %count item(s)</source>
         <translation>הוצעה תוכנית עם פריטים: %count</translation>
     </message>
+    <message>
+        <source>Changed "%name"; rich text that would lose its structure was not written</source>
+        <translation>&quot;%name&quot; שונה; טקסט עשיר שהיה מאבד את המבנה שלו לא נכתב</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/tab</name>
@@ -4801,6 +4813,10 @@
     <message>
         <source>Your note reached Vector: %note</source>
         <translation>ההערה שלך הגיעה ל־Vector: %note</translation>
+    </message>
+    <message>
+        <source>This part would remove %items from the text, so it cannot be accepted. Reject it, or ask for a new proposal that keeps them.</source>
+        <translation>חלק זה היה מסיר %items מהטקסט, ולכן לא ניתן לקבל אותו. יש לדחות אותו, או לבקש הצעה חדשה ששומרת עליהם.</translation>
     </message>
 </context>
 <context>
@@ -6631,6 +6647,101 @@
     <message>
         <source>The rules that refuse a request (expai.ini [RequestVeto] Rules[], each with its [RequestVeto_&lt;rule&gt;]).</source>
         <translation>הכללים שדוחים בקשה (expai.ini [RequestVeto] Rules[], כל אחד עם ה־[RequestVeto_&lt;rule&gt;] שלו).</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/richtext</name>
+    <message>
+        <source>%count custom tag %name</source>
+        <translation>%count תגית מותאמת %name</translation>
+    </message>
+    <message>
+        <source>%count custom tags %name</source>
+        <translation>%count תגיות מותאמות %name</translation>
+    </message>
+    <message>
+        <source>%count embedded object</source>
+        <translation>%count אובייקט מוטמע</translation>
+    </message>
+    <message>
+        <source>%count embedded objects</source>
+        <translation>%count אובייקטים מוטמעים</translation>
+    </message>
+    <message>
+        <source>%count table</source>
+        <translation>%count טבלה</translation>
+    </message>
+    <message>
+        <source>%count tables</source>
+        <translation>%count טבלאות</translation>
+    </message>
+    <message>
+        <source>%count literal block</source>
+        <translation>%count בלוק מילולי</translation>
+    </message>
+    <message>
+        <source>%count literal blocks</source>
+        <translation>%count בלוקים מילוליים</translation>
+    </message>
+    <message>
+        <source>%count anchor</source>
+        <translation>%count עוגן</translation>
+    </message>
+    <message>
+        <source>%count anchors</source>
+        <translation>%count עוגנים</translation>
+    </message>
+    <message>
+        <source>%count link the answer cannot keep</source>
+        <translation>%count קישור שהתשובה אינה יכולה לשמור</translation>
+    </message>
+    <message>
+        <source>%count links the answer cannot keep</source>
+        <translation>%count קישורים שהתשובה אינה יכולה לשמור</translation>
+    </message>
+    <message>
+        <source>%count formatting attribute</source>
+        <translation>%count מאפיין עיצוב</translation>
+    </message>
+    <message>
+        <source>%count formatting attributes</source>
+        <translation>%count מאפייני עיצוב</translation>
+    </message>
+    <message>
+        <source>the rest of the field</source>
+        <translation>שאר השדה</translation>
+    </message>
+    <message>
+        <source>%count element %name</source>
+        <translation>%count רכיב %name</translation>
+    </message>
+    <message>
+        <source>%count elements %name</source>
+        <translation>%count רכיבים %name</translation>
+    </message>
+    <message>
+        <source>Placeholders missing: %list.</source>
+        <translation>מצייני מיקום חסרים: %list.</translation>
+    </message>
+    <message>
+        <source>Placeholders repeated: %list.</source>
+        <translation>מצייני מיקום חוזרים: %list.</translation>
+    </message>
+    <message>
+        <source>Placeholders that are not in the text: %list.</source>
+        <translation>מצייני מיקום שאינם בטקסט: %list.</translation>
+    </message>
+    <message>
+        <source>Placeholders in a place where their element cannot stand: %list.</source>
+        <translation>מצייני מיקום במקום שבו הרכיב שלהם אינו יכול לעמוד: %list.</translation>
+    </message>
+    <message>
+        <source>The text would lose: %items.</source>
+        <translation>הטקסט היה מאבד: %items.</translation>
+    </message>
+    <message>
+        <source>The rich text keeps its structure only when every placeholder comes back exactly once and unchanged.</source>
+        <translation>הטקסט העשיר שומר על המבנה שלו רק כאשר כל מציין מיקום חוזר בדיוק פעם אחת וללא שינוי.</translation>
     </message>
 </context>
 </TS>
