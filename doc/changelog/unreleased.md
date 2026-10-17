@@ -246,3 +246,7 @@ anchors, literals, internal links and formatting attributes were lost, and ezaut
   failed for good and the thread stayed running. The lock now refuses with `expAiConversationBusyException` (an
   `expAiException`, so existing catches keep working); a turn refused before its step began is deferred for 20 seconds
   and runs again with its message, without using up an attempt.
+- **Retention of removed users fails closed**: when the lookup of the users in `ezuser` failed, returned rows without
+  an id, or found none of the users asked for, every user counted as removed and their threads and conversations were
+  removed. Now no user counts as removed then; and when more than half of the users of a table look removed, the run
+  removes none of them and logs a warning.

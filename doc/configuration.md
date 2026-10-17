@@ -188,7 +188,8 @@ See [usage-tracking.md](usage-tracking.md).
 | `PromptSummaryKeepDays` | `365` | The request summary of a draft log row is blanked after this many days; the row stays. |
 
 `0` keeps the rows. Independent of the periods, the threads and conversations of a user that no longer exists are
-removed. The cronjob part `expai` (`expai_prune.php`) and `bin/php/expaithreads.php --prune` do it
+removed. A failed user lookup, or more than half of the users looking removed, removes none of them (a
+warning is logged). The cronjob part `expai` (`expai_prune.php`) and `bin/php/expaithreads.php --prune` do it
 ([threads.md](threads.md#retention)).
 
 ## [Limits]: optional limits

@@ -272,21 +272,72 @@ class expAiThreadRetention
     protected static function removedUsers( $table )
     {
         $ids = self::ids( "SELECT DISTINCT user_id AS id FROM $table" );
+        if ( $ids === null )
+        {
+            eZDebug::writeWarning( "expai retention: the users of $table could not be read; no user counts as removed in this run", __METHOD__ );
+            return array();
+        }
+        return self::goneUsers( $ids, function ( array $chunk )
+        {
+            return expAiThreadRetention::ids( 'SELECT contentobject_id AS id FROM ezuser WHERE contentobject_id IN (' . implode( ', ', $chunk ) . ')' );
+        }, $table );
+    }
+
+    /**
+     * The users of $ids that are no user any more. Fail closed, as their threads and conversations are removed: when
+     * the lookup of the existing users fails (null), or finds none of them although ids were asked, no user counts
+     * as removed; and when more than half of the asked users look removed, the run removes none of them and logs a
+     * warning (a lookup against the wrong database, a broken ezuser table, a mass removal to look at first).
+     * @param int[] $ids the user ids asked for
+     * @param callable $lookup function( int[] $chunk ): int[]|null, the ids of the chunk that are users (null: failed)
+     * @return int[]
+     */
+    public static function goneUsers( array $ids, $lookup, $label = '' )
+    {
+        $ids = array_values( array_unique( array_filter( array_map( 'intval', $ids ), function ( $id ) { return $id > 0; } ) ) );
         if ( !$ids )
             return array();
         $existing = array();
         foreach ( array_chunk( $ids, 500 ) as $chunk )
-            $existing = array_merge( $existing, self::ids( 'SELECT contentobject_id AS id FROM ezuser WHERE contentobject_id IN (' . implode( ', ', $chunk ) . ')' ) );
-        return self::missing( $ids, $existing );
+        {
+            $found = call_user_func( $lookup, $chunk );
+            if ( !is_array( $found ) )
+            {
+                eZDebug::writeWarning( "expai retention: the users of $label could not be looked up; no user counts as removed in this run", __METHOD__ );
+                return array();
+            }
+            $existing = array_merge( $existing, $found );
+        }
+        if ( !$existing )
+        {
+            eZDebug::writeWarning( "expai retention: none of the " . count( $ids ) . " users of $label was found; no user counts as removed in this run", __METHOD__ );
+            return array();
+        }
+        $gone = self::missing( $ids, $existing );
+        if ( count( $gone ) * 2 > count( $ids ) )
+        {
+            eZDebug::writeWarning( "expai retention: " . count( $gone ) . " of the " . count( $ids ) . " users of $label look removed (more than half); "
+                                   . 'their threads and conversations are kept. Check the user table, then remove them by hand if they are gone.', __METHOD__ );
+            return array();
+        }
+        return $gone;
     }
 
-    /** @return int[] the column id of the rows of a query */
-    protected static function ids( $sql )
+    /**
+     * @return int[]|null the column id of the rows of a query; null when the query failed or a row has no id (the
+     *                    caller must not take a failed lookup for "no rows")
+     */
+    public static function ids( $sql )
     {
+        $rows = eZDB::instance()->arrayQuery( $sql );
+        if ( !is_array( $rows ) )
+            return null;
         $out = array();
-        foreach ( (array) eZDB::instance()->arrayQuery( $sql ) as $row )
+        foreach ( $rows as $row )
         {
-            $row = array_change_key_case( $row, CASE_LOWER );
+            $row = is_array( $row ) ? array_change_key_case( $row, CASE_LOWER ) : array();
+            if ( !isset( $row['id'] ) || !is_numeric( $row['id'] ) )
+                return null;
             $out[] = (int) $row['id'];
         }
         return $out;

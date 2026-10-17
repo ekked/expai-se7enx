@@ -46,6 +46,23 @@ class expAiRetentionTest extends expAiCoreTestCase
         $this->assertSame( array(), expAiThreadRetention::missing( array( 14 ), array( '14' ) ) );
     }
 
+    public function testTheLookupOfRemovedUsersFailsClosed(): void
+    {
+        $exists = function ( array $users ) { return function ( array $chunk ) use ( $users ) { return array_values( array_intersect( $chunk, $users ) ); }; };
+        $this->assertSame( array( 9 ), expAiThreadRetention::goneUsers( array( 1, 2, 9, 0 ), $exists( array( 1, 2 ) ), 't' ) );
+        $this->assertSame( array(), expAiThreadRetention::goneUsers( array(), $exists( array() ), 't' ) );
+        $this->assertSame( array(), expAiThreadRetention::goneUsers( array( 1, 2, 9 ), function () { return null; }, 't' ), 'a failed lookup removes no one' );
+        $this->assertSame( array(), expAiThreadRetention::goneUsers( array( 1, 2, 9 ), function () { return false; }, 't' ), 'a failed query removes no one' );
+        $this->assertSame( array(), expAiThreadRetention::goneUsers( array( 1, 2, 9 ), $exists( array() ), 't' ), 'none found although asked: no one' );
+        $this->assertSame( array(), expAiThreadRetention::goneUsers( array( 1, 2, 3, 9 ), $exists( array( 1 ) ), 't' ), 'more than half look gone: no one' );
+        $this->assertSame( array( 3, 9 ), expAiThreadRetention::goneUsers( array( 1, 2, 3, 9 ), $exists( array( 1, 2 ) ), 't' ), 'half is still believed' );
+        // a lookup in chunks: one failed chunk fails the whole run
+        $ids = range( 1, 1001 );
+        $calls = 0;
+        $chunked = function ( array $chunk ) use ( &$calls ) { $calls++; return $calls === 2 ? null : $chunk; };
+        $this->assertSame( array(), expAiThreadRetention::goneUsers( $ids, $chunked, 't' ) );
+    }
+
     public function testAnEmptyColumnOnEveryEngine(): void
     {
         $this->assertSame( "prompt_summary <> ''", expAiThreadRetention::notEmpty( new expAiRetentionTestDb( 'mysql' ), 'prompt_summary' ) );
@@ -61,6 +78,10 @@ class expAiRetentionTest extends expAiCoreTestCase
         if ( !$admin instanceof eZUser )
             $this->markTestSkipped( "needs the user 'admin'" );
         $adminID = (int) $admin->attribute( 'contentobject_id' );
+        // rows of other removed users (left by earlier runs) would make more than half look removed, which the
+        // retention refuses (goneUsers()): out of the way inside this test's transaction
+        foreach ( array( 'expai_conversation', 'expai_thread' ) as $table )
+            eZDB::instance()->query( "DELETE FROM $table WHERE user_id NOT IN ( SELECT contentobject_id FROM ezuser )" );
         $gone = new expAiConversation( array( 'user_id' => self::TEST_USER, 'node_id' => 2, 'messages' => '[]', 'created' => time(), 'modified' => time() ) );
         $gone->store();
         $aged = new expAiConversation( array( 'user_id' => $adminID, 'node_id' => 2, 'messages' => '[]', 'created' => $old, 'modified' => $old ) );

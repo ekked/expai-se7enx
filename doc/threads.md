@@ -94,6 +94,10 @@ The cronjob part `expai` does it (`cronjobs/expai_thread_prune.php`), and so doe
 thread that cannot be removed is logged and skipped). 0 keeps the rows. `[RetentionSettings] Mode=report` makes the
 cronjob only say what it would remove; the cronjob prints its counts on every run, also in quiet mode.
 
+The removal of the rows of removed users fails closed: when the lookup in `ezuser` fails or finds none of the users
+it asked for, no user counts as removed in that run; when more than half of the users of a table look removed, none
+of them is removed and a warning in the debug log asks to check the user table first.
+
 ## From conversations to threads
 
 An installation of an earlier expai has conversations but no threads. `bin/php/expaischema.php --install` adds the
