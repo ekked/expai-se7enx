@@ -264,6 +264,48 @@ class expAiAssistantStepTest extends expAiProviderTestCase
         $this->assertSame( array( 'type' => 'none' ), $stub->requests[0]['tool_choice'] );
     }
 
+    public function testAModelThatIgnoresTheCapStopsAtTheHardCap(): void
+    {
+        // MaxRequestsPerTurn 1: tool_choice none from the first request; the model keeps calling tools regardless
+        $config = $this->sitewide( array( 'Limits' => array( 'MaxRequestsPerTurn' => 1 ) ) );
+        $answers = array();
+        for ( $i = 0; $i < 10; $i++ )
+            $answers[] = expAiProviderTestScript::answer( array( expAiProviderTestScript::call( 'c' . $i, 'get_node', array( 'node_id' => $this->nodeID ) ) ), 'tool_use' );
+        $stub = new expAiProviderTestScript( $answers );
+        $statuses = array();
+        $result = $this->assistant( $stub, $config )->step( $this->nodeID, 'Read node 2' );
+        $statuses[] = $result['status'];
+        for ( $i = 0; $i < 8 && $result['status'] === 'continue'; $i++ )
+        {
+            $result = $this->assistant( $stub, $config )->step( $this->nodeID, null );
+            $statuses[] = $result['status'];
+        }
+        $this->assertSame( array( 'continue', 'continue', 'continue', 'done' ), $statuses, 'requests 1 to 3 run their tools, the 4th (past 1 + 2) not' );
+        $this->assertCount( 4, $stub->requests );
+        $conversation = eZPersistentObject::fetchObject( expAiConversation::definition(), null, array( 'id' => $result['conversation_id'] ) );
+        $messages = $conversation->messages();
+        $last = end( $messages );
+        $this->assertSame( 'assistant', $last['role'], 'the turn ends with the answer: nothing awaits a tool result' );
+        $this->assertStringNotContainsString( 'tool_use', (string) $last['content_json'] );
+        $this->assertStringContainsString( expAiAssistant::CAPPED_NOTE, (string) $last['content_json'] );
+        $this->assertFalse( $conversation->awaitsAnswer() );
+    }
+
+    public function testAnAnswerLosesItsToolCallsAtTheHardCap(): void
+    {
+        $answer = expAiProviderTestScript::answer( array( array( 'type' => 'text', 'text' => 'Looking.' ), expAiProviderTestScript::call( 'a', 'get_node', array( 'node_id' => 2 ) ) ),
+                                                   'tool_use', array( 'native_json' => '{}', 'native_for' => 'x' ) );
+        $this->assertTrue( expAiAssistant::hasToolUse( $answer ) );
+        $out = expAiAssistant::withoutToolUses( $answer );
+        $this->assertFalse( expAiAssistant::hasToolUse( $out ) );
+        $this->assertSame( array( array( 'type' => 'text', 'text' => 'Looking.' ) ), json_decode( $out['content_json'], true ), 'the words stay, no note needed' );
+        $this->assertArrayNotHasKey( 'native_json', $out );
+        $this->assertSame( 'end_turn', $out['stop_reason'] );
+        $only = expAiAssistant::withoutToolUses( expAiProviderTestScript::answer( array( expAiProviderTestScript::call( 'a', 'get_node', array() ) ), 'tool_use' ) );
+        $this->assertSame( array(), $only['content'] );
+        $this->assertSame( array( array( 'type' => 'text', 'text' => expAiAssistant::CAPPED_NOTE ) ), json_decode( $only['content_json'], true ) );
+    }
+
     public function testAModelWithoutToolsGetsASnapshotOfTheNode(): void
     {
         $stub = new expAiProviderTestScript( array( expAiProviderTestScript::text( 'It is a folder.' ) ), 'xtea.stub', 'none' );

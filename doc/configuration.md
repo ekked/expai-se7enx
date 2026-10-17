@@ -108,7 +108,7 @@ The alias is what users choose and what the usage log records (letters, digits, 
 
 | Setting | Default | Effect |
 | --- | --- | --- |
-| `MaxToolIterations` | `10` | The most model calls one editor message may lead to (each tool round is one). The last one is made without tools, so the model answers in words. |
+| `MaxToolIterations` | `10` | The most model calls one editor message may lead to (each tool round is one). The last one is made without tools, so the model answers in words; a model that still calls tools has them run at most two more times, after that its calls are not run and the turn ends ("Stopped. The steps so far are kept."). |
 | `MaxToolResultBytes` | `16000` | The longest tool result sent to the model; longer results are cut and say so. |
 | `MaxConversationBytes` | `400000` | The largest window (messages sent to the model); beyond it the editor is asked to start a new conversation. |
 | `MaxMessageLength` | `4000` | The longest message or brief, in characters (also the textarea's maxlength). |

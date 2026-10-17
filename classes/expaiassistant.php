@@ -432,6 +432,8 @@ class expAiAssistant
                 $this->fallbackTo = '';
             }
         }
+        // the request took its time (a slow model, a retry): the lock holds for the tools and the rest of the step
+        $this->renewLock();
 
         if ( $answer['stop_reason'] === 'refusal' )
         {
@@ -450,6 +452,17 @@ class expAiAssistant
                 $conversation->store();
             }
             throw new expAiException( 'Exponential Intelligence declined this request.', 'stop_reason refusal' );
+        }
+
+        // the hard cap: a model that ignores tool_choice=none (sent from MaxToolIterations on) asks for tools again and
+        // again; past the cap its tool calls are not run and the turn ends with what it has
+        $capped = false;
+        if ( $iterations > $maxIterations + self::HARD_CAP_MARGIN && self::hasToolUse( $answer ) )
+        {
+            eZDebug::writeWarning( 'expai: the model asked for tools after ' . $iterations . ' requests of one turn (limit ' . $maxIterations
+                                   . ', tool_choice none ignored); its tool calls were not run and the turn ended', __METHOD__ );
+            $answer = self::withoutToolUses( $answer );
+            $capped = true;
         }
 
         $assistantMessage = array( 'role' => 'assistant', 'content_json' => $answer['content_json'] );
@@ -475,6 +488,8 @@ class expAiAssistant
             elseif ( isset( $block['type'] ) && $block['type'] === 'tool_use' )
                 $toolUses[] = $block;
         }
+        if ( $capped )
+            $text .= ( $text !== '' ? "\n\n" : '' ) . ezpI18n::tr( 'extension/expai/vector', 'Stopped. The steps so far are kept.' );
 
         $steps = array();
         if ( $toolUses )
@@ -568,6 +583,46 @@ class expAiAssistant
 
     /** the words that ask a model for an answer again, after an answer without words or tool calls */
     const EMPTY_ANSWER_NUDGE = 'Answer the editor in words now, or call a tool.';
+
+    /** requests past MaxToolIterations (or [Limits] MaxRequestsPerTurn) after which tool calls are no longer run */
+    const HARD_CAP_MARGIN = 2;
+
+    /** what the stored answer says in place of tool calls that were not run (for the model, in the conversation) */
+    const CAPPED_NOTE = '(The tool calls of this answer were not run: the turn reached its limit of requests.)';
+
+    /** @return bool the answer asks for a tool */
+    public static function hasToolUse( array $answer )
+    {
+        foreach ( isset( $answer['content'] ) ? (array) $answer['content'] : array() as $block )
+            if ( isset( $block['type'] ) && $block['type'] === 'tool_use' )
+                return true;
+        return false;
+    }
+
+    /**
+     * The answer without its tool calls (the hard cap of a turn): the blocks shown and the blocks stored lose every
+     * tool_use; the stored ones get CAPPED_NOTE when no text is left, so the conversation stays a valid exchange for
+     * every provider. The provider's own state of the turn (native_json) is dropped, as it names the calls.
+     * @return array
+     */
+    public static function withoutToolUses( array $answer )
+    {
+        $keep = function ( $block ) { return !is_array( $block ) || !isset( $block['type'] ) || $block['type'] !== 'tool_use'; };
+        $answer['content'] = array_values( array_filter( isset( $answer['content'] ) ? (array) $answer['content'] : array(), $keep ) );
+        $stored = isset( $answer['content_json'] ) ? json_decode( (string) $answer['content_json'], true ) : null;
+        $stored = array_values( array_filter( is_array( $stored ) ? $stored : $answer['content'], $keep ) );
+        $hasText = false;
+        foreach ( $stored as $block )
+            if ( is_array( $block ) && isset( $block['type'] ) && $block['type'] === 'text' && trim( (string) ( isset( $block['text'] ) ? $block['text'] : '' ) ) !== '' )
+                $hasText = true;
+        if ( !$hasText )
+            $stored[] = array( 'type' => 'text', 'text' => self::CAPPED_NOTE );
+        $answer['content_json'] = json_encode( $stored, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE );
+        unset( $answer['native_json'], $answer['native_for'], $answer['native_ids'] );
+        if ( isset( $answer['stop_reason'] ) && $answer['stop_reason'] === 'tool_use' )
+            $answer['stop_reason'] = 'end_turn';
+        return $answer;
+    }
 
     /**
      * Is the answer empty: no text (besides reasoning) and no tool call? A refusal is an answer.

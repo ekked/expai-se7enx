@@ -255,3 +255,7 @@ anchors, literals, internal links and formatting attributes were lost, and ezaut
 - **Retention reports by default**: `[RetentionSettings] Mode` ships as `report` in this release (the cronjob only
   says what it would remove); `Mode=delete` applies the retention. The next release may switch the default to
   `delete`. An explicit setting is unchanged; an unknown value only reports.
+- **Tool loop**: a step renews its conversation lock right after the model's answer arrives (a slow model no longer
+  lets the lock run out before the tools run). A model that ignores `tool_choice=none` and keeps calling tools is
+  stopped: more than two requests past `MaxToolIterations` (or `[Limits] MaxRequestsPerTurn`), its tool calls are
+  not run and the turn ends as done with "Stopped. The steps so far are kept."
