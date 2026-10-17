@@ -38,6 +38,7 @@ abstract class expAiTestCase extends PHPUnit\Framework\TestCase
             set_time_limit( 0 );
         chdir( EXPAI_TEST_ROOT );
         expAiTestInstallation::forceFileMail();
+        expAiTestInstallation::englishTexts();
         expAiTestInstallation::blockProviders();
         // again before every test: a test of the audit may have reset its settings
         if ( defined( 'EXPAI_TEST_AUDIT_DIR' ) )

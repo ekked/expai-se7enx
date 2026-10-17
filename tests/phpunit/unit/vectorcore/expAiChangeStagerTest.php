@@ -144,10 +144,11 @@ class expAiChangeStagerTest extends expAiVectorCoreTestCase
         $this->assertSame( array( 'title' ), $result['unchanged'] );
         $this->assertSame( 'nothing to stage: the values equal the published version', $result['status'] );
 
-        $scoped = $this->thread( array( 'title' => 'language scope', 'scope' => array( 'nodes' => array( (int) $article->mainNodeID() ), 'languages' => array( 'ger-DE' ) ) ) );
+        $language = (string) $article->attribute( 'initial_language_code' );
+        // a scope language that is not the article's (on a ger-DE site the article is ger-DE)
+        $scoped = $this->thread( array( 'title' => 'language scope', 'scope' => array( 'nodes' => array( (int) $article->mainNodeID() ), 'languages' => array( $language === 'ger-DE' ? 'eng-GB' : 'ger-DE' ) ) ) );
         $context = new expAiToolContext( expAiConfig::instance(), 2, $scoped->conversation() );
         $context->staged = true;
-        $language = (string) $article->attribute( 'initial_language_code' );
         $this->assertSame( "The language $language is not in the scope of this thread.",
                            self::error( function () use ( $context, $article ) { expAiChangeStager::forContext( $context )->stageUpdate( $article, '', array( 'title' => 'X' ) ); } ) );
     }

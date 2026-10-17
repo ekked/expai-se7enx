@@ -27,7 +27,9 @@ class expAiScriptRunner
      */
     public static function run( $script, array $env = array(), array $arguments = array(), $timeout = 1200 )
     {
-        $command = array( 'timeout', (string) (int) $timeout, PHP_BINARY );
+        // GNU timeout (gtimeout from coreutils on macOS, where timeout is missing); without it the script runs unlimited
+        $limit = self::timeoutCommand();
+        $command = $limit !== '' ? array( $limit, (string) (int) $timeout, PHP_BINARY ) : array( PHP_BINARY );
         $coverageFile = null;
         $coverage = self::coverage();
         if ( $coverage )
@@ -138,5 +140,25 @@ class expAiScriptRunner
         if ( !$runner->isActive() )
             return null;
         return $runner->codeCoverage();
+    }
+
+    /** @return string timeout or gtimeout from the PATH, '' when neither is installed */
+    private static function timeoutCommand()
+    {
+        static $found = null;
+        if ( $found === null )
+        {
+            $found = '';
+            foreach ( array( 'timeout', 'gtimeout' ) as $name )
+            {
+                $path = trim( (string) shell_exec( 'command -v ' . $name . ' 2>/dev/null' ) );
+                if ( $path !== '' && is_executable( $path ) )
+                {
+                    $found = $path;
+                    break;
+                }
+            }
+        }
+        return $found;
     }
 }

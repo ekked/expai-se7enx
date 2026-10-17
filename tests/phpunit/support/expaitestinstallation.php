@@ -46,7 +46,28 @@ class expAiTestInstallation
             self::$reason = 'the installation did not start: ' . trim( strtok( $e->getMessage(), "\n" ) );
         }
         self::forceFileMail();
+        self::englishTexts();
         self::blockProviders();
+    }
+
+    /**
+     * The tests compare the texts and numbers expai shows with their English source: whatever language the site
+     * runs in (a ger-DE siteaccess translates every message and writes 1,2k), the run uses the untranslated texts
+     * and the eng-GB locale. Set in memory, again before every test (a test may reset the INI instances).
+     */
+    public static function englishTexts()
+    {
+        if ( !class_exists( 'eZINI' ) )
+            return;
+        $ini = eZINI::instance( 'site.ini' );
+        if ( $ini->variable( 'RegionalSettings', 'Locale' ) === 'eng-GB' && $ini->variable( 'RegionalSettings', 'TextTranslation' ) === 'disabled' )
+            return;
+        $ini->setVariable( 'RegionalSettings', 'Locale', 'eng-GB' );
+        $ini->setVariable( 'RegionalSettings', 'TextTranslation', 'disabled' );
+        if ( class_exists( 'eZTranslatorManager' ) )
+            eZTranslatorManager::resetTranslations();
+        if ( class_exists( 'ezpI18n' ) )
+            ezpI18n::reset();
     }
 
     /**
@@ -84,6 +105,10 @@ class expAiTestInstallation
                     $ini->setVariable( $group, $name, 'http://127.0.0.1:9/blocked-by-the-expai-tests' );
             }
         }
+        // the site's own region rule (e.g. DefaultRegions[]=eu;local) would keep content from the mock providers of the
+        // tests, which declare other regions; the shipped default has none, and a test of the data policy sets its own
+        if ( $ini->hasVariable( 'DataPolicy', 'DefaultRegions' ) )
+            $ini->setVariable( 'DataPolicy', 'DefaultRegions', array() );
     }
 
     /** @return string */
