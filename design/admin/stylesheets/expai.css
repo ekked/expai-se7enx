@@ -274,11 +274,11 @@ html[data-a4-theme="dark"] .exp-ai.exp-ai-on-light, html[data-a4-theme="dark"] .
     padding: 0.5em 0.75em;
     border: 1px solid var(--exp-ai-line);
     border-left: 3px solid var(--exp-ai-accent);
-    border-radius: 4px;
+    border-radius: var(--exp-ai-radius);
     font-size: 0.95em;
 }
 .exp-ai-review-reason { margin: 0 0 0.4em; }
-.exp-ai-review-text { max-height: 16em; overflow: auto; padding: 0.3em 0.5em; border: 1px dashed var(--exp-ai-line); border-radius: 4px; }
+.exp-ai-review-text { max-height: 16em; overflow: auto; padding: 0.3em 0.5em; border: 1px dashed var(--exp-ai-line); border-radius: var(--exp-ai-radius); }
 .exp-ai-review-text p, .exp-ai-review-text ul, .exp-ai-review-text ol { margin: 0.3em 0; }
 .exp-ai-review-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4em; margin: 0.5em 0 0; }
 

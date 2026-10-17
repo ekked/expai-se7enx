@@ -240,6 +240,30 @@
         } );
     }
 
+    /**
+     * The value without script and style elements, in linear time: each element ends at the first closing tag of its
+     * name; an element that is never closed is left as it is (and no later one of the same name is searched again).
+     */
+    function stripRaw( text ) {
+        var lower = text.toLowerCase(), out = '', pos = 0, re = /<(script|style)\b/gi, none = {}, m, name, close, end;
+        while ( ( m = re.exec( text ) ) !== null ) {
+            name = m[1].toLowerCase();
+            if ( m.index < pos || none[name] ) {
+                continue;
+            }
+            close = lower.indexOf( '</' + name, re.lastIndex );
+            end = close < 0 ? -1 : lower.indexOf( '>', close );
+            if ( end < 0 ) {
+                none[name] = true;
+                continue;
+            }
+            out += text.slice( pos, m.index );
+            pos = end + 1;
+            re.lastIndex = pos;
+        }
+        return out + text.slice( pos );
+    }
+
     /** The value as plain text, blocks as paragraphs and list items as "- " lines (for a preview through renderText) */
     function toText( value ) {
         var text = String( value === undefined || value === null ? '' : value );
@@ -247,13 +271,14 @@
         if ( !/<\/?[a-zA-Z]/.test( text ) ) {
             return text;
         }
-        text = text.replace( /<(script|style)\b[\s\S]*?<\/\1\s*>/gi, '' )
+        text = stripRaw( text )
             .replace( /<br\s*\/?>/gi, '\n' )
             .replace( /<li\b[^>]*>/gi, '\n- ' )
             .replace( /<\/(p|h[1-6]|ul|ol|pre|table|tr|div|paragraph|header|section|literal|blockquote)\s*>/gi, '\n\n' )
             .replace( /<\/(td|th)\s*>/gi, ' ' )
             .replace( /<!--[\s\S]*?(?:-->|$)/g, '' )
-            .replace( /<\/?[a-zA-Z][^>]*>/g, '' );
+            // [^<>]: a tag that is never closed ends at the next "<" (linear on a long answer full of "<a")
+            .replace( /<\/?[a-zA-Z][^<>]*>/g, '' );
         return decode( text ).replace( /[ \t]+\n/g, '\n' ).replace( /\n{3,}/g, '\n\n' ).trim();
     }
 

@@ -154,3 +154,14 @@ test( 'malformed markup does not hang the scanner', () => {
     S.count( '<pre><span>'.repeat( 50000 ) );
     assert.ok( Date.now() - start < 2000 );
 } );
+
+test( 'toText takes a long answer full of unclosed tags apart in linear time', () => {
+    const start = Date.now();
+    S.toText( '<p>x</p>' + '<style '.repeat( 50000 ) );
+    S.toText( '<p>x</p>' + '<a '.repeat( 100000 ) );
+    S.toText( '<p>x</p>' + '<script>'.repeat( 50000 ) );
+    assert.ok( Date.now() - start < 2000 );
+    // an unclosed style element is left to the tag rule, a closed one goes with its content
+    assert.equal( S.toText( '<p>a</p><style>b{}</style><p>c</p><style>d' ), 'a\n\nc\n\nd' );
+    assert.equal( S.toText( '<p>a</p><SCRIPT type="x">1</SCRIPT ><p>b</p>' ), 'a\n\nb' );
+} );
