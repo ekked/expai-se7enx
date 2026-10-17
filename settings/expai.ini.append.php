@@ -639,8 +639,32 @@ WritableDatatypes[]=ezurl
 # The most children / siblings one lookup returns.
 ListLimit=25
 
-# The longest field value the lookup tools return, in characters.
+# The longest field value the lookup tools return, in characters (rich text: [RichTextSettings] MaxLength).
 FieldValueMaxLength=3000
+
+[RichTextSettings]
+# Rich text the model reads and writes (the tools, Vector, a plan's batch requests; doc/configuration.md
+# "[RichTextSettings]"). enabled: what the HTML subset cannot express is a placeholder such as ⟦C1⟧ (a formula, custom tag, embed, table, internal link,
+# formatting, the rest of a long field); an answer is written only when every placeholder comes back exactly once and
+# the value keeps all its custom tags, embeds, tables, ... (otherwise Vector shows it for review). disabled: the old
+# plain HTML view, which loses that structure.
+Placeholders=enabled
+# The datatypes whose stored value is ezxmltext and that get placeholders. A datatype of another extension that
+# stores ezxmltext can be added here.
+Datatypes[]=ezxmltext
+# The characters of a rich text field the model reads. A longer field ends in one placeholder for its rest, which is
+# written back unchanged. Empty: [EditViewSettings] MaxFieldLength.
+MaxLength=
+# The elements that are always kept whole as a placeholder, with the letter of the placeholder (C, E, T, P, A, or any
+# other capital except K, L, Q, R and X; Q stands for a ⟦ or ⟧ of the text). Elements outside the HTML subset that are
+# not listed become X placeholders; links the subset cannot keep become L. Custom tags (math_latex, math_mathml, ...)
+# are kept with all their attributes.
+Protected[custom]=C
+Protected[embed]=E
+Protected[embed-inline]=E
+Protected[table]=T
+Protected[literal]=P
+Protected[anchor]=A
 
 [Tool_get_node]
 Class=expAiToolGetNode

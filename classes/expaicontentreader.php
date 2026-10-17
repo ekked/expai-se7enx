@@ -202,6 +202,10 @@ class expAiContentReader
         $max = $this->maxValue();
         if ( !$attribute->hasContent() )
             return null;
+        // rich text with placeholders for what the HTML subset cannot express; a long field ends in a placeholder for
+        // its rest ([RichTextSettings] MaxLength), which the write tools keep as it is
+        if ( expAiRichTextTokens::handles( $attribute->attribute( 'data_type_string' ), $this->config ) )
+            return ( new expAiRichTextTokens( $this->config ) )->forModel( $attribute->attribute( 'data_text' ) );
         switch ( $attribute->attribute( 'data_type_string' ) )
         {
             case 'ezxmltext':
@@ -303,7 +307,9 @@ class expAiContentReader
         $hints = array(
             'ezstring' => 'one line of plain text',
             'eztext' => 'plain text, paragraphs separated by blank lines',
-            'ezxmltext' => 'rich text as HTML using only p, h2, h3, h4, strong, em, ul, ol, li, a href',
+            'ezxmltext' => expAiRichTextTokens::enabled( $this->config )
+                ? 'rich text as HTML using only p, h1-h6, strong, em, ul, ol, li, a href; keep every placeholder like ⟦C1⟧ exactly once and unchanged'
+                : 'rich text as HTML using only p, h2, h3, h4, strong, em, ul, ol, li, a href',
             'ezkeyword' => 'comma separated keywords',
             'ezboolean' => 'true or false',
             'ezinteger' => 'an integer',

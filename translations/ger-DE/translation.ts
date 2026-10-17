@@ -6663,4 +6663,126 @@
         <translation>Bitte geben Sie die Suchbegriffe an.</translation>
     </message>
 </context>
+<!-- expai rich text placeholders: begin -->
+<context>
+    <name>extension/expai/richtext</name>
+    <message>
+        <source>%count custom tag %name</source>
+        <translation>%count Custom-Tag %name</translation>
+    </message>
+    <message>
+        <source>%count custom tags %name</source>
+        <translation>%count Custom-Tags %name</translation>
+    </message>
+    <message>
+        <source>%count embedded object</source>
+        <translation>%count eingebettetes Objekt</translation>
+    </message>
+    <message>
+        <source>%count embedded objects</source>
+        <translation>%count eingebettete Objekte</translation>
+    </message>
+    <message>
+        <source>%count table</source>
+        <translation>%count Tabelle</translation>
+    </message>
+    <message>
+        <source>%count tables</source>
+        <translation>%count Tabellen</translation>
+    </message>
+    <message>
+        <source>%count literal block</source>
+        <translation>%count Literal-Block</translation>
+    </message>
+    <message>
+        <source>%count literal blocks</source>
+        <translation>%count Literal-Blöcke</translation>
+    </message>
+    <message>
+        <source>%count anchor</source>
+        <translation>%count Anker</translation>
+    </message>
+    <message>
+        <source>%count anchors</source>
+        <translation>%count Anker</translation>
+    </message>
+    <message>
+        <source>%count link the answer cannot keep</source>
+        <translation>%count Link, den die Antwort nicht halten kann</translation>
+    </message>
+    <message>
+        <source>%count links the answer cannot keep</source>
+        <translation>%count Links, die die Antwort nicht halten kann</translation>
+    </message>
+    <message>
+        <source>%count formatting attribute</source>
+        <translation>%count Formatierungsattribut</translation>
+    </message>
+    <message>
+        <source>%count formatting attributes</source>
+        <translation>%count Formatierungsattribute</translation>
+    </message>
+    <message>
+        <source>the rest of the field</source>
+        <translation>den Rest des Feldes</translation>
+    </message>
+    <message>
+        <source>%count element %name</source>
+        <translation>%count Element %name</translation>
+    </message>
+    <message>
+        <source>%count elements %name</source>
+        <translation>%count Elemente %name</translation>
+    </message>
+    <message>
+        <source>Placeholders missing: %list.</source>
+        <translation>Fehlende Platzhalter: %list.</translation>
+    </message>
+    <message>
+        <source>Placeholders repeated: %list.</source>
+        <translation>Wiederholte Platzhalter: %list.</translation>
+    </message>
+    <message>
+        <source>Placeholders that are not in the text: %list.</source>
+        <translation>Platzhalter, die nicht im Text stehen: %list.</translation>
+    </message>
+    <message>
+        <source>Placeholders in a place where their element cannot stand: %list.</source>
+        <translation>Platzhalter an einer Stelle, an der ihr Element nicht stehen kann: %list.</translation>
+    </message>
+    <message>
+        <source>The text would lose: %items.</source>
+        <translation>Der Text würde verlieren: %items.</translation>
+    </message>
+    <message>
+        <source>The rich text keeps its structure only when every placeholder comes back exactly once and unchanged.</source>
+        <translation>Der formatierte Text behält seine Struktur nur, wenn jeder Platzhalter genau einmal und unverändert zurückkommt.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>This part would remove %items from the text and cannot be accepted. Reject it, or ask for a new proposal that keeps them.</source>
+        <translation>Dieser Teil würde %items aus dem Text entfernen und kann nicht angenommen werden. Lehnen Sie ihn ab oder bitten Sie um einen neuen Vorschlag, der sie behält.</translation>
+    </message>
+    <message>
+        <source>The accepted parts would remove %items from the field %field. Nothing was written.</source>
+        <translation>Die angenommenen Teile würden %items aus dem Feld %field entfernen. Es wurde nichts geschrieben.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/step</name>
+    <message>
+        <source>Changed "%name"; rich text that would lose its structure was not written</source>
+        <translation>„%name“ geändert; formatierter Text, der seine Struktur verloren hätte, wurde nicht geschrieben</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/vector</name>
+    <message>
+        <source>This part would remove %items from the text, so it cannot be accepted. Reject it, or ask for a new proposal that keeps them.</source>
+        <translation>Dieser Teil würde %items aus dem Text entfernen und kann deshalb nicht angenommen werden. Lehnen Sie ihn ab oder bitten Sie um einen neuen Vorschlag, der sie behält.</translation>
+    </message>
+</context>
+<!-- expai rich text placeholders: end -->
 </TS>

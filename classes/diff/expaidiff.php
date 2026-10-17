@@ -408,7 +408,8 @@ class expAiDiff
             if ( $seen[$id] > 1 )
                 $id .= '-' . $seen[$id];
             $text = function ( array $idx, array $blocks ) { return implode( "\n", array_map( function ( $i ) use ( $blocks ) { return $blocks[$i]['text']; }, $idx ) ); };
-            $hunks[] = array( 'id' => $id, 'attribute' => (string) $attribute,
+            $loses = self::loses( $baseIdx, $base, $propIdx, $prop );
+            $hunks[] = array( 'id' => $id, 'attribute' => (string) $attribute, 'loses' => $loses,
                               'op' => count( $kinds ) === 1 && isset( $kinds['insert'] ) ? 'insert' : ( count( $kinds ) === 1 && isset( $kinds['delete'] ) ? 'delete' : 'replace' ),
                               'op_indexes' => $run, 'base' => $baseIdx, 'prop' => $propIdx, 'changes' => $changes,
                               'base_text' => $text( $baseIdx, $base ), 'prop_text' => $text( $propIdx, $prop ),
@@ -425,6 +426,31 @@ class expAiDiff
         }
         $flush( null );
         return $hunks;
+    }
+
+    /**
+     * The protected elements (custom tags, embeds, anchors, ... of stored rich text: the blocks' "protected") the
+     * proposed blocks of a hunk have fewer of than its base blocks. Such a hunk cannot be accepted: taking it would
+     * drop them (a formula whose paragraph came back as plain text looks like a change of markup only).
+     * @return int[] kind => count
+     */
+    public static function loses( array $baseIdx, array $base, array $propIdx, array $prop )
+    {
+        $sum = function ( array $idx, array $blocks )
+        {
+            $out = array();
+            foreach ( $idx as $i )
+                foreach ( isset( $blocks[$i]['protected'] ) ? (array) $blocks[$i]['protected'] : array() as $kind => $n )
+                    $out[$kind] = ( isset( $out[$kind] ) ? $out[$kind] : 0 ) + (int) $n;
+            return $out;
+        };
+        $before = $sum( $baseIdx, $base );
+        $after = $sum( $propIdx, $prop );
+        $out = array();
+        foreach ( $before as $kind => $n )
+            if ( ( isset( $after[$kind] ) ? $after[$kind] : 0 ) < $n )
+                $out[$kind] = $n - ( isset( $after[$kind] ) ? $after[$kind] : 0 );
+        return $out;
     }
 
     /** @return array the metrics of one attribute */
@@ -523,6 +549,8 @@ class expAiDiff
         foreach ( array_keys( $accepted ) as $id )
             if ( !isset( $known[$id] ) )
                 $result['unknown'][] = (string) $id;
+        if ( !empty( $options['structure_guard'] ) )
+            self::guardStructure( $diff, $result['values'] );
         if ( empty( $options['write'] ) )
             return $result;
 
@@ -534,6 +562,27 @@ class expAiDiff
         foreach ( $diff->attributes() as $identifier => $attribute )
             $types[$identifier] = $attribute['datatype'];
         return $result + self::writeDraft( $object, $language, $result['values'], $types, $options );
+    }
+
+    /**
+     * The last check before merged rich text is written (option structure_guard of apply()): no value may have fewer
+     * custom tags, embeds, tables, ... than its base (expAiRichTextTokens::loss()), whichever parts were accepted.
+     * @throws expAiException naming the field and what it would lose
+     */
+    public static function guardStructure( expAiDiffResult $diff, array $values )
+    {
+        $attributes = $diff->attributes();
+        $tokens = null;
+        foreach ( $values as $identifier => $value )
+        {
+            if ( !isset( $attributes[$identifier] ) || !expAiRichTextTokens::handles( $attributes[$identifier]['datatype'] ) )
+                continue;
+            $tokens = $tokens ?: new expAiRichTextTokens();
+            $loss = $tokens->loss( (string) $attributes[$identifier]['base_value'], (string) $value );
+            if ( $loss )
+                throw new expAiException( 'The accepted parts would remove %items from the field %field. Nothing was written.', 'structure guard', 0,
+                                          array( '%items' => expAiRichTextTokens::describe( $loss ), '%field' => (string) $identifier ) );
+        }
     }
 
     /**

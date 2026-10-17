@@ -426,8 +426,10 @@
                              + '<button type="button" class="exp-ai-v-btn exp-ai-v-btn-small" data-rv="cancel">' + esc( T( 'rv_cancel' ) ) + '</button></div>'
                            : '<div class="exp-ai-v-hunk-body">' + body + '</div>' )
                  + ( !h.mergeable ? '<p class="exp-ai-v-hint">' + esc( T( 'rv_not_alone' ) ) + '</p>' : '' )
+                 // a part that would drop custom tags, embeds, ... cannot be accepted (the server refuses it too)
+                 + ( h.loses ? '<p class="exp-ai-v-hint exp-ai-v-hint-loses" role="note">' + esc( T( 'rv_loses', { '%items': h.loses } ) ) + '</p>' : '' )
                  + ( open && !editing ? '<div class="exp-ai-v-hunk-actions">'
-                     + '<button type="button" class="exp-ai-v-btn exp-ai-v-btn-small" data-rv="accepted" aria-pressed="' + ( h.decision === 'accepted' ) + '">' + esc( T( 'rv_accept' ) ) + ' <kbd class="exp-ai-v-kbd" data-keys="accept"></kbd></button>'
+                     + ( h.loses ? '' : '<button type="button" class="exp-ai-v-btn exp-ai-v-btn-small" data-rv="accepted" aria-pressed="' + ( h.decision === 'accepted' ) + '">' + esc( T( 'rv_accept' ) ) + ' <kbd class="exp-ai-v-kbd" data-keys="accept"></kbd></button>' )
                      + '<button type="button" class="exp-ai-v-btn exp-ai-v-btn-small" data-rv="rejected" aria-pressed="' + ( h.decision === 'rejected' ) + '">' + esc( T( 'rv_reject' ) ) + ' <kbd class="exp-ai-v-kbd" data-keys="reject"></kbd></button>'
                      + ( h.editable ? '<button type="button" class="exp-ai-v-btn exp-ai-v-btn-small" data-rv="edit">' + esc( T( 'rv_edit' ) ) + ' <kbd class="exp-ai-v-kbd" data-keys="edit_hunk"></kbd></button>' : '' )
                      + ( h.decision !== 'pending' ? '<button type="button" class="exp-ai-v-link" data-rv="pending">' + esc( T( 'rv_undo' ) ) + '</button>' : '' )

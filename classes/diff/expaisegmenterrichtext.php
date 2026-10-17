@@ -22,6 +22,8 @@
  *   inserted block is placed after the block before it (lists and tables are created where the neighbour is not in
  *   one), a deleted block is removed with the containers it leaves empty. Table cells cannot be inserted or removed
  *   on their own (mergeable false).
+ * - Blocks of stored rich text carry "protected": the custom tags, embeds, anchors, ... of their inline content
+ *   (expAiRichTextTokens::inlineCounts()); a hunk whose proposal has fewer of them "loses" them (expAiDiff).
  */
 class expAiSegmenterRichText implements expAiSegmenter
 {
@@ -30,6 +32,9 @@ class expAiSegmenterRichText implements expAiSegmenter
     protected static $containerNames = array( 'section' => 1, 'ul' => 1, 'ol' => 1, 'dl' => 1, 'table' => 1, 'tbody' => 1, 'thead' => 1, 'tfoot' => 1,
                                               'tr' => 1, 'div' => 1, 'blockquote' => 1 );
     protected static $atomNames = array( 'embed' => 1, 'embed-inline' => 1, 'img' => 1, 'anchor' => 1, 'br' => 1, 'object' => 1, 'hr' => 1 );
+
+    /** @var expAiRichTextTokens|null what counts as a protected element (read once per instance) */
+    protected $tokens = null;
 
     /** parsed documents by hash of the value (one call of compose() reads the same value many times) */
     protected $documents = array();
@@ -375,9 +380,16 @@ class expAiSegmenterRichText implements expAiSegmenter
         foreach ( $node->attributes as $attribute )
             $attributes[] = $attribute->nodeName . '=' . $attribute->nodeValue;
         sort( $attributes );
-        return expAiSegmenterBase::block( $index, $type, expAiSentences::normalize( $readable ), $coded,
-                                          $node->localName . $level . '[' . implode( ' ', $attributes ) . ']' . $shape, $language, $atoms,
-                                          $this->isMergeable( $node ) );
+        $block = expAiSegmenterBase::block( $index, $type, expAiSentences::normalize( $readable ), $coded,
+                                            $node->localName . $level . '[' . implode( ' ', $attributes ) . ']' . $shape, $language, $atoms,
+                                            $this->isMergeable( $node ) );
+        // the elements of stored rich text a proposal must not drop (custom tags, embeds, ...: expAiDiff "loses")
+        if ( !$this->isHtml( $node->ownerDocument ) && class_exists( 'expAiRichTextTokens' ) )
+        {
+            $this->tokens = $this->tokens ?: new expAiRichTextTokens();
+            $block['protected'] = $this->tokens->inlineCounts( $this->ownInline( $node ) );
+        }
+        return $block;
     }
 
     public function merge( $baseValue, $propValue, array $ops, array $options = array() )

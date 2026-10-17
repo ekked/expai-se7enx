@@ -300,6 +300,7 @@
         'rv_reject_field', 'Reject field'|i18n( $exp_ai_i18n ),
         'rv_edited', 'edited by you'|i18n( $exp_ai_i18n ),
         'rv_not_alone', 'This part can only be accepted together with the rest of its table.'|i18n( $exp_ai_i18n ),
+        'rv_loses', 'This part would remove %items from the text, so it cannot be accepted. Reject it, or ask for a new proposal that keeps them.'|i18n( $exp_ai_i18n ),
         'rv_decision_pending', 'To review'|i18n( $exp_ai_i18n ),
         'rv_decision_accepted', 'Accepted'|i18n( $exp_ai_i18n ),
         'rv_decision_rejected', 'Rejected'|i18n( $exp_ai_i18n ),

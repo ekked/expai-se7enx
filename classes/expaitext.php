@@ -261,9 +261,11 @@ class expAiText
     /**
      * The HTML subset of the assistant, cleaned: only the allowed tags, only http(s) and mailto links, no
      * attributes otherwise, no comments, scripts or styles.
+     * @param bool $headings keep h1, h5 and h6 (rich text with placeholders: expAiRichTextTokens reads every heading
+     *                       level as h1-h6); otherwise h1 becomes h2 and h5, h6 become h4
      * @return string
      */
-    public static function sanitizeHtml( $html )
+    public static function sanitizeHtml( $html, $headings = false )
     {
         $html = (string) $html;
         if ( trim( $html ) === '' )
@@ -281,12 +283,12 @@ class expAiText
             return '';
         $out = '';
         foreach ( iterator_to_array( $root->childNodes ) as $child )
-            $out .= self::cleanNode( $child );
+            $out .= self::cleanNode( $child, $headings );
         // stray text at the top level goes into paragraphs
         return trim( $out );
     }
 
-    protected static function cleanNode( DOMNode $node )
+    protected static function cleanNode( DOMNode $node, $headings = false )
     {
         if ( $node instanceof DOMText )
             return htmlspecialchars( $node->nodeValue, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' );
@@ -295,14 +297,14 @@ class expAiText
         $name = strtolower( $node->nodeName );
         if ( in_array( $name, array( 'script', 'style', 'iframe', 'object', 'embed', 'img', 'svg', 'math', 'form', 'input', 'textarea', 'select', 'button' ), true ) )
             return '';
-        if ( $name === 'h1' )
+        if ( $name === 'h1' && !$headings )
             $name = 'h2';
-        elseif ( in_array( $name, array( 'h5', 'h6' ), true ) )
+        elseif ( in_array( $name, array( 'h5', 'h6' ), true ) && !$headings )
             $name = 'h4';
         $inner = '';
         foreach ( iterator_to_array( $node->childNodes ) as $child )
-            $inner .= self::cleanNode( $child );
-        if ( !isset( self::$allowedTags[$name] ) )
+            $inner .= self::cleanNode( $child, $headings );
+        if ( !isset( self::$allowedTags[$name] ) && !( $headings && in_array( $name, array( 'h1', 'h5', 'h6' ), true ) ) )
             return $inner;
         if ( $name === 'br' )
             return '<br />';

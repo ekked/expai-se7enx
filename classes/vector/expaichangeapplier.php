@@ -75,7 +75,7 @@ class expAiChangeApplier
     /** @return array the options of expAiDiff::apply() for a draft of this thread */
     protected function options( expAiChange $first, array $extra = array() )
     {
-        return $extra + array( 'write' => true, 'source' => 'vector', 'thread_id' => (int) $this->thread->attribute( 'id' ),
+        return $extra + array( 'write' => true, 'structure_guard' => true, 'source' => 'vector', 'thread_id' => (int) $this->thread->attribute( 'id' ),
                                'change_id' => (int) $first->attribute( 'id' ), 'model' => (string) $this->thread->attribute( 'model_alias' ),
                                'provider' => (string) $this->thread->attribute( 'provider' ) ?: expAiConfig::instance()->registry()->providerOf( (string) $this->thread->attribute( 'model_alias' ) ),
                                'prompt_summary' => expAiText::cut( (string) $this->thread->attribute( 'title' ), 200 ) );
