@@ -275,6 +275,10 @@
         <source>%count runs started. Watch them here:</source>
         <translation>Se han iniciado %count ejecuciones. Síguelas aquí:</translation>
     </message>
+    <message>
+        <source>No runs yet.</source>
+        <translation>Todavía no hay ejecuciones.</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/error</name>
@@ -393,6 +397,18 @@
     <message>
         <source>The draft could not be written.</source>
         <translation>No se ha podido escribir el borrador.</translation>
+    </message>
+    <message>
+        <source>The model gave no answer. Try again, or choose another model.</source>
+        <translation>El modelo no ha dado ninguna respuesta. Vuelve a intentarlo o elige otro modelo.</translation>
+    </message>
+    <message>
+        <source>The answer was cut off at the token limit. Raise MaxTokens or lower Effort for this model.</source>
+        <translation>La respuesta se ha cortado en el límite de tokens. Aumenta MaxTokens o reduce Effort para este modelo.</translation>
+    </message>
+    <message>
+        <source>The answer stream ended early.</source>
+        <translation>El flujo de la respuesta ha terminado antes de tiempo.</translation>
     </message>
     <message>
         <source>The batch API of %provider reported an error.</source>
@@ -1079,6 +1095,22 @@
         <translation>Este punto de control ya no existe.</translation>
     </message>
     <message>
+        <source>A step of this conversation is already running. Wait until it has finished, then try again.</source>
+        <translation>Ya se está ejecutando un paso de esta conversación. Espera a que termine y vuelve a intentarlo.</translation>
+    </message>
+    <message>
+        <source>The model %model has no price, so a cost limit of this site cannot be kept for it. Choose another model, or ask an administrator to set its price.</source>
+        <translation>El modelo %model no tiene precio, así que no se puede respetar para él un límite de costes de este sitio. Elige otro modelo o pide a un administrador que fije su precio.</translation>
+    </message>
+    <message>
+        <source>The limit %limit would be passed together with the requests under way (%used used and %reserved reserved of %max). Try again in a moment.</source>
+        <translation>El límite %limit se superaría junto con las solicitudes en curso (%used usado y %reserved reservado de %max). Vuelve a intentarlo dentro de un momento.</translation>
+    </message>
+    <message>
+        <source>Give the words to search for.</source>
+        <translation>Indica las palabras que quieres buscar.</translation>
+    </message>
+    <message>
         <source>Request in the log</source>
         <translation>Solicitud en el registro</translation>
     </message>
@@ -1614,6 +1646,134 @@
         <source>Exponential Intelligence suggested no values.</source>
         <translation>Exponential Intelligence no ha sugerido ningún valor.</translation>
     </message>
+    <message>
+        <source>Review the answer</source>
+        <translation>Revisar la respuesta</translation>
+    </message>
+    <message>
+        <source>Nothing was written into the field yet: review the answer below.</source>
+        <translation>Todavía no se ha escrito nada en el campo: revisa la respuesta de abajo.</translation>
+    </message>
+    <message>
+        <source>The field changed while the answer was written.</source>
+        <translation>El campo ha cambiado mientras se escribía la respuesta.</translation>
+    </message>
+    <message>
+        <source>%list would be lost.</source>
+        <translation>Se perdería: %list.</translation>
+    </message>
+    <message>
+        <source>%count answer(s) not written: review them at their fields.</source>
+        <translation>%count respuesta(s) no aplicada(s): revísalas en sus campos.</translation>
+    </message>
+    <message>
+        <source>Apply anyway</source>
+        <translation>Aplicar de todos modos</translation>
+    </message>
+    <message>
+        <source>Keep the original</source>
+        <translation>Conservar el original</translation>
+    </message>
+    <message>
+        <source>Copy text</source>
+        <translation>Copiar texto</translation>
+    </message>
+    <message>
+        <source>Copied.</source>
+        <translation>Copiado.</translation>
+    </message>
+    <message>
+        <source>The text could not be copied.</source>
+        <translation>No se ha podido copiar el texto.</translation>
+    </message>
+    <message>
+        <source>Kept the original value.</source>
+        <translation>Se ha conservado el valor original.</translation>
+    </message>
+    <message>
+        <source>The structure of the field could not be checked.</source>
+        <translation>No se ha podido comprobar la estructura del campo.</translation>
+    </message>
+    <message>
+        <source>%count table cell</source>
+        <translation>%count celda de tabla</translation>
+    </message>
+    <message>
+        <source>%count table cells</source>
+        <translation>%count celdas de tabla</translation>
+    </message>
+    <message>
+        <source>%count header cell</source>
+        <translation>%count celda de encabezado</translation>
+    </message>
+    <message>
+        <source>%count header cells</source>
+        <translation>%count celdas de encabezado</translation>
+    </message>
+    <message>
+        <source>%count merged cell</source>
+        <translation>%count celda combinada</translation>
+    </message>
+    <message>
+        <source>%count merged cells</source>
+        <translation>%count celdas combinadas</translation>
+    </message>
+    <message>
+        <source>%count embedded object</source>
+        <translation>%count objeto incrustado</translation>
+    </message>
+    <message>
+        <source>%count embedded objects</source>
+        <translation>%count objetos incrustados</translation>
+    </message>
+    <message>
+        <source>%count table</source>
+        <translation>%count tabla</translation>
+    </message>
+    <message>
+        <source>%count tables</source>
+        <translation>%count tablas</translation>
+    </message>
+    <message>
+        <source>%count custom tag</source>
+        <translation>%count etiqueta personalizada</translation>
+    </message>
+    <message>
+        <source>%count custom tags</source>
+        <translation>%count etiquetas personalizadas</translation>
+    </message>
+    <message>
+        <source>%count anchor</source>
+        <translation>%count ancla</translation>
+    </message>
+    <message>
+        <source>%count anchors</source>
+        <translation>%count anclas</translation>
+    </message>
+    <message>
+        <source>%count literal block</source>
+        <translation>%count bloque literal</translation>
+    </message>
+    <message>
+        <source>%count literal blocks</source>
+        <translation>%count bloques literales</translation>
+    </message>
+    <message>
+        <source>%count internal link</source>
+        <translation>%count enlace interno</translation>
+    </message>
+    <message>
+        <source>%count internal links</source>
+        <translation>%count enlaces internos</translation>
+    </message>
+    <message>
+        <source>%count formatting attribute</source>
+        <translation>%count atributo de formato</translation>
+    </message>
+    <message>
+        <source>%count formatting attributes</source>
+        <translation>%count atributos de formato</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/fieldaction</name>
@@ -1647,6 +1807,10 @@
     <message>
         <source>Exponential Intelligence</source>
         <translation>Exponential Intelligence</translation>
+    </message>
+    <message>
+        <source>This version was written with Exponential Intelligence.</source>
+        <translation>Esta versión se ha escrito con Exponential Intelligence.</translation>
     </message>
     <message>
         <source>Exponential Intelligence (Powered by Claude from Anthropic)</source>
@@ -2260,6 +2424,10 @@
         <source>Start it under Models</source>
         <translation>Inícialo en Modelos</translation>
     </message>
+    <message>
+        <source>The earlier answers were not passed to %model: the data policy keeps content they were based on away from it.</source>
+        <translation>Las respuestas anteriores no se han pasado a %model: la política de datos mantiene fuera de su alcance el contenido en el que se basaban.</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/models</name>
@@ -2778,6 +2946,22 @@
         <source>All drafts written with Exponential Intelligence</source>
         <translation>Todos los borradores escritos con Exponential Intelligence</translation>
     </message>
+    <message>
+        <source>Your session has expired. Reload the page and sign in again.</source>
+        <translation>Tu sesión ha caducado. Recarga la página y vuelve a iniciar sesión.</translation>
+    </message>
+    <message>
+        <source>The connection to the run was lost. Reload the page to follow it.</source>
+        <translation>Se ha perdido la conexión con la ejecución. Recarga la página para seguirla.</translation>
+    </message>
+    <message>
+        <source>The answer is ready.</source>
+        <translation>La respuesta está lista.</translation>
+    </message>
+    <message>
+        <source>This draft no longer exists.</source>
+        <translation>Este borrador ya no existe.</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/step</name>
@@ -2796,6 +2980,18 @@
     <message>
         <source>Writing refused after an external tool result (%tool)</source>
         <translation>Escritura rechazada tras el resultado de una herramienta externa (%tool)</translation>
+    </message>
+    <message>
+        <source>A tool call had invalid arguments; retrying</source>
+        <translation>Una llamada a herramienta tenía argumentos no válidos; reintentando</translation>
+    </message>
+    <message>
+        <source>Writing refused outside the scope of this conversation (%tool)</source>
+        <translation>Escritura rechazada fuera del ámbito de esta conversación (%tool)</translation>
+    </message>
+    <message>
+        <source>Searched the content for &quot;%query&quot;</source>
+        <translation>Ha buscado en el contenido &quot;%query&quot;</translation>
     </message>
     <message>
         <source>An answer was too long and was cut off; retrying</source>
@@ -2906,6 +3102,10 @@
     <message>
         <source>Estimated at prices as of %date; Anthropic's invoice is authoritative.</source>
         <translation>Estimado con los precios vigentes a %date; la factura de Anthropic es la que cuenta.</translation>
+    </message>
+    <message>
+        <source>Estimated at prices as of %date; the provider's invoice is authoritative.</source>
+        <translation>Estimado con los precios vigentes a %date; la factura del proveedor es la que cuenta.</translation>
     </message>
     <message>
         <source>Period</source>
@@ -3221,6 +3421,14 @@
     <message>
         <source>Show the shortcuts</source>
         <translation>Mostrar los atajos</translation>
+    </message>
+    <message>
+        <source>%count result</source>
+        <translation>%count resultado</translation>
+    </message>
+    <message>
+        <source>%count results</source>
+        <translation>%count resultados</translation>
     </message>
     <message>
         <source>Accept the whole field</source>
@@ -3943,6 +4151,14 @@
     <message>
         <source>Bulk work is always reviewed before it is written.</source>
         <translation>El trabajo masivo siempre se revisa antes de escribirse.</translation>
+    </message>
+    <message>
+        <source>Your session has expired. Reload the page and sign in again.</source>
+        <translation>Tu sesión ha caducado. Recarga la página y vuelve a iniciar sesión.</translation>
+    </message>
+    <message>
+        <source>The connection to the run was lost. Reload the page to follow it.</source>
+        <translation>Se ha perdido la conexión con la ejecución. Recarga la página para seguirla.</translation>
     </message>
     <message>
         <source>Staged review: what Vector proposes waits in the Changes tab; nothing is written until you accept it and write it to drafts.</source>
@@ -4977,6 +5193,10 @@
         <source>The field is empty: there is nothing to improve.</source>
         <translation>El campo está vacío: no hay nada que mejorar.</translation>
     </message>
+    <message>
+        <source>The model returned no text, so nothing was written.</source>
+        <translation>El modelo no ha devuelto ningún texto, así que no se ha escrito nada.</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/summary</name>
@@ -5632,6 +5852,14 @@
     <message>
         <source>The test of %model runs in the background.</source>
         <translation>La prueba de %model se ejecuta en segundo plano.</translation>
+    </message>
+    <message>
+        <source>Request in the log</source>
+        <translation>Solicitud en el registro</translation>
+    </message>
+    <message>
+        <source>Job</source>
+        <translation>Tarea</translation>
     </message>
 </context>
 <context>

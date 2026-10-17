@@ -278,6 +278,10 @@
         <source>%count runs started. Watch them here:</source>
         <translation>QapmoHghachmey taghlu&apos;ta&apos;: %count. naDev tIbej:</translation>
     </message>
+    <message>
+        <source>No runs yet.</source>
+        <translation>wej QapmoHghach tu&apos;lu&apos;.</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/error</name>
@@ -396,6 +400,18 @@
     <message>
         <source>The draft could not be written.</source>
         <translation>nab ghItlhlu&apos;be&apos;.</translation>
+    </message>
+    <message>
+        <source>The model gave no answer. Try again, or choose another model.</source>
+        <translation>jangbe&apos; yab. yInIDqa&apos;, pagh latlh yab yIwIv.</translation>
+    </message>
+    <message>
+        <source>The answer was cut off at the token limit. Raise MaxTokens or lower Effort for this model.</source>
+        <translation>mu&apos;Hom veHDaq jang pe&apos;lu&apos;ta&apos;. yabvamvaD MaxTokens yIghurmoH pagh Effort yInupmoH.</translation>
+    </message>
+    <message>
+        <source>The answer stream ended early.</source>
+        <translation>pay&apos; mev jang.</translation>
     </message>
     <message>
         <source>The batch API of %provider reported an error.</source>
@@ -1082,6 +1098,22 @@
         <translation>nuDmeH Daqvam tu&apos;lu&apos;be&apos;qa&apos;.</translation>
     </message>
     <message>
+        <source>A step of this conversation is already running. Wait until it has finished, then try again.</source>
+        <translation>ja&apos;chuqghachvam &apos;ay&apos; QaptaH. rInpa&apos; yIloS, ghIq yInIDqa&apos;.</translation>
+    </message>
+    <message>
+        <source>The model %model has no price, so a cost limit of this site cannot be kept for it. Choose another model, or ask an administrator to set its price.</source>
+        <translation>%model yab DIlmeH mI&apos; tu&apos;lu&apos;be&apos;, vaj yabvamvaD jabwI&apos;vam Huch veH pollaHbe&apos;lu&apos;. latlh yab yIwIv, pagh DIlmeH mI&apos; chermeH loHwI&apos; yItlhob.</translation>
+    </message>
+    <message>
+        <source>The limit %limit would be passed together with the requests under way (%used used and %reserved reserved of %max). Try again in a moment.</source>
+        <translation>QaptaHbogh tlhobghachmey je, veH %limit juSlu&apos;qang (%used lo&apos;lu&apos;ta&apos; &apos;ej %reserved polmeH ngaSlu&apos; / %max). tugh yInIDqa&apos;.</translation>
+    </message>
+    <message>
+        <source>Give the words to search for.</source>
+        <translation>nejmeH mu&apos;mey yIngu&apos;.</translation>
+    </message>
+    <message>
         <source>Request in the log</source>
         <translation>wanI&apos; tetlhDaq tlhobghach</translation>
     </message>
@@ -1617,6 +1649,134 @@
         <source>Exponential Intelligence suggested no values.</source>
         <translation>pagh ngoD chup Exponential Intelligence.</translation>
     </message>
+    <message>
+        <source>Review the answer</source>
+        <translation>jang yInuD</translation>
+    </message>
+    <message>
+        <source>Nothing was written into the field yet: review the answer below.</source>
+        <translation>wej tlheghDaq vay&apos; ghItlhlu&apos;be&apos;. bIngDaq jang yInuD.</translation>
+    </message>
+    <message>
+        <source>The field changed while the answer was written.</source>
+        <translation>jang ghItlhlu&apos;taHvIS tlhegh choHlu&apos;.</translation>
+    </message>
+    <message>
+        <source>%list would be lost.</source>
+        <translation>chIllu&apos;laH: %list.</translation>
+    </message>
+    <message>
+        <source>%count answer(s) not written: review them at their fields.</source>
+        <translation>%count jang lanlu&apos;be&apos;. tlheghmeyDaq tInuD.</translation>
+    </message>
+    <message>
+        <source>Apply anyway</source>
+        <translation>yIlan, qay&apos;be&apos;</translation>
+    </message>
+    <message>
+        <source>Keep the original</source>
+        <translation>ghItlh wa&apos;DIch yIpol</translation>
+    </message>
+    <message>
+        <source>Copy text</source>
+        <translation>ghItlh velqa&apos; yIchenmoH</translation>
+    </message>
+    <message>
+        <source>Copied.</source>
+        <translation>velqa&apos; chenmoHlu&apos;ta&apos;.</translation>
+    </message>
+    <message>
+        <source>The text could not be copied.</source>
+        <translation>ghItlh velqa&apos; chenmoHlaHbe&apos;lu&apos;.</translation>
+    </message>
+    <message>
+        <source>Kept the original value.</source>
+        <translation>wa&apos;DIch lo&apos;laHghach pollu&apos;ta&apos;.</translation>
+    </message>
+    <message>
+        <source>The structure of the field could not be checked.</source>
+        <translation>tlhegh mIw nuDlaHbe&apos;lu&apos;.</translation>
+    </message>
+    <message>
+        <source>%count table cell</source>
+        <translation>%count SomHom cellula</translation>
+    </message>
+    <message>
+        <source>%count table cells</source>
+        <translation>%count SomHom cellula</translation>
+    </message>
+    <message>
+        <source>%count header cell</source>
+        <translation>%count nach cellula</translation>
+    </message>
+    <message>
+        <source>%count header cells</source>
+        <translation>%count nach cellula</translation>
+    </message>
+    <message>
+        <source>%count merged cell</source>
+        <translation>%count muvlu&apos;bogh cellula</translation>
+    </message>
+    <message>
+        <source>%count merged cells</source>
+        <translation>%count muvlu&apos;bogh cellula</translation>
+    </message>
+    <message>
+        <source>%count embedded object</source>
+        <translation>%count lanlu&apos;ta&apos;bogh Doch</translation>
+    </message>
+    <message>
+        <source>%count embedded objects</source>
+        <translation>%count lanlu&apos;ta&apos;bogh Doch</translation>
+    </message>
+    <message>
+        <source>%count table</source>
+        <translation>%count SomHom</translation>
+    </message>
+    <message>
+        <source>%count tables</source>
+        <translation>%count SomHom</translation>
+    </message>
+    <message>
+        <source>%count custom tag</source>
+        <translation>%count per motlhbe&apos;</translation>
+    </message>
+    <message>
+        <source>%count custom tags</source>
+        <translation>%count per motlhbe&apos;</translation>
+    </message>
+    <message>
+        <source>%count anchor</source>
+        <translation>%count Daq per</translation>
+    </message>
+    <message>
+        <source>%count anchors</source>
+        <translation>%count Daq per</translation>
+    </message>
+    <message>
+        <source>%count literal block</source>
+        <translation>%count ghItlh choHbe&apos;bogh</translation>
+    </message>
+    <message>
+        <source>%count literal blocks</source>
+        <translation>%count ghItlh choHbe&apos;bogh</translation>
+    </message>
+    <message>
+        <source>%count internal link</source>
+        <translation>%count qoD rarwI&apos;</translation>
+    </message>
+    <message>
+        <source>%count internal links</source>
+        <translation>%count qoD rarwI&apos;</translation>
+    </message>
+    <message>
+        <source>%count formatting attribute</source>
+        <translation>%count Segh DuH</translation>
+    </message>
+    <message>
+        <source>%count formatting attributes</source>
+        <translation>%count Segh DuH</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/fieldaction</name>
@@ -1650,6 +1810,10 @@
     <message>
         <source>Exponential Intelligence</source>
         <translation>Exponential Intelligence QaHwI&apos;</translation>
+    </message>
+    <message>
+        <source>This version was written with Exponential Intelligence.</source>
+        <translation>Exponential Intelligence lo&apos;DI&apos; chovnatlhvam ghItlhlu&apos;.</translation>
     </message>
     <message>
         <source>Exponential Intelligence (Powered by Claude from Anthropic)</source>
@@ -2263,6 +2427,10 @@
         <source>Start it under Models</source>
         <translation>yabmey &apos;ay&apos;Daq yItagh</translation>
     </message>
+    <message>
+        <source>The earlier answers were not passed to %model: the data policy keeps content they were based on away from it.</source>
+        <translation>jangmey ngo&apos; %model yabvaD nobbe&apos;lu&apos;: jangmeyvaD lo&apos;lu&apos;bogh De&apos; Hevbe&apos;meH yab, De&apos; chut ra&apos;ta&apos;.</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/models</name>
@@ -2781,6 +2949,22 @@
         <source>All drafts written with Exponential Intelligence</source>
         <translation>Exponential Intelligence lo&apos;lu&apos;taHvIS ghItlhlu&apos;pu&apos;bogh nabmey Hoch</translation>
     </message>
+    <message>
+        <source>Your session has expired. Reload the page and sign in again.</source>
+        <translation>poHlIj rInta&apos;. nav yIchu&apos;moH &apos;ej yI&apos;elqa&apos;.</translation>
+    </message>
+    <message>
+        <source>The connection to the run was lost. Reload the page to follow it.</source>
+        <translation>QapmoHghach rar chIllu&apos;ta&apos;. QapmoHghach DabejtaHmeH nav yIchu&apos;moH.</translation>
+    </message>
+    <message>
+        <source>The answer is ready.</source>
+        <translation>ghuH jang.</translation>
+    </message>
+    <message>
+        <source>This draft no longer exists.</source>
+        <translation>DaH tu&apos;lu&apos;be&apos; nabvam.</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/step</name>
@@ -2799,6 +2983,18 @@
     <message>
         <source>Writing refused after an external tool result (%tool)</source>
         <translation>Hur jan ngoD (%tool) Hevlu&apos;DI&apos; ghItlhghach lajQo&apos;lu&apos;</translation>
+    </message>
+    <message>
+        <source>A tool call had invalid arguments; retrying</source>
+        <translation>jan rI&apos;ghach ngoDmey lughbe&apos;; nIDqa&apos;lu&apos;taH</translation>
+    </message>
+    <message>
+        <source>Writing refused outside the scope of this conversation (%tool)</source>
+        <translation>ja&apos;chuqghachvam veH Hur ghItlh lajQo&apos;lu&apos; (%tool)</translation>
+    </message>
+    <message>
+        <source>Searched the content for &quot;%query&quot;</source>
+        <translation>De&apos;Daq &quot;%query&quot; nejlu&apos;pu&apos;</translation>
     </message>
     <message>
         <source>An answer was too long and was cut off; retrying</source>
@@ -2909,6 +3105,10 @@
     <message>
         <source>Estimated at prices as of %date; Anthropic's invoice is authoritative.</source>
         <translation>%date DIlmeH mI&apos;mey lo&apos;lu&apos;taHvIS pIHlu&apos;; Anthropic DIlmeH ghItlh &apos;oH ngoD teH&apos;e&apos;.</translation>
+    </message>
+    <message>
+        <source>Estimated at prices as of %date; the provider's invoice is authoritative.</source>
+        <translation>%date DIlmeH mI&apos;mey lo&apos;lu&apos;taHvIS pIHlu&apos;; Suy DIlmeH ghItlh &apos;oH ngoD teH&apos;e&apos;.</translation>
     </message>
     <message>
         <source>Period</source>
@@ -3224,6 +3424,14 @@
     <message>
         <source>Show the shortcuts</source>
         <translation>He ngajmey tI&apos;ang</translation>
+    </message>
+    <message>
+        <source>%count result</source>
+        <translation>%count ngoD</translation>
+    </message>
+    <message>
+        <source>%count results</source>
+        <translation>%count ngoD</translation>
     </message>
     <message>
         <source>Accept the whole field</source>
@@ -3946,6 +4154,14 @@
     <message>
         <source>Bulk work is always reviewed before it is written.</source>
         <translation>Dochmey law&apos; Qu&apos; reH nuDlu&apos; ghItlhlu&apos;pa&apos;.</translation>
+    </message>
+    <message>
+        <source>Your session has expired. Reload the page and sign in again.</source>
+        <translation>poHlIj rInta&apos;. nav yIchu&apos;moH &apos;ej yI&apos;elqa&apos;.</translation>
+    </message>
+    <message>
+        <source>The connection to the run was lost. Reload the page to follow it.</source>
+        <translation>QapmoHghach rar chIllu&apos;ta&apos;. QapmoHghach DabejtaHmeH nav yIchu&apos;moH.</translation>
     </message>
     <message>
         <source>Staged review: what Vector proposes waits in the Changes tab; nothing is written until you accept it and write it to drafts.</source>
@@ -4980,6 +5196,10 @@
         <source>The field is empty: there is nothing to improve.</source>
         <translation>chIm tlhegh: DubmeH pagh tu&apos;lu&apos;.</translation>
     </message>
+    <message>
+        <source>The model returned no text, so nothing was written.</source>
+        <translation>ghItlh nobbe&apos; yab, vaj pagh ghItlhlu&apos;.</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/summary</name>
@@ -5635,6 +5855,14 @@
     <message>
         <source>The test of %model runs in the background.</source>
         <translation>&apos;emDaq %model waHghach Qap.</translation>
+    </message>
+    <message>
+        <source>Request in the log</source>
+        <translation>wanI&apos; tetlhDaq tlhobghach</translation>
+    </message>
+    <message>
+        <source>Job</source>
+        <translation>Qu&apos;</translation>
     </message>
 </context>
 <context>

@@ -278,6 +278,10 @@
         <source>%count runs started. Watch them here:</source>
         <translation>Cursus incepti: %count. Eos hic observa:</translation>
     </message>
+    <message>
+        <source>No runs yet.</source>
+        <translation>Nulli cursus adhuc.</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/error</name>
@@ -396,6 +400,18 @@
     <message>
         <source>The draft could not be written.</source>
         <translation>Adumbratio scribi non potuit.</translation>
+    </message>
+    <message>
+        <source>The model gave no answer. Try again, or choose another model.</source>
+        <translation>Exemplar nihil respondit. Iterum conare, aut aliud exemplar elige.</translation>
+    </message>
+    <message>
+        <source>The answer was cut off at the token limit. Raise MaxTokens or lower Effort for this model.</source>
+        <translation>Responsum ad limitem signorum abscisum est. MaxTokens auge aut Effort huius exemplaris minue.</translation>
+    </message>
+    <message>
+        <source>The answer stream ended early.</source>
+        <translation>Fluxus responsi ante tempus desiit.</translation>
     </message>
     <message>
         <source>The batch API of %provider reported an error.</source>
@@ -1082,6 +1098,22 @@
         <translation>Hoc punctum probationis iam non exstat.</translation>
     </message>
     <message>
+        <source>A step of this conversation is already running. Wait until it has finished, then try again.</source>
+        <translation>Gradus huius colloquii iam currit. Exspecta donec finitus sit, deinde iterum conare.</translation>
+    </message>
+    <message>
+        <source>The model %model has no price, so a cost limit of this site cannot be kept for it. Choose another model, or ask an administrator to set its price.</source>
+        <translation>Exemplar %model pretium non habet, itaque limes sumptuum huius situs pro eo servari non potest. Aliud exemplar elige, aut administratorem roga ut pretium eius statuat.</translation>
+    </message>
+    <message>
+        <source>The limit %limit would be passed together with the requests under way (%used used and %reserved reserved of %max). Try again in a moment.</source>
+        <translation>Limes %limit una cum petitionibus currentibus excederetur (usum %used et reservatum %reserved ex %max). Mox iterum conare.</translation>
+    </message>
+    <message>
+        <source>Give the words to search for.</source>
+        <translation>Verba quaerenda da.</translation>
+    </message>
+    <message>
         <source>Request in the log</source>
         <translation>Petitio in actis</translation>
     </message>
@@ -1617,6 +1649,134 @@
         <source>Exponential Intelligence suggested no values.</source>
         <translation>Exponential Intelligence nullos valores suggessit.</translation>
     </message>
+    <message>
+        <source>Review the answer</source>
+        <translation>Responsum recognoscere</translation>
+    </message>
+    <message>
+        <source>Nothing was written into the field yet: review the answer below.</source>
+        <translation>Nihil adhuc in campum scriptum est: responsum infra recognosce.</translation>
+    </message>
+    <message>
+        <source>The field changed while the answer was written.</source>
+        <translation>Campus mutatus est dum responsum scribebatur.</translation>
+    </message>
+    <message>
+        <source>%list would be lost.</source>
+        <translation>Amitterentur: %list.</translation>
+    </message>
+    <message>
+        <source>%count answer(s) not written: review them at their fields.</source>
+        <translation>Responsa non inserta: %count. Ea apud campos suos recognosce.</translation>
+    </message>
+    <message>
+        <source>Apply anyway</source>
+        <translation>Nihilominus adhibere</translation>
+    </message>
+    <message>
+        <source>Keep the original</source>
+        <translation>Originale servare</translation>
+    </message>
+    <message>
+        <source>Copy text</source>
+        <translation>Textum exscribere</translation>
+    </message>
+    <message>
+        <source>Copied.</source>
+        <translation>Exscriptum.</translation>
+    </message>
+    <message>
+        <source>The text could not be copied.</source>
+        <translation>Textus exscribi non potuit.</translation>
+    </message>
+    <message>
+        <source>Kept the original value.</source>
+        <translation>Valor originalis servatus est.</translation>
+    </message>
+    <message>
+        <source>The structure of the field could not be checked.</source>
+        <translation>Structura campi probari non potuit.</translation>
+    </message>
+    <message>
+        <source>%count table cell</source>
+        <translation>%count cella tabulae</translation>
+    </message>
+    <message>
+        <source>%count table cells</source>
+        <translation>%count cellae tabulae</translation>
+    </message>
+    <message>
+        <source>%count header cell</source>
+        <translation>%count cella capitis</translation>
+    </message>
+    <message>
+        <source>%count header cells</source>
+        <translation>%count cellae capitis</translation>
+    </message>
+    <message>
+        <source>%count merged cell</source>
+        <translation>%count cella coniuncta</translation>
+    </message>
+    <message>
+        <source>%count merged cells</source>
+        <translation>%count cellae coniunctae</translation>
+    </message>
+    <message>
+        <source>%count embedded object</source>
+        <translation>%count res inserta</translation>
+    </message>
+    <message>
+        <source>%count embedded objects</source>
+        <translation>%count res insertae</translation>
+    </message>
+    <message>
+        <source>%count table</source>
+        <translation>%count tabula</translation>
+    </message>
+    <message>
+        <source>%count tables</source>
+        <translation>%count tabulae</translation>
+    </message>
+    <message>
+        <source>%count custom tag</source>
+        <translation>%count nota propria</translation>
+    </message>
+    <message>
+        <source>%count custom tags</source>
+        <translation>%count notae propriae</translation>
+    </message>
+    <message>
+        <source>%count anchor</source>
+        <translation>%count ancora</translation>
+    </message>
+    <message>
+        <source>%count anchors</source>
+        <translation>%count ancorae</translation>
+    </message>
+    <message>
+        <source>%count literal block</source>
+        <translation>%count truncus litteralis</translation>
+    </message>
+    <message>
+        <source>%count literal blocks</source>
+        <translation>%count trunci litterales</translation>
+    </message>
+    <message>
+        <source>%count internal link</source>
+        <translation>%count nexus internus</translation>
+    </message>
+    <message>
+        <source>%count internal links</source>
+        <translation>%count nexus interni</translation>
+    </message>
+    <message>
+        <source>%count formatting attribute</source>
+        <translation>%count attributum formationis</translation>
+    </message>
+    <message>
+        <source>%count formatting attributes</source>
+        <translation>%count attributa formationis</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/fieldaction</name>
@@ -1650,6 +1810,10 @@
     <message>
         <source>Exponential Intelligence</source>
         <translation>Exponential Intelligence</translation>
+    </message>
+    <message>
+        <source>This version was written with Exponential Intelligence.</source>
+        <translation>Haec versio cum Exponential Intelligence scripta est.</translation>
     </message>
     <message>
         <source>Exponential Intelligence (Powered by Claude from Anthropic)</source>
@@ -2263,6 +2427,10 @@
         <source>Start it under Models</source>
         <translation>Id sub Exemplaribus incipe</translation>
     </message>
+    <message>
+        <source>The earlier answers were not passed to %model: the data policy keeps content they were based on away from it.</source>
+        <translation>Responsa priora ad %model tradita non sunt: ratio datorum contenta quibus nitebantur ab eo arcet.</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/models</name>
@@ -2781,6 +2949,22 @@
         <source>All drafts written with Exponential Intelligence</source>
         <translation>Omnes adumbrationes cum Exponential Intelligence scriptae</translation>
     </message>
+    <message>
+        <source>Your session has expired. Reload the page and sign in again.</source>
+        <translation>Sessio tua exspiravit. Paginam iterum onera et denuo intra.</translation>
+    </message>
+    <message>
+        <source>The connection to the run was lost. Reload the page to follow it.</source>
+        <translation>Conexio cum cursu amissa est. Paginam iterum onera ut eum sequaris.</translation>
+    </message>
+    <message>
+        <source>The answer is ready.</source>
+        <translation>Responsum paratum est.</translation>
+    </message>
+    <message>
+        <source>This draft no longer exists.</source>
+        <translation>Haec adumbratio iam non exstat.</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/step</name>
@@ -2799,6 +2983,18 @@
     <message>
         <source>Writing refused after an external tool result (%tool)</source>
         <translation>Scriptio recusata post effectum instrumenti externi (%tool)</translation>
+    </message>
+    <message>
+        <source>A tool call had invalid arguments; retrying</source>
+        <translation>Vocatio instrumenti argumenta invalida habuit; iterum conatur</translation>
+    </message>
+    <message>
+        <source>Writing refused outside the scope of this conversation (%tool)</source>
+        <translation>Scriptio extra ambitum huius colloquii recusata (%tool)</translation>
+    </message>
+    <message>
+        <source>Searched the content for &quot;%query&quot;</source>
+        <translation>In contentis &quot;%query&quot; quaesivit</translation>
     </message>
     <message>
         <source>An answer was too long and was cut off; retrying</source>
@@ -2909,6 +3105,10 @@
     <message>
         <source>Estimated at prices as of %date; Anthropic's invoice is authoritative.</source>
         <translation>Aestimatum pretiis diei %date; computatio Anthropic auctoritatem habet.</translation>
+    </message>
+    <message>
+        <source>Estimated at prices as of %date; the provider's invoice is authoritative.</source>
+        <translation>Aestimatum pretiis diei %date; computatio provisoris auctoritatem habet.</translation>
     </message>
     <message>
         <source>Period</source>
@@ -3224,6 +3424,14 @@
     <message>
         <source>Show the shortcuts</source>
         <translation>Claves compendiarias ostendere</translation>
+    </message>
+    <message>
+        <source>%count result</source>
+        <translation>%count inventum</translation>
+    </message>
+    <message>
+        <source>%count results</source>
+        <translation>%count inventa</translation>
     </message>
     <message>
         <source>Accept the whole field</source>
@@ -3946,6 +4154,14 @@
     <message>
         <source>Bulk work is always reviewed before it is written.</source>
         <translation>Opus cumulatum semper recognoscitur antequam scribitur.</translation>
+    </message>
+    <message>
+        <source>Your session has expired. Reload the page and sign in again.</source>
+        <translation>Sessio tua exspiravit. Paginam iterum onera et denuo intra.</translation>
+    </message>
+    <message>
+        <source>The connection to the run was lost. Reload the page to follow it.</source>
+        <translation>Conexio cum cursu amissa est. Paginam iterum onera ut eum sequaris.</translation>
     </message>
     <message>
         <source>Staged review: what Vector proposes waits in the Changes tab; nothing is written until you accept it and write it to drafts.</source>
@@ -4980,6 +5196,10 @@
         <source>The field is empty: there is nothing to improve.</source>
         <translation>Campus vacuus est: nihil est quod emendetur.</translation>
     </message>
+    <message>
+        <source>The model returned no text, so nothing was written.</source>
+        <translation>Exemplar nullum textum reddidit, itaque nihil scriptum est.</translation>
+    </message>
 </context>
 <context>
     <name>extension/expai/summary</name>
@@ -5635,6 +5855,14 @@
     <message>
         <source>The test of %model runs in the background.</source>
         <translation>Probatio exemplaris %model in recessu currit.</translation>
+    </message>
+    <message>
+        <source>Request in the log</source>
+        <translation>Petitio in actis</translation>
+    </message>
+    <message>
+        <source>Job</source>
+        <translation>Opus</translation>
     </message>
 </context>
 <context>
