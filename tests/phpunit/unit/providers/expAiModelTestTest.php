@@ -209,7 +209,7 @@ class expAiModelTestTest extends expAiProviderTestCase
                 file_put_contents( $lock, $before );
         } );
         $waiting = array( self::job( array( 'state' => 'ready', 'created' => time() - 60 ) ) );
-        $config = $this->config( array( 'VectorSettings' => array( 'KickWorker' => 'true', 'PhpCli' => '/bin/true' ) ) );
+        $config = $this->config( array( 'VectorSettings' => array( 'KickWorker' => 'true', 'PhpCli' => is_executable( '/bin/true' ) ? '/bin/true' : '/usr/bin/true' ) ) ); // /usr/bin/true on macOS
 
         $this->assertFalse( expAiModelTest::nudge( array( self::job( array( 'state' => 'ready', 'created' => time() ) ) ), $config ), 'a fresh job waits' );
         $this->assertFalse( expAiModelTest::nudge( $waiting, $this->config( array( 'VectorSettings' => array( 'KickWorker' => 'false' ) ) ) ) );
