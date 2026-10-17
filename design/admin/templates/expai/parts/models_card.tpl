@@ -71,7 +71,7 @@
 {/if}
                 <td>
 {if gt( $m.per_day|count, 1 )}
-                    <ol class="exp-ai-ms-spark" aria-hidden="true">{foreach $m.per_day as $d}<li title="{$d.day|wash}: {if $d.ms|is_null}{'no successful request'|i18n( 'extension/expai/modelstats' )}{else}{$d.ms|div( 1000 )|expai_number( 1 )} s{/if}"><span style="height: {cond( $d.ms|is_null, 0, max( $d.percent, 6 ) )}%"></span></li>{/foreach}</ol>
+                    <ol class="exp-ai-ms-spark" aria-hidden="true">{foreach $m.per_day as $d}<li title="{$d.day|wash}: {if $d.ms|is_null}{'no successful request'|i18n( 'extension/expai/modelstats' )}{else}{$d.ms|div( 1000 )|expai_number( 1 )} s{/if}"><span class="a4-pct-{cond( $d.ms|is_null, 0, min( 100, max( $d.percent, 6 ) ) )|round}"></span></li>{/foreach}</ol>
                     <span class="exp-ai-visually-hidden">{'Median latency per day:'|i18n( 'extension/expai/modelstats' )} {foreach $m.per_day as $d}{delimiter}; {/delimiter}{$d.day|wash} {if $d.ms|is_null}&ndash;{else}{$d.ms|div( 1000 )|expai_number( 1 )} s{/if}{/foreach}</span>
 {else}<span class="exp-ai-muted">&ndash;</span>{/if}
                 </td>

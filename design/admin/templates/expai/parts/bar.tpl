@@ -3,7 +3,7 @@
 <div class="exp-ai-meter exp-ai-meter-{first_set( $level, 'ok' )|wash}">
 {if gt( $max, 0 )}
     <div class="exp-ai-bar" role="progressbar" aria-valuemin="0" aria-valuemax="{$max|wash}" aria-valuenow="{$value|wash}" aria-label="{first_set( $label, '' )|wash}" aria-valuetext="{$text|wash}">
-        <span style="width: {min( 100, $value|mul( 100 )|div( $max ) )|round}%"></span>
+        <span class="a4-pct-{max( 0, min( 100, $value|mul( 100 )|div( $max ) ) )|round}"></span>
     </div>
 {/if}
     <span class="exp-ai-meter-text">{$text|wash}</span>

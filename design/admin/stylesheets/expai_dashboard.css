@@ -25,7 +25,7 @@
 /* latency per day: a small bar row; the figures are in the hidden text beside it and in each bar's title */
 .exp-ai-ms-spark { display: flex; align-items: flex-end; gap: 2px; height: 2em; min-width: 4em; margin: 0; padding: 0; list-style: none; }
 .exp-ai-ms-spark li { flex: 1 1 0; max-width: 0.6em; height: 100%; display: flex; align-items: flex-end; border-bottom: 1px solid var(--exp-ai-line); }
-.exp-ai-ms-spark span { display: block; width: 100%; background: var(--exp-ai-accent); border-radius: 1px 1px 0 0; }
+.exp-ai-ms-spark span { display: block; width: 100%; height: calc(var(--a4-pct, 0) * 1%); background: var(--exp-ai-accent); border-radius: 1px 1px 0 0; }
 .exp-ai-ms-slow .exp-ai-ms-spark span { background: var(--exp-ai-error); }
 
 /* "Watch this run" in the Start writing card */

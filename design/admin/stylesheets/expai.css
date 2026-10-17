@@ -461,7 +461,7 @@ span.exp-ai-fallback-notice { display: inline-block; }
     background: var(--exp-ai-user);
     overflow: hidden;
 }
-.exp-ai-bar > span { display: block; height: 100%; border-radius: inherit; background: var(--exp-ai-ok); }
+.exp-ai-bar > span { display: block; width: calc(var(--a4-pct, 0) * 1%); height: 100%; border-radius: inherit; background: var(--exp-ai-ok); }
 .exp-ai-meter-warn .exp-ai-bar > span { background: var(--exp-ai-accent); }
 .exp-ai-meter-high .exp-ai-bar > span, .exp-ai-meter-over .exp-ai-bar > span { background: var(--exp-ai-error); }
 .exp-ai-meter-over .exp-ai-meter-text { color: var(--exp-ai-error); font-weight: 600; }
@@ -592,7 +592,7 @@ span.exp-ai-fallback-notice { display: inline-block; }
     background-size: 100% 50%;
 }
 .exp-ai-vchart-bars li { flex: 1 1 0; height: 100%; display: flex; align-items: flex-end; min-width: 4px; border-radius: 3px 3px 0 0; outline-offset: 2px; }
-.exp-ai-vbar { display: block; width: 100%; border-radius: 3px 3px 0 0; background: var(--exp-ai-accent); opacity: 0.55; }
+.exp-ai-vbar { display: block; width: 100%; height: calc(var(--a4-pct, 0) * 1%); border-radius: 3px 3px 0 0; background: var(--exp-ai-accent); opacity: 0.55; }
 .exp-ai-vchart-bars li.exp-ai-today .exp-ai-vbar { opacity: 1; }
 .exp-ai-vchart-bars li.exp-ai-empty-day .exp-ai-vbar { background: var(--exp-ai-line); opacity: 1; }
 .exp-ai-vchart-bars li:hover .exp-ai-vbar, .exp-ai-vchart-bars li:focus .exp-ai-vbar { opacity: 1; }
