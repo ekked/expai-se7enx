@@ -372,4 +372,34 @@ class expAiConversationStateTest extends expAiCoreTestCase
         }
         $this->assertSame( 0, ( new ReflectionProperty( 'expAiAssistant', 'lockedID' ) )->getValue( $assistant ), 'it releases nothing it does not hold' );
     }
+
+    public function testTheLockColumnsAreAskedAgainWhileMissing(): void
+    {
+        $asked = 0;
+        $columns = array( 'id', 'user_id' );
+        expAiSchema::forgetColumns();
+        expAiConversationLock::$columnLister = function ( $table ) use ( &$asked, &$columns )
+        {
+            $asked++;
+            return $columns;
+        };
+        try
+        {
+            $this->assertFalse( expAiConversationLock::columnsPresent() );
+            $this->assertFalse( expAiConversationLock::columnsPresent() );
+            $this->assertSame( 1, $asked, 'a missing column is not asked on every step' );
+            $columns = array( 'id', 'busy_owner', 'busy_until' );
+            $this->assertTrue( expAiSchema::hasColumns( 'expai_conversation', array( 'busy_owner', 'busy_until' ), expAiConversationLock::$columnLister,
+                                                        time() + expAiSchema::COLUMN_RECHECK_SECONDS + 1 ), 'asked again after the recheck time' );
+            $this->assertTrue( expAiConversationLock::columnsPresent() );
+            $columns = array();
+            $this->assertTrue( expAiConversationLock::columnsPresent(), 'a positive answer is kept' );
+            $this->assertSame( 2, $asked );
+        }
+        finally
+        {
+            expAiConversationLock::$columnLister = null;
+            expAiSchema::forgetColumns();
+        }
+    }
 }

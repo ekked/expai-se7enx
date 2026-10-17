@@ -60,14 +60,19 @@ class expAiConversationLock
         return $this->now !== null ? (int) $this->now : time();
     }
 
-    /** @var bool|null the database of this process has the lock's columns (asked once per process) */
-    protected static $columns = null;
+    /** @var bool the warning about the missing columns was written in this process */
+    protected static $warned = false;
+
+    /** @var callable|null function( string $table ): string[]|null, the columns of the table (tests; default the database) */
+    public static $columnLister = null;
 
     /**
      * @return bool the engine runs SQL (every one but MongoDB) and the table has the lock's columns. An installation
      *              that was not upgraded (expaischema.php --install) runs its steps without the lock, with one warning
-     *              per process instead of a failed statement on every step. A database given to the constructor
-     *              (tests) is taken as it is.
+     *              per process instead of a failed statement on every step. Only a positive answer is kept for the
+     *              process; a missing column is asked again after a few minutes (expAiSchema::hasColumns()), so the
+     *              upgrade takes effect in long-running workers too. A database given to the constructor (tests) is
+     *              taken as it is.
      */
     protected function usable()
     {
@@ -76,15 +81,20 @@ class expAiConversationLock
             return false;
         if ( $this->db )
             return true;
-        if ( self::$columns === null )
+        return self::columnsPresent();
+    }
+
+    /** @return bool expai_conversation has busy_owner and busy_until (see usable()) */
+    public static function columnsPresent()
+    {
+        $ok = expAiSchema::hasColumns( 'expai_conversation', array( 'busy_owner', 'busy_until' ), self::$columnLister );
+        if ( !$ok && !self::$warned )
         {
-            $have = expAiSchema::existingColumns( 'expai_conversation', $db );
-            self::$columns = $have === null || ( in_array( 'busy_owner', $have, true ) && in_array( 'busy_until', $have, true ) );
-            if ( !self::$columns )
-                eZDebug::writeWarning( 'expai: expai_conversation has no columns busy_owner and busy_until, so steps run without the conversation lock. '
-                                       . 'Run php extension/expai/bin/php/expaischema.php --install -s <siteaccess>.', __METHOD__ );
+            self::$warned = true;
+            eZDebug::writeWarning( 'expai: expai_conversation has no columns busy_owner and busy_until, so steps run without the conversation lock. '
+                                   . 'Run php extension/expai/bin/php/expaischema.php --install -s <siteaccess>.', __METHOD__ );
         }
-        return self::$columns;
+        return $ok;
     }
 
     /**

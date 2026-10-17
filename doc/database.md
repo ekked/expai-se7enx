@@ -124,9 +124,12 @@ queue (`expqueue_job`, `expqueue_group`) belong to expqueue and are unchanged.
 `expai_conversation.busy_owner` and `busy_until` are the lock of a step under way (one step per conversation at a
 time); `expai_usage_log.reserved_tokens` and `reserved_micros` are the reservation of a request under way.
 
-**`--install` is a mandatory step of every deployment of this version**: the usage log and the limits read the new
-columns (without them their queries fail; the conversation lock then runs without a lock and logs one warning per
-process). On MySQL / MariaDB the widening to `bigint` rebuilds the table (`ALTER TABLE ... MODIFY`): on a large
+**`--install` is a mandatory step of every deployment of this version**. Until it has run, expai degrades instead of
+failing: without `reserved_tokens` and `reserved_micros` the usage log leaves them out of its rows and queries and
+requests are not reserved before they are sent (the limits count settled requests only); without `busy_owner` and
+`busy_until` steps run without the conversation lock. Each logs one warning per process naming the command. A
+process asks for the columns once; a missing column is asked again after five minutes, so long-running workers see
+the upgrade without a restart. On MySQL / MariaDB the widening to `bigint` rebuilds the table (`ALTER TABLE ... MODIFY`): on a large
 `expai_usage_log` it takes a while and blocks writes to the table meanwhile, so run it outside busy hours. PostgreSQL
 rewrites the table as well (`ALTER COLUMN ... TYPE bigint`).
 

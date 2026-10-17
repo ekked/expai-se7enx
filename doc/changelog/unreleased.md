@@ -233,3 +233,8 @@ anchors, literals, internal links and formatting attributes were lost, and ezaut
   the fallback to the site default), the objects it read are checked against the request veto (`[RequestVeto]` rules,
   with the new provider, its region and the purpose) as well as the new provider's data policy. An object that cannot
   be loaded any more now counts as not allowed (fail closed): the new model then gets the editor's words only.
+- **Updated without `expaischema.php --install`**: the usage log no longer fails every insert and query when
+  `expai_usage_log` lacks `reserved_tokens` and `reserved_micros`; it leaves them out (no reservations, the limits count
+  settled requests only) and logs one warning per process naming the command. The conversation lock and the usage log
+  keep a positive column check for the process and ask again for a missing column after five minutes, so an upgrade
+  reaches long-running workers without a restart. `--install` stays a mandatory step of the deployment.

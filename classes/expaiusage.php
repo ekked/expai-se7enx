@@ -41,8 +41,11 @@ class expAiUsage
     {
         foreach ( self::cutRow( $row ) as $field => $value )
             $log->setAttribute( $field, $value );
-        $log->setAttribute( 'reserved_tokens', 0 );
-        $log->setAttribute( 'reserved_micros', 0 );
+        if ( expAiUsageLog::reservationColumns() )
+        {
+            $log->setAttribute( 'reserved_tokens', 0 );
+            $log->setAttribute( 'reserved_micros', 0 );
+        }
         $log->store();
         if ( class_exists( 'expAiAudit' ) )
             expAiAudit::request( $log );
@@ -66,7 +69,7 @@ class expAiUsage
      */
     public static function requestsOnly( array $conds )
     {
-        return $conds + array( 'reserved_tokens' => 0 );
+        return expAiUsageLog::reservationColumns() ? $conds + array( 'reserved_tokens' => 0 ) : $conds;
     }
 
     /**
@@ -76,6 +79,8 @@ class expAiUsage
      */
     public static function removeStaleReservations( $now = null )
     {
+        if ( !expAiUsageLog::reservationColumns() )
+            return 0;
         $before = ( $now === null ? time() : (int) $now ) - expAiLimits::RESERVATION_SECONDS;
         $conds = array( 'reserved_tokens' => array( '>', 0 ), 'created' => array( '<', $before ) );
         $count = (int) eZPersistentObject::count( expAiUsageLog::definition(), $conds );
@@ -219,7 +224,7 @@ class expAiUsage
         if ( !empty( $filters['exclude_id'] ) && empty( $filters['id'] ) )
             $conds['id'] = array( '!=', (int) $filters['exclude_id'] );
         // the reservations of requests under way only where they are asked for (the limits)
-        if ( empty( $filters['with_reservations'] ) )
+        if ( empty( $filters['with_reservations'] ) && expAiUsageLog::reservationColumns() )
             $conds['reserved_tokens'] = 0;
         foreach ( array( 'action', 'model', 'model_alias', 'session_key', 'provider', 'region' ) as $field )
             if ( isset( $filters[$field] ) && $filters[$field] !== '' )

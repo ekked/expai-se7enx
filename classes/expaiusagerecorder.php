@@ -89,9 +89,10 @@ class expAiUsageRecorder implements expAiProvider
             $row += array( 'requested_model_alias' => expAiText::cut( (string) $this->context['requested_alias'], 100 ),
                            'fallback_reason' => expAiText::cut( isset( $this->context['fallback_reason'] ) ? (string) $this->context['fallback_reason'] : '', 20 ) );
 
-        // with limits set, the request reserves its estimate before the check (expAiLimits): parallel requests see it
+        // with limits set, the request reserves its estimate before the check (expAiLimits): parallel requests see it;
+        // an installation not upgraded (no reservation columns) checks without it, as before
         $this->pending = null;
-        if ( expAiLimits::anySet( $config ) )
+        if ( expAiLimits::anySet( $config ) && expAiUsageLog::reservationColumns() )
         {
             expAiUsage::removeStaleReservations();
             $estimate = self::estimate( $request, $this->maxTokens( $request, $config ), $row['model'], $row['model_alias'] );

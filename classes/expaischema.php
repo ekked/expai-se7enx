@@ -389,6 +389,53 @@ class expAiSchema
         return $out;
     }
 
+    /** how long a missing column is believed missing before it is asked again (an upgrade while processes run) */
+    const COLUMN_RECHECK_SECONDS = 300;
+
+    /** @var array "table:col,col" => array( bool have, int recheck after (0: never again) ) */
+    protected static $columnChecks = array();
+
+    /**
+     * Has a table these columns? Asked once per process: a positive answer is kept for good, a negative one (an
+     * installation not upgraded with expaischema.php --install) is asked again after COLUMN_RECHECK_SECONDS, so the
+     * upgrade takes effect without restarting long-running workers. An engine that cannot tell (MongoDB), a failed
+     * lookup or an empty column list count as present (the statements then behave as before).
+     * @param string[] $columns lower-case names
+     * @param callable|null $lister function( string $table ): string[]|null (default existingColumns())
+     * @param int|null $now the current time (tests)
+     * @return bool
+     */
+    public static function hasColumns( $table, array $columns, $lister = null, $now = null )
+    {
+        $now = $now === null ? time() : (int) $now;
+        $key = (string) $table . ':' . implode( ',', $columns );
+        if ( isset( self::$columnChecks[$key] ) && ( self::$columnChecks[$key][1] === 0 || self::$columnChecks[$key][1] > $now ) )
+            return self::$columnChecks[$key][0];
+        try
+        {
+            $have = $lister ? call_user_func( $lister, (string) $table ) : self::existingColumns( $table );
+        }
+        catch ( Exception $e )
+        {
+            $have = null;
+        }
+        if ( !is_array( $have ) || !$have )
+        {
+            // unknown: taken as present, asked again later
+            self::$columnChecks[$key] = array( true, $now + self::COLUMN_RECHECK_SECONDS );
+            return true;
+        }
+        $ok = !array_diff( $columns, $have );
+        self::$columnChecks[$key] = array( $ok, $ok ? 0 : $now + self::COLUMN_RECHECK_SECONDS );
+        return $ok;
+    }
+
+    /** Forgets what hasColumns() learned (tests, after --install in the same process) */
+    public static function forgetColumns()
+    {
+        self::$columnChecks = array();
+    }
+
     /** @return string[] the index names of an expai table in the database (lower case), null when unknown */
     public static function existingIndexes( $table, $db = null )
     {
@@ -576,6 +623,8 @@ class expAiSchema
             else
                 $created[] = 'upgrade: ' . substr( $statement, 0, 120 );
         }
+        // what the tables lacked is asked again after the upgrade (hasColumns())
+        self::forgetColumns();
         if ( !$missing )
             return array( $created, $errors );
         if ( $engine === 'mongodb' )

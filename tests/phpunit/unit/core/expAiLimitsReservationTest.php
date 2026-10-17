@@ -32,6 +32,60 @@ class expAiLimitsReservationTest extends expAiCoreTestCase
         $this->assertSame( 'stale', expAiUsage::reservationState( array( 'reserved_tokens' => 900, 'reserved_micros' => 5, 'created' => $now - expAiLimits::RESERVATION_SECONDS - 1 ), $now ) );
     }
 
+    public function testAnInstallationWithoutTheReservationColumnsLeavesThemOut(): void
+    {
+        $asked = 0;
+        $columns = array( 'id', 'created', 'user_id' );
+        expAiSchema::forgetColumns();
+        expAiUsageLog::$columnLister = function ( $table ) use ( &$asked, &$columns )
+        {
+            $asked++;
+            return $table === 'expai_usage_log' ? $columns : null;
+        };
+        try
+        {
+            $this->assertFalse( expAiUsageLog::reservationColumns() );
+            $definition = expAiUsageLog::definition();
+            $this->assertArrayNotHasKey( 'reserved_tokens', $definition['fields'] );
+            $this->assertArrayNotHasKey( 'reserved_micros', $definition['fields'] );
+            $this->assertArrayHasKey( 'run_id', $definition['fields'] );
+            $this->assertSame( array( 'user_id' => 5 ), expAiUsage::requestsOnly( array( 'user_id' => 5 ) ) );
+            $this->assertArrayNotHasKey( 'reserved_tokens', expAiUsage::conditions( array( 'user_id' => 5 ) ) );
+            $this->assertSame( 0, expAiUsage::removeStaleReservations(), 'nothing to clean without the columns' );
+            $this->assertSame( 1, $asked, 'a missing column is not asked again at once' );
+
+            // after the recheck time a missing column is asked again; the upgrade is seen without a restart
+            $columns[] = 'reserved_tokens';
+            $columns[] = 'reserved_micros';
+            $now = time() + expAiSchema::COLUMN_RECHECK_SECONDS + 1;
+            $this->assertTrue( expAiSchema::hasColumns( 'expai_usage_log', expAiUsageLog::RESERVATION_COLUMNS, expAiUsageLog::$columnLister, $now ) );
+            $this->assertSame( 2, $asked );
+            $this->assertTrue( expAiUsageLog::reservationColumns() );
+            $this->assertArrayHasKey( 'reserved_tokens', expAiUsageLog::definition()['fields'] );
+            $this->assertSame( array( 'user_id' => 5, 'reserved_tokens' => 0 ), expAiUsage::requestsOnly( array( 'user_id' => 5 ) ) );
+            $this->assertSame( 0, expAiUsage::conditions( array() )['reserved_tokens'] );
+            $columns = array( 'id' );
+            $this->assertTrue( expAiUsageLog::reservationColumns(), 'a positive answer is kept for the process' );
+            $this->assertSame( 2, $asked );
+        }
+        finally
+        {
+            expAiUsageLog::$columnLister = null;
+            expAiSchema::forgetColumns();
+        }
+    }
+
+    public function testAnUnknownColumnListCountsAsPresent(): void
+    {
+        expAiSchema::forgetColumns();
+        $this->assertTrue( expAiSchema::hasColumns( 'expai_usage_log', array( 'reserved_tokens' ), function () { return null; } ), 'MongoDB' );
+        expAiSchema::forgetColumns();
+        $this->assertTrue( expAiSchema::hasColumns( 'expai_usage_log', array( 'reserved_tokens' ), function () { throw new Exception( 'no database' ); } ) );
+        expAiSchema::forgetColumns();
+        $this->assertFalse( expAiSchema::hasColumns( 'expai_usage_log', array( 'reserved_tokens' ), function () { return array( 'id' ); } ) );
+        expAiSchema::forgetColumns();
+    }
+
     public function testTheEstimateOfARequest(): void
     {
         $this->useSettings();

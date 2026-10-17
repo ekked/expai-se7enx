@@ -20,7 +20,7 @@ class expAiUsageLog extends eZPersistentObject
     {
         $int = function ( $name ) { return array( 'name' => $name, 'datatype' => 'integer', 'default' => 0, 'required' => true ); };
         $str = function ( $name ) { return array( 'name' => $name, 'datatype' => 'string', 'default' => '', 'required' => true ); };
-        return array(
+        $definition = array(
             'fields' => array(
                 'id' => $int( 'ID' ),
                 'created' => $int( 'Created' ),
@@ -69,7 +69,8 @@ class expAiUsageLog extends eZPersistentObject
                 // threads (classes/vector/): the thread and run of the request, 0 outside threads
                 'thread_id' => $int( 'ThreadID' ),
                 'run_id' => $int( 'RunID' ),
-                // a request under way: its estimate, counted by the limits until the row is settled (expAiLimits)
+                // a request under way: its estimate, counted by the limits until the row is settled (expAiLimits); left out
+                // while the table lacks them (reservationColumns())
                 'reserved_tokens' => $int( 'ReservedTokens' ),
                 'reserved_micros' => $int( 'ReservedMicros' ),
             ),
@@ -80,6 +81,38 @@ class expAiUsageLog extends eZPersistentObject
             'sort' => array( 'id' => 'desc' ),
             'name' => 'expai_usage_log',
         );
+        if ( !self::reservationColumns() )
+            unset( $definition['fields']['reserved_tokens'], $definition['fields']['reserved_micros'] );
+        return $definition;
+    }
+
+    /** the columns of the reservations (expAiLimits), added by an upgrade */
+    const RESERVATION_COLUMNS = array( 'reserved_tokens', 'reserved_micros' );
+
+    /** @var callable|null function( string $table ): string[]|null, the columns of the table (tests; default the database) */
+    public static $columnLister = null;
+
+    /** @var bool the warning about the missing columns was written in this process */
+    protected static $warned = false;
+
+    /**
+     * Has expai_usage_log the columns of the reservations? An installation that was updated without running
+     * expaischema.php --install lacks them: the definition, the conditions and the recorder then leave them out (no
+     * reservations, the limits count settled requests only, as before), with one warning per process instead of a
+     * failed statement on every request. Asked once per process (expAiSchema::hasColumns()); a missing column is
+     * asked again after a few minutes.
+     * @return bool
+     */
+    public static function reservationColumns()
+    {
+        $ok = expAiSchema::hasColumns( 'expai_usage_log', self::RESERVATION_COLUMNS, self::$columnLister );
+        if ( !$ok && !self::$warned )
+        {
+            self::$warned = true;
+            eZDebug::writeWarning( 'expai: expai_usage_log has no columns reserved_tokens and reserved_micros, so requests are not reserved before they '
+                                   . 'are sent. Run php extension/expai/bin/php/expaischema.php --install -s <siteaccess>.', __METHOD__ );
+        }
+        return $ok;
     }
 
     /** @return array the tool calls: list of { name, ms, ok } */
