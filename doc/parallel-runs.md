@@ -36,6 +36,10 @@ the proposed values (rich text as HTML) are added to its message as the current 
 translates the updated text, not the published one. When a dependency fails or is stopped, the items that wait for
 it are not run (state `stopped`, "Not run: the item it waits for did not finish").
 
+A queued turn or item whose conversation is busy with another step (a second tab, the panel) is deferred for 20
+seconds and runs again with its message, without using up an attempt; nothing was sent or written. A step that lost
+its lock midway (the other step took over after the lock ran out) still fails.
+
 ## One field, one run
 
 Two runs never stage the same object, language and field at once: while a run that still works (queued, running,

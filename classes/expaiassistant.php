@@ -152,7 +152,7 @@ class expAiAssistant
         if ( $this->lockedID && $this->lock && !$this->lock->acquire( $this->lockedID, $this->lockSeconds() ) )
         {
             $this->lockedID = 0;
-            throw expAiConversationLock::busy();
+            throw expAiConversationLock::busy( true );
         }
     }
 

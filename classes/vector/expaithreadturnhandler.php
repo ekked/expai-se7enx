@@ -115,6 +115,7 @@ class expAiThreadTurnHandler extends expQueueHandlerBase
                     throw new expQueueCancelledException( 'stopped by the editor' );
                 }
                 $assistant = ( new expAiAssistant( $config ) )->useConversation( $conversation, $options );
+                $sending = $message !== '';
                 try
                 {
                     if ( $message !== '' )
@@ -135,6 +136,14 @@ class expAiThreadTurnHandler extends expQueueHandlerBase
                 }
                 catch ( expAiException $e )
                 {
+                    // another step of the conversation runs (a second tab, the panel): nothing was sent or written,
+                    // the turn runs again shortly with its message (the checkpoint goes back to "not sent")
+                    if ( expAiConversationBusyException::retryable( $e ) )
+                    {
+                        if ( $sending )
+                            $context->saveCheckpoint( array( 'index' => $i, 'sent' => 0 ) );
+                        return expQueueResult::defer( expAiConversationBusyException::RETRY_SECONDS, 'the conversation is busy with another step' );
+                    }
                     // switched off while the turn ran: held, the thread waits again (the conversation keeps its place)
                     if ( strpos( (string) $e->detail(), 'master switch' ) === 0 )
                         return self::hold( expAiThread::fetchByID( (int) $thread->attribute( 'id' ) ), strtr( $e->getMessage(), $e->arguments() ) );

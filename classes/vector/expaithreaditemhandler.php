@@ -111,6 +111,7 @@ class expAiThreadItemHandler extends expQueueHandlerBase
                 throw new expQueueCancelledException( 'stopped by the editor' );
             }
             $assistant = ( new expAiAssistant( $config ) )->useConversation( $conversation, $options );
+            $sending = $message !== '';
             try
             {
                 if ( $message !== '' )
@@ -130,6 +131,14 @@ class expAiThreadItemHandler extends expQueueHandlerBase
             }
             catch ( expAiException $e )
             {
+                // another step of the run's conversation holds it: nothing was sent or written, the item runs again
+                // shortly with its message (the checkpoint goes back to "not sent")
+                if ( expAiConversationBusyException::retryable( $e ) )
+                {
+                    if ( $sending )
+                        $context->saveCheckpoint( array( 'sent' => 0 ) );
+                    return expQueueResult::defer( expAiConversationBusyException::RETRY_SECONDS, 'the conversation is busy with another step' );
+                }
                 $reason = strtr( $e->getMessage(), $e->arguments() );
                 if ( strpos( (string) $e->detail(), 'master switch' ) === 0 )
                     return expQueueResult::hold( expAiGate::HELD_PREFIX . $reason );

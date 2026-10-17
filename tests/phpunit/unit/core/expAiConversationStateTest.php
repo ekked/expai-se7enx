@@ -344,6 +344,11 @@ class expAiConversationStateTest extends expAiCoreTestCase
         $this->assertTrue( $first->acquire( 0, 300 ), 'no conversation yet: nothing to lock' );
         $this->assertTrue( $first->acquire( 99, 300 ), 'a conversation that is gone: nothing to protect' );
         $this->assertSame( 'A step of this conversation is already running. Wait until it has finished, then try again.', expAiConversationLock::busy()->getMessage() );
+        // a refusal before the step began may run again later (a queued turn is deferred); one that lost its lock midway not
+        $this->assertInstanceOf( 'expAiException', expAiConversationLock::busy(), 'existing catches still see it' );
+        $this->assertTrue( expAiConversationBusyException::retryable( expAiConversationLock::busy() ) );
+        $this->assertFalse( expAiConversationBusyException::retryable( expAiConversationLock::busy( true ) ) );
+        $this->assertFalse( expAiConversationBusyException::retryable( new expAiException( 'other' ) ) );
     }
 
     public function testAStepRenewsItsLockAndStopsWhenAnotherTookItOver(): void
@@ -369,6 +374,8 @@ class expAiConversationStateTest extends expAiCoreTestCase
         catch ( expAiException $e )
         {
             $this->assertSame( 'conversation lock held', $e->detail() );
+            $this->assertInstanceOf( 'expAiConversationBusyException', $e );
+            $this->assertTrue( $e->started(), 'the step had begun: not simply run again' );
         }
         $this->assertSame( 0, ( new ReflectionProperty( 'expAiAssistant', 'lockedID' ) )->getValue( $assistant ), 'it releases nothing it does not hold' );
     }

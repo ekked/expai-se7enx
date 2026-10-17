@@ -242,3 +242,7 @@ anchors, literals, internal links and formatting attributes were lost, and ezaut
   `expai_usage_log`) runs at most once a minute per process before a request, instead of before every request; the
   cronjob part `expai` still removes them on every run. A stale reservation was never counted, so nothing changes for
   the limits.
+- **Busy conversation in the queue**: a queued thread turn or plan item whose conversation is held by another step
+  failed for good and the thread stayed running. The lock now refuses with `expAiConversationBusyException` (an
+  `expAiException`, so existing catches keep working); a turn refused before its step began is deferred for 20 seconds
+  and runs again with its message, without using up an attempt.

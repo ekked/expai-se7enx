@@ -131,9 +131,48 @@ class expAiConversationLock
         $db->query( "UPDATE expai_conversation SET busy_owner = '', busy_until = 0 WHERE id = $id AND busy_owner = '$me'" );
     }
 
-    /** @return expAiException the refusal of a second step */
-    public static function busy()
+    /**
+     * @param bool $started the step had begun (it lost its lock to another one midway) rather than being refused before
+     *                      anything happened
+     * @return expAiConversationBusyException the refusal of a second step
+     */
+    public static function busy( $started = false )
     {
-        return new expAiException( 'A step of this conversation is already running. Wait until it has finished, then try again.', 'conversation lock held' );
+        return new expAiConversationBusyException( 'A step of this conversation is already running. Wait until it has finished, then try again.', 'conversation lock held', 0, array(), $started );
+    }
+}
+
+/**
+ * Another step of the conversation holds its lock (expAiConversationLock). An expAiException, so every existing catch
+ * still sees it; a queued turn that meets it before its step began (started() false) is tried again a little later
+ * instead of failing for good, as the other step ends or its lock runs out on its own.
+ */
+class expAiConversationBusyException extends expAiException
+{
+    /** @var bool */
+    protected $started;
+
+    public function __construct( $message, $detail = '', $code = 0, array $arguments = array(), $started = false )
+    {
+        parent::__construct( $message, $detail, $code, $arguments );
+        $this->started = (bool) $started;
+    }
+
+    /** how long a queued turn waits before it tries a busy conversation again */
+    const RETRY_SECONDS = 20;
+
+    /** @return bool the step had begun and lost its lock midway (its work so far is in the conversation) */
+    public function started()
+    {
+        return $this->started;
+    }
+
+    /**
+     * @return bool a queued step that failed with $e may simply run again later: the conversation was busy and the
+     *              step had not begun (nothing was sent, nothing written)
+     */
+    public static function retryable( $e )
+    {
+        return $e instanceof self && !$e->started();
     }
 }
