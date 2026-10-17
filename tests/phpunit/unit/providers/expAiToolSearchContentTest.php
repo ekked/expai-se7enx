@@ -122,6 +122,19 @@ class expAiToolSearchContentTest extends expAiProviderTestCase
         $this->assertSame( array( '%query' => 'prices' ), $tool->stepArguments( array( 'query' => 'prices' ), $result ) );
     }
 
+    public function testMoreMayExistCountsOnlyWhatThisCallWithheld(): void
+    {
+        $tool = new expAiToolSearchContentTestTool( 'search_content' );
+        $tool->result = array( 'SearchCount' => 3, 'SearchResult' => array( self::hit( 61, 161, 'Prices' ), self::hit( 63, 163, 'Kept away' ) ) );
+        $tool->kept = array( 163 );
+        $context = $this->context();
+        // earlier calls of the same step withheld other objects: they are not results of this search
+        $context->reader->withheld = 5;
+        $result = $tool->execute( array( 'query' => 'prices' ), $context );
+        $this->assertTrue( $result['more_may_exist'], 'a third hit exists beyond the two this page saw' );
+        $this->assertSame( 6, $context->reader->withheld, 'the step\'s counter still adds this call\'s withheld hit' );
+    }
+
     public function testAClassASubtreeAndPaging(): void
     {
         $tool = new expAiToolSearchContentTestTool( 'search_content' );

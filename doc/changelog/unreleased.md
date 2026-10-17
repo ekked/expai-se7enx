@@ -262,3 +262,6 @@ anchors, literals, internal links and formatting attributes were lost, and ezaut
 - **Local models and cost limits**: with a cost limit set, `[Limits] UnpricedCost=block` refused every model without a
   price, including the models of local providers, so an installation running a local model stopped working as soon as
   a cost limit existed. A provider with `Region=local` now counts as free and is never refused for a missing price.
+- **search_content**: `more_may_exist` counted every object the data policy withheld in the whole step, not only
+  in this search, so after other tool calls it could say that nothing more exists when more did. It now counts the
+  hits this call withheld.

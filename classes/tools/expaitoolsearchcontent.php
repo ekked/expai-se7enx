@@ -61,6 +61,8 @@ class expAiToolSearchContent extends expAiTool
         $found = $this->search( $query, $params );
         $hits = array();
         $left = 0;
+        // the results of this call kept away (the reader's counter adds up over the whole step)
+        $withheld = 0;
         foreach ( isset( $found['SearchResult'] ) && is_array( $found['SearchResult'] ) ? $found['SearchResult'] : array() as $node )
         {
             if ( !is_object( $node ) || ( method_exists( $node, 'canRead' ) && !$node->canRead() ) )
@@ -72,6 +74,7 @@ class expAiToolSearchContent extends expAiTool
             if ( !$object || !$this->allowed( $context, $object ) )
             {
                 $context->reader->withheld++;
+                $withheld++;
                 continue;
             }
             $hits[] = array(
@@ -86,7 +89,7 @@ class expAiToolSearchContent extends expAiTool
         // the engine's count includes what was left out here: only whether more may exist is told
         $total = isset( $found['SearchCount'] ) ? (int) $found['SearchCount'] : 0;
         return array( 'query' => $query, 'subtrees' => $subtrees, 'offset' => $offset, 'hits' => $hits,
-                      'more_may_exist' => $total > $offset + count( $hits ) + $left + $context->reader->withheld );
+                      'more_may_exist' => $total > $offset + count( $hits ) + $left + $withheld );
     }
 
     /**
