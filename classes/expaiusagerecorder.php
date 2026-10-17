@@ -94,7 +94,7 @@ class expAiUsageRecorder implements expAiProvider
         $this->pending = null;
         if ( expAiLimits::anySet( $config ) && expAiUsageLog::reservationColumns() )
         {
-            expAiUsage::removeStaleReservations();
+            expAiUsage::cleanStaleReservations();
             $estimate = self::estimate( $request, $this->maxTokens( $request, $config ), $row['model'], $row['model_alias'] );
             $this->pending = expAiUsage::record( $row + array( 'reserved_tokens' => $estimate['tokens'], 'reserved_micros' => $estimate['micros'] ), false );
         }

@@ -75,6 +75,31 @@ class expAiLimitsReservationTest extends expAiCoreTestCase
         }
     }
 
+    public function testTheCleanUpOfStaleReservationsRunsAtMostOnceAMinute(): void
+    {
+        $last = new ReflectionProperty( 'expAiUsage', 'lastStaleCleanup' );
+        $before = $last->getValue();
+        expAiSchema::forgetColumns();
+        // without the columns the clean-up itself needs no database
+        expAiUsageLog::$columnLister = function () { return array( 'id' ); };
+        try
+        {
+            $last->setValue( null, 0 );
+            expAiUsage::cleanStaleReservations( 100000 );
+            $this->assertSame( 100000, $last->getValue(), 'the first request of a process cleans up' );
+            expAiUsage::cleanStaleReservations( 100000 + expAiUsage::STALE_CLEANUP_SECONDS - 1 );
+            $this->assertSame( 100000, $last->getValue(), 'skipped within the minute' );
+            expAiUsage::cleanStaleReservations( 100000 + expAiUsage::STALE_CLEANUP_SECONDS );
+            $this->assertSame( 100000 + expAiUsage::STALE_CLEANUP_SECONDS, $last->getValue() );
+        }
+        finally
+        {
+            $last->setValue( null, $before );
+            expAiUsageLog::$columnLister = null;
+            expAiSchema::forgetColumns();
+        }
+    }
+
     public function testAnUnknownColumnListCountsAsPresent(): void
     {
         expAiSchema::forgetColumns();

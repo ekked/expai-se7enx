@@ -89,6 +89,27 @@ class expAiUsage
         return $count;
     }
 
+    /** the least seconds between two clean-ups of stale reservations of one process (cleanStaleReservations()) */
+    const STALE_CLEANUP_SECONDS = 60;
+
+    /** @var int when this process last removed stale reservations */
+    protected static $lastStaleCleanup = 0;
+
+    /**
+     * removeStaleReservations() before a request, at most once every STALE_CLEANUP_SECONDS per process: a stale
+     * reservation is not counted anyway (reservationState()), so the clean-up need not cost a count and a delete on
+     * every request. The prune of the cronjob removes them every time.
+     * @return int rows removed (0 when skipped)
+     */
+    public static function cleanStaleReservations( $now = null )
+    {
+        $now = $now === null ? time() : (int) $now;
+        if ( self::$lastStaleCleanup > 0 && $now - self::$lastStaleCleanup < self::STALE_CLEANUP_SECONDS )
+            return 0;
+        self::$lastStaleCleanup = $now;
+        return self::removeStaleReservations( $now );
+    }
+
     /**
      * Is a log row the reservation of a request under way (expAiLimits)? A reservation older than
      * expAiLimits::RESERVATION_SECONDS belongs to a process that ended without settling it: it is not counted.

@@ -212,7 +212,8 @@ While any limit is set, every request reserves its estimate before it is sent (i
 its `MaxTokens` as output) and counts with it until its row is settled with the real numbers. Parallel requests
 therefore cannot pass a limit together: a request that would pass it with the requests under way is refused ("would
 be passed together with the requests under way"). A reservation older than 15 minutes (a process that ended without
-settling it) no longer counts.
+settling it) no longer counts; such rows are removed by the cronjob part `expai` and, at most once a minute per
+process, before a request.
 
 Anthropic's own limits apply as well: the rate limits of the key (the dashboard shows the last values the API
 reported) and the spend limit of the organization, set in the Claude Console.

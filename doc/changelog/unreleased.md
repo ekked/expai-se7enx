@@ -238,3 +238,7 @@ anchors, literals, internal links and formatting attributes were lost, and ezaut
   settled requests only) and logs one warning per process naming the command. The conversation lock and the usage log
   keep a positive column check for the process and ask again for a missing column after five minutes, so an upgrade
   reaches long-running workers without a restart. `--install` stays a mandatory step of the deployment.
+- **Stale reservations**: the removal of reservations a process left behind (a count and a delete on
+  `expai_usage_log`) runs at most once a minute per process before a request, instead of before every request; the
+  cronjob part `expai` still removes them on every run. A stale reservation was never counted, so nothing changes for
+  the limits.
