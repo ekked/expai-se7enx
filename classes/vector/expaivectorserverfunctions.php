@@ -320,7 +320,10 @@ class expAiVectorServerFunctions extends ezjscServerFunctions
             $scripts = array();
             try
             {
-                $scripts = ezjscPacker::buildJavascriptFiles( array( 'expai_palette.js' ), (int) eZINI::instance( 'ezjscore.ini' )->variable( 'eZJSCore', 'Packer' ) );
+                // ezjscore.ini [eZJSCore] Packer is optional (ezjscPacker applies it itself when it is set)
+                $ezjscINI = eZINI::instance( 'ezjscore.ini' );
+                $packLevel = $ezjscINI->hasVariable( 'eZJSCore', 'Packer' ) ? (int) $ezjscINI->variable( 'eZJSCore', 'Packer' ) : 0;
+                $scripts = ezjscPacker::buildJavascriptFiles( array( 'expai_palette.js' ), $packLevel );
             }
             catch ( Exception $e )
             {
