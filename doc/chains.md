@@ -57,7 +57,7 @@ write (Opus) -> review (Sonnet) --fail--> revise (Opus) -> review ... (at most 3
    for the editor. When the class has an `xrowmetadata` field, the meta title, description and keywords are written
    into it (its other values are kept).
 5. **checkpoint** (`human`): the draft is written now (one new object under the location, as the user who started the
-   run, labelled "Exponential Intelligence" like every AI-written version, `expai_draft_log.source` = `chain`) and the
+   run, labeled "Exponential Intelligence" like every AI-written version, `expai_draft_log.source` = `chain`) and the
    run waits for an editor.
 6. **translate** (`translate`): the object is handed to `[ChainSettings] TranslateHandler`, shipped as
    `expAiChainTranslateSync`, which uses the translation sync ([translation-sync.md](translation-sync.md)). The sync

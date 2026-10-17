@@ -121,7 +121,7 @@ A custom editor needs a field adapter (`ExpAi.fieldAdapters.register( 'ezxmltext
 ## No label in a list
 
 The label needs `ezjscore/call` for the viewer, `[LabelSettings] Enabled`, and links to `content/versionview/<id>/<v>`,
-`content/edit/<id>/<v>` or `collaboration/item/full/<id>`. Only versions in expai's log are labelled.
+`content/edit/<id>/<v>` or `collaboration/item/full/<id>`. Only versions in expai's log are labeled.
 
 ## "Send for approval" leaves the version pending
 

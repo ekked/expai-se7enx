@@ -18,7 +18,7 @@ without regard to case; the palette and the sheet then show ⌘K. A keystroke wi
 single-key shortcut (j, k, ...), and a key held down or an input method composing text does not trigger the palette.
 
 For screen readers the search field is a combobox whose `aria-expanded` is true only while there are results, the
-results are in labelled groups (`role="group"`), and a status line announces the number of results (or "Searching...").
+results are in labeled groups (`role="group"`), and a status line announces the number of results (or "Searching...").
 While the palette is open the page behind it does not scroll.
 
 What it lists, as you type:
