@@ -105,7 +105,7 @@ and for the whole site per month, in tokens or in estimated cost, plus the most 
 checked before a request is sent; when one is reached the editor sees which limit and when it resets, and the request
 is not sent. Each request reserves its estimate first, and the check counts what the requests under way reserved:
 parallel requests cannot pass a limit together. A model without a price is refused while a cost limit applies
-(`UnpricedCost=block`, the default; `ignore` counts it as free). The dashboard shows a bar for every limit that is set.
+(`UnpricedCost=block`, the default; `ignore` counts it as free); a model of a provider with `Region=local` is always free. The dashboard shows a bar for every limit that is set.
 
 Anthropic's own limits apply in addition: the rate limits of the key (the dashboard shows what the last response
 reported; a rate-limited request is retried (up to twice) when its `retry-after` is short (at most `RetryAfterMax` seconds, [providers.md](providers.md)), otherwise it fails with "busy or over its limit, try again later" and is recorded with its `retry-after`) and the organization's

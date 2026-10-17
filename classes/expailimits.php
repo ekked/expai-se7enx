@@ -22,6 +22,7 @@
  *                              all users together on one provider (reset on the 1st)
  *   UnpricedCost               block (default) | ignore: a request to a model without a price while a cost limit
  *                              applies is refused (block), or counted as free (ignore)
+ *                              (a provider with Region=local is always free)
  *
  * Requests under way: while any limit is set, every request reserves its estimate (a row of expai_usage_log with
  * reserved_tokens and reserved_micros, written before the request is sent and settled with the real numbers after
@@ -53,6 +54,19 @@ class expAiLimits
     {
         $config = $config ?: expAiConfig::instance();
         return strtolower( trim( (string) $config->get( 'Limits', 'UnpricedCost', 'block' ) ) ) === 'ignore' ? 'ignore' : 'block';
+    }
+
+    /**
+     * @return bool the provider runs on the site's own hardware ([Provider_<id>] Region=local): its models cost
+     *              nothing per request, so UnpricedCost=block does not refuse them
+     */
+    public static function isLocalProvider( $providerID, ?expAiConfig $config = null )
+    {
+        $config = $config ?: expAiConfig::instance();
+        if ( (string) $providerID === '' )
+            return false;
+        $settings = $config->registry()->getProvider( (string) $providerID );
+        return $settings && isset( $settings['Region'] ) && strtolower( trim( (string) $settings['Region'] ) ) === 'local';
     }
 
     /**
@@ -262,7 +276,9 @@ class expAiLimits
         if ( !self::anySet( $config ) )
             return;
         // a model without a price: a cost limit cannot be kept for it
+        // a model of a local provider (Region=local, it runs on own hardware) is free: never refused for its missing price
         if ( isset( $context['model'] ) && self::unpricedCost( $config ) === 'block' && expAiCost::enabled( $config )
+             && !self::isLocalProvider( isset( $context['provider'] ) ? (string) $context['provider'] : '', $config )
              && self::costLimitsFor( isset( $context['provider'] ) ? (string) $context['provider'] : '', $config )
              && expAiUsage::cost( (string) $context['model'], 1000, 1000, 0, 0, isset( $context['model_alias'] ) ? (string) $context['model_alias'] : '' ) === null )
         {

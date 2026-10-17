@@ -259,3 +259,6 @@ anchors, literals, internal links and formatting attributes were lost, and ezaut
   lets the lock run out before the tools run). A model that ignores `tool_choice=none` and keeps calling tools is
   stopped: more than two requests past `MaxToolIterations` (or `[Limits] MaxRequestsPerTurn`), its tool calls are
   not run and the turn ends as done with "Stopped. The steps so far are kept."
+- **Local models and cost limits**: with a cost limit set, `[Limits] UnpricedCost=block` refused every model without a
+  price, including the models of local providers, so an installation running a local model stopped working as soon as
+  a cost limit existed. A provider with `Region=local` now counts as free and is never refused for a missing price.

@@ -155,6 +155,29 @@ class expAiLimitsReservationTest extends expAiCoreTestCase
         }
     }
 
+    public function testAnUnpricedModelOfALocalProviderIsFree(): void
+    {
+        $config = $this->useSettings( array( 'Limits' => array( 'MaxCostPerUserPerDay' => '2' ),
+                                             'Provider_xtd' => array( 'Type' => 'openai_chat', 'BaseURL' => 'http://127.0.0.1:9/v1', 'ApiKey' => '', 'Region' => 'eu' ),
+                                             'Provider_xlo' => array( 'Type' => 'openai_chat', 'BaseURL' => 'http://127.0.0.1:9/v1', 'ApiKey' => '', 'Region' => 'local' ),
+                                             'Model_xtd.free' => array( 'Provider' => 'xtd', 'Id' => 'xtd-free' ),
+                                             'Model_xlo.free' => array( 'Provider' => 'xlo', 'Id' => 'xlo-free' ),
+                                             'ProviderSettings' => array( 'Providers' => array( 'anthropic', 'xtd', 'xlo' ) ) ) );
+        $this->assertTrue( expAiLimits::isLocalProvider( 'xlo', $config ) );
+        $this->assertFalse( expAiLimits::isLocalProvider( 'xtd', $config ) );
+        $this->assertFalse( expAiLimits::isLocalProvider( '', $config ) );
+        $this->assertFalse( expAiLimits::isLocalProvider( 'unknown', $config ) );
+        try
+        {
+            expAiLimits::check( array( 'user_id' => self::TEST_USER, 'provider' => 'xlo', 'model' => 'xlo-free', 'model_alias' => 'xlo.free' ) );
+            $this->addToAssertionCount( 1 );
+        }
+        catch ( expAiException $e )
+        {
+            $this->assertStringStartsNotWith( 'The model %model has no price', $e->getMessage(), 'a local model is not refused for its missing price' );
+        }
+    }
+
     public function testTheRowOfARefusalNamesItsCategoryAndTheRowOfAnyFailure(): void
     {
         $this->useSettings();

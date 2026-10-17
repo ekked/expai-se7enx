@@ -207,7 +207,7 @@ and when it resets. Days and months follow the site's time zone. The dashboard s
 | `MaxTokensPerSitePerMonth`, `MaxCostPerSitePerMonth` | on the 1st (all users together) |
 | `MaxRequestsPerTurn` | the most model calls one message may lead to; empty: `[AssistantSettings] MaxToolIterations` (a retry of the prompted tool protocol counts) |
 | `ProviderMaxTokensPerMonth[<provider>]`, `ProviderMaxCostPerMonth[<provider>]` | on the 1st: all users together on one provider; only requests to that provider are stopped |
-| `UnpricedCost` | `block` (default): a request to a model without a price is refused while a cost limit applies to it, as the limit could not be kept; `ignore`: it goes and counts as free |
+| `UnpricedCost` | `block` (default): a request to a model without a price is refused while a cost limit applies to it, as the limit could not be kept; `ignore`: it goes and counts as free. A model of a provider with `Region=local` (it runs on the site's own hardware) always counts as free and is never refused for its missing price. |
 
 While any limit is set, every request reserves its estimate before it is sent (input from the length of the request,
 its `MaxTokens` as output) and counts with it until its row is settled with the real numbers. Parallel requests
