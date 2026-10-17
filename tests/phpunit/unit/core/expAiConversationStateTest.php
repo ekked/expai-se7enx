@@ -137,11 +137,42 @@ class expAiConversationStateTest extends expAiCoreTestCase
             }
         };
         $fetch = function ( $id ) { return $id === 3 ? null : (object) array( 'id' => $id ); };
+        $none = function ( $object, array $request ) { return ''; };
         $this->assertTrue( expAiModelFallback::objectsAllowed( $config, 'xtd', array(), $fetch, $policy ) );
-        $this->assertTrue( expAiModelFallback::objectsAllowed( $config, 'xtd', array( 1, 3 ), $fetch, $policy ), 'a removed object does not count' );
-        $this->assertFalse( expAiModelFallback::objectsAllowed( $config, 'xtd', array( 1, 2 ), $fetch, $policy ) );
+        $this->assertTrue( expAiModelFallback::objectsAllowed( $config, 'xtd', array( 1, 4 ), $fetch, $policy, array(), $none ) );
+        $this->assertFalse( expAiModelFallback::objectsAllowed( $config, 'xtd', array( 1, 3 ), $fetch, $policy, array(), $none ), 'fail closed: an object that cannot be loaded is not allowed' );
+        $this->assertFalse( expAiModelFallback::objectsAllowed( $config, 'xtd', array( 1, 2 ), $fetch, $policy, array(), $none ) );
+        $this->assertFalse( expAiModelFallback::objectsAllowed( $config, 'xtd', array( 1 ), $fetch, $policy ), 'an object the veto cannot check is not allowed' );
         $this->assertNull( expAiModelFallback::objectsAllow( $config, array() ) );
         $this->assertIsCallable( expAiModelFallback::objectsAllow( $config, array( 1 ) ) );
+    }
+
+    public function testTheRequestVetoOfANewProviderOverTheObjectsRead(): void
+    {
+        $config = $this->useSettings();
+        $policy = new class
+        {
+            public function allowsObject( $object )
+            {
+                return true;
+            }
+
+            public function providerRegion()
+            {
+                return 'us';
+            }
+        };
+        $fetch = function ( $id ) { return (object) array( 'id' => $id ); };
+        $seen = array();
+        $veto = function ( $object, array $request ) use ( &$seen )
+        {
+            $seen[] = $request;
+            return $object->id === 7 && $request['provider'] === 'xtd' ? 'Not to this provider.' : '';
+        };
+        $this->assertFalse( expAiModelFallback::objectsAllowed( $config, 'xtd', array( 5, 7 ), $fetch, $policy, array( 'purpose' => 'panel' ), $veto ),
+                            'the data policy lets the object through, the request veto does not' );
+        $this->assertSame( array( 'purpose' => 'panel', 'provider' => 'xtd', 'region' => 'us' ), $seen[0], 'the veto hears the new provider, its region and the purpose' );
+        $this->assertTrue( expAiModelFallback::objectsAllowed( $config, 'other', array( 5, 7 ), $fetch, $policy, array( 'purpose' => 'panel' ), $veto ) );
     }
 
     public function testTheEditorsWordsOnlyAndTheDraftsOfAnOpenExchange(): void

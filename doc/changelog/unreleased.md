@@ -226,3 +226,10 @@ anchors, literals, internal links and formatting attributes were lost, and ezaut
   no change (the default accepts it).
 - New strings in the contexts `panel`, `vector`, `preset`, `keyboard` and `chain` (ger-DE and eng-US included).
 
+
+## After the review
+
+- **Change of model and the request veto**: when a conversation goes on with another model (the editor's choice or
+  the fallback to the site default), the objects it read are checked against the request veto (`[RequestVeto]` rules,
+  with the new provider, its region and the purpose) as well as the new provider's data policy. An object that cannot
+  be loaded any more now counts as not allowed (fail closed): the new model then gets the editor's words only.

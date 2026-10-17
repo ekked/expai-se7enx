@@ -37,7 +37,9 @@ an unknown region meets no region requirement. Without any rule everything may g
   can choose another model.
 - **A change of model in a conversation**: the conversation notes every object whose content a tool returned (and
   the open node). When it goes on with another model - the editor chose one, or the fallback to the site default
-  answers - these objects are checked against the new provider's policy. When all may go there, the new model gets
+  answers - these objects are checked against the new provider's policy and against the request veto
+  (`[RequestVeto]` rules, with the new provider, its region and the purpose of the request). An object that cannot be
+  loaded any more counts as not allowed (fail closed). When all may go there, the new model gets
   the earlier exchanges as a short summary as before; when one may not, it gets the editor's words only (each
   earlier answer is replaced by a placeholder, drafts by their object:version keys) and the exchange says so. The
   fallback prefers a model whose provider may take everything the conversation read.

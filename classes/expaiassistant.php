@@ -232,7 +232,7 @@ class expAiAssistant
         $policy = expAiDataPolicy::forProvider( $this->config, $providerID );
         $reader = new expAiContentReader( $this->config, $policy );
         // the purpose of the request, for the veto of every object read (the provider and region come from the policy)
-        $vetoRequest = array( 'purpose' => $this->bound ? (string) $this->threadOptions['action'] : 'panel' );
+        $vetoRequest = $this->vetoRequest();
         $reader->setRequest( $vetoRequest );
         $node = $reader->readableNode( $nodeID );
         $conversation = $this->bound ?: expAiConversation::fetchCurrent( $user->attribute( 'contentobject_id' ), $nodeID );
@@ -264,7 +264,7 @@ class expAiAssistant
                 // have all of it; else the new model gets the editor's words only
                 // fail closed: content the conversation cannot account for (more objects than it keeps, a tool that
                 // does not read through the reader) is never carried to another model
-                $carry = !$conversation->contentUntracked() && expAiModelFallback::objectsAllowed( $this->config, $providerID, $conversation->readObjects() );
+                $carry = !$conversation->contentUntracked() && expAiModelFallback::objectsAllowed( $this->config, $providerID, $conversation->readObjects(), null, null, $vetoRequest );
                 $messages = $done ? ( $carry ? self::compact( $done, $keep ) : self::compactWordsOnly( $done, $keep ) ) : array();
                 if ( $pending )
                     // the drafts the open exchange wrote so far go with it, so the new model does not write them again
@@ -808,7 +808,7 @@ class expAiAssistant
             return $this->fallbackTo;
         $this->fallback = null;
         list( $used, $fallback ) = expAiModelFallback::resolve( $this->config, $this->requestedAlias(), expAiModelFallback::nodeAllows( $this->config, $nodeID ),
-                                                                expAiModelFallback::objectsAllow( $this->config, $this->readObjectsOf( $nodeID ), $this->untrackedOf( $nodeID ) ) );
+                                                                expAiModelFallback::objectsAllow( $this->config, $this->readObjectsOf( $nodeID ), $this->untrackedOf( $nodeID ), $this->vetoRequest() ) );
         $this->fallback = $fallback;
         return $used;
     }
@@ -828,6 +828,12 @@ class expAiAssistant
     {
         $conversation = $this->current ?: ( $this->bound ?: expAiConversation::fetchCurrent( eZUser::currentUserID(), $nodeID ) );
         return $conversation ? $conversation->contentUntracked() : false;
+    }
+
+    /** @return array what is known of the request for the veto of the objects it carries: the purpose (a thread's action, else panel) */
+    protected function vetoRequest()
+    {
+        return array( 'purpose' => $this->bound ? (string) $this->threadOptions['action'] : 'panel' );
     }
 
     /** @return string the model the step asks for: a thread's model, else the user's choice, else the site default */
@@ -854,7 +860,7 @@ class expAiAssistant
         if ( $alias === $this->config->model() )
             return '';
         $used = expAiModelFallback::choose( $this->config, $alias, expAiModelFallback::nodeAllows( $this->config, $nodeID ),
-                                            expAiModelFallback::objectsAllow( $this->config, $this->readObjectsOf( $nodeID ), $this->untrackedOf( $nodeID ) ) );
+                                            expAiModelFallback::objectsAllow( $this->config, $this->readObjectsOf( $nodeID ), $this->untrackedOf( $nodeID ), $this->vetoRequest() ) );
         if ( $used === '' )
             throw expAiModelFallback::noneLeft( $this->config, $alias, $reason );
         $this->fallback = expAiModelFallback::describe( $this->config, $alias, $used, $reason );

@@ -307,44 +307,78 @@ class expAiModelFallback
     }
 
     /**
-     * The data policy check of the objects a conversation read, for choose().
+     * The data policy and request veto check of the objects a conversation read, for choose() (objectsAllowed()).
      * @param int[] $objectIDs
      * @param bool $untracked the conversation holds content its list does not cover (no provider passes then)
+     * @param array $request what is known of the request for the veto (purpose)
      * @return callable|null function( string $providerID ): bool; null when there are none
      */
-    public static function objectsAllow( expAiConfig $config, array $objectIDs, $untracked = false )
+    public static function objectsAllow( expAiConfig $config, array $objectIDs, $untracked = false, array $request = array() )
     {
         // content the conversation cannot account for: no provider is known to be allowed it
         if ( $untracked )
             return function ( $providerID ) { return false; };
         if ( !$objectIDs )
             return null;
-        return function ( $providerID ) use ( $config, $objectIDs )
+        return function ( $providerID ) use ( $config, $objectIDs, $request )
         {
-            return expAiModelFallback::objectsAllowed( $config, $providerID, $objectIDs );
+            return expAiModelFallback::objectsAllowed( $config, $providerID, $objectIDs, null, null, $request );
         };
     }
 
     /**
-     * Does the data policy of a provider let every one of these objects go to it? An object that no longer exists
-     * is not content any more and does not count.
+     * May every one of these objects go to a provider? Both the data policy of the provider and the request veto
+     * ([RequestVeto] rules, expAiGate::objectVeto() with the provider, its region and the purpose of the request) must
+     * let each of them through.
+     * Fail closed: an object that cannot be loaded any more (removed, or the lookup failed) counts as not allowed,
+     * since what the conversation holds of it cannot be checked.
      * @param int[] $objectIDs
      * @param callable|null $fetch function( int $id ): eZContentObject|null (default eZContentObject::fetch)
      * @param expAiDataPolicy|null $policy the provider's policy (default expAiDataPolicy::forProvider())
+     * @param array $request what is known of the request for the veto (purpose, siteaccess); provider and region are
+     *                       those of the new provider
+     * @param callable|null $veto function( object $object, array $request ): string reason ('' when allowed)
+     *                            (default expAiGate::objectVeto())
      * @return bool
      */
-    public static function objectsAllowed( expAiConfig $config, $providerID, array $objectIDs, $fetch = null, $policy = null )
+    public static function objectsAllowed( expAiConfig $config, $providerID, array $objectIDs, $fetch = null, $policy = null, array $request = array(), $veto = null )
     {
         if ( !$objectIDs )
             return true;
         $policy = $policy ?: expAiDataPolicy::forProvider( $config, (string) $providerID );
+        $request['provider'] = (string) $providerID;
+        if ( !isset( $request['region'] ) )
+            $request['region'] = self::providerRegion( $config, (string) $providerID, $policy );
         foreach ( array_unique( array_map( 'intval', $objectIDs ) ) as $id )
         {
             $object = $fetch ? call_user_func( $fetch, $id ) : eZContentObject::fetch( $id );
-            if ( is_object( $object ) && !$policy->allowsObject( $object ) )
+            if ( !is_object( $object ) )
+                return false;
+            if ( !$policy->allowsObject( $object ) )
+                return false;
+            if ( $veto )
+                $reason = (string) call_user_func( $veto, $object, $request );
+            elseif ( $object instanceof eZContentObject )
+            {
+                $result = expAiGate::objectVeto( $object, $request, $config );
+                $reason = (string) $result[0];
+            }
+            else
+                // nothing the veto can check: fail closed
+                $reason = 'unknown object';
+            if ( $reason !== '' )
                 return false;
         }
         return true;
+    }
+
+    /** @return string the region of a provider: from its data policy, else from the registry ('' when not known) */
+    protected static function providerRegion( expAiConfig $config, $providerID, $policy )
+    {
+        if ( is_object( $policy ) && method_exists( $policy, 'providerRegion' ) )
+            return (string) $policy->providerRegion();
+        $settings = $config->registry()->getProvider( $providerID );
+        return $settings && isset( $settings['Region'] ) ? (string) $settings['Region'] : '';
     }
 
     /** @return callable the data policy check of an object */
