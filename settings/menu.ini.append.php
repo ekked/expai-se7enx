@@ -20,10 +20,11 @@ PolicyList_expai_chain[]=expai/chain
 Links[expai_log]=expai/log
 LinkNames[expai_log]=EI: Log
 PolicyList_expai_log[]=expai/write
-# The extension's documentation (expai/help, doc/index.md)
+# The extension's documentation (expai/help, doc/index.md). No PolicyList_expai_help[]: the view opens with expai/write
+# OR expai/summary (a data protection officer reads the documentation too), which one PolicyList entry cannot say;
+# [MenuAccessSettings] CheckViewAccess asks the view itself, as for setup/menu in settings/menu.ini.
 Links[expai_help]=expai/help
 LinkNames[expai_help]=EI: Help
-PolicyList_expai_help[]=expai/write
 
 # Setup > EI: Summary (expai/summary): the printable page for a data protection officer (doc/summary.md), shown only to users
 # with the policy expai/summary (the Administrator role holds every policy).
@@ -47,6 +48,8 @@ PolicyList_expqueue[]=expqueue/view
 
 # Audit > the events of Exponential Intelligence (doc/audit-trail.md): the channel "ai" in the
 # audit console (audit/read), and the usage log for users who see everyone's requests (expai/log)
+# The audit entry of expai/log is narrower than its view on purpose: the view needs expai/write (the Dashboard menu
+# checks exactly that); in Audit it is listed only for those who also hold expai/log.
 [Leftmenu_audit]
 Links[expai_events]=audit/console/(channel)/ai
 LinkNames[expai_events]=AI events
