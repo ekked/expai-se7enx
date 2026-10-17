@@ -125,7 +125,7 @@
                     <span class="exp-ai-v-label">{'Queued'|i18n( $exp_ai_i18n )}</span>
                     <ol class="exp-ai-v-queue-list"></ol>
                 </div>
-                <form class="exp-ai-v-composer" onsubmit="return false;">
+                <form class="exp-ai-v-composer">
                     <label class="exp-ai-sr" for="exp-ai-v-message">{'Your request'|i18n( $exp_ai_i18n )}</label>
                     <textarea id="exp-ai-v-message" class="exp-ai-v-input" rows="3" maxlength="{ezini( 'AssistantSettings', 'MaxMessageLength', 'expai.ini' )|wash}"
                               placeholder="{'What should happen in this scope?'|i18n( $exp_ai_i18n )|wash}"></textarea>

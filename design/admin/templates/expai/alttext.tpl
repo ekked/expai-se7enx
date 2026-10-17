@@ -26,7 +26,7 @@
 
     <section class="exp-ai-card" aria-labelledby="exp-ai-alttext-where">
         <h2 id="exp-ai-alttext-where">{'Where'|i18n( 'extension/expai/alttext' )}</h2>
-        <form method="get" action={'expai/alttext'|ezurl} class="exp-ai-inline-form" onsubmit="this.action = this.action.replace( /\/$/, '' ) + '/(node)/' + encodeURIComponent( this.querySelector( 'input' ).value ); return true;">
+        <form method="get" action={'expai/alttext'|ezurl} class="exp-ai-inline-form" data-exp-ai-node-form="1">
             <label class="exp-ai-label">{'Node ID of the subtree'|i18n( 'extension/expai/alttext' )}
                 <input type="number" min="1" class="box" value="{if $node}{$node.node_id}{/if}" /></label>
             <input type="submit" class="button exp-ai-btn" value="{'Show'|i18n( 'extension/expai/alttext' )}" />
@@ -45,7 +45,7 @@
 {/if}
         <form method="post" action={concat( 'expai/alttext/(node)/', $node.node_id )|ezurl}>
         <table class="list exp-ai-draft-table" cellspacing="0">
-            <thead><tr><th class="tight"><input type="checkbox" class="exp-ai-alttext-all" title="{'Choose all'|i18n( 'extension/expai/alttext' )}" aria-label="{'Choose all'|i18n( 'extension/expai/alttext' )}" /></th>
+            <thead><tr><th class="tight"><input type="checkbox" class="exp-ai-alttext-all" data-exp-ai-check-all="ExpAiAltTextRows[]" title="{'Choose all'|i18n( 'extension/expai/alttext' )}" aria-label="{'Choose all'|i18n( 'extension/expai/alttext' )}" /></th>
                 <th>{'Content'|i18n( 'extension/expai/alttext' )}</th><th>{'Class'|i18n( 'extension/expai/alttext' )}</th><th>{'Field'|i18n( 'extension/expai/alttext' )}</th>
                 <th>{'Language'|i18n( 'extension/expai/alttext' )}</th><th>{'Size'|i18n( 'extension/expai/alttext' )}</th><th></th></tr></thead>
             <tbody>
@@ -68,16 +68,10 @@
         <p class="exp-ai-muted">{'The job queue (extension expqueue) is not active: open each image in the edit form and use "Write alt text" there.'|i18n( 'extension/expai/alttext' )}</p>
 {/if}
         </form>
-        <script>
-        (function () {ldelim}
-            var all = document.querySelector( '.exp-ai-alttext-all' );
-            if ( all ) {ldelim} all.addEventListener( 'change', function () {ldelim}
-                Array.prototype.forEach.call( document.querySelectorAll( 'input[name="ExpAiAltTextRows[]"]' ), function ( c ) {ldelim} c.checked = all.checked; {rdelim} );
-            {rdelim} ); {rdelim}
-        {rdelim})();
-        </script>
     </section>
 {elseif $node}
     <p class="exp-ai-notice">{'Every image here has an alt text.'|i18n( 'extension/expai/alttext' )}</p>
 {/if}
 </div>
+{* the "Where" form and "Choose all" (data-exp-ai-node-form, data-exp-ai-check-all): expai_page_actions.js, no inline code *}
+{ezscript( array( 'expai_page_actions.js' ) )}

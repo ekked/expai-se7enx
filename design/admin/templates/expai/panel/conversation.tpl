@@ -16,7 +16,7 @@
     <p class="exp-ai-slow" hidden="hidden" aria-live="polite"><span class="exp-ai-slow-text"></span> <span class="exp-ai-slow-time"></span>
         <button type="button" class="button exp-ai-btn exp-ai-slow-switch" hidden="hidden"></button></p>
     <p class="exp-ai-error" role="alert" hidden="hidden"></p>
-    <form class="exp-ai-form" method="post" action={'expai/log'|ezurl} onsubmit="return false;">
+    <form class="exp-ai-form" method="post" action={'expai/log'|ezurl}>
         <label class="exp-ai-label" for="exp-ai-message">{'Your request'|i18n( 'extension/expai/panel' )}</label>
         <textarea id="exp-ai-message" class="exp-ai-input box" rows="3" maxlength="{ezini( 'AssistantSettings', 'MaxMessageLength', 'expai.ini' )|wash}"
                   placeholder="{'For example: Write three short articles about our spring events under this folder.'|i18n( 'extension/expai/panel' )|wash}"></textarea>

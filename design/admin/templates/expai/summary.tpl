@@ -14,7 +14,7 @@
 {if $summary.contact}            <p class="exp-ai-summary-note">{'Contact for questions about this processing: %contact'|i18n( 'extension/expai/summary',, hash( '%contact', $summary.contact ) )|wash}</p>{/if}
         </div>
         {include uri='design:expai/parts/help_link.tpl' page='summary' label='EI: Summary'|i18n( 'extension/expai/summary' ) text='?'}
-        <p class="exp-ai-summary-noprint"><input type="button" class="button exp-ai-btn" onclick="window.print();" value="{'Print or save as PDF'|i18n( 'extension/expai/summary' )}" /></p>
+        <p class="exp-ai-summary-noprint"><input type="button" class="button exp-ai-btn" data-exp-ai-print="1" value="{'Print or save as PDF'|i18n( 'extension/expai/summary' )}" /></p>
     </header>
 
     <section class="exp-ai-card exp-ai-summary-section" id="exp-ai-summary-switch" aria-labelledby="exp-ai-summary-switch-title">
@@ -167,3 +167,5 @@
     </section>
 </div>
 {undef $yes $no}
+{* "Print or save as PDF" (data-exp-ai-print): expai_page_actions.js, no inline code *}
+{ezscript( array( 'expai_page_actions.js' ) )}
