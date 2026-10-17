@@ -67,10 +67,12 @@ class expAiUsageTest extends expAiCoreTestCase
     public function testConditionsOfTheLogFilters(): void
     {
         $this->useSettings();
-        $this->assertSame( array(), expAiUsage::conditions( array() ) );
+        // the reservations of requests under way are left out unless asked for (with_reservations, the limits)
+        $this->assertSame( array( 'reserved_tokens' => 0 ), expAiUsage::conditions( array() ) );
+        $this->assertSame( array(), expAiUsage::conditions( array( 'with_reservations' => 1 ) ) );
         $conds = expAiUsage::conditions( array( 'from' => 10, 'user_id' => '5', 'node_id' => 0, 'action' => 'panel', 'model' => '', 'errors' => 1 ) );
-        $this->assertSame( array( 'created' => array( false, array( 10, 2147483647 ) ), 'user_id' => 5, 'action' => 'panel', 'error_class' => array( '!=', '' ) ), $conds );
-        $this->assertSame( array( 'created' => array( false, array( 0, 99 ) ) ), expAiUsage::conditions( array( 'to' => 99 ) ) );
+        $this->assertSame( array( 'created' => array( false, array( 10, 2147483647 ) ), 'user_id' => 5, 'reserved_tokens' => 0, 'action' => 'panel', 'error_class' => array( '!=', '' ) ), $conds );
+        $this->assertSame( array( 'created' => array( false, array( 0, 99 ) ), 'reserved_tokens' => 0 ), expAiUsage::conditions( array( 'to' => 99 ) ) );
 
         // unpriced: the models without a price; none at all is a filter that matches nothing
         $this->usage( array( 'model' => 'xtd-mystery', 'model_alias' => self::TEST_PROVIDER . '.mystery' ) );

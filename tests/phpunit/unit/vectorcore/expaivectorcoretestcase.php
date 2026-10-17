@@ -150,8 +150,10 @@ abstract class expAiVectorCoreTestCase extends expAiTestCase
         // a guard: the threads of the test logged requests of the stub provider only
         $foreign = array();
         $db = eZDB::instance();
-        // a second guard: the code under test closed every transaction it opened
-        $open = $db->transactionCounter();
+        // a second guard: the code under test closed every transaction it opened (the test's own inTransaction() is
+        // rolled back by its cleanup and does not count)
+        $total = $db->transactionCounter();
+        $open = max( 0, $total - $this->testTransactions );
         if ( $open > 0 )
             $db->rollback();
         $rows = $db->arrayQuery( 'SELECT u.id, u.provider FROM expai_usage_log u, expai_thread t WHERE u.thread_id = t.id AND u.id > ' . (int) $this->usageBefore

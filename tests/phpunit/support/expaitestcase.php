@@ -26,6 +26,9 @@ abstract class expAiTestCase extends PHPUnit\Framework\TestCase
     /** @var eZUser|null */
     private $previousUser = null;
 
+    /** @var int the transactions the test opened itself (inTransaction()); guards count only the ones beyond them */
+    protected $testTransactions = 0;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -116,6 +119,7 @@ abstract class expAiTestCase extends PHPUnit\Framework\TestCase
         $this->requireDatabase();
         $db = eZDB::instance();
         $db->begin();
+        ++$this->testTransactions;
         $this->cleanup( static function () use ( $db )
         {
             $open = $db->transactionCounter();
