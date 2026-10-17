@@ -202,9 +202,9 @@ anchors, literals, internal links and formatting attributes were lost, and ezaut
   with `[ProviderSettings] KeyLocations[]` (default `settings/override`, `extension/*settings`).
 - **Alternative text report**: the images without alt text under a node are read with one query per 200 objects instead
   of one data map per object and language.
-- **Script cache busting**: the scripts the templates load directly carry `?v=<change time>`; for
-  `BackendJavaScriptList` the packer's `AppendLastModifiedTime` does the same in production
-  ([architecture.md](../architecture.md)).
+- **Script caching**: for `BackendJavaScriptList` the packer's `AppendLastModifiedTime` puts the change time into the
+  name of the packed file in production; the scripts the templates load directly keep their address without a version
+  query ([architecture.md](../architecture.md)).
 - **Workers**: `expAiQueueKick` detaches with `setsid` only where the system has it (else `nohup` alone) and reports a
   start where the shell gives no process id as failed (this detects only that the shell could not be started, not a worker
   that exits at once); `--allow-root-user` is passed only with `[VectorSettings] WorkerAllowRoot=enabled`

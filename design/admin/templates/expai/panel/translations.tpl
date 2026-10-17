@@ -51,6 +51,6 @@
         'skipped_note', 'Marked as up to date.'|i18n( 'extension/expai/translation' ),
         'error', 'Something went wrong:'|i18n( 'extension/expai/panel' )
     )|expai_json}</script>
-    <script src="{'javascript/expai_translations.js'|ezdesign( 'no' )}?v={'javascript/expai_translations.js'|expai_version}"></script>
+    <script src={'javascript/expai_translations.js'|ezdesign}></script>
 </div>
 {/if}

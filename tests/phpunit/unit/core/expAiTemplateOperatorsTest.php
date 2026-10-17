@@ -50,17 +50,14 @@ class expAiTemplateOperatorsTest extends expAiCoreTestCase
         $this->assertSame( '{"n":1}', $value );
     }
 
-    public function testAnAssetVersionIsTheChangeTimeOfTheFile(): void
+    public function testNoTemplateAddsAVersionQueryToAnAssetAddress(): void
     {
-        $file = EXPAI_TEST_CHECKOUT . '/design/admin/javascript/expai.js';
-        $this->assertSame( (string) filemtime( $file ), expAiTemplateOperators::assetVersion( 'javascript/expai.js' ) );
-        $this->assertSame( (string) filemtime( $file ), expAiTemplateOperators::assetVersion( '/javascript/expai.js' ) );
-    }
-
-    public function testAnUnknownAssetFallsBackToTheExtensionVersion(): void
-    {
-        $this->assertMatchesRegularExpression( '/^\d+(\.\d+)+$/', expAiTemplateOperators::assetVersion( 'javascript/none.js' ) );
-        $this->assertMatchesRegularExpression( '/^\d+(\.\d+)+$/', expAiTemplateOperators::assetVersion( '../extension.xml' ), 'no path outside design/admin' );
+        // the packer puts the change time into the name of the packed file; a ?v= on a link is not used (doc/architecture.md)
+        $this->assertNotContains( 'expai_version', ( new expAiTemplateOperators() )->operatorList() );
+        $templates = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( EXPAI_TEST_CHECKOUT . '/design', FilesystemIterator::SKIP_DOTS ) );
+        foreach ( $templates as $file )
+            if ( substr( $file->getFilename(), -4 ) === '.tpl' )
+                $this->assertDoesNotMatchRegularExpression( '/\.(js|css)[^"\'\s>]*\?v=/', (string) file_get_contents( $file->getPathname() ), $file->getPathname() );
     }
 
     public function testOnlyUnknownIsTranslatedInARetention(): void

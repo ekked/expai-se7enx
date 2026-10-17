@@ -11,7 +11,8 @@ DesignExtensions[]=expai
 # of it: [ezjscore.ini] [Packer] AppendLastModifiedTime=enabled (the default) puts the last change of the files into
 # the name of the packed file. With the packer off (ezjscore.ini [eZJSCore] Packer=disabled, or DevelopmentMode)
 # the files are served under their own address, and an old copy is reloaded by hand (shift-reload). The scripts the
-# templates of this extension load directly (presets, alt text, translations) carry ?v=<change time> themselves.
+# templates of this extension load directly (presets, alt text, translations) have no version in their address
+# either: after an update of expai, clear the caches (deploy with the packer) and reload.
 # the structure detector of the edit form (ExpAiStructure), before expai.js, which uses it
 BackendJavaScriptList[]=expai_structure.js
 BackendJavaScriptList[]=expai.js

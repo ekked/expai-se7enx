@@ -52,7 +52,7 @@ are thrown as `expAiException` with a translated message, which ezjscore returns
 
 The token and the root URL come from what every admin page already has: `#ezxform_token_js` (ezformtoken) and
 `$.ez.root_url` (ezjscore's jqueryio). expai's scripts and styles are in design.ini's `BackendJavaScriptList` and
-`BackendCSSFileList`, so the ezjscore packer bundles them with the admin's (with the packer on, `[Packer] AppendLastModifiedTime=enabled` puts the change time into the name of the packed file, which is what keeps a browser from showing an old script after an update; with the packer off, as in `DevelopmentMode`, the files keep their own address and an old copy is reloaded by hand). The scripts the templates load directly (presets, alternative text, translations) carry `?v=<change time>` themselves (template operator `expai_version`); the panel, the edit form, the dashboard
+`BackendCSSFileList`, so the ezjscore packer bundles them with the admin's (with the packer on, `[Packer] AppendLastModifiedTime=enabled` puts the change time into the name of the packed file, which is what keeps a browser from showing an old script after an update; with the packer off, as in `DevelopmentMode`, the files keep their own address and an old copy is reloaded by hand). The scripts the templates load directly (presets, alternative text, translations) have no version in their address (a query string such as `?v=` is not used on asset links): after an update, clear the caches and reload; the panel, the edit form, the dashboard
 and Vector are started by their markup (`#exp-ai-panel`, `#exp-ai-edit`, `#exp-ai-dashboard`, `#exp-ai-vector`).
 
 The module `expai` holds the policies ([permissions.md](permissions.md)) and the views `expai/dashboard`, `expai/log`,

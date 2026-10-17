@@ -39,6 +39,6 @@
             'no_text', 'The model returned no text, so nothing was written.'|i18n( 'extension/expai/preset' )
         )
     )|expai_json}</script>
-    <script src="{'javascript/expai_presets.js'|ezdesign( 'no' )}?v={'javascript/expai_presets.js'|expai_version}"></script>
+    <script src={'javascript/expai_presets.js'|ezdesign}></script>
 {/if}
 {undef $exp_ai_presets}

@@ -12,8 +12,6 @@
  * {$tokens|expai_tokens}            "950", "21.6k", "1.2M" (expAiCost::tokens())
  * {$value|expai_number( 2 )}        the locale's separators (expAiCost::number())
  * {$retention|expai_retention}     "unknown" translated, every other retention as written
- * {'javascript/expai_x.js'|expai_version}  the modification time of a file of the admin design of expai, for ?v= on a script the
- *                                   templates load directly (a browser keeps an old copy until the address changes)
  * {$data|expai_json}                JSON for a <script type="application/json"> block: <, >, &, ' and " are escaped
  *                                   invalid UTF-8 becomes U+FFFD instead of failing
  */
@@ -21,7 +19,7 @@ class expAiTemplateOperators
 {
     public function operatorList()
     {
-        return array( 'expai_money', 'expai_tokens', 'expai_number', 'expai_json', 'expai_retention', 'expai_version' );
+        return array( 'expai_money', 'expai_tokens', 'expai_number', 'expai_json', 'expai_retention' );
     }
 
     public function namedParameterPerOperator()
@@ -37,7 +35,6 @@ class expAiTemplateOperators
             'expai_number' => array( 'decimals' => array( 'type' => 'integer', 'required' => false, 'default' => 0 ) ),
             'expai_json' => array(),
             'expai_retention' => array(),
-            'expai_version' => array(),
         );
     }
 
@@ -57,9 +54,6 @@ class expAiTemplateOperators
             case 'expai_json':
                 $operatorValue = self::json( $operatorValue );
                 break;
-            case 'expai_version':
-                $operatorValue = self::assetVersion( $operatorValue );
-                break;
             case 'expai_retention':
                 $operatorValue = self::retention( $operatorValue );
                 break;
@@ -77,28 +71,6 @@ class expAiTemplateOperators
     {
         $value = (string) $value;
         return strtolower( $value ) === 'unknown' ? ezpI18n::tr( 'extension/expai/models', 'unknown' ) : $value;
-    }
-
-    /**
-     * The version of a file of this extension's admin design (path relative to design/admin/, e.g.
-     * javascript/expai_presets.js): its modification time, else the version of the extension.
-     *
-     * @param mixed $path
-     * @return string
-     */
-    public static function assetVersion( $path )
-    {
-        $path = ltrim( (string) $path, '/' );
-        $root = dirname( __DIR__ );
-        if ( $path !== '' && strpos( $path, '..' ) === false )
-        {
-            $time = @filemtime( $root . '/design/admin/' . $path );
-            if ( $time )
-                return (string) $time;
-        }
-        if ( preg_match( '#<version>([^<]+)</version>#', (string) @file_get_contents( $root . '/extension.xml' ), $m ) )
-            return $m[1];
-        return '0';
     }
 
     /**

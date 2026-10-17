@@ -52,7 +52,7 @@
             'timeout', 'The server did not answer in time. Please try again.'|i18n( 'extension/expai/edit' )
         )
     )|expai_json}</script>
-    <script src="{'javascript/expai_alttext.js'|ezdesign( 'no' )}?v={'javascript/expai_alttext.js'|expai_version}"></script>
+    <script src={'javascript/expai_alttext.js'|ezdesign}></script>
 {undef $exp_ai_alt_model}
 {/if}
 {undef $exp_ai_alt_images $exp_ai_alt_companions $exp_ai_alt_texts $exp_ai_alt_names}
