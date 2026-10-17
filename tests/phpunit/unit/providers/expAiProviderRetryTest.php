@@ -60,9 +60,9 @@ class expAiProviderRetryTest extends expAiProviderTestCase
         }
     }
 
-    public function testASlowGatewayTimeoutIsNotRetried(): void
+    public function testASlowServerErrorIsNotRetried(): void
     {
-        foreach ( array( 408 => 0, 502 => 0, 504 => 0, 429 => 1, 503 => 1, 529 => 1, 500 => 1 ) as $status => $retries )
+        foreach ( array( 408 => 0, 425 => 0, 500 => 0, 502 => 0, 504 => 0, 429 => 1, 503 => 1, 529 => 1 ) as $status => $retries )
         {
             // an attempt of 40 seconds on the virtual clock, within a timeout of 115 seconds
             $http = new class( array() ) extends expAiProviderTestHttp
@@ -219,6 +219,33 @@ class expAiProviderRetryTest extends expAiProviderTestCase
         $this->assertSame( array(), $http->requests[0][3], 'the first attempt has the full timeout' );
         $this->assertSame( 2, $http->requests[1][3]['timeout'] );
         $this->assertLessThanOrEqual( $start + 5, $http->clock );
+    }
+
+    public function testAFollowUpRequestSharesTheDeadline(): void
+    {
+        $refused = function ( $took ) use ( &$http )
+        {
+            return function () use ( &$http, $took )
+            {
+                $http->clock += $took;
+                return array( 400, json_encode( array( 'error' => array( 'message' => 'Unrecognized request argument supplied: reasoning_effort',
+                                                                          'type' => 'invalid_request_error', 'param' => 'reasoning_effort' ) ) ) );
+            };
+        };
+        $settings = array( 'Capabilities' => array( 'reasoning_effort' ), 'Effort' => 'low' );
+        // the client's timeout is 5 s: a refusal after 2 s leaves 3 s for the request without the field
+        $http = new expAiProviderTestHttp();
+        $start = $http->clock;
+        $http->answers = array( $refused( 2 ), array( 200, self::OK ) );
+        $this->assertSame( 1, self::openai( $settings, $http )->send( array( 'messages' => array() ) )['retries'] );
+        $this->assertSame( 3, $http->requests[1][3]['timeout'], 'the follow-up gets the time that is left, not a timeout of its own' );
+        $this->assertLessThanOrEqual( $start + 5, $http->clock );
+
+        // a refusal after 4.5 s leaves no room: the 400 stands, no second request
+        $http = new expAiProviderTestHttp();
+        $http->answers = array( $refused( 4.5 ), array( 200, self::OK ) );
+        $this->assertSame( 400, $this->failure( function () use ( $http, $settings ) { self::openai( $settings, $http )->send( array( 'messages' => array() ) ); } )->getCode() );
+        $this->assertCount( 1, $http->requests );
     }
 
     // ------------------------------------------------------------------ Anthropic

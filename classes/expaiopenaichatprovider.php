@@ -324,7 +324,10 @@ class expAiOpenAiChatProvider extends expAiProviderBase
         for ( $i = 0; $i < count( self::$optionalParameters ) && $status === 400 && ( $field = $this->unsupportedParameter( $received, $payload ) ) !== ''; $i++ )
         {
             $this->dropParameter( $field, $payload );
-            list( $status, $received, $rateHeaders, $more ) = $this->post( $endpoint, $headers, $this->encode( $payload ) );
+            $next = $this->postFollowUp( $endpoint, $headers, $this->encode( $payload ) );
+            if ( $next === null )
+                break;
+            list( $status, $received, $rateHeaders, $more ) = $next;
             $retries += 1 + $more;
         }
         $data = json_decode( $received, true );

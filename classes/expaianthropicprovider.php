@@ -261,9 +261,13 @@ class expAiAnthropicProvider extends expAiProviderBase
             $retryHeaders = array_values( array_filter( $headers, function ( $h ) { return stripos( $h, 'anthropic-beta:' ) !== 0; } ) );
             $retryHeaders[] = 'anthropic-beta: ' . implode( ',', $betas );
             $body = json_encode( $payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE );
-            list( $status, $received, $rateHeaders, $more ) = $this->post( $endpoint, $retryHeaders, $body );
-            $data = json_decode( $received, true );
-            $retries += 1 + $more;
+            $next = $this->postFollowUp( $endpoint, $retryHeaders, $body );
+            if ( $next !== null )
+            {
+                list( $status, $received, $rateHeaders, $more ) = $next;
+                $data = json_decode( $received, true );
+                $retries += 1 + $more;
+            }
         }
         if ( $status < 200 || $status >= 300 )
             throw $this->httpError( $status, $data, $rateHeaders, $retries );

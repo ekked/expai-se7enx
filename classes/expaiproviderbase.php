@@ -166,7 +166,7 @@ abstract class expAiProviderBase implements expAiProvider
     /** gateway timeouts: the provider behind the gateway may still be generating (and billing) the answer */
     protected static $gatewayTimeoutStatuses = array( 408, 502, 504 );
 
-    /** a gateway timeout after an attempt longer than this (seconds) is not retried */
+    /** a server error after an attempt longer than this (seconds) is not retried */
     const SLOW_ATTEMPT = 30;
 
     /**
@@ -175,9 +175,10 @@ abstract class expAiProviderBase implements expAiProvider
      * time). A timeout or an answer that broke off is never retried: the model may have done (and billed) the work.
      * The wait is the Retry-After of the answer (seconds or an HTTP date; no retry when it is longer than
      * [Provider_<id>] RetryAfterMax, default and at most 5 seconds), otherwise 1 and then 2 seconds with a little
-     * jitter. All attempts share one deadline, the client's timeout. A gateway timeout (408, 502, 504) is not retried
-     * when the attempt itself took longer than SLOW_ATTEMPT seconds: the provider behind the gateway may still bill
-     * that long generation; 429, 503, 529 and quick server errors are retried. [Provider_<id>] RetryOnServerError=disabled
+     * jitter. All attempts share one deadline, the client's timeout; a follow-up request of the same call (postFollowUp())
+     * shares it too. A server error (408, 425, 500, 502, 504) is not retried when the attempt itself took longer than
+     * SLOW_ATTEMPT seconds: the provider behind a gateway may still bill that long generation; 429, 503, 529 (the request
+     * was not taken) and quick server errors are retried. [Provider_<id>] RetryOnServerError=disabled
      * leaves only a 429/503/529 with a short Retry-After to be retried.
      * @return array( int status, string body, array rate limit headers, int retries )
      * @throws expAiException
@@ -186,7 +187,8 @@ abstract class expAiProviderBase implements expAiProvider
     {
         $retries = 0;
         $timeout = method_exists( $this->http, 'timeout' ) ? (float) $this->http->timeout() : (float) $this->setting( 'Timeout', 115 );
-        $deadline = $this->now() + $timeout;
+        $deadline = $this->sharedDeadline !== null ? (float) $this->sharedDeadline : $this->now() + $timeout;
+        $this->lastDeadline = $deadline;
         while ( true )
         {
             $failure = null;
@@ -197,7 +199,7 @@ abstract class expAiProviderBase implements expAiProvider
             try
             {
                 $left = $deadline - $started;
-                if ( $retries === 0 || $left >= $timeout || !method_exists( $this->http, 'request' ) )
+                if ( ( $retries === 0 && $this->sharedDeadline === null ) || $left >= $timeout || !method_exists( $this->http, 'request' ) )
                     list( $status, $received, $rate ) = array_pad( $this->http->postJson( $url, $headers, $body ), 3, array() );
                 else
                     list( $status, $received, $rate ) = array_pad( $this->http->request( $url, $headers, $body, array( 'timeout' => (int) floor( $left ) ) ), 3, array() );
@@ -220,6 +222,37 @@ abstract class expAiProviderBase implements expAiProvider
             }
             $this->pause( $wait );
             $retries++;
+        }
+    }
+
+    /** @var float|null the deadline post() uses instead of its own (a follow-up request of the same call) */
+    private $sharedDeadline = null;
+
+    /** @var float|null the deadline of the last post() */
+    protected $lastDeadline = null;
+
+    /**
+     * A follow-up request of the same call (the same request without a parameter the server refused, or with
+     * different thinking options): post() on the deadline of the previous post(), so the call as a whole never runs
+     * longer than one timeout.
+     * @return array|null what post() returns, null when less than a second of the deadline is left
+     * @throws expAiException
+     */
+    protected function postFollowUp( $url, array $headers, $body )
+    {
+        $deadline = $this->lastDeadline;
+        if ( $deadline === null )
+            return $this->post( $url, $headers, $body );
+        if ( $this->now() + 1 > $deadline )
+            return null;
+        $this->sharedDeadline = $deadline;
+        try
+        {
+            return $this->post( $url, $headers, $body );
+        }
+        finally
+        {
+            $this->sharedDeadline = null;
         }
     }
 
@@ -247,7 +280,8 @@ abstract class expAiProviderBase implements expAiProvider
     {
         if ( !in_array( (int) $status, self::$transientStatuses, true ) )
             return null;
-        if ( in_array( (int) $status, self::$gatewayTimeoutStatuses, true ) && $took > self::SLOW_ATTEMPT )
+        // a slow failure may have been generated (and billed) behind a gateway; 429, 503 and 529 say the request was not taken
+        if ( $took > self::SLOW_ATTEMPT && !in_array( (int) $status, array( 429, 503, 529 ), true ) )
             return null;
         $after = $this->retryAfter( $rate );
         if ( !$this->enabled( 'RetryOnServerError', 'enabled' ) && !( $after !== null && in_array( (int) $status, array( 429, 503, 529 ), true ) ) )
@@ -328,7 +362,8 @@ abstract class expAiProviderBase implements expAiProvider
             $apiMessage = $data['message'];
         $type = preg_replace( '/[^\w.-]/', '', substr( $type, 0, 60 ) );
         // never echo something that looks like a key (masked before and after shortening: a cut key is still a key)
-        $apiMessage = self::maskSecrets( substr( self::maskSecrets( preg_replace( '/[\x00-\x1f]/', ' ', $apiMessage ) ), 0, 300 ) );
+        // at most 2000 bytes are masked (the answer may be megabytes long), 300 are shown
+        $apiMessage = self::maskSecrets( substr( self::maskSecrets( preg_replace( '/[\x00-\x1f]/', ' ', substr( (string) $apiMessage, 0, 2000 ) ) ), 0, 300 ) );
         $detail = 'provider ' . $this->providerId() . ': HTTP ' . $status . ( $type !== '' ? ' ' . $type : '' )
                 . ( $apiMessage !== '' ? ': ' . $apiMessage : '' ) . ( $retries ? ' (after ' . $retries . ( $retries === 1 ? ' retry)' : ' retries)' ) : '' );
         $arguments = array( '%provider' => $this->providerLabel() );
@@ -360,11 +395,13 @@ abstract class expAiProviderBase implements expAiProvider
     public static function maskSecrets( $text )
     {
         $text = (string) $text;
-        $text = preg_replace( '/"([\w.-]*(?:key|token|secret|password|passwd|authorization))"\s*:\s*"(?:[^"\\\\]|\\\\.)*"?/i', '"$1":"[redacted]"', $text );
-        $text = preg_replace( '/\b([\w.-]*(?:key|token|secret|password|passwd))=(?!\[redacted\])[^&\s"\',;]+/i', '$1=[redacted]', $text );
-        $text = preg_replace( '/\bAuthorization(?::|%3A)(?:\s|%20|\+)*(?!\[redacted\])(?:(?:Bearer|Basic|Token|Digest)(?:\s|%20|\+)+)?[^\s&"\',;]+/i', 'Authorization: [redacted]', $text );
-        $text = preg_replace( '/\bBearer(?:\s+|%20|\+)(?!\[redacted\])[^\s&"\',;]+/i', '[redacted]', $text );
-        return preg_replace( '/\b(sk-[A-Za-z0-9_-]{6,}|hf_[A-Za-z0-9]{6,})/', '[redacted]', $text );
+        // a text PCRE gives up on (backtrack limit) is not shown at all rather than unmasked or empty
+        $redacted = static function ( $result ) { return is_string( $result ) ? $result : '[redacted]'; };
+        $text = $redacted( preg_replace( '/"([\w.-]*(?:key|token|secret|password|passwd|authorization))"\s*:\s*"(?:[^"\\\\]|\\\\.)*"?/i', '"$1":"[redacted]"', $text ) );
+        $text = $redacted( preg_replace( '/\b([\w.-]*(?:key|token|secret|password|passwd))=(?!\[redacted\])[^&\s"\',;]+/i', '$1=[redacted]', $text ) );
+        $text = $redacted( preg_replace( '/\bAuthorization(?::|%3A)(?:\s|%20|\+)*(?!\[redacted\])(?:(?:Bearer|Basic|Token|Digest)(?:\s|%20|\+)+)?[^\s&"\',;]+/i', 'Authorization: [redacted]', $text ) );
+        $text = $redacted( preg_replace( '/\bBearer(?:\s+|%20|\+)(?!\[redacted\])[^\s&"\',;]+/i', '[redacted]', $text ) );
+        return $redacted( preg_replace( '/\b(sk-[A-Za-z0-9_-]{6,}|hf_[A-Za-z0-9]{6,})/', '[redacted]', $text ) );
     }
 
     /** @return string JSON of a payload */
