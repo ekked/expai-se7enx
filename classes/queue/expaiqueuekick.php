@@ -22,7 +22,10 @@
  *                    MaxKickedWorkers=4   live workers at most
  *                    PhpCli=              the PHP command line binary (empty: the one of this PHP)
  *                    WorkerAllowRoot=disabled  pass --allow-root-user to the worker (only for a site whose PHP runs
- *                                         as root; a worker as root writes files the web server's user cannot)
+ *                                         as root; a worker as root writes files the web server's user cannot).
+ *                                         Disabled, a process running as root (Velocity, a root cron) starts the
+ *                                         worker as the owner of the installation's var/ directory (runuser), and
+ *                                         starts none, with a warning, where that is not possible
  *
  * The start record (var/<site>/cache/expai/worker-kick.json) is shared by PHP-FPM (the site's user) and Velocity or
  * the command line: it is created with mode 0660 (owner and group), and a record that cannot be opened by the
@@ -218,10 +221,20 @@ class expAiQueueKick
             return 0;
         }
         $class = preg_replace( '/[^a-z0-9_]/', '', (string) $class );
-        // setsid only where the system has it (macOS has not), else nohup alone; root only when the site says so
-        $command = 'cd ' . escapeshellarg( $root ) . ' && D=; command -v setsid > /dev/null 2>&1 && D=setsid; nohup $D ' . escapeshellarg( $php ) . ' ' . escapeshellarg( $script )
+        $allowRoot = $config->flag( 'VectorSettings', 'WorkerAllowRoot', false );
+        list( $asUser, $refused ) = self::workerUser( $root, $allowRoot );
+        if ( $refused !== '' )
+        {
+            self::$lastError = $refused;
+            eZDebug::writeWarning( 'expai: ' . self::$lastError, __METHOD__ );
+            return 0;
+        }
+        // setsid only where the system has it (macOS has not), else nohup alone; root only when the site says so; no
+        // worker at all when the installation's directory cannot be entered
+        $command = 'cd ' . escapeshellarg( $root ) . ' || exit 1; D=; command -v setsid > /dev/null 2>&1 && D=setsid; nohup $D '
+                 . ( $asUser !== '' ? 'runuser -u ' . escapeshellarg( $asUser ) . ' -- ' : '' ) . escapeshellarg( $php ) . ' ' . escapeshellarg( $script )
                  . ' --until-empty --max-seconds=' . max( 30, min( 3600, (int) $maxSeconds ) ) . ( $class !== '' ? ' --class=' . $class : '' ) . ' --origin=cli'
-                 . ( $config->flag( 'VectorSettings', 'WorkerAllowRoot', false ) ? ' --allow-root-user' : '' )
+                 . ( $allowRoot && $asUser === '' ? ' --allow-root-user' : '' )
                  // the siteaccess of this request: expai may be active for the admin siteaccesses only
                  . ( $access !== '' ? ' -s ' . escapeshellarg( $access ) : '' ) . ' > /dev/null 2>&1';
         $started = 0;
@@ -237,4 +250,37 @@ class expAiQueueKick
         }
         return $started;
     }
+
+    /**
+     * Who runs the worker when this process is root and the site does not allow a root worker: the owner of the
+     * installation's var/ directory (the user the web server writes as), through runuser.
+     *
+     * @param string $root the installation
+     * @param bool $allowRoot [VectorSettings] WorkerAllowRoot
+     * @param int|null $uid the user of this process (default posix_geteuid())
+     * @return array( string user to run the worker as ('' = this process's user), string why no worker is started ('' = start) )
+     */
+    protected static function workerUser( $root, $allowRoot, $uid = null )
+    {
+        if ( $uid === null )
+            $uid = function_exists( 'posix_geteuid' ) ? posix_geteuid() : -1;
+        if ( (int) $uid !== 0 || $allowRoot )
+            return array( '', '' );
+        $owner = @fileowner( rtrim( (string) $root, '/' ) . '/var' );
+        $info = $owner !== false && $owner !== 0 && function_exists( 'posix_getpwuid' ) ? posix_getpwuid( $owner ) : false;
+        $name = is_array( $info ) && isset( $info['name'] ) ? (string) $info['name'] : '';
+        if ( $name === '' || !preg_match( '/^[A-Za-z0-9._-]+$/', $name ) || !self::hasRunuser() )
+            return array( '', 'this process runs as root and var/ belongs to root or runuser is missing: no worker is started (set [VectorSettings] WorkerAllowRoot=enabled to allow a root worker; the cron part of expqueue still runs the jobs)' );
+        return array( $name, '' );
+    }
+
+    /** @return bool the system has runuser (util-linux) */
+    protected static function hasRunuser()
+    {
+        foreach ( array( '/usr/sbin/runuser', '/sbin/runuser', '/usr/bin/runuser', '/bin/runuser' ) as $path )
+            if ( is_executable( $path ) )
+                return true;
+        return false;
+    }
+
 }

@@ -74,7 +74,7 @@ class expAiQueueKickTest extends expAiProviderTestCase
     public function testKickStartsTheMissingWorkersAndRecordsTheStarts(): void
     {
         $this->requireDatabase();
-        $this->site( array( 'VectorSettings' => array( 'KickWorker' => 'true', 'PhpCli' => self::trueBinary(), 'MaxKickedWorkers' => 16 ) ) );
+        $this->site( array( 'VectorSettings' => array( 'KickWorker' => 'true', 'PhpCli' => self::trueBinary(), 'MaxKickedWorkers' => 16, 'WorkerAllowRoot' => 'enabled' ) ) );
         @mkdir( dirname( $this->record ), 0775, true );
         file_put_contents( $this->record, json_encode( array( 'starts' => array( time() - 3600 ) ) ) );
         list( $live, $idle ) = expAiQueueKick::workers( array() );
@@ -107,7 +107,7 @@ class expAiQueueKickTest extends expAiProviderTestCase
         $this->assertGreaterThan( 0, self::invoke( 'expAiQueueKick', 'launch', array( 'true' ) ), 'the shell reports the process id' );
         $this->assertSame( 0, self::invoke( 'expAiQueueKick', 'processId', array( '' ) ) );
         $this->assertSame( 4711, self::invoke( 'expAiQueueKick', 'processId', array( "warning\n4711\n" ) ) );
-        $config = $this->config( array( 'VectorSettings' => array( 'PhpCli' => self::trueBinary() ) ) );
+        $config = $this->config( array( 'VectorSettings' => array( 'PhpCli' => self::trueBinary(), 'WorkerAllowRoot' => 'enabled' ) ) );
         $this->assertSame( 2, self::invoke( 'expAiQueueKick', 'start', array( 2, 9999, 'bulk', $config ) ) );
     }
 
@@ -116,11 +116,36 @@ class expAiQueueKickTest extends expAiProviderTestCase
         foreach ( array( 'disabled', 'enabled' ) as $allow )
         {
             $config = $this->config( array( 'VectorSettings' => array( 'PhpCli' => self::trueBinary(), 'WorkerAllowRoot' => $allow ) ) );
-            $this->assertSame( 1, self::invoke( 'expAiQueueKick', 'start', array( 1, 60, 'bulk', $config ) ) );
+            $started = self::invoke( 'expAiQueueKick', 'start', array( 1, 60, 'bulk', $config ) );
+            // as root with a root-owned var/ (a test checkout) and a root worker not allowed, none is started, with the reason
+            if ( $started === 0 && $allow === 'disabled' && function_exists( 'posix_geteuid' ) && posix_geteuid() === 0 )
+                $this->assertStringContainsString( 'runs as root', (string) ( new ReflectionProperty( 'expAiQueueKick', 'lastError' ) )->getValue() );
+            else
+                $this->assertSame( 1, $started, "WorkerAllowRoot=$allow" );
         }
         $source = file_get_contents( EXPAI_TEST_CHECKOUT . '/classes/queue/expaiqueuekick.php' );
         $this->assertStringContainsString( "'WorkerAllowRoot', false", $source );
         $this->assertStringContainsString( 'command -v setsid', $source );
         $this->assertStringNotContainsString( 'nohup setsid', $source );
+    }
+
+    public function testAWorkerKickedAsRootRunsAsTheOwnerOfVarOrNotAtAll(): void
+    {
+        $this->assertSame( array( '', '' ), self::invoke( 'expAiQueueKick', 'workerUser', array( '/nonexistent', false, 1000 ) ), 'not root: as this user' );
+        $this->assertSame( array( '', '' ), self::invoke( 'expAiQueueKick', 'workerUser', array( '/nonexistent', true, 0 ) ), 'root allowed: as root' );
+        list( $user, $refused ) = self::invoke( 'expAiQueueKick', 'workerUser', array( '/nonexistent', false, 0 ) );
+        $this->assertSame( '', $user );
+        $this->assertStringContainsString( 'WorkerAllowRoot=enabled', $refused, 'no owner to run as: no worker, and why' );
+        $root = expAiTestMockServer::tmp( 'xte-kick' );
+        $this->cleanup( static function () use ( $root ) { expAiTestMockServer::removeTree( $root ); } );
+        mkdir( $root . '/var' );
+        $owner = fileowner( $root . '/var' );
+        list( $user, $refused ) = self::invoke( 'expAiQueueKick', 'workerUser', array( $root, false, 0 ) );
+        if ( $owner === 0 )
+            $this->assertNotSame( '', $refused, 'a root-owned var/ is no user to switch to' );
+        elseif ( $refused === '' )
+            $this->assertSame( posix_getpwuid( $owner )['name'], $user );
+        $source = file_get_contents( EXPAI_TEST_CHECKOUT . '/classes/queue/expaiqueuekick.php' );
+        $this->assertStringContainsString( "' || exit 1; D=;", $source, 'no worker when the installation cannot be entered' );
     }
 }
