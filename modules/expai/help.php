@@ -1,7 +1,8 @@
 <?php
 /**
- * expai/help (policy expai/write or expai/summary): the address of the extension's documentation, which every link of
- * the extension uses (the menu entry EI: Help, the dashboard's Help link, the "?" links). It redirects to the page:
+ * expai/help (policy expai/write or expai/summary): the address of the extension's documentation for old bookmarks and
+ * for a kernel or user without the help center, where the extension's links (the menu entry EI: Help, the dashboard's
+ * Help link, the "?" links) lead here; with the help center they lead to it directly. It redirects to the page:
  * in the help center of the administration where the kernel has one that shows extension documentation (Exponential
  * 6.0.15 and later) and the user may read it (exphelp/read), otherwise on GitHub, in the tree of the installed release
  * (Exponential 6.0.14). expai/help leads to the index, expai/help/(page)/<name> to that page; see expAiHelpLinks.

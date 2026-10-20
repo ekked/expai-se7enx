@@ -28,7 +28,7 @@ All menu entries of expai (settings/menu.ini.append.php), each shown only with i
 | Dashboard | EI: Vector | `expai/vector` | `expai/write`, `expai/vector` |
 | Dashboard | EI: Chains | `expai/chain` | `expai/write`, `expai/chain` |
 | Dashboard | EI: Log | `expai/log` | `expai/write` |
-| Dashboard | EI: Help | `expai/help` (to the help center, or to GitHub on Exponential 6.0.14) | `expai/write` or `expai/summary` |
+| Dashboard | EI: Help | `exphelp/extensions/expai`, the extension's index in the help center (`expai/help`, a redirect to GitHub, on Exponential 6.0.14) | `exphelp/read` (none on Exponential 6.0.14) |
 | Design | Missing alt text | `expai/alttext` | `expai/write` |
 | Setup | EI: Summary | `expai/summary` | `expai/summary` |
 | Setup | EI: Models | `expai/models` | `expai/model_manage` |
@@ -38,9 +38,10 @@ All menu entries of expai (settings/menu.ini.append.php), each shown only with i
 Job queue is the page of the extension expqueue; expai lists it right after EI: Budgets. Missing alt text is in the
 left menu of the Design tab: `expai/alttext` uses the navigation part `ezvisualnavigationpart`, so the Design tab
 stays active. The Setup entries are translated in `design/admin/parts/setup/menu`, the Design entry in
-`design/admin/parts/design/menu`. Every expai page also has a "?" link to its page in the help center
-(`exphelp/viewer/ext/expai/<name>.md`), and the dashboard's **Details** link to the models page (with `expai/model_manage`), the "EI: Summary" page
-(`expai/summary`, with `expai/summary`), the "Missing alt text" report and the help.
+`design/admin/parts/design/menu`. Every expai page also has a "?" link straight to its page in the help center
+(`exphelp/viewer/ext/expai/<name>.md`; without the help center, or without `exphelp/read`, `expai/help/(page)/<name>`,
+which redirects to GitHub), and the dashboard's **Details** link to the models page (with `expai/model_manage`), the "EI: Summary" page
+(`expai/summary`, with `expai/summary`), the "Missing alt text" report and the help (the extension's index in the help center, the same address as EI: Help).
 
 ### Start writing
 

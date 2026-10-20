@@ -2,7 +2,8 @@
 /**
  * expAiHelpLinks: the extension's documentation is in the help center (exphelp, Exponential 6.0.15 and later) or, on a
  * kernel without it (6.0.14), on GitHub in the tree of the release; the page names of expai/help/(page)/<name> become
- * the page ids there, and every link goes through expai/help. Reads files and needs no database.
+ * the page ids there. The links lead straight to the help center where it is read there, otherwise to expai/help, which
+ * redirects to GitHub. Reads files and needs no database.
  *
  * @copyright Copyright (C) 1998 - 2026 7x & Exponential Foundation. All rights reserved.
  * @license GNU General Public License v2.0 (or any later version)
@@ -80,6 +81,27 @@ class expAiHelpLinksTest extends PHPUnit\Framework\TestCase
         $this->assertSame( $base . 'doc/index.md', expAiHelpLinks::target( 'javascript:alert(1)' ) );
     }
 
+    public function testLinksLeadStraightToTheHelpCenter(): void
+    {
+        expAiHelpLinks::setHelpCenter( true );
+        $this->assertSame( 'exphelp/extensions/expai', expAiHelpLinks::link() );
+        $this->assertSame( 'exphelp/viewer/ext/expai/vector.md', expAiHelpLinks::link( 'vector' ) );
+        $this->assertSame( 'exphelp/viewer/ext/expai/dashboard.md', expAiHelpLinks::link( 'dashboard' ) );
+        $this->assertSame( 'exphelp/viewer/ext/expai/README.md', expAiHelpLinks::link( 'readme' ) );
+        $this->assertSame( 'exphelp/extensions/expai', expAiHelpLinks::link( 'no-such-page' ) );
+        $this->assertSame( 'exphelp/extensions/expai', expAiHelpLinks::link( 'javascript:alert(1)' ) );
+        // the same page the redirect leads to
+        foreach ( array( '', 'vector', 'chains', 'alt-text', 'full-view-panel', 'readme' ) as $name )
+            $this->assertSame( expAiHelpLinks::target( $name ), '/' . expAiHelpLinks::link( $name ), $name );
+        // without the help center (6.0.14, or no exphelp/read) the links keep going to expai/help, which redirects to GitHub
+        expAiHelpLinks::setHelpCenter( false );
+        $this->assertSame( 'expai/help', expAiHelpLinks::link() );
+        $this->assertSame( 'expai/help/(page)/vector', expAiHelpLinks::link( 'vector' ) );
+        $this->assertSame( 'expai/help/(page)/readme', expAiHelpLinks::link( 'README' ) );
+        $this->assertSame( 'expai/help', expAiHelpLinks::link( 'no-such-page' ) );
+        $this->assertSame( 'expai/help', expAiHelpLinks::link( '../etc/passwd' ) );
+    }
+
     /** The check runs against the kernel the suite runs on, whatever it is, and never fails on one without help */
     public function testKernelCheckNeverFails(): void
     {
@@ -101,9 +123,13 @@ class expAiHelpLinksTest extends PHPUnit\Framework\TestCase
             $this->assertFileExists( $root . '/doc/' . $page . '.md', "the \"?\" link to $page" );
         $this->assertFileDoesNotExist( $root . '/classes/expaihelp.php' );
         $this->assertFileDoesNotExist( $root . '/design/admin/templates/expai/help.tpl' );
-        // every link goes through expai/help, which decides between the help center and GitHub; none names exphelp
-        $this->assertStringContainsString( "'expai/help/(page)/'", (string) file_get_contents( $root . '/design/admin/templates/expai/parts/help_link.tpl' ) );
+        // the links are built by expAiHelpLinks::link() (expai_help_url), which decides between the help center and
+        // expai/help; no template names a page address itself, and expai/help still redirects for old bookmarks
+        $this->assertStringContainsString( 'expai_help_url( $page )|ezurl', (string) file_get_contents( $root . '/design/admin/templates/expai/parts/help_link.tpl' ) );
+        $this->assertStringContainsString( 'expai_help_url()|ezurl', (string) file_get_contents( $root . '/design/admin/templates/expai/dashboard.tpl' ) );
         $this->assertStringContainsString( 'expAiHelpLinks::target(', (string) file_get_contents( $root . '/modules/expai/help.php' ) );
+        foreach ( glob( $root . '/design/admin/templates/{,*/,*/*/}*.tpl', GLOB_BRACE ) ?: array() as $file )
+            $this->assertDoesNotMatchRegularExpression( "#'expai/help#", (string) file_get_contents( $file ), $file );
         foreach ( glob( $root . '/design/admin/templates/{,*/,*/*/}*.tpl', GLOB_BRACE ) ?: array() as $file )
             $this->assertDoesNotMatchRegularExpression( "#'exphelp/#", (string) file_get_contents( $file ), $file );
     }

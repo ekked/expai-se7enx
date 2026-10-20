@@ -2,10 +2,10 @@
 /**
  * The menu links of expai check what their views require (settings/menu.ini.append.php against module.php).
  *
- * The view expai/help (a redirect to the help center or to GitHub) opens with expai/write OR expai/summary; a menu link that
- * required expai/write hid it from a user with expai/summary only, who could open it. A view with "a or b" has no PolicyList
- * (menu.ini [MenuAccessSettings] CheckViewAccess asks the view, as for setup/menu); every other link names its view's
- * function; a link may be narrower than its view only where NARROWER says so.
+ * The menu entry EI: Help leads straight to the help center (exphelp/extensions/expai) and asks only for exphelp/read, so
+ * a user with expai/summary only, who may read the help, still sees it (an expai/write PolicyList hid it from them once).
+ * A view with "a or b" has no PolicyList (menu.ini [MenuAccessSettings] CheckViewAccess asks the view, as for setup/menu);
+ * every other link names its view's function; a link may be narrower than its view only where NARROWER says so.
  *
  * Reads the two files as text and needs no kernel: module.php is not included (it builds limitation values from the
  * database). Also runs on its own: php vendor/bin/phpunit --no-configuration extension/expai/tests/phpunit/unit/core/expAiMenuPolicyTest.php
@@ -74,11 +74,22 @@ class expAiMenuPolicyTest extends PHPUnit\Framework\TestCase
         $views = self::viewFunctions();
         $this->assertSame( 'write or summary', $views['help'] ?? null );
         $this->assertSame( 'write', $views['log'] ?? null );
-        // EI: Help opens expai/help, which leads to the help center or to GitHub; no policy of the help center, which a
-        // kernel without it (6.0.14) does not have
+        // EI: Help opens the extension's index in the help center, for whoever may read the help center: no expai
+        // policy, so a user with only expai/summary (or only expai/write) who holds exphelp/read sees it
         $help = self::menuLinks()['Leftmenu_my/expai_help'] ?? array();
-        $this->assertSame( 'expai/help', $help['url'] ?? null );
-        $this->assertArrayNotHasKey( 'policies', $help );
+        $this->assertSame( 'exphelp/extensions/expai', $help['url'] ?? null );
+        $this->assertSame( array( 'exphelp/read' ), $help['policies'] ?? null );
+    }
+
+    /** Without the help center (6.0.14) the entry is pointed at expai/help by the request/input listener, which exists */
+    public function testTheMenuFallsBackToTheRedirectWithoutTheHelpCenter()
+    {
+        $this->assertStringContainsString( 'Listeners[]=request/input@expAiHelpLinks::menuFallback', self::read( 'settings/site.ini.append.php' ) );
+        $class = self::read( 'classes/expaihelplinks.php' );
+        $this->assertMatchesRegularExpression( '/public static function menuFallback\(/', $class );
+        $this->assertStringContainsString( "removeSetting( 'Leftmenu_my', 'PolicyList_expai_help' )", $class );
+        // the redirect it falls back to opens for the same users as before
+        $this->assertSame( 'write or summary', self::viewFunctions()['help'] ?? null );
     }
 
     public function testEveryLinkChecksWhatItsViewRequires()

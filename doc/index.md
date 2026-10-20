@@ -50,6 +50,7 @@
 | [testing.md](testing.md) | The PHPUnit suite: running it, suites and groups, what the tests may touch, measuring coverage, the current figures |
 | [troubleshooting.md](troubleshooting.md) | Failures and their fixes |
 | [faq.md](faq.md) | Short answers |
+| [changelog/0.0.1.15.md](changelog/0.0.1.15.md) | EI: Help, the dashboard's Help link and the "?" links open the help center directly |
 | [changelog/0.0.1.2.md](changelog/0.0.1.2.md) | Every translation file validates again, so expai is translated |
 | [changelog/0.0.1.3.md](changelog/0.0.1.3.md) | Draft log entries of removed objects show as removed, without an "Object not found" error |
 | [changelog/0.0.1.1.md](changelog/0.0.1.1.md) | No "Decorative" choice for a field that requires an alt text |
@@ -63,25 +64,28 @@ module `exphelp` of Exponential 6.0.15 and later): the help center shows the doc
 in the folder and category **Extensions**, so this documentation is read, searched and printed there with the same
 viewer, contents and search as the documentation of Exponential itself.
 
-- **Dashboard > EI: Help** and the dashboard's Help link open the extension's index in the help center,
+- **Dashboard > EI: Help** and the dashboard's Help link open the extension's index in the help center directly,
   `exphelp/extensions/expai`: every page of this documentation by folder, and a search limited to it.
 - A page has the id `ext/expai/<path below doc/>` (`exphelp/viewer/ext/expai/vector.md`); the files at the top of the
   extension are `ext/expai/README.md`, `ext/expai/INSTALL.md`, `ext/expai/USAGE.md`, and a changelog is
   `ext/expai/changelog/<version>.md`.
 - Each expai page (the dashboard, the Intelligence tab, Vector, the "Missing alt text" report, chains) has a "?" link
-  to its page there.
-- Every link goes through `expai/help`, which redirects: `expai/help` to the extension's index,
+  straight to its page there. The templates name only the page (`{expai_help_url( 'vector' )|ezurl}`); the address
+  comes from `expAiHelpLinks::link()` (classes/expaihelplinks.php), which maps the page names.
+- The old address `expai/help` keeps working for bookmarks and redirects: `expai/help` to the extension's index,
   `expai/help/(page)/<name>` (`readme`, `install`, `usage`, `index`, the name of a `doc/*.md` without `.md`, or
-  `changelog-<version>`) to the same page (`expAiHelpLinks`, classes/expaihelplinks.php). A name of a page the
-  extension does not have leads to the index.
-- Policy: `exphelp/read`, the policy of the help center (editors and administrators have it). The view `expai/help`
-  opens with `expai/write` or `expai/summary`, and so does the menu entry EI: Help.
+  `changelog-<version>`) to the same page. A name of a page the extension does not have leads to the index.
+- Policy: `exphelp/read`, the policy of the help center (editors and administrators have it). The menu entry EI: Help
+  is shown to users who hold it, whatever expai policy they have (a data protection officer with only `expai/summary`
+  sees it too). The view `expai/help` opens with `expai/write` or `expai/summary`.
 
-**Exponential 6.0.14** has no help center. There, and for a user without `exphelp/read`, `expai/help` leads to the
-same page on GitHub, in the tree of the installed release
+**Exponential 6.0.14** has no help center. There, and for a user without `exphelp/read`, the links lead to
+`expai/help`, which redirects to the same page on GitHub, in the tree of the installed release
 (`https://github.com/se7enxweb/expai/blob/v<version>/doc/<page>.md`). `expAiHelpLinks::kernelHasHelpCenter()` asks the
 running kernel (the class `expHelpDocumentIndex` with `extensions()`, the module `exphelp`, exphelp.ini
-`[IndexSettings] ActiveExtensionDocs`); nothing of the help center is required where it is missing.
+`[IndexSettings] ActiveExtensionDocs`); nothing of the help center is required where it is missing. On such a kernel
+`expAiHelpLinks::menuFallback()` (the kernel's event `request/input`, settings/site.ini.append.php) points the menu
+entry EI: Help at `expai/help` and drops its `exphelp/read` policy, for that request only.
 
 The help center shows only the files the extension's repository tracks (or its release lists), never source files,
 and renders them safely: every character of a document is escaped, raw HTML stays text, and links are kept only to

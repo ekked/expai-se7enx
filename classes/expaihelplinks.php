@@ -9,9 +9,12 @@
  * in the tree of the release that is installed (GITHUB_REF), so no link leads to a page the installation lacks.
  * helpCenter() decides, for the running kernel and the current user.
  *
- * Every link of the extension goes through the view expai/help (the menu entry EI: Help, the dashboard's Help link and
- * the "?" links), which redirects to target(). The page names of the former view expai/help/(page)/<name> keep
- * working: readme, install and usage are the files at the top of the extension, index is doc/index.md,
+ * The links of the extension lead straight to the help center where it is read there (helpCenter()): the menu entry
+ * EI: Help (settings/menu.ini.append.php) to its index, exphelp/extensions/expai, the dashboard's Help link and the
+ * "?" links to their page, exphelp/viewer/ext/expai/<page>.md (link(), the template operator expai_help_url). Without
+ * the help center they lead to the view expai/help, which redirects to target() on GitHub; menuFallback() points the
+ * menu entry there on such a kernel. expai/help stays for old bookmarks: the page names of expai/help/(page)/<name>
+ * keep working: readme, install and usage are the files at the top of the extension, index is doc/index.md,
  * changelog-<version> is doc/changelog/<version>.md, any other name is doc/<name>.md. A name of a page the extension
  * does not have leads to the index.
  *
@@ -27,14 +30,20 @@ class expAiHelpLinks
     /** The extension's index in the help center (its pages and a search limited to them) */
     const INDEX = 'exphelp/extensions/expai';
 
+    /** The view that redirects to the documentation (old bookmarks, and every link where there is no help center) */
+    const REDIRECT = 'expai/help';
+
     /** The documentation on GitHub, in the tree of this release: always 'v' . the Version of ezinfo.php */
-    const GITHUB_REF = 'v0.0.1.14';
+    const GITHUB_REF = 'v0.0.1.15';
 
     /** The repository's address on GitHub */
     const GITHUB_BASE = 'https://github.com/se7enxweb/expai/blob/';
 
     /** @var bool|null what helpCenter() answers instead of looking (tests), null to look */
     private static $helpCenter = null;
+
+    /** @var bool|null kernelHasHelpCenter() once per process, for menuFallback() (the kernel does not change under it) */
+    private static $kernelHelpCenter = null;
 
     /**
      * The help center's page id of a page name of expai/help, or null for a name that is none.
@@ -170,5 +179,50 @@ class expAiHelpLinks
     {
         $name = self::existing( $name );
         return self::helpCenter() ? '/' . self::url( $name ) : self::githubUrl( $name );
+    }
+
+    /**
+     * The module address a link of the extension uses (for |ezurl): the page in the help center
+     * (exphelp/viewer/ext/expai/<page>.md, or exphelp/extensions/expai for an empty name) where it is read there
+     * (helpCenter()), otherwise the view expai/help (expai/help/(page)/<page>), which redirects to GitHub. A page the
+     * extension does not have leads to the index.
+     *
+     * @param string $name see helpId()
+     * @return string
+     */
+    public static function link( $name = '' )
+    {
+        $name = self::existing( $name );
+        if ( self::helpCenter() )
+            return self::url( $name );
+        return $name === '' ? self::REDIRECT : self::REDIRECT . '/(page)/' . $name;
+    }
+
+    /**
+     * The listener of the kernel's event request/input (settings/site.ini.append.php [Event] Listeners[]): on a kernel
+     * without the help center (Exponential 6.0.14, or ActiveExtensionDocs disabled) the menu entry EI: Help, which
+     * menu.ini points at exphelp/extensions/expai for users with exphelp/read, leads to expai/help instead and asks for
+     * no policy of the help center, which such a kernel does not have. On a kernel with the help center it changes
+     * nothing. Only the menu.ini of this request is changed, never a file.
+     *
+     * @return bool whether the entry was pointed at expai/help
+     */
+    public static function menuFallback()
+    {
+        if ( self::$kernelHelpCenter === null )
+            self::$kernelHelpCenter = self::kernelHasHelpCenter();
+        if ( self::$kernelHelpCenter )
+            return false;
+        $ini = eZINI::instance( 'menu.ini' );
+        if ( !$ini->hasVariable( 'Leftmenu_my', 'Links' ) )
+            return false;
+        $links = $ini->variable( 'Leftmenu_my', 'Links' );
+        if ( !is_array( $links ) || !isset( $links['expai_help'] ) || $links['expai_help'] !== self::INDEX )
+            return false;
+        $links['expai_help'] = self::REDIRECT;
+        $ini->setVariable( 'Leftmenu_my', 'Links', $links );
+        if ( $ini->hasVariable( 'Leftmenu_my', 'PolicyList_expai_help' ) )
+            $ini->removeSetting( 'Leftmenu_my', 'PolicyList_expai_help' );
+        return true;
     }
 }

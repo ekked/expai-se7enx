@@ -14,12 +14,14 @@
  * {$retention|expai_retention}     "unknown" translated, every other retention as written
  * {$data|expai_json}                JSON for a <script type="application/json"> block: <, >, &, ' and " are escaped
  *                                   invalid UTF-8 becomes U+FFFD instead of failing
+ * {expai_help_url( 'vector' )|ezurl} the address of a help page: in the help center where it is read there, otherwise
+ *                                   expai/help/(page)/<page> (expAiHelpLinks::link()); expai_help_url() the index
  */
 class expAiTemplateOperators
 {
     public function operatorList()
     {
-        return array( 'expai_money', 'expai_tokens', 'expai_number', 'expai_json', 'expai_retention' );
+        return array( 'expai_money', 'expai_tokens', 'expai_number', 'expai_json', 'expai_retention', 'expai_help_url' );
     }
 
     public function namedParameterPerOperator()
@@ -35,6 +37,7 @@ class expAiTemplateOperators
             'expai_number' => array( 'decimals' => array( 'type' => 'integer', 'required' => false, 'default' => 0 ) ),
             'expai_json' => array(),
             'expai_retention' => array(),
+            'expai_help_url' => array( 'page' => array( 'type' => 'string', 'required' => false, 'default' => '' ) ),
         );
     }
 
@@ -56,6 +59,9 @@ class expAiTemplateOperators
                 break;
             case 'expai_retention':
                 $operatorValue = self::retention( $operatorValue );
+                break;
+            case 'expai_help_url':
+                $operatorValue = expAiHelpLinks::link( (string) $namedParameters['page'] );
                 break;
         }
     }
