@@ -2,7 +2,7 @@
 /**
  * The menu links of expai check what their views require (settings/menu.ini.append.php against module.php).
  *
- * The view expai/help (now a redirect to the help center) opens with expai/write OR expai/summary; a menu link that
+ * The view expai/help (a redirect to the help center or to GitHub) opens with expai/write OR expai/summary; a menu link that
  * required expai/write hid it from a user with expai/summary only, who could open it. A view with "a or b" has no PolicyList
  * (menu.ini [MenuAccessSettings] CheckViewAccess asks the view, as for setup/menu); every other link names its view's
  * function; a link may be narrower than its view only where NARROWER says so.
@@ -74,10 +74,11 @@ class expAiMenuPolicyTest extends PHPUnit\Framework\TestCase
         $views = self::viewFunctions();
         $this->assertSame( 'write or summary', $views['help'] ?? null );
         $this->assertSame( 'write', $views['log'] ?? null );
-        // EI: Help opens the extension's documentation in the help center, with the help center's policy
+        // EI: Help opens expai/help, which leads to the help center or to GitHub; no policy of the help center, which a
+        // kernel without it (6.0.14) does not have
         $help = self::menuLinks()['Leftmenu_my/expai_help'] ?? array();
-        $this->assertSame( 'exphelp/extensions/expai', $help['url'] ?? null );
-        $this->assertSame( array( 'exphelp/read' ), $help['policies'] ?? null );
+        $this->assertSame( 'expai/help', $help['url'] ?? null );
+        $this->assertArrayNotHasKey( 'policies', $help );
     }
 
     public function testEveryLinkChecksWhatItsViewRequires()

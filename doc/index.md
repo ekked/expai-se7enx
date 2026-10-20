@@ -70,11 +70,18 @@ viewer, contents and search as the documentation of Exponential itself.
   `ext/expai/changelog/<version>.md`.
 - Each expai page (the dashboard, the Intelligence tab, Vector, the "Missing alt text" report, chains) has a "?" link
   to its page there.
-- The old addresses keep working: `expai/help` redirects to the extension's index, `expai/help/(page)/<name>`
-  (`readme`, `install`, `usage`, `index`, the name of a `doc/*.md` without `.md`, or `changelog-<version>`) to the
-  same page in the help center (`expAiHelpLinks`, classes/expaihelplinks.php).
+- Every link goes through `expai/help`, which redirects: `expai/help` to the extension's index,
+  `expai/help/(page)/<name>` (`readme`, `install`, `usage`, `index`, the name of a `doc/*.md` without `.md`, or
+  `changelog-<version>`) to the same page (`expAiHelpLinks`, classes/expaihelplinks.php). A name of a page the
+  extension does not have leads to the index.
 - Policy: `exphelp/read`, the policy of the help center (editors and administrators have it). The view `expai/help`
-  still opens with `expai/write` or `expai/summary`, but only to redirect.
+  opens with `expai/write` or `expai/summary`, and so does the menu entry EI: Help.
+
+**Exponential 6.0.14** has no help center. There, and for a user without `exphelp/read`, `expai/help` leads to the
+same page on GitHub, in the tree of the installed release
+(`https://github.com/se7enxweb/expai/blob/v<version>/doc/<page>.md`). `expAiHelpLinks::kernelHasHelpCenter()` asks the
+running kernel (the class `expHelpDocumentIndex` with `extensions()`, the module `exphelp`, exphelp.ini
+`[IndexSettings] ActiveExtensionDocs`); nothing of the help center is required where it is missing.
 
 The help center shows only the files the extension's repository tracks (or its release lists), never source files,
 and renders them safely: every character of a document is escaped, raw HTML stays text, and links are kept only to

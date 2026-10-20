@@ -28,7 +28,7 @@ All menu entries of expai (settings/menu.ini.append.php), each shown only with i
 | Dashboard | EI: Vector | `expai/vector` | `expai/write`, `expai/vector` |
 | Dashboard | EI: Chains | `expai/chain` | `expai/write`, `expai/chain` |
 | Dashboard | EI: Log | `expai/log` | `expai/write` |
-| Dashboard | EI: Help | `exphelp/extensions/expai` (the help center) | `exphelp/read` |
+| Dashboard | EI: Help | `expai/help` (to the help center, or to GitHub on Exponential 6.0.14) | `expai/write` or `expai/summary` |
 | Design | Missing alt text | `expai/alttext` | `expai/write` |
 | Setup | EI: Summary | `expai/summary` | `expai/summary` |
 | Setup | EI: Models | `expai/models` | `expai/model_manage` |

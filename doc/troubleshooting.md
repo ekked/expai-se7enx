@@ -197,5 +197,9 @@ The help center shows the extension's documentation only while the extension is 
 repository tracks (or its release lists in `share/filelist.md5`): a page added to `doc/` and not committed is not shown.
 The old address `expai/help/(page)/<name>` knows the names `readme`, `install`, `usage`, `index`, the name of a
 `doc/*.md` without `.md` (`providers`, `vector`, `summary` ...) and `changelog-<version>`, and redirects to that page;
-any other name goes to the extension's index. "Access denied" in the help center: the user's role lacks
-`exphelp/read`. The pages are read from the installed extension, so they always match its version.
+any other name goes to the extension's index. A user whose role lacks `exphelp/read` is sent to the same page on
+GitHub instead. The pages are read from the installed extension, so they always match its version.
+
+Help opens on GitHub instead of in the administration: the kernel has no help center that shows extension
+documentation (Exponential 6.0.14, or exphelp.ini `[IndexSettings] ActiveExtensionDocs=disabled` without `expai` in
+`ExtensionDocDirs[]`), or the user lacks `exphelp/read`. The GitHub pages are those of the installed release's tag.

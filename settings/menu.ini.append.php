@@ -20,10 +20,12 @@ PolicyList_expai_chain[]=expai/chain
 Links[expai_log]=expai/log
 LinkNames[expai_log]=EI: Log
 PolicyList_expai_log[]=expai/write
-# The extension's documentation, in the help center (exphelp/extensions/expai, doc/index.md): read with the policy
-# exphelp/read, as every page of the help center. The old address expai/help redirects there.
-Links[expai_help]=exphelp/extensions/expai
-PolicyList_expai_help[]=exphelp/read
+# The extension's documentation (expai/help, doc/index.md): in the help center where the kernel has one (Exponential
+# 6.0.15 and later, for users with exphelp/read), otherwise on GitHub. No PolicyList_expai_help[]: the view opens with
+# expai/write OR expai/summary, which one PolicyList entry cannot say; [MenuAccessSettings] CheckViewAccess asks the
+# view itself, as for setup/menu in settings/menu.ini. No exphelp/read either: that policy does not exist without the
+# help center and would hide the entry there.
+Links[expai_help]=expai/help
 LinkNames[expai_help]=EI: Help
 
 # Setup > EI: Summary (expai/summary): the printable page for a data protection officer (doc/summary.md), shown only to users

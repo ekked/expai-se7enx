@@ -161,8 +161,8 @@ $ViewList['alttext'] = array(
     'params' => array(),
     'unordered_params' => array( 'node' => 'Node' ) );
 
-// Help (doc/index.md): the former address of the extension's documentation, which is in the help center now
-// (exphelp/extensions/expai); expai/help and expai/help/(page)/<name> redirect there (classes/expaihelplinks.php).
+// Help (doc/index.md): the address of the extension's documentation; expai/help and expai/help/(page)/<name> redirect
+// to the help center (exphelp/extensions/expai, Exponential 6.0.15 and later) or to GitHub (classes/expaihelplinks.php).
 // For editors (expai/write) and for a data protection officer with only expai/summary, as before
 $ViewList['help'] = array(
     'default_navigation_part' => 'ezmynavigationpart',

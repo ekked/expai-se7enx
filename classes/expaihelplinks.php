@@ -1,13 +1,19 @@
 <?php
 /**
- * The addresses of the extension's documentation in the help center of the administration (exphelp, doc/index.md
- * "Help in the administration interface"). The documentation is read, rendered and searched there, as the documentation
- * of every active extension (ids ext/expai/<path below doc/>, and ext/expai/README.md, INSTALL.md, USAGE.md for the files
- * at the top of the extension); this class only names the pages.
+ * The addresses of the extension's documentation.
  *
- * The page names of the former view expai/help/(page)/<name> keep working: helpId() turns one into its page id, and the
- * view redirects there. readme, install and usage are the files at the top of the extension, index is doc/index.md,
- * changelog-<version> is doc/changelog/<version>.md, any other name is doc/<name>.md.
+ * With Exponential 6.0.15 and later the documentation is read in the help center of the administration (exphelp,
+ * doc/index.md "Help in the administration interface"), which reads, renders and searches the documentation of every
+ * active extension (ids ext/expai/<path below doc/>, and ext/expai/README.md, INSTALL.md, USAGE.md for the files at
+ * the top of the extension). An older Exponential (6.0.14) has no help center: there the same page is read on GitHub,
+ * in the tree of the release that is installed (GITHUB_REF), so no link leads to a page the installation lacks.
+ * helpCenter() decides, for the running kernel and the current user.
+ *
+ * Every link of the extension goes through the view expai/help (the menu entry EI: Help, the dashboard's Help link and
+ * the "?" links), which redirects to target(). The page names of the former view expai/help/(page)/<name> keep
+ * working: readme, install and usage are the files at the top of the extension, index is doc/index.md,
+ * changelog-<version> is doc/changelog/<version>.md, any other name is doc/<name>.md. A name of a page the extension
+ * does not have leads to the index.
  *
  * @copyright Copyright (C) 1998 - 2026 7x & Exponential Foundation. All rights reserved.
  * @license GNU General Public License v2.0 (or any later version)
@@ -20,6 +26,15 @@ class expAiHelpLinks
 
     /** The extension's index in the help center (its pages and a search limited to them) */
     const INDEX = 'exphelp/extensions/expai';
+
+    /** The documentation on GitHub, in the tree of this release: always 'v' . the Version of ezinfo.php */
+    const GITHUB_REF = 'v0.0.1.14';
+
+    /** The repository's address on GitHub */
+    const GITHUB_BASE = 'https://github.com/se7enxweb/expai/blob/';
+
+    /** @var bool|null what helpCenter() answers instead of looking (tests), null to look */
+    private static $helpCenter = null;
 
     /**
      * The help center's page id of a page name of expai/help, or null for a name that is none.
@@ -43,6 +58,34 @@ class expAiHelpLinks
     }
 
     /**
+     * The file of a page name below the extension's directory (README.md, doc/vector.md, doc/changelog/0.0.1.0.md),
+     * or null for a name that is none.
+     *
+     * @param string $name see helpId()
+     * @return string|null
+     */
+    public static function file( $name )
+    {
+        $id = self::helpId( $name );
+        if ( $id === null )
+            return null;
+        $path = substr( $id, strlen( self::PREFIX ) );
+        return in_array( $path, array( 'README.md', 'INSTALL.md', 'USAGE.md' ), true ) ? $path : 'doc/' . $path;
+    }
+
+    /**
+     * The page name itself when the extension has that page, otherwise '' (the index).
+     *
+     * @param string $name see helpId()
+     * @return string
+     */
+    public static function existing( $name )
+    {
+        $file = (string) $name === '' ? null : self::file( $name );
+        return $file !== null && is_file( dirname( __DIR__ ) . '/' . $file ) ? strtolower( trim( (string) $name ) ) : '';
+    }
+
+    /**
      * The module address of a page in the help center's viewer (for |ezurl), or the extension's index for an empty
      * or unknown name.
      *
@@ -53,5 +96,79 @@ class expAiHelpLinks
     {
         $id = (string) $name === '' ? null : self::helpId( $name );
         return $id === null ? self::INDEX : 'exphelp/viewer/' . $id;
+    }
+
+    /**
+     * The page on GitHub, in the tree of this release, or doc/index.md there for an empty or unknown name.
+     *
+     * @param string $name see helpId()
+     * @return string
+     */
+    public static function githubUrl( $name = '' )
+    {
+        $file = (string) $name === '' ? null : self::file( $name );
+        return self::GITHUB_BASE . self::GITHUB_REF . '/' . ( $file === null ? 'doc/index.md' : $file );
+    }
+
+    /**
+     * Whether the running kernel's help center shows this extension's documentation: its index class with the
+     * extensions' documentation (expHelpDocumentIndex::extensions(), Exponential 6.0.15 and later), the module exphelp,
+     * and exphelp.ini [IndexSettings] ActiveExtensionDocs not disabled (or expai named in ExtensionDocDirs[]).
+     * Nothing here fails on a kernel without them; the class is looked up through the autoload only.
+     *
+     * @return bool
+     */
+    public static function kernelHasHelpCenter()
+    {
+        if ( !class_exists( 'expHelpDocumentIndex' ) || !method_exists( 'expHelpDocumentIndex', 'extensions' ) )
+            return false;
+        if ( !class_exists( 'eZModule' ) || !eZModule::exists( 'exphelp' ) )
+            return false;
+        $ini = eZINI::instance( 'exphelp.ini' );
+        $active = $ini->hasVariable( 'IndexSettings', 'ActiveExtensionDocs' ) ? $ini->variable( 'IndexSettings', 'ActiveExtensionDocs' ) : 'enabled';
+        if ( $active !== 'disabled' )
+            return true;
+        $dirs = $ini->hasVariable( 'IndexSettings', 'ExtensionDocDirs' ) ? $ini->variable( 'IndexSettings', 'ExtensionDocDirs' ) : array();
+        return is_array( $dirs ) && in_array( 'expai', $dirs, true );
+    }
+
+    /**
+     * Whether the documentation is read in the help center: the kernel has it (kernelHasHelpCenter()) and the current
+     * user may read it (exphelp/read). Otherwise it is read on GitHub.
+     *
+     * @return bool
+     */
+    public static function helpCenter()
+    {
+        if ( self::$helpCenter !== null )
+            return self::$helpCenter;
+        if ( !self::kernelHasHelpCenter() )
+            return false;
+        $access = eZUser::currentUser()->hasAccessTo( 'exphelp', 'read' );
+        return isset( $access['accessWord'] ) && $access['accessWord'] !== 'no';
+    }
+
+    /**
+     * Sets what helpCenter() answers (tests); null looks again.
+     *
+     * @param bool|null $helpCenter
+     */
+    public static function setHelpCenter( $helpCenter )
+    {
+        self::$helpCenter = $helpCenter === null ? null : (bool) $helpCenter;
+    }
+
+    /**
+     * Where expai/help/(page)/<name> leads: the page in the help center ('/exphelp/viewer/...', for
+     * eZModule::redirectTo()) or, without it, on GitHub (an absolute address). A page the extension does not have
+     * leads to the index.
+     *
+     * @param string $name see helpId()
+     * @return string
+     */
+    public static function target( $name = '' )
+    {
+        $name = self::existing( $name );
+        return self::helpCenter() ? '/' . self::url( $name ) : self::githubUrl( $name );
     }
 }
