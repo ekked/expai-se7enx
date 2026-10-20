@@ -5,8 +5,8 @@ or account) write content, and bring that content to the live site as a package.
 drafts; a person reviews and publishes them. The server never stores or uses anybody's subscription credentials.
 
 The package is an ordinary Exponential kernel package in the **JSON format** (`package.json`), described with its
-JSON Schema in [the JSON package format](https://github.com/se7enxweb/exponential/blob/main/doc/bc/6.0/package-json-format.md)
-(`doc/bc/6.0/package-json-format.md`, schema `share/package/schema/package-v1.json` of the installation). It is the
+JSON Schema in [the JSON package format](https://github.com/se7enxweb/exponential/blob/main/doc/en/us/bc/6.0/package-json-format.md)
+(`doc/en/us/bc/6.0/package-json-format.md`, schema `share/package/schema/package-v1.json` of the installation). It is the
 classic package mirrored element for element in JsonML, so whatever the kernel's package handlers read, the agent can
 write, and a package exported from the site is the best template.
 

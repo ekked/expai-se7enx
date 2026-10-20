@@ -127,4 +127,4 @@ The step line in the panel reads "Called the service node::childrenNames".
   `service=node::childrenNames`, and the reply named both children.
 
 See also [tools.md](tools.md), [permissions.md](permissions.md), [mcp.md](mcp.md), and
-`doc/bc/6.0/backend_ezjscore_services.md` of the distribution for writing a service.
+`doc/en/us/bc/6.0/backend_ezjscore_services.md` of the distribution for writing a service.

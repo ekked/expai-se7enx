@@ -2,8 +2,8 @@
 
 Content packages are the kernel's packages, in the classic XML or the JSON format. expai has no package pages,
 commands or tables of its own: everything a package needs is in Setup > Packages and `ezpm`, and the format is
-described in the kernel's [JSON package format](https://github.com/se7enxweb/exponential/blob/main/doc/bc/6.0/package-json-format.md)
-(`doc/bc/6.0/package-json-format.md` of the installation).
+described in the kernel's [JSON package format](https://github.com/se7enxweb/exponential/blob/main/doc/en/us/bc/6.0/package-json-format.md)
+(`doc/en/us/bc/6.0/package-json-format.md` of the installation).
 
 | What | Where |
 | --- | --- |

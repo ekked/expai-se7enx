@@ -320,7 +320,7 @@ server class in your extension's ezjscore.ini rather than changing expai's.
 
 The extension point survey of the kernel (Setup > RAD tools > Extension point survey, `setup/radsurvey/(show)/registries`)
 counts and checks every entry of the registries expai declares in `settings/rad.ini.append.php` (the format is described
-in the kernel's `settings/rad.ini` and in doc/bc/6.0/rad-extension-surface.md, "Registries declared in rad.ini"). A
+in the kernel's `settings/rad.ini` and in doc/en/us/bc/6.0/rad-extension-surface.md, "Registries declared in rad.ini"). A
 provider, tool or field action you add in your own settings appears there at once, and one whose class, template or
 block is missing is shown as broken.
 

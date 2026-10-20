@@ -2,7 +2,7 @@
 
 Next to its own usage log (`expai/log`, [usage-tracking.md](usage-tracking.md)) and draft log, expai records what it
 does in the system's **audit trail**: the kernel's tamper-evident log of who did what and when (Audit tab,
-`doc/bc/6.0/audit.md` of the Exponential distribution). The records are written by the kernel's audit writer, as
+`doc/en/us/bc/6.0/audit.md` of the Exponential distribution). The records are written by the kernel's audit writer, as
 canonical JSON lines with a hash chain, into a channel of their own, **`ai`** (`var/log/audit/ai-<day>.jsonl`), so
 they can be verified, archived, exported and forwarded to a SIEM like every other audit record, and given to an
 auditor without the content channel.

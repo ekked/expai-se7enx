@@ -10,7 +10,7 @@
 /**
  * Listens to the kernel's event package/install/drafts (eZPackage::notifyDraftsInstalled(): after any install of a
  * package as drafts, in Setup > Packages, with ezpm install --as-drafts, or in a background install). The packages
- * themselves are the kernel's (Setup > Packages, ezpm, doc/bc/6.0/package-json-format.md); this is only the
+ * themselves are the kernel's (Setup > Packages, ezpm, doc/en/us/bc/6.0/package-json-format.md); this is only the
  * integration: a package whose metadata says expai.ai-generated=true was written with Exponential Intelligence, so
  * each draft it gave is recorded in expai_draft_log (source "package"). That is what puts the "Written with
  * Exponential Intelligence" label on the draft and lists it among the drafts of expai. Any other package is left
