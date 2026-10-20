@@ -57,12 +57,26 @@
 
 ## Help in the administration interface
 
-Every page above is also part of the administration interface: `expai/help` (Dashboard > EI: Help) shows this
-index, `expai/help/(page)/<name>` one page (`readme`, `install`, `usage`, the name of a `doc/*.md`
-without `.md`, or `changelog-<version>`), and each expai page (the dashboard, the Intelligence tab, Vector, EI: Summary,
-the "Missing alt text" report, chains) has a "?" link to its page. The pages are rendered from the
-installed files, so they always match the installed version. Policy: `expai/write` or `expai/summary`.
+Every page above is also part of the administration interface, in its help center (Help in the top bar, the
+module `exphelp` of Exponential 6.0.15 and later): the help center shows the documentation of every active extension
+in the folder and category **Extensions**, so this documentation is read, searched and printed there with the same
+viewer, contents and search as the documentation of Exponential itself.
 
-The rendering is a Markdown subset (headings, paragraphs, lists, tables, code, emphasis, links) by `expAiHelp`
-(classes/expaihelp.php): every character of a document is escaped, only the renderer's own tags are written, and
-links are kept only to other help pages, anchors, http(s) and mailto addresses. Test: `tests/expaihelp_test.php`.
+- **Dashboard > EI: Help** and the dashboard's Help link open the extension's index in the help center,
+  `exphelp/extensions/expai`: every page of this documentation by folder, and a search limited to it.
+- A page has the id `ext/expai/<path below doc/>` (`exphelp/viewer/ext/expai/vector.md`); the files at the top of the
+  extension are `ext/expai/README.md`, `ext/expai/INSTALL.md`, `ext/expai/USAGE.md`, and a changelog is
+  `ext/expai/changelog/<version>.md`.
+- Each expai page (the dashboard, the Intelligence tab, Vector, the "Missing alt text" report, chains) has a "?" link
+  to its page there.
+- The old addresses keep working: `expai/help` redirects to the extension's index, `expai/help/(page)/<name>`
+  (`readme`, `install`, `usage`, `index`, the name of a `doc/*.md` without `.md`, or `changelog-<version>`) to the
+  same page in the help center (`expAiHelpLinks`, classes/expaihelplinks.php).
+- Policy: `exphelp/read`, the policy of the help center (editors and administrators have it). The view `expai/help`
+  still opens with `expai/write` or `expai/summary`, but only to redirect.
+
+The help center shows only the files the extension's repository tracks (or its release lists), never source files,
+and renders them safely: every character of a document is escaped, raw HTML stays text, and links are kept only to
+pages of the help, anchors and http(s) and mailto addresses. The pages are read from the installed files, so they
+always match the installed version. Tests: `tests/phpunit/unit/core/expAiHelpLinksTest.php`, and the help center's
+own (`tests/tests/kernel/classes/help/expHelpExtensionDocsTest.php` in Exponential).

@@ -58,8 +58,9 @@ Version 0.0.1.3. What is new: [doc/changelog/0.0.1.3.md](doc/changelog/0.0.1.3.m
 - **The dashboard** (Dashboard > Exponential Intelligence): estimated cost, tokens, requests and drafts with trends,
   a chart per day, limits, Start writing at a preselected location, recent drafts, versions waiting for your approval
   ([doc/dashboard.md](doc/dashboard.md)).
-- **Help in the administration interface**: every page of this documentation at `expai/help`, with a "?" link on
-  each expai page ([doc/index.md](doc/index.md)).
+- **Help in the administration interface**: every page of this documentation in the help center of the
+  administration (Dashboard > EI: Help, `exphelp/extensions/expai`), searchable with the rest of the help, with a "?"
+  link on each expai page ([doc/index.md](doc/index.md)).
 
 **For administrators**
 

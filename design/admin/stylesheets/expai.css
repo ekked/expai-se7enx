@@ -749,7 +749,7 @@ html.exp-ai-palette-open { overflow: hidden; }
 .exp-ai .exp-ai-improve-item:hover, .exp-ai .exp-ai-improve-item:focus { background: var(--exp-ai-accent-soft); color: var(--exp-ai-accent-text); outline: none; }
 .exp-ai .exp-ai-improve-item:focus-visible { outline: 2px solid var(--exp-ai-accent); outline-offset: -2px; }
 
-/* ---- Help (expai/help, the "?" links; classes/expaihelp.php) ---------------------------------------------------- */
+/* ---- Help (the "?" links to the extension's pages in the help center) ------------------------------------------- */
 .exp-ai-help-link {
     display: inline-flex;
     align-items: center;
@@ -768,27 +768,6 @@ html.exp-ai-palette-open { overflow: hidden; }
 }
 a.exp-ai-help-link:hover, a.exp-ai-help-link:focus-visible { color: var(--exp-ai-accent-text); border-color: var(--exp-ai-accent); text-decoration: none; }
 a.exp-ai-help-link:focus-visible { outline: 2px solid var(--exp-ai-accent); outline-offset: 2px; }
-.exp-ai-help-layout { display: grid; grid-template-columns: minmax(12em, 16em) minmax(0, 1fr); gap: 1.5em; align-items: start; }
-.exp-ai-help-nav { position: sticky; top: 0.5em; max-height: calc(100vh - 2em); overflow-y: auto; padding: 0.6em 0.8em; border: 1px solid var(--exp-ai-line); border-radius: var(--exp-ai-radius); }
-.exp-ai-help-nav-title { margin: 0 0 0.4em; font-weight: 600; }
-.exp-ai-help-nav ul { margin: 0; padding: 0; list-style: none; }
-.exp-ai-help-nav li { margin: 0.15em 0; }
-.exp-ai-help-nav a[aria-current="page"] { color: var(--exp-ai-accent-text); font-weight: 600; }
-.exp-ai-help-doc { min-width: 0; max-width: 60em; line-height: 1.55; }
-.exp-ai-help-doc h1 { font-size: 1.5em; margin: 0 0 0.6em; padding: 0; border: 0; }
-.exp-ai-help-doc h2 { font-size: 1.25em; margin: 1.4em 0 0.5em; padding: 0; border: 0; }
-.exp-ai-help-doc h3, .exp-ai-help-doc h4 { font-size: 1.05em; margin: 1.2em 0 0.4em; }
-.exp-ai-help-doc code { padding: 0 0.25em; border-radius: 3px; background: var(--exp-ai-user); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em; overflow-wrap: anywhere; }
-.exp-ai-help-doc pre.exp-ai-help-code { overflow-x: auto; padding: 0.7em 0.9em; border-radius: var(--exp-ai-radius); background: var(--exp-ai-surface); border: 1px solid var(--exp-ai-line); }
-.exp-ai-help-doc pre.exp-ai-help-code code { padding: 0; background: none; overflow-wrap: normal; white-space: pre; }
-.exp-ai-help-table { overflow-x: auto; margin: 0.6em 0 1em; }
-.exp-ai-help-doc table { border-collapse: collapse; width: 100%; }
-.exp-ai-help-doc th, .exp-ai-help-doc td { padding: 0.35em 0.6em; border: 1px solid var(--exp-ai-line); text-align: left; vertical-align: top; }
-.exp-ai-help-doc blockquote { margin: 0.6em 0; padding: 0.2em 0.9em; border-left: 3px solid var(--exp-ai-line); color: var(--exp-ai-muted); }
-@media (max-width: 60em) {
-    .exp-ai-help-layout { grid-template-columns: minmax(0, 1fr); }
-    .exp-ai-help-nav { position: static; max-height: 14em; }
-}
 @media print { .exp-ai-help-link { display: none !important; } }
 .exp-ai-help-link.exp-ai-help-link-text { width: auto; padding: 0 0.6em; font-weight: 500; }
 

@@ -1,7 +1,7 @@
 # Troubleshooting
 
-Each entry was met while building and testing 0.0.1.0. The help pages of the administration interface
-(`expai/help`) show this page too.
+Each entry was met while building and testing 0.0.1.0. The help center of the administration interface
+(Help > Extensions > expai) shows this page too.
 
 ## The Intelligence tab is missing
 
@@ -193,6 +193,9 @@ children are held and new requests wait. Remove `enablereuse` (keep `flushpacket
 
 ## A help page says "not found"
 
-`expai/help/(page)/<name>` knows the extension's own documents only: `readme`, `install`, `usage`, `index`, the name
-of a `doc/*.md` without `.md` (`providers`, `vector`, `summary` ...) and `changelog-<version>`. The pages are read
-from the installed extension, so they always match its version.
+The help center shows the extension's documentation only while the extension is active, and only the files its
+repository tracks (or its release lists in `share/filelist.md5`): a page added to `doc/` and not committed is not shown.
+The old address `expai/help/(page)/<name>` knows the names `readme`, `install`, `usage`, `index`, the name of a
+`doc/*.md` without `.md` (`providers`, `vector`, `summary` ...) and `changelog-<version>`, and redirects to that page;
+any other name goes to the extension's index. "Access denied" in the help center: the user's role lacks
+`exphelp/read`. The pages are read from the installed extension, so they always match its version.

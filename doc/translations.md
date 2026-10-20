@@ -20,7 +20,7 @@ as the start for a new language). site.ini `[RegionalSettings] TranslationExtens
 | `extension/expai/chain`, `extension/expai/translation` | AI chains; translation sync |
 | `extension/expai/budget` | budgets and lanes |
 | `extension/expai/preset`, `extension/expai/alttext`, `extension/expai/summary` | presets and the Improve menu; alt text; the "EI: Summary" page |
-| `extension/expai/help` | the help pages and the "?" links |
+| `extension/expai/help` | the "?" links and the dashboard's Help entry |
 | `design/admin/parts/setup/menu` | the Setup menu entries (EI: Summary, EI: Models, EI: Budgets, Job queue) |
 | `design/admin/parts/my/menu` | the Dashboard menu entries (Exponential Intelligence, EI: Vector, EI: Chains, EI: Log, EI: Help) |
 | `design/admin/parts/design/menu` | the Design menu entry (Missing alt text) |
@@ -36,9 +36,9 @@ Texts the browser shows are rendered into the page by the templates (JSON blocks
 1. Copy `translations/untranslated/translation.ts` to `translations/<locale>/translation.ts` (e.g. `fre-FR`), set
    `language="fr_FR"` and fill every `<translation>`.
 2. Clear the translation cache: `php bin/php/ezcache.php --clear-id=translation`.
-3. Open the full view, the edit form, the dashboard, Vector, the log and the help in a siteaccess with that locale; the admin's debug
+3. Open the full view, the edit form, the dashboard, Vector and the log in a siteaccess with that locale; the admin's debug
    output lists any "Missing translation" for them.
 
 The model answers in the language the editor writes in, whatever the interface language.
 
-The help pages (`expai/help`) show the documentation in English in every interface language.
+The help center shows the extension's documentation in English in every interface language.

@@ -23,7 +23,7 @@ expai:
 | `expai/chain.tpl`, `expai/chain_run.tpl`, `expai/chains/*.tpl` | AI chains: the runs, one run, the prompt of each step |
 | `expai/alttext.tpl` | the "Missing alt text" report |
 | `expai/models.tpl`, `expai/budgets.tpl`, `expai/summary.tpl` | models and providers, budgets and lanes, the "EI: Summary" page |
-| `expai/help.tpl`, `expai/parts/help_link.tpl` | the help pages, the "?" link of each page |
+| `expai/parts/help_link.tpl` | the "?" link of each page to its page in the help center |
 | `expai/parts/*.tpl` | shared parts: the model picker, bars, trends, links, budget summary, thread cards |
 
 Keep the classes and ids expai.js uses (`#exp-ai-panel`, `.exp-ai-log`, `.exp-ai-input`, `.exp-ai-send`, ... in the
