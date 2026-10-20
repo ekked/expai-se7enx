@@ -5,6 +5,7 @@
 | [../README.md](../README.md) | What expai is, why, features, provider support, requirements, quick start |
 | [../INSTALL.md](../INSTALL.md) | Requirements, activation, keys, tables, roles and policies, caches, Velocity, cron parts, streaming, checks, the install and upgrade checklist |
 | [../USAGE.md](../USAGE.md) | For editors: the Intelligence tab, the edit form, the label, approval, the dashboard |
+| [manual/README.md](manual/README.md) | The user manual: one question per page (ask the assistant, Vector, alt text, chains, drafts, usage), with who may do it, the steps and what can go wrong |
 | [architecture.md](architecture.md) | How the parts fit: browser, ezjscore, the step loop, tools, provider, storage, long turns |
 | [configuration.md](configuration.md) | Every setting of expai.ini and the other settings files, with default and effect |
 | [providers.md](providers.md) | The provider registry, the anthropic and openai_chat adapters, models, the picker, tool modes, errors and retries |
