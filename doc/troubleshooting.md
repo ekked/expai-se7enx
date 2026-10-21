@@ -195,11 +195,11 @@ children are held and new requests wait. Remove `enablereuse` (keep `flushpacket
 
 The help center shows the extension's documentation only while the extension is active, and only the files its
 repository tracks (or its release lists in `share/filelist.md5`): a page added to `doc/` and not committed is not shown.
-The links lead to the page in the help center directly. The old address `expai/help/(page)/<name>` knows the names `readme`, `install`, `usage`, `index`, the name of a
-`doc/*.md` without `.md` (`providers`, `vector`, `summary` ...) and `changelog-<version>`, and redirects to that page;
-any other name goes to the extension's index. A user whose role lacks `exphelp/read` is sent to the same page on
-GitHub instead. The pages are read from the installed extension, so they always match its version.
+The links lead to the page in the help center directly; a page name the extension does not have goes to the
+extension's index. A user whose role lacks `exphelp/read` gets the help center's access denied. The pages are read
+from the installed extension, so they always match its version.
 
-Help opens on GitHub instead of in the administration: the kernel has no help center that shows extension
-documentation (Exponential 6.0.14, or exphelp.ini `[IndexSettings] ActiveExtensionDocs=disabled` without `expai` in
-`ExtensionDocDirs[]`), or the user lacks `exphelp/read`. The GitHub pages are those of the installed release's tag.
+Help opens nothing useful (a "not found" page): the kernel has no help center that shows extension documentation
+(Exponential 6.0.14, or exphelp.ini `[IndexSettings] ActiveExtensionDocs=disabled` without `expai` in
+`ExtensionDocDirs[]`). expai 0.0.1.17 and later need the help center of Exponential 6.0.15; read the files in the
+extension's `doc/` folder instead, or enable the extension documentation in exphelp.ini.

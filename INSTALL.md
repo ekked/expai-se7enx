@@ -6,7 +6,8 @@ The short version is the [checklist](#checklist-install-and-upgrade) at the end.
 
 ## 1. Requirements
 
-- Exponential 6.0.14 or later (the legacy kernel), PHP 8.1 or later with `curl`, `dom`, `json` and `mbstring`.
+- Exponential 6.0.14 or later (the legacy kernel), PHP 8.1 or later with `curl`, `dom`, `json` and `mbstring`. The
+  documentation in the administration (EI: Help, the "?" links) needs the help center of Exponential 6.0.15.
 - The extensions **ezjscore** (the browser talks to expai through `ezjscore/call`) and, recommended, **ezformtoken**
   (every expai request carries the form token).
 - For queued work the extension **expqueue** (0.0.1.0 or later): lanes and provider batches, budgets, AI chains,

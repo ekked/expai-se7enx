@@ -72,24 +72,13 @@ class expAiMenuPolicyTest extends PHPUnit\Framework\TestCase
     public function testTheViewsAndLinksAreRead()
     {
         $views = self::viewFunctions();
-        $this->assertSame( 'write or summary', $views['help'] ?? null );
+        $this->assertArrayNotHasKey( 'help', $views );
         $this->assertSame( 'write', $views['log'] ?? null );
         // EI: Help opens the extension's index in the help center, for whoever may read the help center: no expai
         // policy, so a user with only expai/summary (or only expai/write) who holds exphelp/read sees it
         $help = self::menuLinks()['Leftmenu_my/expai_help'] ?? array();
         $this->assertSame( 'exphelp/extensions/expai', $help['url'] ?? null );
         $this->assertSame( array( 'exphelp/read' ), $help['policies'] ?? null );
-    }
-
-    /** Without the help center (6.0.14) the entry is pointed at expai/help by the request/input listener, which exists */
-    public function testTheMenuFallsBackToTheRedirectWithoutTheHelpCenter()
-    {
-        $this->assertStringContainsString( 'Listeners[]=request/input@expAiHelpLinks::menuFallback', self::read( 'settings/site.ini.append.php' ) );
-        $class = self::read( 'classes/expaihelplinks.php' );
-        $this->assertMatchesRegularExpression( '/public static function menuFallback\(/', $class );
-        $this->assertStringContainsString( "removeSetting( 'Leftmenu_my', 'PolicyList_expai_help' )", $class );
-        // the redirect it falls back to opens for the same users as before
-        $this->assertSame( 'write or summary', self::viewFunctions()['help'] ?? null );
     }
 
     public function testEveryLinkChecksWhatItsViewRequires()

@@ -161,14 +161,4 @@ $ViewList['alttext'] = array(
     'params' => array(),
     'unordered_params' => array( 'node' => 'Node' ) );
 
-// Help (doc/index.md): the old address of the extension's documentation (bookmarks, and every link where there is no
-// help center; with it the links lead there directly); expai/help and expai/help/(page)/<name> redirect to the help center (exphelp/extensions/expai, Exponential 6.0.15 and later) or to GitHub (classes/expaihelplinks.php).
-// For editors (expai/write) and for a data protection officer with only expai/summary, as before
-$ViewList['help'] = array(
-    'default_navigation_part' => 'ezmynavigationpart',
-    'script' => 'help.php',
-    'functions' => array( 'write or summary' ),
-    'params' => array(),
-    'unordered_params' => array( 'page' => 'Page' ) );
-
 ?>

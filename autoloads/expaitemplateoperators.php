@@ -14,8 +14,8 @@
  * {$retention|expai_retention}     "unknown" translated, every other retention as written
  * {$data|expai_json}                JSON for a <script type="application/json"> block: <, >, &, ' and " are escaped
  *                                   invalid UTF-8 becomes U+FFFD instead of failing
- * {expai_help_url( 'vector' )|ezurl} the address of a help page: in the help center where it is read there, otherwise
- *                                   expai/help/(page)/<page> (expAiHelpLinks::link()); expai_help_url() the index
+ * {expai_help_url( 'vector' )|ezurl} the address of a help page in the help center
+ *                                   (expAiHelpLinks::link()); expai_help_url() the index
  */
 class expAiTemplateOperators
 {

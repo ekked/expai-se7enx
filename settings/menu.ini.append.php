@@ -22,9 +22,7 @@ LinkNames[expai_log]=EI: Log
 PolicyList_expai_log[]=expai/write
 # The extension's documentation (doc/index.md): its index in the help center (Exponential 6.0.15 and later), shown to
 # users who may read the help center (exphelp/read), whatever expai policy they hold (an editor with expai/write, a data
-# protection officer with only expai/summary). On a kernel without the help center (6.0.14) expAiHelpLinks::menuFallback()
-# (site.ini [Event] request/input) points the entry at expai/help, which redirects to GitHub, and drops the policy,
-# which such a kernel does not have.
+# protection officer with only expai/summary).
 Links[expai_help]=exphelp/extensions/expai
 PolicyList_expai_help[]=exphelp/read
 LinkNames[expai_help]=EI: Help

@@ -37,7 +37,7 @@ expai_presets.js, ...                    (Functions[]=expai)  expAiVectorServerF
 | Content | `expAiContentReader`, `expAiContentWriter`, `expAiPublisher`, `expAiApprovalCheck`, `expAiDraftLog` | reading with the user's checks, writing drafts, keep / send / discard |
 | Usage and cost | `expAiUsageRecorder`, `expAiUsageLog`, `expAiCost`, `expAiDashboard`, `expAiSummary` | the usage log, prices, the dashboard and the "EI: Summary" page |
 | Queued work | classes/queue/, classes/lanes/, classes/budget/, classes/chain/, classes/diff/, classes/package/ | lanes and batches, budgets, chains, translation sync, packages ([lanes.md](lanes.md)) |
-| Help | `expAiHelpLinks` | the addresses of the documentation in the help center (`exphelp/extensions/expai`), which the links use directly (`link()`, `expai_help_url`); `expai/help` redirects there or to GitHub |
+| Help | `expAiHelpLinks` | the addresses of the documentation in the help center (`exphelp/extensions/expai`), which the links use directly (`link()`, `expai_help_url`) |
 | Storage | `expAiSchema` (with `expAiThreadSchema`, `expAiChainSchema`) | the 15 tables, per engine ([database.md](database.md)) |
 
 ## How the browser talks to the server
@@ -56,8 +56,8 @@ The token and the root URL come from what every admin page already has: `#ezxfor
 and Vector are started by their markup (`#exp-ai-panel`, `#exp-ai-edit`, `#exp-ai-dashboard`, `#exp-ai-vector`).
 
 The module `expai` holds the policies ([permissions.md](permissions.md)) and the views `expai/dashboard`, `expai/log`,
-`expai/vector`, `expai/stream`, `expai/chain`, `expai/alttext`, `expai/models`, `expai/budgets`,
-`expai/summary` and `expai/help` (a redirect to the help center).
+`expai/vector`, `expai/stream`, `expai/chain`, `expai/alttext`, `expai/models`, `expai/budgets`
+and `expai/summary`.
 
 ## The step loop (panel)
 

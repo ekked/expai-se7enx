@@ -52,6 +52,7 @@
 | [faq.md](faq.md) | Short answers |
 | [changelog/0.0.1.15.md](changelog/0.0.1.15.md) | EI: Help, the dashboard's Help link and the "?" links open the help center directly |
 | [changelog/0.0.1.16.md](changelog/0.0.1.16.md) | Translations in French, Ukrainian, Arabic, Persian, Pashto and Kurdish (Kurmanji) |
+| [changelog/0.0.1.17.md](changelog/0.0.1.17.md) | The old help reader is removed; the documentation needs the help center of Exponential 6.0.15 |
 | [changelog/0.0.1.2.md](changelog/0.0.1.2.md) | Every translation file validates again, so expai is translated |
 | [changelog/0.0.1.3.md](changelog/0.0.1.3.md) | Draft log entries of removed objects show as removed, without an "Object not found" error |
 | [changelog/0.0.1.1.md](changelog/0.0.1.1.md) | No "Decorative" choice for a field that requires an alt text |
@@ -73,20 +74,14 @@ viewer, contents and search as the documentation of Exponential itself.
 - Each expai page (the dashboard, the Intelligence tab, Vector, the "Missing alt text" report, chains) has a "?" link
   straight to its page there. The templates name only the page (`{expai_help_url( 'vector' )|ezurl}`); the address
   comes from `expAiHelpLinks::link()` (classes/expaihelplinks.php), which maps the page names.
-- The old address `expai/help` keeps working for bookmarks and redirects: `expai/help` to the extension's index,
-  `expai/help/(page)/<name>` (`readme`, `install`, `usage`, `index`, the name of a `doc/*.md` without `.md`, or
-  `changelog-<version>`) to the same page. A name of a page the extension does not have leads to the index.
 - Policy: `exphelp/read`, the policy of the help center (editors and administrators have it). The menu entry EI: Help
   is shown to users who hold it, whatever expai policy they have (a data protection officer with only `expai/summary`
-  sees it too). The view `expai/help` opens with `expai/write` or `expai/summary`.
+  sees it too).
 
-**Exponential 6.0.14** has no help center. There, and for a user without `exphelp/read`, the links lead to
-`expai/help`, which redirects to the same page on GitHub, in the tree of the installed release
-(`https://github.com/se7enxweb/expai/blob/v<version>/doc/<page>.md`). `expAiHelpLinks::kernelHasHelpCenter()` asks the
-running kernel (the class `expHelpDocumentIndex` with `extensions()`, the module `exphelp`, exphelp.ini
-`[IndexSettings] ActiveExtensionDocs`); nothing of the help center is required where it is missing. On such a kernel
-`expAiHelpLinks::menuFallback()` (the kernel's event `request/input`, settings/site.ini.append.php) points the menu
-entry EI: Help at `expai/help` and drops its `exphelp/read` policy, for that request only.
+**The help center is required.** expai needs the help center of Exponential 6.0.15 or later. An older kernel
+(6.0.14) has none: there EI: Help, the dashboard's Help link and the "?" links open nothing useful (the kernel's
+"not found"). Read the documentation in the extension's `doc/` folder or on GitHub instead. The old redirect view
+`expai/help`, its GitHub fallback and the menu fallback for such kernels were removed in 0.0.1.17.
 
 The help center shows only the files the extension's repository tracks (or its release lists), never source files,
 and renders them safely: every character of a document is escaped, raw HTML stays text, and links are kept only to

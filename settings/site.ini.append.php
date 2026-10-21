@@ -12,8 +12,5 @@ ExtensionAutoloadPath[]=expai
 # (expAiPackageDraftListener, the kernel's event package/install/drafts)
 [Event]
 Listeners[]=package/install/drafts@expAiPackageDraftListener::installed
-# The menu entry EI: Help leads to the help center (menu.ini.append.php); on a kernel without it (Exponential 6.0.14)
-# it leads to expai/help, which redirects to GitHub (expAiHelpLinks::menuFallback(), changes nothing where it is)
-Listeners[]=request/input@expAiHelpLinks::menuFallback
 
 */ ?>
