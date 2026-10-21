@@ -51,6 +51,7 @@
 | [troubleshooting.md](troubleshooting.md) | Failures and their fixes |
 | [faq.md](faq.md) | Short answers |
 | [changelog/0.0.1.15.md](changelog/0.0.1.15.md) | EI: Help, the dashboard's Help link and the "?" links open the help center directly |
+| [changelog/0.0.1.16.md](changelog/0.0.1.16.md) | Translations in French, Ukrainian, Arabic, Persian, Pashto and Kurdish (Kurmanji) |
 | [changelog/0.0.1.2.md](changelog/0.0.1.2.md) | Every translation file validates again, so expai is translated |
 | [changelog/0.0.1.3.md](changelog/0.0.1.3.md) | Draft log entries of removed objects show as removed, without an "Object not found" error |
 | [changelog/0.0.1.1.md](changelog/0.0.1.1.md) | No "Decorative" choice for a field that requires an alt text |
