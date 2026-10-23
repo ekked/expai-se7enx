@@ -30,7 +30,7 @@
     </message>
     <message>
         <source>Run</source>
-        <translation>Uruchom</translation>
+        <translation>Uruchomić</translation>
     </message>
     <message>
         <source>State</source>
@@ -94,7 +94,7 @@
     </message>
     <message>
         <source>Edit the draft</source>
-        <translation>Edytuj wersję roboczą</translation>
+        <translation>Edytować wersję roboczą</translation>
     </message>
     <message>
         <source>written at the checkpoint</source>
@@ -134,19 +134,19 @@
     </message>
     <message>
         <source>Approve and continue</source>
-        <translation>Zatwierdź i kontynuuj</translation>
+        <translation>Zatwierdzić i kontynuować</translation>
     </message>
     <message>
         <source>Ask for changes</source>
-        <translation>Poproś o zmiany</translation>
+        <translation>Poprosić o zmiany</translation>
     </message>
     <message>
         <source>Stop the run</source>
-        <translation>Zatrzymaj przebieg</translation>
+        <translation>Zatrzymać przebieg</translation>
     </message>
     <message>
         <source>Continue with a higher run budget</source>
-        <translation>Kontynuuj z wyższym budżetem przebiegu</translation>
+        <translation>Kontynuować z wyższym budżetem przebiegu</translation>
     </message>
     <message>
         <source>Steps</source>
@@ -214,11 +214,11 @@
     </message>
     <message>
         <source>Write with a chain</source>
-        <translation>Pisz za pomocą łańcucha</translation>
+        <translation>Pisać za pomocą łańcucha</translation>
     </message>
     <message>
         <source>Use chain</source>
-        <translation>Użyj łańcucha</translation>
+        <translation>Użyć łańcucha</translation>
     </message>
     <message>
         <source>Items</source>
@@ -230,7 +230,7 @@
     </message>
     <message>
         <source>Start the chain</source>
-        <translation>Uruchom łańcuch</translation>
+        <translation>Uruchomić łańcuch</translation>
     </message>
     <message>
         <source>Runs and checkpoints</source>
@@ -242,7 +242,7 @@
     </message>
     <message>
         <source>Use chain: %label</source>
-        <translation>Użyj łańcucha: %label</translation>
+        <translation>Użyć łańcucha: %label</translation>
     </message>
     <message>
         <source>%count wait for you</source>
@@ -474,7 +474,7 @@
     </message>
     <message>
         <source>Resume held jobs that fit the budget</source>
-        <translation>Wznów wstrzymane zadania mieszczące się w budżecie</translation>
+        <translation>Wznowić wstrzymane zadania mieszczące się w budżecie</translation>
     </message>
     <message>
         <source>Lanes</source>
@@ -796,7 +796,7 @@
     </message>
     <message>
         <source>Choose where Exponential Intelligence should write</source>
-        <translation>Wybierz, gdzie Exponential Intelligence ma pisać</translation>
+        <translation>Wybrać, gdzie Exponential Intelligence ma pisać</translation>
     </message>
     <message>
         <source>Choose the folder (or the content) to work on. Its full view opens with the Exponential Intelligence panel and your request.</source>
@@ -864,7 +864,7 @@
     </message>
     <message>
         <source>Start writing</source>
-        <translation>Zacznij pisać</translation>
+        <translation>Zacząć pisać</translation>
     </message>
     <message>
         <source>Exponential Intelligence works on "%name" and everything below it: it may look up and write drafts in this location or any location under it, always only where your own permissions allow.</source>
@@ -896,11 +896,11 @@
     </message>
     <message>
         <source>Write</source>
-        <translation>Pisz</translation>
+        <translation>Pisać</translation>
     </message>
     <message>
         <source>Choose the location</source>
-        <translation>Wybierz lokalizację</translation>
+        <translation>Wybrać lokalizację</translation>
     </message>
     <message>
         <source>Waiting for my approval</source>
@@ -956,7 +956,7 @@
     </message>
     <message>
         <source>Watch this run</source>
-        <translation>Śledź to wykonanie</translation>
+        <translation>Śledzić to wykonanie</translation>
     </message>
     <message>
         <source>Intelligence tab</source>
@@ -975,7 +975,7 @@
     <name>extension/expai/edit</name>
     <message>
         <source>View record</source>
-        <translation>Pokaż wpis</translation>
+        <translation>Pokazać wpis</translation>
     </message>
     <message>
         <source>This request in the usage log (opens in a new tab)</source>
@@ -983,7 +983,7 @@
     </message>
     <message>
         <source>View job</source>
-        <translation>Pokaż zadanie</translation>
+        <translation>Pokazać zadanie</translation>
     </message>
     <message>
         <source>The job of this request in the queue (opens in a new tab)</source>
@@ -999,11 +999,11 @@
     </message>
     <message>
         <source>Fill the fields</source>
-        <translation>Wypełnij pola</translation>
+        <translation>Wypełnić pola</translation>
     </message>
     <message>
         <source>Undo</source>
-        <translation>Cofnij</translation>
+        <translation>Cofnąć</translation>
     </message>
     <message>
         <source>Exponential Intelligence is working...</source>
@@ -1019,11 +1019,11 @@
     </message>
     <message>
         <source>Show</source>
-        <translation>Pokaż</translation>
+        <translation>Pokazać</translation>
     </message>
     <message>
         <source>Hide</source>
-        <translation>Ukryj</translation>
+        <translation>Ukryć</translation>
     </message>
     <message>
         <source>What should be written?</source>
@@ -1039,11 +1039,11 @@
     </message>
     <message>
         <source>Go</source>
-        <translation>Wykonaj</translation>
+        <translation>Wykonać</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Anuluj</translation>
+        <translation>Anulować</translation>
     </message>
     <message>
         <source>Filled in by Exponential Intelligence. Review it before you store the draft.</source>
@@ -1071,7 +1071,7 @@
     </message>
     <message>
         <source>Review the answer</source>
-        <translation>Przejrzyj odpowiedź</translation>
+        <translation>Przejrzeć odpowiedź</translation>
     </message>
     <message>
         <source>Nothing was written into the field yet: review the answer below.</source>
@@ -1091,15 +1091,15 @@
     </message>
     <message>
         <source>Apply anyway</source>
-        <translation>Zastosuj mimo to</translation>
+        <translation>Zastosować mimo to</translation>
     </message>
     <message>
         <source>Keep the original</source>
-        <translation>Zachowaj oryginał</translation>
+        <translation>Zachować oryginał</translation>
     </message>
     <message>
         <source>Copy text</source>
-        <translation>Kopiuj tekst</translation>
+        <translation>Kopiować tekst</translation>
     </message>
     <message>
         <source>Copied.</source>
@@ -1525,23 +1525,23 @@
     <name>extension/expai/fieldaction</name>
     <message>
         <source>Write</source>
-        <translation>Pisz</translation>
+        <translation>Pisać</translation>
     </message>
     <message>
         <source>Rewrite</source>
-        <translation>Przepisz</translation>
+        <translation>Przepisać</translation>
     </message>
     <message>
         <source>Shorten</source>
-        <translation>Skróć</translation>
+        <translation>Skrócić</translation>
     </message>
     <message>
         <source>Translate</source>
-        <translation>Przetłumacz</translation>
+        <translation>Przetłumaczyć</translation>
     </message>
     <message>
         <source>Suggest</source>
-        <translation>Zaproponuj</translation>
+        <translation>Zaproponować</translation>
     </message>
 </context>
 <context>
@@ -1746,15 +1746,15 @@
     </message>
     <message>
         <source>View</source>
-        <translation>Wyświetl</translation>
+        <translation>Wyświetlić</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation>Edytuj</translation>
+        <translation>Edytować</translation>
     </message>
     <message>
         <source>Prompt again</source>
-        <translation>Zapytaj ponownie</translation>
+        <translation>Zapytać ponownie</translation>
     </message>
     <message>
         <source>Intelligence tab</source>
@@ -1837,11 +1837,11 @@
     </message>
     <message>
         <source>Reset</source>
-        <translation>Wyzeruj</translation>
+        <translation>Wyzerować</translation>
     </message>
     <message>
         <source>Export CSV</source>
-        <translation>Eksportuj CSV</translation>
+        <translation>Wyeksportować CSV</translation>
     </message>
     <message>
         <source>Totals of the filtered requests</source>
@@ -1913,7 +1913,7 @@
     </message>
     <message>
         <source>Sort</source>
-        <translation>Sortuj</translation>
+        <translation>Sortować</translation>
     </message>
     <message>
         <source>Time</source>
@@ -1973,7 +1973,7 @@
     </message>
     <message>
         <source>Stop</source>
-        <translation>Zatrzymaj</translation>
+        <translation>Zatrzymać</translation>
     </message>
     <message>
         <source>Tools</source>
@@ -2069,7 +2069,7 @@
     </message>
     <message>
         <source>Show all</source>
-        <translation>Pokaż wszystko</translation>
+        <translation>Pokazać wszystko</translation>
     </message>
 </context>
 <context>
@@ -2116,7 +2116,7 @@
     </message>
     <message>
         <source>Reset to default</source>
-        <translation>Przywróć domyślne</translation>
+        <translation>Przywrócić domyślne</translation>
     </message>
     <message>
         <source>%used answered instead: %requested is stopped.</source>
@@ -2156,7 +2156,7 @@
     </message>
     <message>
         <source>Start it under Models</source>
-        <translation>Uruchom w sekcji Modele</translation>
+        <translation>Uruchomić w sekcji Modele</translation>
     </message>
 </context>
 <context>
@@ -2395,27 +2395,27 @@
     </message>
     <message>
         <source>Start the server</source>
-        <translation>Uruchom serwer</translation>
+        <translation>Uruchomić serwer</translation>
     </message>
     <message>
         <source>Stop the server</source>
-        <translation>Zatrzymaj serwer</translation>
+        <translation>Zatrzymać serwer</translation>
     </message>
     <message>
         <source>Pull the model</source>
-        <translation>Pobierz model</translation>
+        <translation>Pobrać model</translation>
     </message>
     <message>
         <source>Remove the model</source>
-        <translation>Usuń model</translation>
+        <translation>Usunąć model</translation>
     </message>
     <message>
         <source>Refresh the status</source>
-        <translation>Odśwież stan</translation>
+        <translation>Odświeżyć stan</translation>
     </message>
     <message>
         <source>Send to the helper</source>
-        <translation>Wyślij do pomocnika</translation>
+        <translation>Wysłać do pomocnika</translation>
     </message>
     <message>
         <source>Install the helper of share/systemd/ (doc/local-models.md) to start, stop and pull models from here.</source>
@@ -2514,7 +2514,7 @@
     </message>
     <message>
         <source>Continue</source>
-        <translation>Kontynuuj</translation>
+        <translation>Kontynuować</translation>
     </message>
     <message>
         <source>The last answer was interrupted.</source>
@@ -2530,19 +2530,19 @@
     </message>
     <message>
         <source>Edit</source>
-        <translation>Edytuj</translation>
+        <translation>Edytować</translation>
     </message>
     <message>
         <source>View version</source>
-        <translation>Wyświetl wersję</translation>
+        <translation>Wyświetlić wersję</translation>
     </message>
     <message>
         <source>Open</source>
-        <translation>Otwórz</translation>
+        <translation>Otworzyć</translation>
     </message>
     <message>
         <source>Discard</source>
-        <translation>Odrzuć</translation>
+        <translation>Odrzucić</translation>
     </message>
     <message>
         <source>Discard the draft "%name"? This cannot be undone.</source>
@@ -2618,15 +2618,15 @@
     </message>
     <message>
         <source>Show older</source>
-        <translation>Pokaż starsze</translation>
+        <translation>Pokazać starsze</translation>
     </message>
     <message>
         <source>Expand all</source>
-        <translation>Rozwiń wszystko</translation>
+        <translation>Rozwinąć wszystko</translation>
     </message>
     <message>
         <source>Collapse all</source>
-        <translation>Zwiń wszystko</translation>
+        <translation>Zwinąć wszystko</translation>
     </message>
     <message>
         <source>Conversation</source>
@@ -2642,7 +2642,7 @@
     </message>
     <message>
         <source>Send</source>
-        <translation>Wyślij</translation>
+        <translation>Wysłać</translation>
     </message>
     <message>
         <source>New conversation</source>
@@ -2654,11 +2654,11 @@
     </message>
     <message>
         <source>Save as drafts</source>
-        <translation>Zapisz jako wersje robocze</translation>
+        <translation>Zapisać jako wersje robocze</translation>
     </message>
     <message>
         <source>Send for approval</source>
-        <translation>Wyślij do zatwierdzenia</translation>
+        <translation>Wysłać do zatwierdzenia</translation>
     </message>
     <message>
         <source>"Save as drafts" keeps the selected drafts; you find them under My drafts and can edit them in the normal edit form. "Send for approval" publishes them the normal way: where an approval workflow applies they wait for the approver, otherwise they are published at once. Each draft says which applies.</source>
@@ -2795,7 +2795,7 @@
     </message>
     <message>
         <source>Show them</source>
-        <translation>Pokaż je</translation>
+        <translation>Pokazać je</translation>
     </message>
     <message>
         <source>%count without a price</source>
@@ -3013,7 +3013,7 @@
     </message>
     <message>
         <source>Type a command, a thread or a node...</source>
-        <translation>Wpisz polecenie, wątek lub węzeł...</translation>
+        <translation>Wpisać polecenie, wątek lub węzeł...</translation>
     </message>
     <message>
         <source>Nothing found.</source>
@@ -3045,7 +3045,7 @@
     </message>
     <message>
         <source>Open Vector</source>
-        <translation>Otwórz Vector</translation>
+        <translation>Otworzyć Vector</translation>
     </message>
     <message>
         <source>New thread</source>
@@ -3057,15 +3057,15 @@
     </message>
     <message>
         <source>Open thread</source>
-        <translation>Otwórz wątek</translation>
+        <translation>Otworzyć wątek</translation>
     </message>
     <message>
         <source>Jump to node</source>
-        <translation>Przejdź do węzła</translation>
+        <translation>Przejść do węzła</translation>
     </message>
     <message>
         <source>Switch model</source>
-        <translation>Zmień model</translation>
+        <translation>Zmienić model</translation>
     </message>
     <message>
         <source>current</source>
@@ -3089,7 +3089,7 @@
     </message>
     <message>
         <source>Close</source>
-        <translation>Zamknij</translation>
+        <translation>Zamknąć</translation>
     </message>
     <message>
         <source>changed</source>
@@ -3101,15 +3101,15 @@
     </message>
     <message>
         <source>Reset</source>
-        <translation>Wyzeruj</translation>
+        <translation>Wyzerować</translation>
     </message>
     <message>
         <source>Reset all shortcuts</source>
-        <translation>Przywróć wszystkie skróty</translation>
+        <translation>Przywrócić wszystkie skróty</translation>
     </message>
     <message>
         <source>Press the new keys for "%command" (Esc cancels)</source>
-        <translation>Naciśnij nowe klawisze dla "%command" (Esc anuluje)</translation>
+        <translation>Nacisnąć nowe klawisze dla "%command" (Esc anuluje)</translation>
     </message>
     <message>
         <source>Something went wrong:</source>
@@ -3117,19 +3117,19 @@
     </message>
     <message>
         <source>Open the command palette</source>
-        <translation>Otwórz paletę poleceń</translation>
+        <translation>Otworzyć paletę poleceń</translation>
     </message>
     <message>
         <source>Run / send the message</source>
-        <translation>Uruchom / wyślij wiadomość</translation>
+        <translation>Uruchomić / wysłać wiadomość</translation>
     </message>
     <message>
         <source>Queue the message while a turn runs</source>
-        <translation>Dodaj wiadomość do kolejki, gdy trwa tura</translation>
+        <translation>Dodać wiadomość do kolejki, gdy trwa tura</translation>
     </message>
     <message>
         <source>Stop the thread (press twice)</source>
-        <translation>Zatrzymaj wątek (naciśnij dwukrotnie)</translation>
+        <translation>Zatrzymać wątek (nacisnąć dwukrotnie)</translation>
     </message>
     <message>
         <source>Next item</source>
@@ -3141,11 +3141,11 @@
     </message>
     <message>
         <source>Accept the change</source>
-        <translation>Zaakceptuj zmianę</translation>
+        <translation>Zaakceptować zmianę</translation>
     </message>
     <message>
         <source>Reject the change</source>
-        <translation>Odrzuć zmianę</translation>
+        <translation>Odrzucić zmianę</translation>
     </message>
     <message>
         <source>Next thread</source>
@@ -3157,35 +3157,35 @@
     </message>
     <message>
         <source>Switch between plan and write</source>
-        <translation>Przełącz między planowaniem a pisaniem</translation>
+        <translation>Przełączyć między planowaniem a pisaniem</translation>
     </message>
     <message>
         <source>Choose the model</source>
-        <translation>Wybierz model</translation>
+        <translation>Wybrać model</translation>
     </message>
     <message>
         <source>Choose the lane</source>
-        <translation>Wybierz tor</translation>
+        <translation>Wybrać tor</translation>
     </message>
     <message>
         <source>Change the scope</source>
-        <translation>Zmień zakres</translation>
+        <translation>Zmienić zakres</translation>
     </message>
     <message>
         <source>Show the plan</source>
-        <translation>Pokaż plan</translation>
+        <translation>Pokazać plan</translation>
     </message>
     <message>
         <source>Show the changes</source>
-        <translation>Pokaż zmiany</translation>
+        <translation>Pokazać zmiany</translation>
     </message>
     <message>
         <source>Show the cost</source>
-        <translation>Pokaż koszt</translation>
+        <translation>Pokazać koszt</translation>
     </message>
     <message>
         <source>Show the shortcuts</source>
-        <translation>Pokaż skróty</translation>
+        <translation>Pokazać skróty</translation>
     </message>
     <message>
         <source>%count result</source>
@@ -3296,7 +3296,7 @@
     </message>
     <message>
         <source>Open in Vector</source>
-        <translation>Otwórz w Vectorze</translation>
+        <translation>Otworzyć w Vectorze</translation>
     </message>
     <message>
         <source>This conversation</source>
@@ -3312,7 +3312,7 @@
     </message>
     <message>
         <source>Open Vector</source>
-        <translation>Otwórz Vector</translation>
+        <translation>Otworzyć Vector</translation>
     </message>
     <message>
         <source>No threads yet. A conversation in the Intelligence tab of a page becomes a thread; Vector starts threads of its own.</source>
@@ -3347,7 +3347,7 @@
     </message>
     <message>
         <source>Search threads, commands, nodes...</source>
-        <translation>Szukaj wątków, poleceń, węzłów...</translation>
+        <translation>Szukać wątków, poleceń, węzłów...</translation>
     </message>
     <message>
         <source>Threads</source>
@@ -3379,7 +3379,7 @@
     </message>
     <message>
         <source>Filter threads</source>
-        <translation>Filtruj wątki</translation>
+        <translation>Filtrować wątki</translation>
     </message>
     <message>
         <source>Active</source>
@@ -3399,7 +3399,7 @@
     </message>
     <message>
         <source>Start a thread</source>
-        <translation>Rozpocznij wątek</translation>
+        <translation>Rozpocząć wątek</translation>
     </message>
     <message>
         <source>Choose what it may touch (nodes, subtrees, classes, languages), then say what to do. Bulk work starts with a plan.</source>
@@ -3415,11 +3415,11 @@
     </message>
     <message>
         <source>Pin</source>
-        <translation>Przypnij</translation>
+        <translation>Przypiąć</translation>
     </message>
     <message>
         <source>Settle</source>
-        <translation>Zamknij</translation>
+        <translation>Zamknąć</translation>
     </message>
     <message>
         <source>Archive</source>
@@ -3447,7 +3447,7 @@
     </message>
     <message>
         <source>Write</source>
-        <translation>Pisz</translation>
+        <translation>Pisać</translation>
     </message>
     <message>
         <source>Model</source>
@@ -3471,7 +3471,7 @@
     </message>
     <message>
         <source>Show older</source>
-        <translation>Pokaż starsze</translation>
+        <translation>Pokazać starsze</translation>
     </message>
     <message>
         <source>Conversation</source>
@@ -3495,11 +3495,11 @@
     </message>
     <message>
         <source>Stop</source>
-        <translation>Zatrzymaj</translation>
+        <translation>Zatrzymać</translation>
     </message>
     <message>
         <source>Run</source>
-        <translation>Uruchom</translation>
+        <translation>Uruchomić</translation>
     </message>
     <message>
         <source>Changes</source>
@@ -3519,7 +3519,7 @@
     </message>
     <message>
         <source>Add a node</source>
-        <translation>Dodaj węzeł</translation>
+        <translation>Dodać węzeł</translation>
     </message>
     <message>
         <source>Name or node id</source>
@@ -3539,15 +3539,15 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Anuluj</translation>
+        <translation>Anulować</translation>
     </message>
     <message>
         <source>Save scope</source>
-        <translation>Zapisz zakres</translation>
+        <translation>Zapisać zakres</translation>
     </message>
     <message>
         <source>Undo</source>
-        <translation>Cofnij</translation>
+        <translation>Cofnąć</translation>
     </message>
     <message>
         <source>Pinned.</source>
@@ -3583,11 +3583,11 @@
     </message>
     <message>
         <source>Remove %name</source>
-        <translation>Usuń %name</translation>
+        <translation>Usunąć %name</translation>
     </message>
     <message>
         <source>Include everything below</source>
-        <translation>Uwzględnij wszystko poniżej</translation>
+        <translation>Uwzględnić wszystko poniżej</translation>
     </message>
     <message>
         <source>Your role does not allow this kind of scope.</source>
@@ -3659,7 +3659,7 @@
     </message>
     <message>
         <source>Remove from the queue</source>
-        <translation>Usuń z kolejki</translation>
+        <translation>Usunąć z kolejki</translation>
     </message>
     <message>
         <source>Sending the next queued message...</source>
@@ -3695,7 +3695,7 @@
     </message>
     <message>
         <source>Continue</source>
-        <translation>Kontynuuj</translation>
+        <translation>Kontynuować</translation>
     </message>
     <message>
         <source>Something went wrong:</source>
@@ -3723,15 +3723,15 @@
     </message>
     <message>
         <source>Edit</source>
-        <translation>Edytuj</translation>
+        <translation>Edytować</translation>
     </message>
     <message>
         <source>View version</source>
-        <translation>Wyświetl wersję</translation>
+        <translation>Wyświetlić wersję</translation>
     </message>
     <message>
         <source>Open the Intelligence tab</source>
-        <translation>Otwórz kartę Intelligence</translation>
+        <translation>Otworzyć kartę Intelligence</translation>
     </message>
     <message>
         <source>Draft</source>
@@ -3979,7 +3979,7 @@
     </message>
     <message>
         <source>Check translations</source>
-        <translation>Sprawdź tłumaczenia</translation>
+        <translation>Sprawdzić tłumaczenia</translation>
     </message>
     <message>
         <source>Small changes of the source are queued as translation patches at once; full translations and larger or more expensive changes wait for your approval. Results are drafts of the translation; nothing is published.</source>
@@ -4043,15 +4043,15 @@
     </message>
     <message>
         <source>Approve</source>
-        <translation>Zatwierdź</translation>
+        <translation>Zatwierdzić</translation>
     </message>
     <message>
         <source>Translate in full</source>
-        <translation>Przetłumacz w całości</translation>
+        <translation>Przetłumaczyć w całości</translation>
     </message>
     <message>
         <source>Skip</source>
-        <translation>Pomiń</translation>
+        <translation>Pominąć</translation>
     </message>
     <message>
         <source>Mark the %language translation as up to date without changing it?</source>
@@ -4063,11 +4063,11 @@
     </message>
     <message>
         <source>View draft</source>
-        <translation>Wyświetl wersję roboczą</translation>
+        <translation>Wyświetlić wersję roboczą</translation>
     </message>
     <message>
         <source>Open the job</source>
-        <translation>Otwórz zadanie</translation>
+        <translation>Otworzyć zadanie</translation>
     </message>
     <message>
         <source>Checking...</source>
@@ -4100,7 +4100,7 @@
     <name>extension/expai/fieldaction</name>
     <message>
         <source>Write alt text</source>
-        <translation>Napisz tekst alternatywny</translation>
+        <translation>Napisać tekst alternatywny</translation>
     </message>
 </context>
 <context>
@@ -4175,7 +4175,7 @@
     </message>
     <message>
         <source>Show</source>
-        <translation>Pokaż</translation>
+        <translation>Pokazać</translation>
     </message>
     <message>
         <source>Images without alt text under %name (the node included): %count in %checked objects looked at.</source>
@@ -4203,7 +4203,7 @@
     </message>
     <message>
         <source>Choose all</source>
-        <translation>Wybierz wszystkie</translation>
+        <translation>Wybrać wszystkie</translation>
     </message>
     <message>
         <source>Content</source>
@@ -4227,7 +4227,7 @@
     </message>
     <message>
         <source>Edit</source>
-        <translation>Edytuj</translation>
+        <translation>Edytować</translation>
     </message>
     <message>
         <source>Budget of this job group (optional, %currency)</source>
@@ -4235,7 +4235,7 @@
     </message>
     <message>
         <source>Queue suggestions as drafts</source>
-        <translation>Dodaj propozycje do kolejki jako wersje robocze</translation>
+        <translation>Dodać propozycje do kolejki jako wersje robocze</translation>
     </message>
     <message>
         <source>Each chosen image gets a job: a vision model writes the alt text into a new draft of the object (never published). Review the drafts and publish them as usual. At most %max per click; jobs are held when the site budget%cap or the group budget is reached.</source>
@@ -4259,7 +4259,7 @@
     </message>
     <message>
         <source>Watch the jobs</source>
-        <translation>Obserwuj zadania</translation>
+        <translation>Obserwować zadania</translation>
     </message>
 </context>
 <context>
@@ -4335,11 +4335,11 @@
     <name>extension/expai/preset</name>
     <message>
         <source>Suggest title</source>
-        <translation>Zaproponuj tytuł</translation>
+        <translation>Zaproponować tytuł</translation>
     </message>
     <message>
         <source>Write summary</source>
-        <translation>Napisz podsumowanie</translation>
+        <translation>Napisać podsumowanie</translation>
     </message>
     <message>
         <source>Meta description</source>
@@ -4351,23 +4351,23 @@
     </message>
     <message>
         <source>Shorten</source>
-        <translation>Skróć</translation>
+        <translation>Skrócić</translation>
     </message>
     <message>
         <source>Expand</source>
-        <translation>Rozwiń</translation>
+        <translation>Rozwinąć</translation>
     </message>
     <message>
         <source>Clarify</source>
-        <translation>Doprecyzuj</translation>
+        <translation>Doprecyzować</translation>
     </message>
     <message>
         <source>Fix grammar</source>
-        <translation>Popraw gramatykę</translation>
+        <translation>Poprawić gramatykę</translation>
     </message>
     <message>
         <source>Simplify for new readers</source>
-        <translation>Uprość dla nowych czytelników</translation>
+        <translation>Uprościć dla nowych czytelników</translation>
     </message>
     <message>
         <source>More formal</source>
@@ -4423,11 +4423,11 @@
     </message>
     <message>
         <source>Improve</source>
-        <translation>Ulepsz</translation>
+        <translation>Ulepszyć</translation>
     </message>
     <message>
         <source>Improve this field</source>
-        <translation>Ulepsz to pole</translation>
+        <translation>Ulepszyć to pole</translation>
     </message>
     <message>
         <source>%action: %field</source>
@@ -4435,7 +4435,7 @@
     </message>
     <message>
         <source>Improve: %field</source>
-        <translation>Ulepsz: %field</translation>
+        <translation>Ulepszyć: %field</translation>
     </message>
     <message>
         <source>The field is empty: there is nothing to improve.</source>
@@ -4490,7 +4490,7 @@
     </message>
     <message>
         <source>Print or save as PDF</source>
-        <translation>Drukuj lub zapisz jako PDF</translation>
+        <translation>Drukować lub zapisać jako PDF</translation>
     </message>
     <message>
         <source>Master switch and surfaces</source>
@@ -4965,15 +4965,15 @@
     <name>extension/expai/keyboard</name>
     <message>
         <source>Accept the whole field</source>
-        <translation>Zaakceptuj całe pole</translation>
+        <translation>Zaakceptować całe pole</translation>
     </message>
     <message>
         <source>Reject the whole field</source>
-        <translation>Odrzuć całe pole</translation>
+        <translation>Odrzucić całe pole</translation>
     </message>
     <message>
         <source>Edit the proposed text</source>
-        <translation>Edytuj proponowany tekst</translation>
+        <translation>Edytować proponowany tekst</translation>
     </message>
 </context>
 <context>
@@ -5019,27 +5019,27 @@
     </message>
     <message>
         <source>Accept</source>
-        <translation>Zaakceptuj</translation>
+        <translation>Zaakceptować</translation>
     </message>
     <message>
         <source>Reject</source>
-        <translation>Odrzuć</translation>
+        <translation>Odrzucić</translation>
     </message>
     <message>
         <source>Undecide</source>
-        <translation>Cofnij decyzję</translation>
+        <translation>Cofnąć decyzję</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>Zapisz</translation>
+        <translation>Zapisać</translation>
     </message>
     <message>
         <source>Accept field</source>
-        <translation>Zaakceptuj pole</translation>
+        <translation>Zaakceptować pole</translation>
     </message>
     <message>
         <source>Reject field</source>
-        <translation>Odrzuć pole</translation>
+        <translation>Odrzucić pole</translation>
     </message>
     <message>
         <source>edited by you</source>
@@ -5083,15 +5083,15 @@
     </message>
     <message>
         <source>Keep current</source>
-        <translation>Zachowaj bieżące</translation>
+        <translation>Zachować bieżące</translation>
     </message>
     <message>
         <source>Compare with the current version</source>
-        <translation>Porównaj z bieżącą wersją</translation>
+        <translation>Porównać z bieżącą wersją</translation>
     </message>
     <message>
         <source>Ask the AI to rebase</source>
-        <translation>Poproś AI o ponowne uzgodnienie</translation>
+        <translation>Poprosić AI o ponowne uzgodnienie</translation>
     </message>
     <message>
         <source>Vector stages the changes again against the current version...</source>
@@ -5147,15 +5147,15 @@
     </message>
     <message>
         <source>Create</source>
-        <translation>Utwórz</translation>
+        <translation>Utworzyć</translation>
     </message>
     <message>
         <source>Update</source>
-        <translation>Zaktualizuj</translation>
+        <translation>Zaktualizować</translation>
     </message>
     <message>
         <source>Translate</source>
-        <translation>Przetłumacz</translation>
+        <translation>Przetłumaczyć</translation>
     </message>
     <message>
         <source>Action</source>
@@ -5259,11 +5259,11 @@
     </message>
     <message>
         <source>Accept all</source>
-        <translation>Zaakceptuj wszystkie</translation>
+        <translation>Zaakceptować wszystkie</translation>
     </message>
     <message>
         <source>Reject all</source>
-        <translation>Odrzuć wszystkie</translation>
+        <translation>Odrzucić wszystkie</translation>
     </message>
     <message>
         <source>No staged changes. With staged review, what Vector proposes appears here to accept or reject, field by field.</source>
@@ -5271,7 +5271,7 @@
     </message>
     <message>
         <source>Write accepted changes to drafts</source>
-        <translation>Zapisz zaakceptowane zmiany do wersji roboczych</translation>
+        <translation>Zapisać zaakceptowane zmiany do wersji roboczych</translation>
     </message>
     <message>
         <source>Drafts are never published: you publish or send them for approval.</source>
@@ -5279,11 +5279,11 @@
     </message>
     <message>
         <source>Approve and run</source>
-        <translation>Zatwierdź i uruchom</translation>
+        <translation>Zatwierdzić i uruchomić</translation>
     </message>
     <message>
         <source>Ask for changes</source>
-        <translation>Poproś o zmiany</translation>
+        <translation>Poprosić o zmiany</translation>
     </message>
     <message>
         <source>Approved items run one after the other; every change is staged for your review in the Changes tab, new objects too.</source>
@@ -5449,7 +5449,7 @@
     </message>
     <message>
         <source>Load model</source>
-        <translation>Załaduj model</translation>
+        <translation>Załadować model</translation>
     </message>
     <message>
         <source>Loads the model into memory, so the next request does not wait for it</source>
@@ -5624,7 +5624,7 @@
     <name>extension/expai/keyboard</name>
     <message>
         <source>Steer the running turn with a note</source>
-        <translation>Pokieruj trwającą turą za pomocą notatki</translation>
+        <translation>Pokierować trwającą turą za pomocą notatki</translation>
     </message>
 </context>
 <context>
@@ -5643,7 +5643,7 @@
     </message>
     <message>
         <source>Steer</source>
-        <translation>Pokieruj</translation>
+        <translation>Pokierować</translation>
     </message>
     <message>
         <source>Restore to this checkpoint?</source>
@@ -5655,7 +5655,7 @@
     </message>
     <message>
         <source>Restore</source>
-        <translation>Przywróć</translation>
+        <translation>Przywrócić</translation>
     </message>
     <message>
         <source>Plan approved: %count item(s), up to %parallel side by side. Their changes appear in the Changes tab.</source>
@@ -5727,7 +5727,7 @@
     </message>
     <message>
         <source>Restore to "%label"</source>
-        <translation>Przywróć do "%label"</translation>
+        <translation>Przywrócić do "%label"</translation>
     </message>
     <message>
         <source>turn %n</source>
@@ -5819,7 +5819,7 @@
     </message>
     <message>
         <source>Switch to %model</source>
-        <translation>Przełącz na %model</translation>
+        <translation>Przełączyć na %model</translation>
     </message>
     <message>
         <source>The turn goes on with %model.</source>
@@ -5835,7 +5835,7 @@
     </message>
     <message>
         <source>Watch this run</source>
-        <translation>Śledź to wykonanie</translation>
+        <translation>Śledzić to wykonanie</translation>
     </message>
     <message>
         <source>Requests in the log</source>
@@ -5847,7 +5847,7 @@
     </message>
     <message>
         <source>Open in Vector</source>
-        <translation>Otwórz w Vectorze</translation>
+        <translation>Otworzyć w Vectorze</translation>
     </message>
     <message>
         <source>Request</source>
@@ -6090,11 +6090,11 @@
     </message>
     <message>
         <source>Revert</source>
-        <translation>Przywróć</translation>
+        <translation>Przywrócić</translation>
     </message>
     <message>
         <source>Revert field</source>
-        <translation>Przywróć pole</translation>
+        <translation>Przywrócić pole</translation>
     </message>
     <message>
         <source>This part cannot be taken back alone; revert the whole field.</source>
@@ -6118,15 +6118,15 @@
     </message>
     <message>
         <source>Close</source>
-        <translation>Zamknij</translation>
+        <translation>Zamknąć</translation>
     </message>
     <message>
         <source>Edit draft</source>
-        <translation>Edytuj wersję roboczą</translation>
+        <translation>Edytować wersję roboczą</translation>
     </message>
     <message>
         <source>View version</source>
-        <translation>Wyświetl wersję</translation>
+        <translation>Wyświetlić wersję</translation>
     </message>
     <message>
         <source>j / k: next / previous part · x: revert the part · Shift+X: revert the field · Esc: close</source>
@@ -6220,7 +6220,7 @@
     </message>
     <message>
         <source>Export the AI events</source>
-        <translation>Eksportuj zdarzenia AI</translation>
+        <translation>Wyeksportować zdarzenia AI</translation>
     </message>
     <message>
         <source>Failed requests</source>
