@@ -6769,4 +6769,114 @@
         <translation>Din il-parti tneħħi %items mit-test, għalhekk ma tistax tiġi aċċettata. Irrifjutaha, jew itlob proposta ġdida li żżommhom.</translation>
     </message>
 </context>
+<!-- expai translation services: begin -->
+<context>
+    <name>extension/expai/translation</name>
+    <message>
+        <source>No translation service</source>
+        <translation>L-ebda servizz tat-traduzzjoni</translation>
+    </message>
+    <message>
+        <source>Blocked by the data policy</source>
+        <translation>Imblukkat mill-politika tad-dejta</translation>
+    </message>
+    <message>
+        <source>Translated by %provider</source>
+        <translation>Tradott minn %provider</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>No translation service is installed for %source → %target.</source>
+        <translation>L-ebda servizz tat-traduzzjoni mhu installat għal %source → %target.</translation>
+    </message>
+    <message>
+        <source>The data policy keeps this content away from every translation service for %source → %target.</source>
+        <translation>Il-politika tad-dejta żżomm dan il-kontenut &apos;il bogħod minn kull servizz tat-traduzzjoni għal %source → %target.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not configured.</source>
+        <translation>Is-servizz tat-traduzzjoni %service mhuwiex ikkonfigurat.</translation>
+    </message>
+    <message>
+        <source>The translation service %service does not translate %source into %target.</source>
+        <translation>Is-servizz tat-traduzzjoni %service ma jittraduċix minn %source għal %target.</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the key.</source>
+        <translation>Is-servizz tat-traduzzjoni %service irrifjuta ċ-ċavetta.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is busy. Please try again later.</source>
+        <translation>Is-servizz tat-traduzzjoni %service huwa okkupat. Erġa&apos; pprova aktar tard, jekk jogħġbok.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not available (HTTP %status).</source>
+        <translation>Is-servizz tat-traduzzjoni %service mhuwiex disponibbli (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the request (HTTP %status).</source>
+        <translation>Is-servizz tat-traduzzjoni %service irrifjuta t-talba (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The quota of the translation service %service is used up.</source>
+        <translation>Il-kwota tas-servizz tat-traduzzjoni %service intużat kollha.</translation>
+    </message>
+    <message>
+        <source>The translation service %service could not be reached.</source>
+        <translation>Is-servizz tat-traduzzjoni %service ma setax jintlaħaq.</translation>
+    </message>
+    <message>
+        <source>The answer of the translation service %service could not be read.</source>
+        <translation>It-tweġiba tas-servizz tat-traduzzjoni %service ma setgħetx tinqara.</translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to translate.</source>
+        <translation>Il-qasam huwa vojt: m&apos;hemm xejn x&apos;tittraduċi.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/summary</name>
+    <message>
+        <source>Translation services</source>
+        <translation>Servizzi tat-traduzzjoni</translation>
+    </message>
+    <message>
+        <source>Default service: %default; when the chosen service cannot translate a pair: %fallback.</source>
+        <translation>Servizz predefinit: %default; meta s-servizz magħżul ma jistax jittraduċi par ta&apos; lingwi: %fallback.</translation>
+    </message>
+    <message>
+        <source>Rule</source>
+        <translation>Regola</translation>
+    </message>
+    <message>
+        <source>Service</source>
+        <translation>Servizz</translation>
+    </message>
+    <message>
+        <source>machine translation</source>
+        <translation>traduzzjoni awtomatika</translation>
+    </message>
+    <message>
+        <source>model</source>
+        <translation>mudell</translation>
+    </message>
+    <message>
+        <source>Only the text of the blocks to translate goes to a machine translation service (with SendContext also the blocks next to them), never other fields or the name of the object.</source>
+        <translation>Lejn servizz tat-traduzzjoni awtomatika jmur biss it-test tal-blokki li għandhom jiġu tradotti (b&apos;SendContext anki l-blokki ta&apos; ħdejhom), qatt oqsma oħra jew l-isem tal-oġġett.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/rad</name>
+    <message>
+        <source>AI translation services</source>
+        <translation>Servizzi tat-traduzzjoni bl-AI</translation>
+    </message>
+    <message>
+        <source>The translation services of the translation sync and the field action Translate (expai.ini [TranslationProvider_&lt;name&gt;] Class=, implementing expAiTranslationProvider; chosen by [TranslationSettings]).</source>
+        <translation>Is-servizzi tat-traduzzjoni tas-sinkronizzazzjoni tat-traduzzjonijiet u tal-azzjoni tal-qasam Ittraduċi (expai.ini [TranslationProvider_&lt;name&gt;] Class=, li jimplimentaw expAiTranslationProvider; magħżula permezz ta&apos; [TranslationSettings]).</translation>
+    </message>
+</context>
+<!-- expai translation services: end -->
 </TS>

@@ -6769,4 +6769,114 @@
         <translation>Tämä osa poistaisi tekstistä seuraavat: %items, joten sitä ei voi hyväksyä. Hylkää se tai pyydä uutta ehdotusta, joka säilyttää ne.</translation>
     </message>
 </context>
+<!-- expai translation services: begin -->
+<context>
+    <name>extension/expai/translation</name>
+    <message>
+        <source>No translation service</source>
+        <translation>Ei käännöspalvelua</translation>
+    </message>
+    <message>
+        <source>Blocked by the data policy</source>
+        <translation>Tietokäytännön estämä</translation>
+    </message>
+    <message>
+        <source>Translated by %provider</source>
+        <translation>Kääntänyt: %provider</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>No translation service is installed for %source → %target.</source>
+        <translation>Kieliparille %source → %target ei ole asennettu käännöspalvelua.</translation>
+    </message>
+    <message>
+        <source>The data policy keeps this content away from every translation service for %source → %target.</source>
+        <translation>Tietokäytäntö estää tämän sisällön välittämisen millekään kieliparin %source → %target käännöspalvelulle.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not configured.</source>
+        <translation>Käännöspalvelua %service ei ole määritetty.</translation>
+    </message>
+    <message>
+        <source>The translation service %service does not translate %source into %target.</source>
+        <translation>Käännöspalvelu %service ei käännä kielestä %source kieleen %target.</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the key.</source>
+        <translation>Käännöspalvelu %service hylkäsi avaimen.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is busy. Please try again later.</source>
+        <translation>Käännöspalvelu %service on ruuhkautunut. Yritä myöhemmin uudelleen.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not available (HTTP %status).</source>
+        <translation>Käännöspalvelu %service ei ole käytettävissä (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the request (HTTP %status).</source>
+        <translation>Käännöspalvelu %service hylkäsi pyynnön (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The quota of the translation service %service is used up.</source>
+        <translation>Käännöspalvelun %service kiintiö on käytetty loppuun.</translation>
+    </message>
+    <message>
+        <source>The translation service %service could not be reached.</source>
+        <translation>Käännöspalveluun %service ei saatu yhteyttä.</translation>
+    </message>
+    <message>
+        <source>The answer of the translation service %service could not be read.</source>
+        <translation>Käännöspalvelun %service vastausta ei voitu lukea.</translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to translate.</source>
+        <translation>Kenttä on tyhjä: käännettävää ei ole.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/summary</name>
+    <message>
+        <source>Translation services</source>
+        <translation>Käännöspalvelut</translation>
+    </message>
+    <message>
+        <source>Default service: %default; when the chosen service cannot translate a pair: %fallback.</source>
+        <translation>Oletuspalvelu: %default; kun valittu palvelu ei pysty kääntämään kieliparia: %fallback.</translation>
+    </message>
+    <message>
+        <source>Rule</source>
+        <translation>Sääntö</translation>
+    </message>
+    <message>
+        <source>Service</source>
+        <translation>Palvelu</translation>
+    </message>
+    <message>
+        <source>machine translation</source>
+        <translation>konekäännös</translation>
+    </message>
+    <message>
+        <source>model</source>
+        <translation>malli</translation>
+    </message>
+    <message>
+        <source>Only the text of the blocks to translate goes to a machine translation service (with SendContext also the blocks next to them), never other fields or the name of the object.</source>
+        <translation>Konekäännöspalveluun lähetetään vain käännettävien lohkojen teksti (SendContext-asetuksella myös niiden viereiset lohkot), ei koskaan muita kenttiä eikä objektin nimeä.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/rad</name>
+    <message>
+        <source>AI translation services</source>
+        <translation>Tekoälypohjaiset käännöspalvelut</translation>
+    </message>
+    <message>
+        <source>The translation services of the translation sync and the field action Translate (expai.ini [TranslationProvider_&lt;name&gt;] Class=, implementing expAiTranslationProvider; chosen by [TranslationSettings]).</source>
+        <translation>Käännösten synkronoinnin ja kenttätoiminnon ”Käännä” käännöspalvelut (expai.ini [TranslationProvider_&lt;name&gt;] Class=, toteuttavat rajapinnan expAiTranslationProvider; valitaan osiossa [TranslationSettings]).</translation>
+    </message>
+</context>
+<!-- expai translation services: end -->
 </TS>

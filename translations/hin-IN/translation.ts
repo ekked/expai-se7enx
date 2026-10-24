@@ -6769,4 +6769,114 @@
         <translation>यह भाग पाठ से %items हटा देगा, इसलिए इसे स्वीकार नहीं किया जा सकता। इसे अस्वीकार करें, या ऐसे नए प्रस्ताव के लिए कहें जो उन्हें बनाए रखे।</translation>
     </message>
 </context>
+<!-- expai translation services: begin -->
+<context>
+    <name>extension/expai/translation</name>
+    <message>
+        <source>No translation service</source>
+        <translation>कोई अनुवाद सेवा नहीं</translation>
+    </message>
+    <message>
+        <source>Blocked by the data policy</source>
+        <translation>डेटा नीति द्वारा अवरुद्ध</translation>
+    </message>
+    <message>
+        <source>Translated by %provider</source>
+        <translation>%provider द्वारा अनूदित</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>No translation service is installed for %source → %target.</source>
+        <translation>%source → %target के लिए कोई अनुवाद सेवा स्थापित नहीं है।</translation>
+    </message>
+    <message>
+        <source>The data policy keeps this content away from every translation service for %source → %target.</source>
+        <translation>डेटा नीति इस सामग्री को %source → %target के लिए हर अनुवाद सेवा से दूर रखती है।</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not configured.</source>
+        <translation>अनुवाद सेवा %service कॉन्फ़िगर नहीं की गई है।</translation>
+    </message>
+    <message>
+        <source>The translation service %service does not translate %source into %target.</source>
+        <translation>अनुवाद सेवा %service, %source से %target में अनुवाद नहीं करती।</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the key.</source>
+        <translation>अनुवाद सेवा %service ने कुंजी अस्वीकार कर दी।</translation>
+    </message>
+    <message>
+        <source>The translation service %service is busy. Please try again later.</source>
+        <translation>अनुवाद सेवा %service व्यस्त है। कृपया बाद में फिर से प्रयास करें।</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not available (HTTP %status).</source>
+        <translation>अनुवाद सेवा %service उपलब्ध नहीं है (HTTP %status)।</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the request (HTTP %status).</source>
+        <translation>अनुवाद सेवा %service ने अनुरोध अस्वीकार कर दिया (HTTP %status)।</translation>
+    </message>
+    <message>
+        <source>The quota of the translation service %service is used up.</source>
+        <translation>अनुवाद सेवा %service का कोटा समाप्त हो गया है।</translation>
+    </message>
+    <message>
+        <source>The translation service %service could not be reached.</source>
+        <translation>अनुवाद सेवा %service तक नहीं पहुँचा जा सका।</translation>
+    </message>
+    <message>
+        <source>The answer of the translation service %service could not be read.</source>
+        <translation>अनुवाद सेवा %service का उत्तर पढ़ा नहीं जा सका।</translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to translate.</source>
+        <translation>फ़ील्ड खाली है: अनुवाद करने के लिए कुछ नहीं है।</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/summary</name>
+    <message>
+        <source>Translation services</source>
+        <translation>अनुवाद सेवाएँ</translation>
+    </message>
+    <message>
+        <source>Default service: %default; when the chosen service cannot translate a pair: %fallback.</source>
+        <translation>डिफ़ॉल्ट सेवा: %default; जब चुनी गई सेवा किसी भाषा युग्म का अनुवाद नहीं कर सकती: %fallback।</translation>
+    </message>
+    <message>
+        <source>Rule</source>
+        <translation>नियम</translation>
+    </message>
+    <message>
+        <source>Service</source>
+        <translation>सेवा</translation>
+    </message>
+    <message>
+        <source>machine translation</source>
+        <translation>मशीनी अनुवाद</translation>
+    </message>
+    <message>
+        <source>model</source>
+        <translation>मॉडल</translation>
+    </message>
+    <message>
+        <source>Only the text of the blocks to translate goes to a machine translation service (with SendContext also the blocks next to them), never other fields or the name of the object.</source>
+        <translation>मशीनी अनुवाद सेवा को केवल अनुवाद किए जाने वाले ब्लॉकों का टेक्स्ट भेजा जाता है (SendContext के साथ उनके आस-पास के ब्लॉक भी), कभी भी अन्य फ़ील्ड या ऑब्जेक्ट का नाम नहीं।</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/rad</name>
+    <message>
+        <source>AI translation services</source>
+        <translation>AI अनुवाद सेवाएँ</translation>
+    </message>
+    <message>
+        <source>The translation services of the translation sync and the field action Translate (expai.ini [TranslationProvider_&lt;name&gt;] Class=, implementing expAiTranslationProvider; chosen by [TranslationSettings]).</source>
+        <translation>अनुवाद सिंक और फ़ील्ड क्रिया “अनुवाद करें” की अनुवाद सेवाएँ (expai.ini [TranslationProvider_&lt;name&gt;] Class=, expAiTranslationProvider को लागू करती हैं; [TranslationSettings] द्वारा चुनी जाती हैं)।</translation>
+    </message>
+</context>
+<!-- expai translation services: end -->
 </TS>

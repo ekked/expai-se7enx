@@ -6769,4 +6769,114 @@
         <translation>Αυτό το τμήμα θα αφαιρούσε από το κείμενο τα εξής: %items, οπότε δεν μπορεί να γίνει αποδεκτό. Απορρίψτε το ή ζητήστε μια νέα πρόταση που τα διατηρεί.</translation>
     </message>
 </context>
+<!-- expai translation services: begin -->
+<context>
+    <name>extension/expai/translation</name>
+    <message>
+        <source>No translation service</source>
+        <translation>Καμία υπηρεσία μετάφρασης</translation>
+    </message>
+    <message>
+        <source>Blocked by the data policy</source>
+        <translation>Αποκλείστηκε από την πολιτική δεδομένων</translation>
+    </message>
+    <message>
+        <source>Translated by %provider</source>
+        <translation>Μετάφραση από %provider</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>No translation service is installed for %source → %target.</source>
+        <translation>Δεν έχει εγκατασταθεί υπηρεσία μετάφρασης για %source → %target.</translation>
+    </message>
+    <message>
+        <source>The data policy keeps this content away from every translation service for %source → %target.</source>
+        <translation>Η πολιτική δεδομένων κρατά αυτό το περιεχόμενο μακριά από κάθε υπηρεσία μετάφρασης για %source → %target.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not configured.</source>
+        <translation>Η υπηρεσία μετάφρασης %service δεν έχει ρυθμιστεί.</translation>
+    </message>
+    <message>
+        <source>The translation service %service does not translate %source into %target.</source>
+        <translation>Η υπηρεσία μετάφρασης %service δεν μεταφράζει από %source σε %target.</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the key.</source>
+        <translation>Η υπηρεσία μετάφρασης %service απέρριψε το κλειδί.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is busy. Please try again later.</source>
+        <translation>Η υπηρεσία μετάφρασης %service είναι απασχολημένη. Δοκιμάστε ξανά αργότερα.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not available (HTTP %status).</source>
+        <translation>Η υπηρεσία μετάφρασης %service δεν είναι διαθέσιμη (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the request (HTTP %status).</source>
+        <translation>Η υπηρεσία μετάφρασης %service απέρριψε το αίτημα (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The quota of the translation service %service is used up.</source>
+        <translation>Το όριο χρήσης της υπηρεσίας μετάφρασης %service έχει εξαντληθεί.</translation>
+    </message>
+    <message>
+        <source>The translation service %service could not be reached.</source>
+        <translation>Δεν ήταν δυνατή η πρόσβαση στην υπηρεσία μετάφρασης %service.</translation>
+    </message>
+    <message>
+        <source>The answer of the translation service %service could not be read.</source>
+        <translation>Δεν ήταν δυνατή η ανάγνωση της απάντησης της υπηρεσίας μετάφρασης %service.</translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to translate.</source>
+        <translation>Το πεδίο είναι κενό: δεν υπάρχει τίποτα για μετάφραση.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/summary</name>
+    <message>
+        <source>Translation services</source>
+        <translation>Υπηρεσίες μετάφρασης</translation>
+    </message>
+    <message>
+        <source>Default service: %default; when the chosen service cannot translate a pair: %fallback.</source>
+        <translation>Προεπιλεγμένη υπηρεσία: %default· όταν η επιλεγμένη υπηρεσία δεν μπορεί να μεταφράσει ένα ζεύγος γλωσσών: %fallback.</translation>
+    </message>
+    <message>
+        <source>Rule</source>
+        <translation>Κανόνας</translation>
+    </message>
+    <message>
+        <source>Service</source>
+        <translation>Υπηρεσία</translation>
+    </message>
+    <message>
+        <source>machine translation</source>
+        <translation>αυτόματη μετάφραση</translation>
+    </message>
+    <message>
+        <source>model</source>
+        <translation>μοντέλο</translation>
+    </message>
+    <message>
+        <source>Only the text of the blocks to translate goes to a machine translation service (with SendContext also the blocks next to them), never other fields or the name of the object.</source>
+        <translation>Σε μια υπηρεσία αυτόματης μετάφρασης αποστέλλεται μόνο το κείμενο των μπλοκ προς μετάφραση (με το SendContext και τα διπλανά τους μπλοκ), ποτέ άλλα πεδία ή το όνομα του αντικειμένου.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/rad</name>
+    <message>
+        <source>AI translation services</source>
+        <translation>Υπηρεσίες μετάφρασης ΤΝ</translation>
+    </message>
+    <message>
+        <source>The translation services of the translation sync and the field action Translate (expai.ini [TranslationProvider_&lt;name&gt;] Class=, implementing expAiTranslationProvider; chosen by [TranslationSettings]).</source>
+        <translation>Οι υπηρεσίες μετάφρασης του συγχρονισμού μεταφράσεων και της ενέργειας πεδίου «Μετάφραση» (expai.ini [TranslationProvider_&lt;name&gt;] Class=, υλοποιούν το expAiTranslationProvider· επιλέγονται μέσω του [TranslationSettings]).</translation>
+    </message>
+</context>
+<!-- expai translation services: end -->
 </TS>

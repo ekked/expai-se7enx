@@ -6769,4 +6769,114 @@
         <translation>Bhainfeadh an chuid seo %items den téacs, mar sin ní féidir glacadh léi. Diúltaigh di, nó iarr togra nua a choinníonn iad.</translation>
     </message>
 </context>
+<!-- expai translation services: begin -->
+<context>
+    <name>extension/expai/translation</name>
+    <message>
+        <source>No translation service</source>
+        <translation>Gan seirbhís aistriúcháin</translation>
+    </message>
+    <message>
+        <source>Blocked by the data policy</source>
+        <translation>Blocáilte ag an bpolasaí sonraí</translation>
+    </message>
+    <message>
+        <source>Translated by %provider</source>
+        <translation>Aistrithe ag %provider</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>No translation service is installed for %source → %target.</source>
+        <translation>Níl aon seirbhís aistriúcháin suiteáilte do %source → %target.</translation>
+    </message>
+    <message>
+        <source>The data policy keeps this content away from every translation service for %source → %target.</source>
+        <translation>Coinníonn an polasaí sonraí an t-ábhar seo ó gach seirbhís aistriúcháin do %source → %target.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not configured.</source>
+        <translation>Níl an tseirbhís aistriúcháin %service cumraithe.</translation>
+    </message>
+    <message>
+        <source>The translation service %service does not translate %source into %target.</source>
+        <translation>Ní aistríonn an tseirbhís aistriúcháin %service ó %source go %target.</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the key.</source>
+        <translation>Dhiúltaigh an tseirbhís aistriúcháin %service don eochair.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is busy. Please try again later.</source>
+        <translation>Tá an tseirbhís aistriúcháin %service gnóthach. Bain triail eile as ar ball.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not available (HTTP %status).</source>
+        <translation>Níl an tseirbhís aistriúcháin %service ar fáil (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the request (HTTP %status).</source>
+        <translation>Dhiúltaigh an tseirbhís aistriúcháin %service don iarratas (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The quota of the translation service %service is used up.</source>
+        <translation>Tá cuóta na seirbhíse aistriúcháin %service ídithe.</translation>
+    </message>
+    <message>
+        <source>The translation service %service could not be reached.</source>
+        <translation>Níorbh fhéidir an tseirbhís aistriúcháin %service a shroicheadh.</translation>
+    </message>
+    <message>
+        <source>The answer of the translation service %service could not be read.</source>
+        <translation>Níorbh fhéidir freagra na seirbhíse aistriúcháin %service a léamh.</translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to translate.</source>
+        <translation>Tá an réimse folamh: níl aon rud le haistriú.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/summary</name>
+    <message>
+        <source>Translation services</source>
+        <translation>Seirbhísí aistriúcháin</translation>
+    </message>
+    <message>
+        <source>Default service: %default; when the chosen service cannot translate a pair: %fallback.</source>
+        <translation>Seirbhís réamhshocraithe: %default; nuair nach féidir leis an tseirbhís roghnaithe péire teangacha a aistriú: %fallback.</translation>
+    </message>
+    <message>
+        <source>Rule</source>
+        <translation>Riail</translation>
+    </message>
+    <message>
+        <source>Service</source>
+        <translation>Seirbhís</translation>
+    </message>
+    <message>
+        <source>machine translation</source>
+        <translation>meaisínaistriúchán</translation>
+    </message>
+    <message>
+        <source>model</source>
+        <translation>samhail</translation>
+    </message>
+    <message>
+        <source>Only the text of the blocks to translate goes to a machine translation service (with SendContext also the blocks next to them), never other fields or the name of the object.</source>
+        <translation>Ní théann chuig seirbhís meaisínaistriúcháin ach téacs na mbloc atá le haistriú (le SendContext, na bloic in aice leo freisin), riamh réimsí eile ná ainm na hoibiachta.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/rad</name>
+    <message>
+        <source>AI translation services</source>
+        <translation>Seirbhísí aistriúcháin IS</translation>
+    </message>
+    <message>
+        <source>The translation services of the translation sync and the field action Translate (expai.ini [TranslationProvider_&lt;name&gt;] Class=, implementing expAiTranslationProvider; chosen by [TranslationSettings]).</source>
+        <translation>Seirbhísí aistriúcháin an tsioncronaithe aistriúchán agus an ghnímh réimse Aistrigh (expai.ini [TranslationProvider_&lt;name&gt;] Class=, a chuireann expAiTranslationProvider i bhfeidhm; roghnaithe trí [TranslationSettings]).</translation>
+    </message>
+</context>
+<!-- expai translation services: end -->
 </TS>

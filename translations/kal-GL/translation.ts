@@ -6769,4 +6769,114 @@
         <translation>Ilaa una allakkamit %items peersissagaluarpai, taamaammat akuerineqarsinnaanngilaq. Itigartiguk, imaluunniit siunnersuummik nutaamik taakkuninnga pigiinnaasumik qinnuteqarit.</translation>
     </message>
 </context>
+<!-- expai translation services: begin -->
+<context>
+    <name>extension/expai/translation</name>
+    <message>
+        <source>No translation service</source>
+        <translation>Nutserinermik kiffartuussisoqanngilaq</translation>
+    </message>
+    <message>
+        <source>Blocked by the data policy</source>
+        <translation>Paasissutissanut maleruagassanit unitsinneqarpoq</translation>
+    </message>
+    <message>
+        <source>Translated by %provider</source>
+        <translation>%provider-imit nutserneqarpoq</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>No translation service is installed for %source → %target.</source>
+        <translation>%source → %target pillugu nutserinermik kiffartuussineq ikkunneqarsimanngilaq.</translation>
+    </message>
+    <message>
+        <source>The data policy keeps this content away from every translation service for %source → %target.</source>
+        <translation>Paasissutissanut maleruagassat malillugit imarisaq manna %source → %target pillugu nutserinermik kiffartuussinermut sumulluunniit nassiunneqarneq ajorpoq.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not configured.</source>
+        <translation>Nutserinermik kiffartuussineq %service aaqqissuunneqarsimanngilaq.</translation>
+    </message>
+    <message>
+        <source>The translation service %service does not translate %source into %target.</source>
+        <translation>Nutserinermik kiffartuussineq %service %source-imit %target-imut nutserisinnaanngilaq.</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the key.</source>
+        <translation>Nutserinermik kiffartuussinerup %service kodi itigartippaa.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is busy. Please try again later.</source>
+        <translation>Nutserinermik kiffartuussineq %service maannakkut ulapputeqarpoq. Kingusinnerusukkut misileqqiguk.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not available (HTTP %status).</source>
+        <translation>Nutserinermik kiffartuussineq %service pissarsiarineqarsinnaanngilaq (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the request (HTTP %status).</source>
+        <translation>Nutserinermik kiffartuussinerup %service qinnut itigartippaa (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The quota of the translation service %service is used up.</source>
+        <translation>Nutserinermik kiffartuussinerup %service killiliussaa atorneqareerpoq.</translation>
+    </message>
+    <message>
+        <source>The translation service %service could not be reached.</source>
+        <translation>Nutserinermik kiffartuussineq %service attavigineqarsinnaanngilaq.</translation>
+    </message>
+    <message>
+        <source>The answer of the translation service %service could not be read.</source>
+        <translation>Nutserinermik kiffartuussinerup %service akissutaa atuarneqarsinnaanngilaq.</translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to translate.</source>
+        <translation>Immersugassaq imaqanngilaq: nutserneqartussaqanngilaq.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/summary</name>
+    <message>
+        <source>Translation services</source>
+        <translation>Nutserinermik kiffartuussinerit</translation>
+    </message>
+    <message>
+        <source>Default service: %default; when the chosen service cannot translate a pair: %fallback.</source>
+        <translation>Kiffartuussineq aallaavittut: %default; kiffartuussineq toqqagaq oqaatsinik marlunnik nutserisinnaanngippat: %fallback.</translation>
+    </message>
+    <message>
+        <source>Rule</source>
+        <translation>Malittarisassaq</translation>
+    </message>
+    <message>
+        <source>Service</source>
+        <translation>Kiffartuussineq</translation>
+    </message>
+    <message>
+        <source>machine translation</source>
+        <translation>maskiinamik nutserineq</translation>
+    </message>
+    <message>
+        <source>model</source>
+        <translation>modeli</translation>
+    </message>
+    <message>
+        <source>Only the text of the blocks to translate goes to a machine translation service (with SendContext also the blocks next to them), never other fields or the name of the object.</source>
+        <translation>Maskiinamik nutserinermik kiffartuussinermut blokkit nutserneqartussat allagaat kisiisa nassiunneqartarput (SendContext atorlugu aamma blokkit eqqaaniittut), immersugassat allat objektilluunniit aqqa nassiunneqarneq ajorput.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/rad</name>
+    <message>
+        <source>AI translation services</source>
+        <translation>AI atorlugu nutserinermik kiffartuussinerit</translation>
+    </message>
+    <message>
+        <source>The translation services of the translation sync and the field action Translate (expai.ini [TranslationProvider_&lt;name&gt;] Class=, implementing expAiTranslationProvider; chosen by [TranslationSettings]).</source>
+        <translation>Nutserinerit naapertuutsinneqarnerannut immersugassamilu iliuusissamut Nutseruk atorneqartut nutserinermik kiffartuussinerit (expai.ini [TranslationProvider_&lt;name&gt;] Class=, expAiTranslationProvider atulersillugu; [TranslationSettings] aqqutigalugu toqqarneqartartut).</translation>
+    </message>
+</context>
+<!-- expai translation services: end -->
 </TS>

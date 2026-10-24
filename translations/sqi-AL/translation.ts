@@ -6769,4 +6769,114 @@
         <translation>Kjo pjesë do të hiqte nga teksti: %items, prandaj nuk mund të pranohet. Refuzojeni ose kërkoni një propozim të ri që i ruan ato.</translation>
     </message>
 </context>
+<!-- expai translation services: begin -->
+<context>
+    <name>extension/expai/translation</name>
+    <message>
+        <source>No translation service</source>
+        <translation>Asnjë shërbim përkthimi</translation>
+    </message>
+    <message>
+        <source>Blocked by the data policy</source>
+        <translation>Bllokuar nga politika e të dhënave</translation>
+    </message>
+    <message>
+        <source>Translated by %provider</source>
+        <translation>Përkthyer nga %provider</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>No translation service is installed for %source → %target.</source>
+        <translation>Për %source → %target nuk është instaluar asnjë shërbim përkthimi.</translation>
+    </message>
+    <message>
+        <source>The data policy keeps this content away from every translation service for %source → %target.</source>
+        <translation>Politika e të dhënave e mban këtë përmbajtje larg nga çdo shërbim përkthimi për %source → %target.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not configured.</source>
+        <translation>Shërbimi i përkthimit %service nuk është konfiguruar.</translation>
+    </message>
+    <message>
+        <source>The translation service %service does not translate %source into %target.</source>
+        <translation>Shërbimi i përkthimit %service nuk përkthen nga %source në %target.</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the key.</source>
+        <translation>Shërbimi i përkthimit %service e refuzoi çelësin.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is busy. Please try again later.</source>
+        <translation>Shërbimi i përkthimit %service është i zënë. Provoni përsëri më vonë.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not available (HTTP %status).</source>
+        <translation>Shërbimi i përkthimit %service nuk është i disponueshëm (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the request (HTTP %status).</source>
+        <translation>Shërbimi i përkthimit %service e refuzoi kërkesën (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The quota of the translation service %service is used up.</source>
+        <translation>Kuota e shërbimit të përkthimit %service është shteruar.</translation>
+    </message>
+    <message>
+        <source>The translation service %service could not be reached.</source>
+        <translation>Shërbimi i përkthimit %service nuk mund të arrihej.</translation>
+    </message>
+    <message>
+        <source>The answer of the translation service %service could not be read.</source>
+        <translation>Përgjigjja e shërbimit të përkthimit %service nuk mund të lexohej.</translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to translate.</source>
+        <translation>Fusha është bosh: nuk ka asgjë për të përkthyer.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/summary</name>
+    <message>
+        <source>Translation services</source>
+        <translation>Shërbimet e përkthimit</translation>
+    </message>
+    <message>
+        <source>Default service: %default; when the chosen service cannot translate a pair: %fallback.</source>
+        <translation>Shërbimi i parazgjedhur: %default; kur shërbimi i zgjedhur nuk mund të përkthejë një çift gjuhësh: %fallback.</translation>
+    </message>
+    <message>
+        <source>Rule</source>
+        <translation>Rregulli</translation>
+    </message>
+    <message>
+        <source>Service</source>
+        <translation>Shërbimi</translation>
+    </message>
+    <message>
+        <source>machine translation</source>
+        <translation>përkthim automatik</translation>
+    </message>
+    <message>
+        <source>model</source>
+        <translation>model</translation>
+    </message>
+    <message>
+        <source>Only the text of the blocks to translate goes to a machine translation service (with SendContext also the blocks next to them), never other fields or the name of the object.</source>
+        <translation>Te një shërbim përkthimi automatik shkon vetëm teksti i blloqeve që duhen përkthyer (me SendContext edhe blloqet fqinje), asnjëherë fusha të tjera ose emri i objektit.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/rad</name>
+    <message>
+        <source>AI translation services</source>
+        <translation>Shërbimet e përkthimit me IA</translation>
+    </message>
+    <message>
+        <source>The translation services of the translation sync and the field action Translate (expai.ini [TranslationProvider_&lt;name&gt;] Class=, implementing expAiTranslationProvider; chosen by [TranslationSettings]).</source>
+        <translation>Shërbimet e përkthimit të sinkronizimit të përkthimeve dhe të veprimit në fushë Përkthe (expai.ini [TranslationProvider_&lt;name&gt;] Class=, që zbaton expAiTranslationProvider; zgjidhen përmes [TranslationSettings]).</translation>
+    </message>
+</context>
+<!-- expai translation services: end -->
 </TS>

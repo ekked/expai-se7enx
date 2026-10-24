@@ -6769,4 +6769,114 @@
         <translation>Toś ten źěl by z teksta wótpórał: %items, togodla njedajo se akceptěrowaś. Wótpokažćo jen abo pšosćo wó nowe naraźenje, kótarež je wobchowajo.</translation>
     </message>
 </context>
+<!-- expai translation services: begin -->
+<context>
+    <name>extension/expai/translation</name>
+    <message>
+        <source>No translation service</source>
+        <translation>Žedna słužba za pśełožowanje</translation>
+    </message>
+    <message>
+        <source>Blocked by the data policy</source>
+        <translation>Blokěrowane pśez směrnicu za daty</translation>
+    </message>
+    <message>
+        <source>Translated by %provider</source>
+        <translation>Pśełožone wót %provider</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>No translation service is installed for %source → %target.</source>
+        <translation>Za %source → %target njejo žedna słužba za pśełožowanje instalěrowana.</translation>
+    </message>
+    <message>
+        <source>The data policy keeps this content away from every translation service for %source → %target.</source>
+        <translation>Směrnica za daty źaržy toś to wopśimjeśe zdalone wót kuždeje słužby za pśełožowanje za %source → %target.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not configured.</source>
+        <translation>Słužba za pśełožowanje %service njejo konfigurěrowana.</translation>
+    </message>
+    <message>
+        <source>The translation service %service does not translate %source into %target.</source>
+        <translation>Słužba za pśełožowanje %service njepśełožujo z %source do %target.</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the key.</source>
+        <translation>Słužba za pśełožowanje %service jo kluc wótpokazała.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is busy. Please try again later.</source>
+        <translation>Słužba za pśełožowanje %service jo pśeśěžona. Pšosym wopytajśo pózdźej hyšći raz.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not available (HTTP %status).</source>
+        <translation>Słužba za pśełožowanje %service njejo k dispoziciji (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the request (HTTP %status).</source>
+        <translation>Słužba za pśełožowanje %service jo napšašowanje wótpokazała (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The quota of the translation service %service is used up.</source>
+        <translation>Kontingent słužby za pśełožowanje %service jo wótetrjebany.</translation>
+    </message>
+    <message>
+        <source>The translation service %service could not be reached.</source>
+        <translation>Słužba za pśełožowanje %service njejo była dojśpjobna.</translation>
+    </message>
+    <message>
+        <source>The answer of the translation service %service could not be read.</source>
+        <translation>Wótegrono słužby za pśełožowanje %service njejo se dało cytaś.</translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to translate.</source>
+        <translation>Pólo jo prozne: njejo nic k pśełožowanju.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/summary</name>
+    <message>
+        <source>Translation services</source>
+        <translation>Słužby za pśełožowanje</translation>
+    </message>
+    <message>
+        <source>Default service: %default; when the chosen service cannot translate a pair: %fallback.</source>
+        <translation>Standardna słužba: %default; gaž wubrana słužba njamóžo rěcny pór pśełožyś: %fallback.</translation>
+    </message>
+    <message>
+        <source>Rule</source>
+        <translation>Pšawidło</translation>
+    </message>
+    <message>
+        <source>Service</source>
+        <translation>Słužba</translation>
+    </message>
+    <message>
+        <source>machine translation</source>
+        <translation>mašinelne pśełožowanje</translation>
+    </message>
+    <message>
+        <source>model</source>
+        <translation>model</translation>
+    </message>
+    <message>
+        <source>Only the text of the blocks to translate goes to a machine translation service (with SendContext also the blocks next to them), never other fields or the name of the object.</source>
+        <translation>Na słužbu za mašinelne pśełožowanje źo jano tekst blokow, kótarež maju se pśełožyś (z SendContext teke bloki pódla nich), nigda druge póla abo mě objekta.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/rad</name>
+    <message>
+        <source>AI translation services</source>
+        <translation>Słužby za pśełožowanje z KI</translation>
+    </message>
+    <message>
+        <source>The translation services of the translation sync and the field action Translate (expai.ini [TranslationProvider_&lt;name&gt;] Class=, implementing expAiTranslationProvider; chosen by [TranslationSettings]).</source>
+        <translation>Słužby za pśełožowanje synchronizacije pśełožkow a pólneje akcije Pśełožyś (expai.ini [TranslationProvider_&lt;name&gt;] Class=, implementěruju expAiTranslationProvider; wubrane pśez [TranslationSettings]).</translation>
+    </message>
+</context>
+<!-- expai translation services: end -->
 </TS>

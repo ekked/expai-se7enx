@@ -6769,4 +6769,114 @@
         <translation>Această parte ar elimina din text următoarele: %items, așa că nu poate fi acceptată. Respingeți-o sau solicitați o propunere nouă care le păstrează.</translation>
     </message>
 </context>
+<!-- expai translation services: begin -->
+<context>
+    <name>extension/expai/translation</name>
+    <message>
+        <source>No translation service</source>
+        <translation>Niciun serviciu de traducere</translation>
+    </message>
+    <message>
+        <source>Blocked by the data policy</source>
+        <translation>Blocat de politica de date</translation>
+    </message>
+    <message>
+        <source>Translated by %provider</source>
+        <translation>Tradus de %provider</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>No translation service is installed for %source → %target.</source>
+        <translation>Nu este instalat niciun serviciu de traducere pentru %source → %target.</translation>
+    </message>
+    <message>
+        <source>The data policy keeps this content away from every translation service for %source → %target.</source>
+        <translation>Politica de date ține acest conținut departe de orice serviciu de traducere pentru %source → %target.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not configured.</source>
+        <translation>Serviciul de traducere %service nu este configurat.</translation>
+    </message>
+    <message>
+        <source>The translation service %service does not translate %source into %target.</source>
+        <translation>Serviciul de traducere %service nu traduce din %source în %target.</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the key.</source>
+        <translation>Serviciul de traducere %service a refuzat cheia.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is busy. Please try again later.</source>
+        <translation>Serviciul de traducere %service este ocupat. Încercați din nou mai târziu.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not available (HTTP %status).</source>
+        <translation>Serviciul de traducere %service nu este disponibil (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the request (HTTP %status).</source>
+        <translation>Serviciul de traducere %service a refuzat solicitarea (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The quota of the translation service %service is used up.</source>
+        <translation>Cota serviciului de traducere %service este epuizată.</translation>
+    </message>
+    <message>
+        <source>The translation service %service could not be reached.</source>
+        <translation>Serviciul de traducere %service nu a putut fi accesat.</translation>
+    </message>
+    <message>
+        <source>The answer of the translation service %service could not be read.</source>
+        <translation>Răspunsul serviciului de traducere %service nu a putut fi citit.</translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to translate.</source>
+        <translation>Câmpul este gol: nu există nimic de tradus.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/summary</name>
+    <message>
+        <source>Translation services</source>
+        <translation>Servicii de traducere</translation>
+    </message>
+    <message>
+        <source>Default service: %default; when the chosen service cannot translate a pair: %fallback.</source>
+        <translation>Serviciu implicit: %default; când serviciul ales nu poate traduce o pereche de limbi: %fallback.</translation>
+    </message>
+    <message>
+        <source>Rule</source>
+        <translation>Regulă</translation>
+    </message>
+    <message>
+        <source>Service</source>
+        <translation>Serviciu</translation>
+    </message>
+    <message>
+        <source>machine translation</source>
+        <translation>traducere automată</translation>
+    </message>
+    <message>
+        <source>model</source>
+        <translation>model</translation>
+    </message>
+    <message>
+        <source>Only the text of the blocks to translate goes to a machine translation service (with SendContext also the blocks next to them), never other fields or the name of the object.</source>
+        <translation>La un serviciu de traducere automată ajunge doar textul blocurilor de tradus (cu SendContext și blocurile vecine), niciodată alte câmpuri sau numele obiectului.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/rad</name>
+    <message>
+        <source>AI translation services</source>
+        <translation>Servicii de traducere IA</translation>
+    </message>
+    <message>
+        <source>The translation services of the translation sync and the field action Translate (expai.ini [TranslationProvider_&lt;name&gt;] Class=, implementing expAiTranslationProvider; chosen by [TranslationSettings]).</source>
+        <translation>Serviciile de traducere ale sincronizării traducerilor și ale acțiunii pe câmp Traducere (expai.ini [TranslationProvider_&lt;name&gt;] Class=, care implementează expAiTranslationProvider; alese prin [TranslationSettings]).</translation>
+    </message>
+</context>
+<!-- expai translation services: end -->
 </TS>

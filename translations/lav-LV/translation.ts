@@ -6769,4 +6769,114 @@
         <translation>Šī daļa noņemtu no teksta %items, tāpēc to nevar pieņemt. Noraidiet to vai lūdziet jaunu priekšlikumu, kas tos saglabā.</translation>
     </message>
 </context>
+<!-- expai translation services: begin -->
+<context>
+    <name>extension/expai/translation</name>
+    <message>
+        <source>No translation service</source>
+        <translation>Nav tulkošanas pakalpojuma</translation>
+    </message>
+    <message>
+        <source>Blocked by the data policy</source>
+        <translation>Bloķēts datu politikas dēļ</translation>
+    </message>
+    <message>
+        <source>Translated by %provider</source>
+        <translation>Tulkoja: %provider</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>No translation service is installed for %source → %target.</source>
+        <translation>Virzienam %source → %target nav iestatīts neviens tulkošanas pakalpojums.</translation>
+    </message>
+    <message>
+        <source>The data policy keeps this content away from every translation service for %source → %target.</source>
+        <translation>Datu politika neļauj nodot šo saturu nevienam tulkošanas pakalpojumam virzienam %source → %target.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not configured.</source>
+        <translation>Tulkošanas pakalpojums %service nav konfigurēts.</translation>
+    </message>
+    <message>
+        <source>The translation service %service does not translate %source into %target.</source>
+        <translation>Tulkošanas pakalpojums %service netulko no %source uz %target.</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the key.</source>
+        <translation>Tulkošanas pakalpojums %service noraidīja atslēgu.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is busy. Please try again later.</source>
+        <translation>Tulkošanas pakalpojums %service ir aizņemts. Lūdzu, mēģiniet vēlreiz vēlāk.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not available (HTTP %status).</source>
+        <translation>Tulkošanas pakalpojums %service nav pieejams (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the request (HTTP %status).</source>
+        <translation>Tulkošanas pakalpojums %service noraidīja pieprasījumu (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The quota of the translation service %service is used up.</source>
+        <translation>Tulkošanas pakalpojuma %service kvota ir izlietota.</translation>
+    </message>
+    <message>
+        <source>The translation service %service could not be reached.</source>
+        <translation>Ar tulkošanas pakalpojumu %service nevarēja sazināties.</translation>
+    </message>
+    <message>
+        <source>The answer of the translation service %service could not be read.</source>
+        <translation>Tulkošanas pakalpojuma %service atbildi nevarēja nolasīt.</translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to translate.</source>
+        <translation>Lauks ir tukšs: nav ko tulkot.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/summary</name>
+    <message>
+        <source>Translation services</source>
+        <translation>Tulkošanas pakalpojumi</translation>
+    </message>
+    <message>
+        <source>Default service: %default; when the chosen service cannot translate a pair: %fallback.</source>
+        <translation>Noklusējuma pakalpojums: %default; ja izvēlētais pakalpojums nevar tulkot valodu pāri: %fallback.</translation>
+    </message>
+    <message>
+        <source>Rule</source>
+        <translation>Kārtula</translation>
+    </message>
+    <message>
+        <source>Service</source>
+        <translation>Pakalpojums</translation>
+    </message>
+    <message>
+        <source>machine translation</source>
+        <translation>mašīntulkošana</translation>
+    </message>
+    <message>
+        <source>model</source>
+        <translation>modelis</translation>
+    </message>
+    <message>
+        <source>Only the text of the blocks to translate goes to a machine translation service (with SendContext also the blocks next to them), never other fields or the name of the object.</source>
+        <translation>Mašīntulkošanas pakalpojumam tiek nosūtīts tikai tulkojamo bloku teksts (ar SendContext arī blakus esošie bloki), nekad citi lauki vai objekta nosaukums.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/rad</name>
+    <message>
+        <source>AI translation services</source>
+        <translation>MI tulkošanas pakalpojumi</translation>
+    </message>
+    <message>
+        <source>The translation services of the translation sync and the field action Translate (expai.ini [TranslationProvider_&lt;name&gt;] Class=, implementing expAiTranslationProvider; chosen by [TranslationSettings]).</source>
+        <translation>Tulkojumu sinhronizācijas un lauka darbības „Tulkot“ tulkošanas pakalpojumi (expai.ini [TranslationProvider_&lt;name&gt;] Class=, realizē expAiTranslationProvider; izvēlas [TranslationSettings]).</translation>
+    </message>
+</context>
+<!-- expai translation services: end -->
 </TS>

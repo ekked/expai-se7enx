@@ -6769,4 +6769,114 @@
         <translation>Táto časť by z textu odstránila %items, preto ju nemožno prijať. Zamietnite ju alebo požiadajte o nový návrh, ktorý ich zachová.</translation>
     </message>
 </context>
+<!-- expai translation services: begin -->
+<context>
+    <name>extension/expai/translation</name>
+    <message>
+        <source>No translation service</source>
+        <translation>Žiadna prekladová služba</translation>
+    </message>
+    <message>
+        <source>Blocked by the data policy</source>
+        <translation>Zablokované politikou údajov</translation>
+    </message>
+    <message>
+        <source>Translated by %provider</source>
+        <translation>Preložené službou %provider</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>No translation service is installed for %source → %target.</source>
+        <translation>Pre %source → %target nie je nainštalovaná žiadna prekladová služba.</translation>
+    </message>
+    <message>
+        <source>The data policy keeps this content away from every translation service for %source → %target.</source>
+        <translation>Politika údajov neodovzdáva tento obsah žiadnej prekladovej službe pre %source → %target.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not configured.</source>
+        <translation>Prekladová služba %service nie je nakonfigurovaná.</translation>
+    </message>
+    <message>
+        <source>The translation service %service does not translate %source into %target.</source>
+        <translation>Prekladová služba %service neprekladá z jazyka %source do jazyka %target.</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the key.</source>
+        <translation>Prekladová služba %service odmietla kľúč.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is busy. Please try again later.</source>
+        <translation>Prekladová služba %service je zaneprázdnená. Skúste to znova neskôr.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not available (HTTP %status).</source>
+        <translation>Prekladová služba %service nie je dostupná (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the request (HTTP %status).</source>
+        <translation>Prekladová služba %service odmietla požiadavku (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The quota of the translation service %service is used up.</source>
+        <translation>Kvóta prekladovej služby %service je vyčerpaná.</translation>
+    </message>
+    <message>
+        <source>The translation service %service could not be reached.</source>
+        <translation>S prekladovou službou %service sa nepodarilo spojiť.</translation>
+    </message>
+    <message>
+        <source>The answer of the translation service %service could not be read.</source>
+        <translation>Odpoveď prekladovej služby %service sa nepodarilo prečítať.</translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to translate.</source>
+        <translation>Pole je prázdne: nie je čo prekladať.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/summary</name>
+    <message>
+        <source>Translation services</source>
+        <translation>Prekladové služby</translation>
+    </message>
+    <message>
+        <source>Default service: %default; when the chosen service cannot translate a pair: %fallback.</source>
+        <translation>Predvolená služba: %default; keď vybratá služba nedokáže preložiť jazykový pár: %fallback.</translation>
+    </message>
+    <message>
+        <source>Rule</source>
+        <translation>Pravidlo</translation>
+    </message>
+    <message>
+        <source>Service</source>
+        <translation>Služba</translation>
+    </message>
+    <message>
+        <source>machine translation</source>
+        <translation>strojový preklad</translation>
+    </message>
+    <message>
+        <source>model</source>
+        <translation>model</translation>
+    </message>
+    <message>
+        <source>Only the text of the blocks to translate goes to a machine translation service (with SendContext also the blocks next to them), never other fields or the name of the object.</source>
+        <translation>Službe strojového prekladu sa odosiela iba text blokov na preklad (so SendContext aj susedné bloky), nikdy iné polia ani názov objektu.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/rad</name>
+    <message>
+        <source>AI translation services</source>
+        <translation>Prekladové služby AI</translation>
+    </message>
+    <message>
+        <source>The translation services of the translation sync and the field action Translate (expai.ini [TranslationProvider_&lt;name&gt;] Class=, implementing expAiTranslationProvider; chosen by [TranslationSettings]).</source>
+        <translation>Prekladové služby synchronizácie prekladov a akcie poľa Preložiť (expai.ini [TranslationProvider_&lt;name&gt;] Class=, implementuje expAiTranslationProvider; vyberajú sa v [TranslationSettings]).</translation>
+    </message>
+</context>
+<!-- expai translation services: end -->
 </TS>

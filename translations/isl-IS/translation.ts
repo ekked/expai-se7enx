@@ -6769,4 +6769,114 @@
         <translation>Þessi hluti myndi fjarlægja %items úr textanum svo ekki er hægt að samþykkja hann. Hafnaðu honum eða biddu um nýja tillögu sem heldur þeim.</translation>
     </message>
 </context>
+<!-- expai translation services: begin -->
+<context>
+    <name>extension/expai/translation</name>
+    <message>
+        <source>No translation service</source>
+        <translation>Engin þýðingarþjónusta</translation>
+    </message>
+    <message>
+        <source>Blocked by the data policy</source>
+        <translation>Lokað af gagnastefnunni</translation>
+    </message>
+    <message>
+        <source>Translated by %provider</source>
+        <translation>Þýtt af %provider</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>No translation service is installed for %source → %target.</source>
+        <translation>Engin þýðingarþjónusta er uppsett fyrir %source → %target.</translation>
+    </message>
+    <message>
+        <source>The data policy keeps this content away from every translation service for %source → %target.</source>
+        <translation>Gagnastefnan heldur þessu efni frá öllum þýðingarþjónustum fyrir %source → %target.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not configured.</source>
+        <translation>Þýðingarþjónustan %service er ekki stillt.</translation>
+    </message>
+    <message>
+        <source>The translation service %service does not translate %source into %target.</source>
+        <translation>Þýðingarþjónustan %service þýðir ekki úr %source á %target.</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the key.</source>
+        <translation>Þýðingarþjónustan %service hafnaði lyklinum.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is busy. Please try again later.</source>
+        <translation>Þýðingarþjónustan %service er upptekin. Reyndu aftur síðar.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not available (HTTP %status).</source>
+        <translation>Þýðingarþjónustan %service er ekki tiltæk (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the request (HTTP %status).</source>
+        <translation>Þýðingarþjónustan %service hafnaði beiðninni (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The quota of the translation service %service is used up.</source>
+        <translation>Kvóti þýðingarþjónustunnar %service er uppurinn.</translation>
+    </message>
+    <message>
+        <source>The translation service %service could not be reached.</source>
+        <translation>Ekki náðist í þýðingarþjónustuna %service.</translation>
+    </message>
+    <message>
+        <source>The answer of the translation service %service could not be read.</source>
+        <translation>Ekki tókst að lesa svar þýðingarþjónustunnar %service.</translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to translate.</source>
+        <translation>Reiturinn er tómur: það er ekkert að þýða.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/summary</name>
+    <message>
+        <source>Translation services</source>
+        <translation>Þýðingarþjónustur</translation>
+    </message>
+    <message>
+        <source>Default service: %default; when the chosen service cannot translate a pair: %fallback.</source>
+        <translation>Sjálfgefin þjónusta: %default; þegar valin þjónusta getur ekki þýtt tungumálapar: %fallback.</translation>
+    </message>
+    <message>
+        <source>Rule</source>
+        <translation>Regla</translation>
+    </message>
+    <message>
+        <source>Service</source>
+        <translation>Þjónusta</translation>
+    </message>
+    <message>
+        <source>machine translation</source>
+        <translation>vélþýðing</translation>
+    </message>
+    <message>
+        <source>model</source>
+        <translation>líkan</translation>
+    </message>
+    <message>
+        <source>Only the text of the blocks to translate goes to a machine translation service (with SendContext also the blocks next to them), never other fields or the name of the object.</source>
+        <translation>Aðeins texti bálkanna sem á að þýða fer til vélþýðingarþjónustu (með SendContext einnig bálkarnir við hliðina á þeim), aldrei aðrir reitir eða heiti hlutarins.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/rad</name>
+    <message>
+        <source>AI translation services</source>
+        <translation>Gervigreindarþýðingarþjónustur</translation>
+    </message>
+    <message>
+        <source>The translation services of the translation sync and the field action Translate (expai.ini [TranslationProvider_&lt;name&gt;] Class=, implementing expAiTranslationProvider; chosen by [TranslationSettings]).</source>
+        <translation>Þýðingarþjónustur þýðingasamstillingarinnar og reitaðgerðarinnar Þýða (expai.ini [TranslationProvider_&lt;name&gt;] Class=, útfærir expAiTranslationProvider; valið í [TranslationSettings]).</translation>
+    </message>
+</context>
+<!-- expai translation services: end -->
 </TS>

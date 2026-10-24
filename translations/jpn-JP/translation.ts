@@ -6769,4 +6769,114 @@
         <translation>この部分はテキストから %items を削除するため、受け入れることができません。却下するか、それらを保持する新しい提案を依頼してください。</translation>
     </message>
 </context>
+<!-- expai translation services: begin -->
+<context>
+    <name>extension/expai/translation</name>
+    <message>
+        <source>No translation service</source>
+        <translation>翻訳サービスなし</translation>
+    </message>
+    <message>
+        <source>Blocked by the data policy</source>
+        <translation>データポリシーによりブロック</translation>
+    </message>
+    <message>
+        <source>Translated by %provider</source>
+        <translation>%provider による翻訳</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>No translation service is installed for %source → %target.</source>
+        <translation>%source → %target の翻訳サービスがインストールされていません。</translation>
+    </message>
+    <message>
+        <source>The data policy keeps this content away from every translation service for %source → %target.</source>
+        <translation>データポリシーにより、このコンテンツは %source → %target のどの翻訳サービスにも送信されません。</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not configured.</source>
+        <translation>翻訳サービス %service が設定されていません。</translation>
+    </message>
+    <message>
+        <source>The translation service %service does not translate %source into %target.</source>
+        <translation>翻訳サービス %service は %source から %target への翻訳に対応していません。</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the key.</source>
+        <translation>翻訳サービス %service がキーを拒否しました。</translation>
+    </message>
+    <message>
+        <source>The translation service %service is busy. Please try again later.</source>
+        <translation>翻訳サービス %service はビジー状態です。後でもう一度お試しください。</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not available (HTTP %status).</source>
+        <translation>翻訳サービス %service を利用できません (HTTP %status)。</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the request (HTTP %status).</source>
+        <translation>翻訳サービス %service がリクエストを拒否しました (HTTP %status)。</translation>
+    </message>
+    <message>
+        <source>The quota of the translation service %service is used up.</source>
+        <translation>翻訳サービス %service のクォータを使い切りました。</translation>
+    </message>
+    <message>
+        <source>The translation service %service could not be reached.</source>
+        <translation>翻訳サービス %service に接続できませんでした。</translation>
+    </message>
+    <message>
+        <source>The answer of the translation service %service could not be read.</source>
+        <translation>翻訳サービス %service の応答を読み取れませんでした。</translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to translate.</source>
+        <translation>フィールドが空です。翻訳するものがありません。</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/summary</name>
+    <message>
+        <source>Translation services</source>
+        <translation>翻訳サービス</translation>
+    </message>
+    <message>
+        <source>Default service: %default; when the chosen service cannot translate a pair: %fallback.</source>
+        <translation>既定のサービス: %default、選択したサービスが言語ペアを翻訳できない場合: %fallback。</translation>
+    </message>
+    <message>
+        <source>Rule</source>
+        <translation>ルール</translation>
+    </message>
+    <message>
+        <source>Service</source>
+        <translation>サービス</translation>
+    </message>
+    <message>
+        <source>machine translation</source>
+        <translation>機械翻訳</translation>
+    </message>
+    <message>
+        <source>model</source>
+        <translation>モデル</translation>
+    </message>
+    <message>
+        <source>Only the text of the blocks to translate goes to a machine translation service (with SendContext also the blocks next to them), never other fields or the name of the object.</source>
+        <translation>機械翻訳サービスに送信されるのは、翻訳するブロックのテキストだけです (SendContext を使用すると、その前後のブロックも送信されます)。他のフィールドやオブジェクトの名前は送信されません。</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/rad</name>
+    <message>
+        <source>AI translation services</source>
+        <translation>AI 翻訳サービス</translation>
+    </message>
+    <message>
+        <source>The translation services of the translation sync and the field action Translate (expai.ini [TranslationProvider_&lt;name&gt;] Class=, implementing expAiTranslationProvider; chosen by [TranslationSettings]).</source>
+        <translation>翻訳の同期とフィールド操作「翻訳」で使用する翻訳サービス (expai.ini [TranslationProvider_&lt;name&gt;] Class=、expAiTranslationProvider を実装、[TranslationSettings] で選択)。</translation>
+    </message>
+</context>
+<!-- expai translation services: end -->
 </TS>

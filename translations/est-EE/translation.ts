@@ -6769,4 +6769,114 @@
         <translation>See osa eemaldaks tekstist %items, seega sellega ei saa nõustuda. Lükake see tagasi või paluge uut ettepanekut, mis need säilitab.</translation>
     </message>
 </context>
+<!-- expai translation services: begin -->
+<context>
+    <name>extension/expai/translation</name>
+    <message>
+        <source>No translation service</source>
+        <translation>Tõlketeenus puudub</translation>
+    </message>
+    <message>
+        <source>Blocked by the data policy</source>
+        <translation>Andmepoliitika on blokeerinud</translation>
+    </message>
+    <message>
+        <source>Translated by %provider</source>
+        <translation>Tõlkinud: %provider</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>No translation service is installed for %source → %target.</source>
+        <translation>Suuna %source → %target jaoks pole ühtegi tõlketeenust installitud.</translation>
+    </message>
+    <message>
+        <source>The data policy keeps this content away from every translation service for %source → %target.</source>
+        <translation>Andmepoliitika hoiab selle sisu suuna %source → %target kõigist tõlketeenustest eemal.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not configured.</source>
+        <translation>Tõlketeenus %service pole konfigureeritud.</translation>
+    </message>
+    <message>
+        <source>The translation service %service does not translate %source into %target.</source>
+        <translation>Tõlketeenus %service ei tõlgi keelest %source keelde %target.</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the key.</source>
+        <translation>Tõlketeenus %service lükkas võtme tagasi.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is busy. Please try again later.</source>
+        <translation>Tõlketeenus %service on hõivatud. Proovige hiljem uuesti.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not available (HTTP %status).</source>
+        <translation>Tõlketeenus %service pole saadaval (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the request (HTTP %status).</source>
+        <translation>Tõlketeenus %service lükkas päringu tagasi (HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The quota of the translation service %service is used up.</source>
+        <translation>Tõlketeenuse %service kvoot on ära kasutatud.</translation>
+    </message>
+    <message>
+        <source>The translation service %service could not be reached.</source>
+        <translation>Tõlketeenusega %service ei saanud ühendust.</translation>
+    </message>
+    <message>
+        <source>The answer of the translation service %service could not be read.</source>
+        <translation>Tõlketeenuse %service vastust ei saanud lugeda.</translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to translate.</source>
+        <translation>Väli on tühi: pole midagi tõlkida.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/summary</name>
+    <message>
+        <source>Translation services</source>
+        <translation>Tõlketeenused</translation>
+    </message>
+    <message>
+        <source>Default service: %default; when the chosen service cannot translate a pair: %fallback.</source>
+        <translation>Vaiketeenus: %default; kui valitud teenus ei saa keelepaari tõlkida: %fallback.</translation>
+    </message>
+    <message>
+        <source>Rule</source>
+        <translation>Reegel</translation>
+    </message>
+    <message>
+        <source>Service</source>
+        <translation>Teenus</translation>
+    </message>
+    <message>
+        <source>machine translation</source>
+        <translation>masintõlge</translation>
+    </message>
+    <message>
+        <source>model</source>
+        <translation>mudel</translation>
+    </message>
+    <message>
+        <source>Only the text of the blocks to translate goes to a machine translation service (with SendContext also the blocks next to them), never other fields or the name of the object.</source>
+        <translation>Masintõlketeenusele saadetakse ainult tõlgitavate plokkide tekst (SendContexti korral ka nende kõrval olevad plokid), mitte kunagi muid välju ega objekti nime.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/rad</name>
+    <message>
+        <source>AI translation services</source>
+        <translation>TI-tõlketeenused</translation>
+    </message>
+    <message>
+        <source>The translation services of the translation sync and the field action Translate (expai.ini [TranslationProvider_&lt;name&gt;] Class=, implementing expAiTranslationProvider; chosen by [TranslationSettings]).</source>
+        <translation>Tõlgete sünkroonimise ja väljatoimingu „Tõlgi“ tõlketeenused (expai.ini [TranslationProvider_&lt;name&gt;] Class=, mis realiseerib liidese expAiTranslationProvider; valitakse jaotises [TranslationSettings]).</translation>
+    </message>
+</context>
+<!-- expai translation services: end -->
 </TS>

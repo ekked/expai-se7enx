@@ -6769,4 +6769,114 @@
         <translation>이 부분은 텍스트에서 %items을(를) 제거하므로 수락할 수 없습니다. 거부하거나, 해당 항목을 유지하는 새 제안을 요청하십시오.</translation>
     </message>
 </context>
+<!-- expai translation services: begin -->
+<context>
+    <name>extension/expai/translation</name>
+    <message>
+        <source>No translation service</source>
+        <translation>번역 서비스 없음</translation>
+    </message>
+    <message>
+        <source>Blocked by the data policy</source>
+        <translation>데이터 정책에 의해 차단됨</translation>
+    </message>
+    <message>
+        <source>Translated by %provider</source>
+        <translation>번역: %provider</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/error</name>
+    <message>
+        <source>No translation service is installed for %source → %target.</source>
+        <translation>%source → %target에 대해 설치된 번역 서비스가 없습니다.</translation>
+    </message>
+    <message>
+        <source>The data policy keeps this content away from every translation service for %source → %target.</source>
+        <translation>데이터 정책에 따라 이 콘텐츠는 %source → %target의 어떤 번역 서비스에도 전달되지 않습니다.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not configured.</source>
+        <translation>%service 번역 서비스가 구성되지 않았습니다.</translation>
+    </message>
+    <message>
+        <source>The translation service %service does not translate %source into %target.</source>
+        <translation>%service 번역 서비스는 %source에서 %target(으)로 번역하지 않습니다.</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the key.</source>
+        <translation>%service 번역 서비스에서 키를 거부했습니다.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is busy. Please try again later.</source>
+        <translation>%service 번역 서비스가 사용 중입니다. 나중에 다시 시도하십시오.</translation>
+    </message>
+    <message>
+        <source>The translation service %service is not available (HTTP %status).</source>
+        <translation>%service 번역 서비스를 사용할 수 없습니다(HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The translation service %service refused the request (HTTP %status).</source>
+        <translation>%service 번역 서비스에서 요청을 거부했습니다(HTTP %status).</translation>
+    </message>
+    <message>
+        <source>The quota of the translation service %service is used up.</source>
+        <translation>%service 번역 서비스의 할당량이 소진되었습니다.</translation>
+    </message>
+    <message>
+        <source>The translation service %service could not be reached.</source>
+        <translation>%service 번역 서비스에 연결할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>The answer of the translation service %service could not be read.</source>
+        <translation>%service 번역 서비스의 응답을 읽을 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>The field is empty: there is nothing to translate.</source>
+        <translation>필드가 비어 있습니다. 번역할 내용이 없습니다.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/summary</name>
+    <message>
+        <source>Translation services</source>
+        <translation>번역 서비스</translation>
+    </message>
+    <message>
+        <source>Default service: %default; when the chosen service cannot translate a pair: %fallback.</source>
+        <translation>기본 서비스: %default, 선택한 서비스가 언어 쌍을 번역할 수 없는 경우: %fallback.</translation>
+    </message>
+    <message>
+        <source>Rule</source>
+        <translation>규칙</translation>
+    </message>
+    <message>
+        <source>Service</source>
+        <translation>서비스</translation>
+    </message>
+    <message>
+        <source>machine translation</source>
+        <translation>기계 번역</translation>
+    </message>
+    <message>
+        <source>model</source>
+        <translation>모델</translation>
+    </message>
+    <message>
+        <source>Only the text of the blocks to translate goes to a machine translation service (with SendContext also the blocks next to them), never other fields or the name of the object.</source>
+        <translation>기계 번역 서비스에는 번역할 블록의 텍스트만 전송되며(SendContext를 사용하면 인접 블록도 함께 전송됨), 다른 필드나 개체 이름은 절대 전송되지 않습니다.</translation>
+    </message>
+</context>
+<context>
+    <name>extension/expai/rad</name>
+    <message>
+        <source>AI translation services</source>
+        <translation>AI 번역 서비스</translation>
+    </message>
+    <message>
+        <source>The translation services of the translation sync and the field action Translate (expai.ini [TranslationProvider_&lt;name&gt;] Class=, implementing expAiTranslationProvider; chosen by [TranslationSettings]).</source>
+        <translation>번역 동기화 및 “번역” 필드 작업의 번역 서비스입니다(expai.ini [TranslationProvider_&lt;name&gt;] Class=, expAiTranslationProvider 구현, [TranslationSettings]에서 선택).</translation>
+    </message>
+</context>
+<!-- expai translation services: end -->
 </TS>
